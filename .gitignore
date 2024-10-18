@@ -16,4 +16,4 @@ venv/
 *.log
 *.out
 
-.vscode/
+vscode/
