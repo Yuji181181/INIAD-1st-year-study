@@ -28,8 +28,6 @@ def print_bfs(top):
     print(", ".join(map(str, result)))
 
 
-
-# Example usage (to match the expected output 1, 2, 3, 4, 5, 6, 7):
 top = Node(1)
 top.left = Node(2)
 top.right = Node(3)
@@ -37,6 +35,5 @@ top.left.left = Node(4)
 top.left.right = Node(5)
 top.right.left = Node(6)
 top.right.right = Node(7)
-
 
 print_bfs(top)
