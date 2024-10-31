@@ -37,5 +37,3 @@ top.right.left = Node(6)
 top.right.right = Node(7)
 
 print_bfs(top)
-
-print("HELLO")
