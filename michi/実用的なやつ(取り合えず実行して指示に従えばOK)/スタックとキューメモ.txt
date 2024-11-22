@@ -1,4 +1,0 @@
-PUSH 先頭から入れる
-POP 先頭から消す
-Dequeue 先頭から消す
-Enqueue 後ろから入れる
