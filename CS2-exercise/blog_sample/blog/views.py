@@ -5,3 +5,5 @@ from django.http import HttpResponse
 def index(request):
 	return render(request, 'blog/index.html')
 
+def update(request, article_id):
+	return HttpResponse("article_id: {}".format(article_id))
