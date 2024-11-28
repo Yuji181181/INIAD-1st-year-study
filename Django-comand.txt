@@ -1,0 +1,8 @@
+ ## venv 有効化
+.\.venv\Scripts\Activate.ps1
+
+## blog_sample ディレクトリに移動
+cd CS2-exercise/blog_sample
+
+## サーバー起動
+python manage.py runserver
