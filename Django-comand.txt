@@ -4,5 +4,8 @@
 ## blog_sample ディレクトリに移動
 cd CS2-exercise/blog_sample
 
+## django1 ディレクトリに移動
+cd CS2-exercise/django1
+
 ## サーバー起動
 python manage.py runserver
