@@ -9,10 +9,10 @@
 <body>
     <h1>{{ title }}</h1>
     <ul>
-        {% for item in forecasts %}
+    {% for item in forecasts %}
         <li>Day {{forloop.counter}}: {{item}}
         </li>
-        {% endfor %}
+    {% endfor %}
     </ul>
 </body>
 
