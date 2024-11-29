@@ -9,3 +9,9 @@ cd CS2-exercise/django1
 
 ## サーバー起動
 python manage.py runserver
+
+
+
+## アプリケーション作成
+python manage.py startapp 名前
+
