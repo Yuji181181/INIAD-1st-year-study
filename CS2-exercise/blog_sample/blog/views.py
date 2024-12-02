@@ -7,3 +7,6 @@ def index(request):
 
 def update(request, article_id):
 	return HttpResponse("article_id: {}".format(article_id))
+
+def hello(request):
+    return render(request, 'blog/hello.html')
