@@ -13,6 +13,7 @@ def hello(request):
 		'name': 'Alice',
 		'weather': 'CLOUDY',
 		'weather_detail':['Temperature:23℃','Humidity:40%','Wind: 5m/s'],
+		'isGreatFortune':True,
 		'fortune': 'Great Fortune!'
 	}
     return render(request, 'blog/hello.html',data)
