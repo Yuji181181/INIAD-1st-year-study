@@ -17,9 +17,7 @@ def minmax(opponent_hand):
     best_hand = max(scores, key=scores.get)
     best_score = scores[best_hand]
 
-
     return best_hand, best_score
-
 
 # 全ての相手の手に対して最適な手を計算
 opponent_hands = ["G", "C", "P"]
