@@ -7,6 +7,11 @@
     <body>
         <h2>Hello,{{name}} </h2>
         <h2>Today's weather: {{weather | lower}} </h2>
+        <ul>
+        {%for item in weather_detail %}
+            <li>{{item}}</li>
+        {% endfor %}
+        </ul>
         <h2>Today's fortune: {{fortune}} </h2>
     </body>
 </html>
