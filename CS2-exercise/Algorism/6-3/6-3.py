@@ -17,7 +17,6 @@ def minmax(opponent_hand):
     best_hand = max(scores, key=scores.get)
     best_score = scores[best_hand]
 
-
     return best_hand, best_score
 
 
