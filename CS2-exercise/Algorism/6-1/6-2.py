@@ -15,15 +15,13 @@ def print_bfs(top):
 
     queue = deque([top])
     result = []
-
     while queue:
         current_node = queue.popleft()
         result.append(current_node.value)
-
         if current_node.left:
-            queue.append(current_node.left)
+            queue1.append(current_node.left)
         if current_node.right:
-            queue.append(current_node.right)
+            queue1.append(current_node.right)
 
     print(", ".join(map(str, result)))
 
