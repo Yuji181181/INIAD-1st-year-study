@@ -5,7 +5,18 @@ from django.utils import timezone
 
 # Create your views here.
 def index(request):
-	return render(request, 'blog/index.html')
+    context = {
+        "articles": [
+            {
+                "id": 1,
+                "title": "Post 01",
+                "body": "test post.\nLorem ipsum dolor sit amet, \nconsectetur adipiscing elit,\n sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\n", 
+                "posted_at": timezone.now # option
+            }
+        ]
+    }
+    return render(request, 'blog/index.html',context)
+
 
 def detail(request, article_id):
 	context = {
