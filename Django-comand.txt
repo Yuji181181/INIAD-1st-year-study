@@ -15,3 +15,5 @@ python manage.py runserver
 ## アプリケーション作成
 python manage.py startapp 名前
 
+test
+
