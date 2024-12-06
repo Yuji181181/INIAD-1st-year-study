@@ -7,6 +7,9 @@ cd CS2-exercise/blog_sample
 ## django1 ディレクトリに移動
 cd CS2-exercise/django1
 
+## django ディレクトリに移動(class3-team13-project)
+cd class3-team13-project/django1
+
 ## サーバー起動
 python manage.py runserver
 
@@ -14,6 +17,4 @@ python manage.py runserver
 
 ## アプリケーション作成
 python manage.py startapp 名前
-
-test
 
