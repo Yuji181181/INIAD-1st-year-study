@@ -1,0 +1,19 @@
+# blog_sample ディレクトリに移動(CS概論)
+cd CS2-exercise/blog_sample
+
+# django1 ディレクトリに移動(CS演習)
+cd CS2-exercise/django1
+
+# django ディレクトリに移動(チーム演習)
+cd class3-team13-project/django1
+
+# サーバー起動
+python manage.py runserver
+
+
+##その他
+# venv 有効化
+.\.venv\Scripts\Activate.ps1
+
+# アプリケーション作成
+python manage.py startapp 名前
