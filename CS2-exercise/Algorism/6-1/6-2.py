@@ -1,13 +1,15 @@
 from collections import deque
 
+
 class Node:
     def __init__(self, value):
         self.value = value
         self.left = None
         self.right = None
 
-    def __str__(self): 
+    def __str__(self):
         return str(self.value)
+
 
 def print_bfs(top):
     if top is None:
@@ -33,5 +35,6 @@ top.left.left = Node(4)
 top.left.right = Node(5)
 top.right.left = Node(6)
 top.right.right = Node(7)
+
 
 print_bfs(top)
