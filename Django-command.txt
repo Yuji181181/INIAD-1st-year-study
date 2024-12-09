@@ -10,6 +10,11 @@ cd class3-team13-project/django1
 # サーバー起動
 python manage.py runserver
 
+# マイグレーションの作成
+python manage.py makemigrations
+
+# マイグレーションの実行
+python manage.py migrate
 
 ##その他
 # venv 有効化
