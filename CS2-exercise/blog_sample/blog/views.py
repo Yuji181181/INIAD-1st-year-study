@@ -1,7 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.http import Http404
 import random
 from django.utils import timezone
+from blog.models import Article
 
 
 # Create your views here.
@@ -11,8 +13,12 @@ def index(request):
 
 
 def detail(request, article_id):
-    context = {"article_id": article_id}
-    return render(request, "blog/tbd.html", context)
+    try:
+        article = Article.objects.get(pk=article_id)
+    except Article.DoesNotExist:
+        raise Http404("Article does not exist")
+    context = {"article": article}
+    return render(request, "blog/detail.html", context)
 
 
 def update(request, article_id):

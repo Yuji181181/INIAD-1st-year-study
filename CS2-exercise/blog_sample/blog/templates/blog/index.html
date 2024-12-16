@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
   </head>
   <body>
     <h1>Django Sample Application</h1>
@@ -10,7 +10,12 @@
       {% csrf_token %}
       <div>
         <label for="titleInput">Title</label>
-        <input id="titleInput" name="title" type="text" placeholder="Input title">
+        <input
+          id="titleInput"
+          name="title"
+          type="text"
+          placeholder="Input title"
+        />
       </div>
       <div>
         <label for="textInput">Text</label>
@@ -21,15 +26,14 @@
       </div>
     </form>
 
-    <br>
+    <br />
 
-    {% for article in articles %}
+    {% if articles %} {% for article in articles %}
     <a href="{% url 'detail' article.id %}">{{ article.title }}</a>
     <small>{{ article.posted_at }}</small>
-    <div>
-      {{ article.body | linebreaksbr }}
-    </div>
-    {% endfor %}
-
+    <div>{{ article.body | linebreaksbr }}</div>
+    {% endfor %} {% else %}
+    <p>No articles</p>
+    {% endif %}
   </body>
 </html>
