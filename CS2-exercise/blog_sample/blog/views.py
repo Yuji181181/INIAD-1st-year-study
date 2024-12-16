@@ -22,8 +22,12 @@ def detail(request, article_id):
 
 
 def update(request, article_id):
-    context = {"article_id": article_id}
-    return render(request, "blog/tbd.html", context)
+    try:
+        article = Article.objects.get(pk=article_id)
+    except Article.DoesNotExist:
+        raise Http404("Article does not exist")
+    context = {"article": article}
+    return render(request, "blog/edit.html", context)
 
 
 def delete(request, article_id):
