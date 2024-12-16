@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.http import Http404
 import random
 from django.utils import timezone
-from blog.models import Article
+from blog.models import Article, Comment
 
 
 # Create your views here.
@@ -12,7 +12,15 @@ def index(request):
         article = Article(title=request.POST["title"], body=request.POST["text"])
         article.save()
         return redirect(detail, article.id)
-    context = {"articles": Article.objects.all()}
+
+    if "sort" in request.GET:
+        if request.GET["sort"] == "like":
+            articles = Article.objects.all().order_by("-like")
+        else:
+            articles = Article.objects.all().order_by("-posted_at")
+    else:
+        articles = Article.objects.all().order_by("-posted_at")
+    context = {"articles": articles}
     return render(request, "blog/index.html", context)
 
 
@@ -21,7 +29,11 @@ def detail(request, article_id):
         article = Article.objects.get(pk=article_id)
     except Article.DoesNotExist:
         raise Http404("Article does not exist")
-    context = {"article": article}
+
+    if request.method == "POST":
+        comment = Comment(text=request.POST["text"], article=article)
+        comment.save()
+    context = {"article": article, "comments": article.comments.order_by("-posted_at")}
     return render(request, "blog/detail.html", context)
 
 
@@ -58,3 +70,13 @@ def hello(request):
 
 def redirect_test(request):
     return redirect(hello)
+
+
+def like(request, article_id):
+    try:
+        article = Article.objects.get(pk=article_id)
+        article.like += 1
+        article.save()
+    except Article.DoesNotExist:
+        raise Http404("Article does not exist")
+    return redirect(detail, article_id)

@@ -17,3 +17,11 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Comment(models.Model):
+    text = models.TextField()
+    posted_at = models.DateTimeField(default=timezone.now)
+    article = models.ForeignKey(
+        Article, related_name="comments", on_delete=models.CASCADE
+    )

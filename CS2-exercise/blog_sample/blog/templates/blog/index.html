@@ -3,10 +3,10 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <link href="{% static 'blog/css/style.css' %}" rel="stylesheet" />
+    <link href="{% static 'blog/css/default.css' %}" rel="stylesheet" />
   </head>
   <body>
-    <div>
+  <div id="header">
       <img src="{% static 'blog/img/iniad.png' %}" alt="Logo" />
     </div>
     <h1>Django Sample Application</h1>
@@ -33,10 +33,20 @@
 
     <br />
 
+    <div>
+      <a href="{% url 'index' %}?sort=date">Sort by date</a>"
+      <a href="{% url 'index' %}?sort=like">Sort by like</a>
+    <div>
+
     {% if articles %} {% for article in articles %}
     <div class = "text">
       <h2><a href="{% url 'detail' article.id %}">{{ article.title }}</a><h2>
       <small>{{ article.posted_at }}</small>
+      <div>
+        <a href="{% url 'like' article.id %}">
+          Like: {{ article.like }}
+        </a>
+      </div>
       <div>{{ article.body | linebreaksbr }}</div>
     </div>
     {% endfor %} {% else %}
