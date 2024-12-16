@@ -3,6 +3,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <link href="{% static 'blog/css/style.css' %}" rel="stylesheet" />
   </head>
   <body>
     <div>
@@ -13,7 +14,7 @@
     <form action="{% url 'index' %}" method="post">
       {% csrf_token %}
       <div>
-        <label for="titleInput">Title</label>
+        <label for="titleInput">Title</label><br />
         <input
           id="titleInput"
           name="title"
@@ -22,7 +23,7 @@
         />
       </div>
       <div>
-        <label for="textInput">Text</label>
+        <label for="textInput">Text</label><br />
         <textarea id="textInput" name="text" rows="3"></textarea>
       </div>
       <div>
@@ -33,9 +34,11 @@
     <br />
 
     {% if articles %} {% for article in articles %}
-    <a href="{% url 'detail' article.id %}">{{ article.title }}</a>
-    <small>{{ article.posted_at }}</small>
-    <div>{{ article.body | linebreaksbr }}</div>
+    <div class = "text">
+      <h2><a href="{% url 'detail' article.id %}">{{ article.title }}</a><h2>
+      <small>{{ article.posted_at }}</small>
+      <div>{{ article.body | linebreaksbr }}</div>
+    </div>
     {% endfor %} {% else %}
     <p>No articles</p>
     {% endif %}
