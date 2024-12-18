@@ -1,0 +1,53 @@
+{% load static %}  <!-- staticファイル（CSS, JS, 画像など）を扱うためのテンプレートタグをロード -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Detail page</title>  <!-- ページのタイトル -->
+    <meta charset="UTF-8">  <!-- 文字コードをUTF-8に設定 -->
+    <meta name="author" content="INIAD">  <!-- ページの作成者を指定 -->
+    <link href="{% static 'blog/css/default.css' %}" rel="stylesheet">  <!-- CSSファイルを読み込む -->
+  </head>
+  <body>
+    <div id="header">  <!-- ヘッダー領域 -->
+      <img src="{% static 'blog/img/iniad.png' %}" alt="Logo">  <!-- ロゴ画像を表示 -->
+    </div>
+    <h1>Django Sample Application</h1>  <!-- メインの見出し -->
+    <h2>Title: {{ article.title }}</h2>  <!-- 記事のタイトルを表示 -->
+    <small>Posted at:{{ article.posted_at }}</small>  <!-- 記事の投稿日時を表示 -->
+    <div>  <!-- 記事の本文を表示する領域 -->
+      {{ article.body | linebreaksbr }}  <!-- 記事の本文を表示（改行を<br>タグに変換） -->
+    </div>
+    
+    <h2>Comments</h2>  <!-- コメントセクションの見出し -->
+    <form action="{% url 'detail' article.id %}" method="post">  <!-- コメントを投稿するフォーム -->
+      {% csrf_token %}  <!-- CSRFトークンを埋め込む（セキュリティ対策） -->
+      <div>
+        <label for="textInput">Text</label><br>  <!-- コメント入力欄のラベル -->
+        <textarea id="textInput" name="text" rows="3"></textarea>  <!-- コメント入力用のテキストエリア -->
+      </div>
+      <div>
+        <button type="submit">Submit</button>  <!-- コメントを送信するボタン -->
+      </div>
+    </form>
+
+    {% if comments %}  <!-- コメントが存在する場合の処理 -->
+    {% for comment in comments %}  <!-- コメントリストをループ処理 -->
+    <div class="text">  <!-- コメントの表示領域 -->
+      <small>[{{ comment.posted_at }}]</small>  <!-- コメントの投稿日時を表示 -->
+      <div>
+        {{ comment.text | linebreaksbr }}  <!-- コメントの本文を表示（改行を<br>タグに変換） -->
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}  <!-- コメントが存在しない場合の処理 -->
+    <p>No comment.</p>  <!-- コメントがないことを表示 -->
+    {% endif %}
+
+    <hr>  <!-- 水平線 -->
+    <p>  <!-- リンクを表示する領域 -->
+  	  <a href="{% url 'index' %}">Top</a> |   <!-- トップページへのリンク -->
+      <a href="{% url 'update' article.id %}">Edit</a> |  <!-- 記事編集ページへのリンク -->
+      <a href="{% url 'delete' article.id %}">Delete</a>   <!-- 記事削除ページへのリンク -->
+	  </p>
+  </body>
+</html>

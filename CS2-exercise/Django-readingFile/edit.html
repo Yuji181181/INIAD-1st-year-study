@@ -1,0 +1,31 @@
+{% load static %}  <!-- staticファイル（CSS, JS, 画像など）を扱うためのテンプレートタグをロード -->
+<!DOCTYPE html>
+<html>
+  <head>    
+    <title>Edit page</title>  <!-- ページのタイトル -->
+    <meta charset="UTF-8">  <!-- 文字コードをUTF-8に設定 -->
+    <meta name="author" content="INIAD">  <!-- ページの作成者を指定 -->
+    <link href="{% static 'blog/css/default.css' %}" rel="stylesheet">  <!-- CSSファイルを読み込む -->
+  </head>
+  <body>
+    <div id="header">  <!-- ヘッダー領域 -->
+      <img src="{% static 'blog/img/iniad.png' %}" alt="Logo">  <!-- ロゴ画像を表示 -->
+    </div>
+    <h1 >Edit article</h1>  <!-- メインの見出し（記事の編集） -->
+    <form action="{% url 'update' article.id %}" method="post">  <!-- 記事を更新するフォーム -->
+      {% csrf_token %}  <!-- CSRFトークンを埋め込む（セキュリティ対策） -->
+      <div>
+        <label for="titleInput">Title</label><br>  <!-- タイトル入力欄のラベル -->
+        <input id="titleInput" name="title" type="text"  <!-- タイトル入力用のテキストフィールド -->
+          placeholder="Input title" value="{{ article.title }}">  <!-- placeholder属性で入力例を表示、value属性で記事のタイトルを初期値として表示 -->
+      </div>
+      <div>
+        <label for="textInput">Text</label><br>  <!-- 本文入力欄のラベル -->
+        <textarea id="textInput" name="text" rows="3">{{ article.body }}</textarea>  <!-- 本文入力用のテキストエリア、記事の本文を初期値として表示 -->
+      </div>
+      <div>
+        <button type="submit">Submit</button>  <!-- フォームを送信するボタン -->
+      </div>
+    </form>
+  </body>
+</html>

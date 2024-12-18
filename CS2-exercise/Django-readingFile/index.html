@@ -1,0 +1,57 @@
+{% load static %}  <!-- staticファイル（CSS, JS, 画像など）を扱うためのテンプレートタグをロード -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Index page</title>  <!-- ページのタイトル -->
+    <meta charset="UTF-8">  <!-- 文字コードをUTF-8に設定 -->
+    <meta name="author" content="INIAD">  <!-- ページの作成者を指定 -->
+    <link href="{% static 'blog/css/default.css' %}" rel="stylesheet">  <!-- CSSファイルを読み込む -->
+    <script type="text/javascript" src="{% static 'blog/js/index.js' %}" ></script>  <!-- JavaScriptファイルを読み込む -->
+  </head>
+  <body>
+    <div id="header">  <!-- ヘッダー領域 -->
+      <img src="{% static 'blog/img/iniad.png' %}" alt="Logo">  <!-- ロゴ画像を表示 -->
+    </div>
+    <h1>Django Sample Application</h1>  <!-- メインの見出し -->
+    <p>You can submit articles from the following form.</p>  <!-- 記事投稿フォームの説明 -->
+    <form action="{% url 'index' %}" method="post">  <!-- 記事を投稿するフォーム -->
+      {% csrf_token %}  <!-- CSRFトークンを埋め込む（セキュリティ対策） -->
+      <div>
+        <label for="titleInput">Title</label><br>  <!-- タイトル入力欄のラベル -->
+        <input id="titleInput" name="title" type="text" placeholder="Input title">  <!-- タイトル入力用のテキストフィールド -->
+      </div>
+      <div>
+        <label for="textInput">Text</label><br>  <!-- 本文入力欄のラベル -->
+        <textarea id="textInput" name="text" rows="3"></textarea>  <!-- 本文入力用のテキストエリア -->
+      </div>
+      <div>
+        <button type="submit">Submit</button>  <!-- フォームを送信するボタン -->
+      </div>
+    </form>
+    <br>  <!-- 空白行を追加 -->
+
+    <div>  <!-- ソートリンクを表示する領域 -->
+  	  <a href="{% url 'index' %}?sort=date">Sort by Date</a> |   <!-- 日付順にソートするためのリンク -->
+      <a href="{% url 'index' %}?sort=like">Sort by Like</a>  <!-- いいね数順にソートするためのリンク -->
+	  </div>
+    
+    {% if articles %}  <!-- 記事が存在する場合の処理 -->
+    {% for article in articles %}  <!-- 記事リストをループ処理 -->
+    <div class="text">  <!-- 記事の表示領域 -->
+      <h2><a href="{% url 'detail' article.id %}">{{  article.title }}</a></h2>  <!-- 記事のタイトルを表示（詳細ページへのリンク付き）-->
+      <small>[{{ article.posted_at }}]</small>  <!-- 記事の投稿日時を表示 -->
+      <div>
+        <a href="" onclick="like({{article.id}});">  <!-- いいねボタン（JavaScriptで処理）-->
+          Like: <span id="like{{article.id}}">{{ article.like }}</span>  <!-- いいね数を表示する領域 -->
+        </a>
+      </div>
+      <div>
+        {{ article.body |linebreaksbr }}  <!-- 記事の本文を表示（改行を<br>タグに変換） -->
+      </div>
+    </div>
+    {% endfor %}
+    {% else %}  <!-- 記事が存在しない場合の処理 -->
+    <p>No article.</p>  <!-- 記事がないことを表示 -->
+    {% endif %}
+  </body>
+</html>
