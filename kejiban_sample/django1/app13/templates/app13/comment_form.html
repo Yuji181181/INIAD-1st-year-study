@@ -1,0 +1,22 @@
+<!-- templates/app13/comment_form.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>コメント編集 - 掲示板</title>
+    <link rel="stylesheet" href="/static/app13/style.css" />
+  </head>
+  <body>
+    <h1>コメント編集</h1>
+    <form method="post">
+      {% csrf_token %}
+      <label for="text">コメント:</label><br />
+      <textarea id="text" name="text" required>{{ comment.text }}</textarea
+      ><br />
+      <button type="submit">送信</button>
+    </form>
+    <br />
+    <a href="{% url 'thread_detail' pk=comment.thread.pk %}"
+      >スレッド詳細に戻る</a
+    >
+  </body>
+</html>

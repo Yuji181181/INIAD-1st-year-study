@@ -1,0 +1,31 @@
+<!-- templates/app13/form.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      {% if thread %}スレッド編集{% else %}スレッド作成{% endif %} - 掲示板
+    </title>
+    <link rel="stylesheet" href="/static/app13/style.css" />
+  </head>
+  <body>
+    <h1>{% if thread %}スレッド編集{% else %}スレッド作成{% endif %}</h1>
+    <form method="post">
+      {% csrf_token %}
+      <label for="title">タイトル:</label><br />
+      <input
+        type="text"
+        id="title"
+        name="title"
+        value="{% if thread %}{{ thread.title }}{% endif %}"
+        required
+      /><br />
+      <label for="content">内容:</label><br />
+      <textarea id="content" name="content" required>
+{% if thread %}{{ thread.content }}{% endif %}</textarea
+      ><br />
+      <button type="submit">送信</button>
+    </form>
+    <br />
+    <a href="{% url 'index' %}">スレッド一覧に戻る</a>
+  </body>
+</html>

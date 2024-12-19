@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ thread.title }} - 掲示板</title>
+    <link rel="stylesheet" href="/static/app13/style.css" />
+  </head>
+  <body>
+    <h1>{{ thread.title }}</h1>
+    <p>内容: {{ thread.content }}</p>
+    <p>作成日時: {{ thread.created_at }}</p>
+    <p>いいね数: {{ thread.likes }}</p>
+    <a href="{% url 'thread_edit' pk=thread.pk %}">編集</a>
+    <a href="{% url 'thread_delete' pk=thread.pk %}">削除</a>
+
+    <h2>コメント</h2>
+    <ul>
+      {% for comment in thread.comments.all %}
+      <li>
+        <p>
+          {{ comment.text }} {{ comment.created_at|date:"Y-m-d H:i" }}
+          <a href="{% url 'comment_edit' pk=comment.pk %}">編集</a>
+          <a href="{% url 'comment_delete' pk=comment.pk %}">削除</a>
+        </p>
+      </li>
+      {% empty %}
+      <li>コメントはありません。</li>
+      {% endfor %}
+    </ul>
+
+    <h2>コメント投稿</h2>
+    <form method="post" action="{% url 'comment_create' pk=thread.pk %}">
+      {% csrf_token %}
+      <textarea name="text" required></textarea><br />
+      <button type="submit">コメントを送信</button>
+    </form>
+    <br />
+    <a href="{% url 'index' %}">スレッド一覧に戻る</a>
+  </body>
+</html>
