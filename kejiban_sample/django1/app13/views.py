@@ -6,7 +6,7 @@ from django.db.models import Q
 from datetime import datetime, timedelta
 
 
-def index(request):
+def index(request):  # スレッド一覧表示機能の実装
     sort_by = request.GET.get("sort", "likes")
     search_query = request.GET.get("search", "")
     threads = Thread.objects.all()
@@ -23,12 +23,12 @@ def index(request):
     )
 
 
-def thread_detail(request, pk):
+def thread_detail(request, pk):  # スレッド詳細表示機能の実装
     thread = get_object_or_404(Thread, pk=pk)
     return render(request, "app13/detail.html", {"thread": thread})
 
 
-def thread_create(request):
+def thread_create(request):  # スレッド作成機能の実装
     if request.method == "POST":
         title = request.POST.get("title")
         content = request.POST.get("content")
@@ -37,7 +37,7 @@ def thread_create(request):
     return render(request, "app13/form.html")
 
 
-def thread_edit(request, pk):
+def thread_edit(request, pk):  # スレッド編集機能の実装
     thread = get_object_or_404(Thread, pk=pk)
     if request.method == "POST":
         thread.title = request.POST.get("title")
@@ -47,13 +47,13 @@ def thread_edit(request, pk):
     return render(request, "app13/form.html", {"thread": thread})
 
 
-def thread_delete(request, pk):
+def thread_delete(request, pk):  # スレッド削除機能の実装
     thread = get_object_or_404(Thread, pk=pk)
     thread.delete()
     return redirect("index")
 
 
-def comment_create(request, pk):
+def comment_create(request, pk):  # コメント投稿機能の実装
     thread = get_object_or_404(Thread, pk=pk)
     if request.method == "POST":
         text = request.POST.get("text")
@@ -62,7 +62,7 @@ def comment_create(request, pk):
     return HttpResponse("コメントの送信に失敗しました")
 
 
-def comment_edit(request, pk):
+def comment_edit(request, pk):  # コメント編集機能の実装
     comment = get_object_or_404(Comment, pk=pk)
     thread_pk = comment.thread.pk
     if request.method == "POST":
@@ -73,21 +73,21 @@ def comment_edit(request, pk):
     return render(request, "app13/comment_form.html", {"comment": comment})
 
 
-def comment_delete(request, pk):
+def comment_delete(request, pk):  # コメント削除機能の実装
     comment = get_object_or_404(Comment, pk=pk)
     thread_pk = comment.thread.pk
     comment.delete()
     return redirect("thread_detail", pk=thread_pk)
 
 
-def like_thread(request, pk):
+def like_thread(request, pk):  # いいね機能の実装
     thread = get_object_or_404(Thread, pk=pk)
     thread.likes += 1
     thread.save()
     return redirect("index")
 
 
-def search_thread(request):
+def search_thread(request):  # スレッドのキーワード検索機能
     search_query = request.GET.get("search", "")
     threads = Thread.objects.filter(Q(title__icontains=search_query))
     return render(
@@ -95,7 +95,7 @@ def search_thread(request):
     )
 
 
-def time_ago(time):
+def time_ago(time):  # 投稿日時からの経過時間表示機能の実装
     now = timezone.now()
     diff = now - time
     if diff < timedelta(minutes=1):
