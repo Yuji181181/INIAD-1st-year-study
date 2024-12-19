@@ -29,3 +29,6 @@ from django.utils import timezone
 
 # アプリケーション作成
 python manage.py startapp 名前
+
+
+cd kejiban_sample/django1

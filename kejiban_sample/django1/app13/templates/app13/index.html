@@ -23,10 +23,7 @@
       {% for thread in threads %}
       <li>
         <a href="{% url 'thread_detail' pk=thread.pk %}">{{ thread.title }}</a>
-        <p>
-          作成日時: {{ thread.created_at }} ({{ thread.created_at|date:"Y-m-d
-          H:i" }})
-        </p>
+        <p>作成日時: {{ thread.created_at }}</p>
         <p>いいね数: {{ thread.likes }}</p>
         <a href="{% url 'like_thread' pk=thread.pk %}">いいね！</a>
       </li>
