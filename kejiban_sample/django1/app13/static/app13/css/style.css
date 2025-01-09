@@ -1,0 +1,113 @@
+/* static/app13/style.css */
+
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e3f2fd; /* 薄い水色 */
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1, h2 {
+    color: #1976d2; /* 少し濃い青 */
+    border-bottom: 2px solid #42a5f5; /* 少し明るい青 */
+    padding-bottom: 5px;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    margin-bottom: 15px;
+    border: 1px solid #bbdefb; /* 薄い青 */
+    padding: 15px;
+    background-color: #f0f7ff; /* さらに薄い青 */
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s;
+}
+
+li:hover {
+    transform: translateY(-2px);
+}
+
+li a {
+    color: #1565c0; /* 濃い青 */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+li a:hover {
+    color: #0d47a1; /* より濃い青 */
+    text-decoration: underline;
+}
+
+p {
+    margin: 5px 0;
+    color: #555;
+}
+
+form {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #e8f0fe;  /* 薄い青 */
+    border-radius: 8px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+input[type="text"],
+textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #90caf9; /* 少し濃い青 */
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1rem;
+}
+
+button {
+    background-color: #1976d2; /* 少し濃い青 */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 1rem;
+}
+
+button:hover {
+    background-color: #1565c0;  /* 濃い青 */
+}
+
+a.back-link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #1976d2; /* 少し濃い青 */
+    text-decoration: none;
+    font-weight: bold;
+}
+a.back-link:hover {
+    text-decoration: underline;
+}
