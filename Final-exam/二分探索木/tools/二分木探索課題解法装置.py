@@ -19,11 +19,13 @@
    - プログラム末尾の操作を追加・変更することで、異なる操作を試すことができます
 """
 
+
 class Node:
     def __init__(self, value):
         self.value = value
         self.left = None
         self.right = None
+
 
 class BinarySearchTree:
     def __init__(self):
@@ -116,7 +118,7 @@ class BinarySearchTree:
 
 # 初期状態のBSTを構築する
 bst = BinarySearchTree()
-initial_values = [12, 5, 2, 7, 15, 13, 20]  # 最初のデータを修正
+initial_values = [12, 5, 2, 7, 15, 13, 20]  # 最初のデータを入力
 for value in initial_values:
     bst.add(value)
 
