@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>組み込みのビュー &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="メタドキュメントとその他" href="../misc/index.html" />
+    <link rel="prev" title="バリデータ (Validator)" href="validators.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="validators.html" title="バリデータ (Validator)">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="../misc/index.html" title="メタドキュメントとその他">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-views">
+            
+  <section id="s-module-django.views">
+<span id="s-built-in-views"></span><span id="module-django.views"></span><span id="built-in-views"></span><h1>組み込みのビュー<a class="headerlink" href="#module-django.views" title="Link to this heading">¶</a></h1>
+<p>Django の組み込みビューのいくつかは、 <a class="reference internal" href="../topics/http/views.html"><span class="doc">ビューを記述する</span></a> や他のドキュメントで説明されています。</p>
+<section id="s-serving-files-in-development">
+<span id="serving-files-in-development"></span><h2>開発中のファイルの配信<a class="headerlink" href="#serving-files-in-development" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.static.serve">
+<span class="sig-prename descclassname"><span class="pre">static.</span></span><span class="sig-name descname"><span class="pre">serve</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_indexes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="headerlink" href="#django.views.static.serve" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>プロジェクトの静的アセット以外にも、利便性のために、ローカル開発で Django に配信させたいファイルがあるかもしれません。 <a class="reference internal" href="#django.views.static.serve" title="django.views.static.serve"><code class="xref py py-func docutils literal notranslate"><span class="pre">serve()</span></code></a> ビューを使えば、任意のディレクトリに配信できます。(このビューは本番環境では <strong>使えない</strong> ので、開発の補助としてだけ使ってください。本番環境では実際のフロントエンド Web サーバを使ってこれらのファイルを配信してください)。</p>
+<p>最もありそうな例は、 <a class="reference internal" href="settings.html#std-setting-MEDIA_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code></a> にあるユーザがアップロードしたコンテンツです。 <code class="docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code> は静的アセット用で、ユーザがアップロードしたファイルに対する組み込みの処理はありませんが、 URLconf に次のような記述を追加することで、 Django に <a class="reference internal" href="settings.html#std-setting-MEDIA_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code></a> を配信させることができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">re_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.static</span><span class="w"> </span><span class="kn">import</span> <span class="n">serve</span>
+
+<span class="c1"># ... the rest of your URLconf goes here ...</span>
+
+<span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">:</span>
+    <span class="n">urlpatterns</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="n">re_path</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;^media/(?P&lt;path&gt;.*)$&quot;</span><span class="p">,</span>
+            <span class="n">serve</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;document_root&quot;</span><span class="p">:</span> <span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>このコードは <a class="reference internal" href="settings.html#std-setting-MEDIA_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_URL</span></code></a> の値が <code class="docutils literal notranslate"><span class="pre">'media/'</span></code> であると仮定しています。これは <a class="reference internal" href="#django.views.static.serve" title="django.views.static.serve"><code class="xref py py-func docutils literal notranslate"><span class="pre">serve()</span></code></a> ビューを呼び出して、 URLconf からのパス (必須) と <code class="docutils literal notranslate"><span class="pre">document_root</span></code> パラメータを渡します。</p>
+<p>この URL パターンを定義するのは少し面倒なので、 Django には小さな URL ヘルパー関数 <a class="reference internal" href="urls.html#django.conf.urls.static.static" title="django.conf.urls.static.static"><code class="xref py py-func docutils literal notranslate"><span class="pre">static()</span></code></a> が同梱されています。この関数は <a class="reference internal" href="settings.html#std-setting-MEDIA_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_URL</span></code></a> のようなプレフィックスと、 <code class="docutils literal notranslate"><span class="pre">'django.views.static.serve'</span></code> のようなビューへのドットパスをパラメータとして受け取ります。その他の関数のパラメータは透過的にビューに渡されます。</p>
+</section>
+<section id="s-error-views">
+<span id="s-id1"></span><span id="error-views"></span><span id="id1"></span><h2>エラー・ビュー<a class="headerlink" href="#error-views" title="Link to this heading">¶</a></h2>
+<p>Django には HTTP エラーを処理するためのビューがデフォルトでいくつか付属して います。これらを独自のカスタムビューで上書きするには、 <a class="reference internal" href="../topics/http/views.html#customizing-error-views"><span class="std std-ref">エラービューをカスタマイズする</span></a> を参照してください。</p>
+<section id="s-the-404-page-not-found-view">
+<span id="s-http-not-found-view"></span><span id="the-404-page-not-found-view"></span><span id="http-not-found-view"></span><h3>404 (page not found) ビュー<a class="headerlink" href="#the-404-page-not-found-view" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.defaults.page_not_found">
+<span class="sig-prename descclassname"><span class="pre">defaults.</span></span><span class="sig-name descname"><span class="pre">page_not_found</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'404.html'</span></span></em>)<a class="headerlink" href="#django.views.defaults.page_not_found" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>ビュー内で <a class="reference internal" href="../topics/http/views.html#django.http.Http404" title="django.http.Http404"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Http404</span></code></a> を発生させると、 Django は 404 エラーの処理に特化した特別なビューを読み込みます。デフォルトでは <a class="reference internal" href="#django.views.defaults.page_not_found" title="django.views.defaults.page_not_found"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.views.defaults.page_not_found()</span></code></a> というビューで、&quot;Not Found&quot; メッセージを表示するか、ルートテンプレートディレクトリにテンプレート <code class="docutils literal notranslate"><span class="pre">404.html</span></code> を作成した場合、それを読み込んでレンダリングします。</p>
+<p>デフォルトの404ビューはテンプレートに2つの変数を渡します。<code class="docutils literal notranslate"><span class="pre">request_path</span></code> はエラーの原因となった URL で、<code class="docutils literal notranslate"><span class="pre">exception</span></code> はビューのトリガーとなった例外の有用な表現です (たとえば、特定の <code class="docutils literal notranslate"><span class="pre">Http404</span></code> インスタンスに渡されたメッセージなど)。</p>
+<p>404ビューには以下の3つの注意点があります:</p>
+<ul class="simple">
+<li><p>404 ビューは、 Django が URLconf 内の正規表現を全てチェックしてもマッチしない場合にも呼び出されます。</p></li>
+<li><p>404 ビューには <a class="reference internal" href="templates/api.html#django.template.RequestContext" title="django.template.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a> が渡され、テンプレートコンテキストプロセッサが提供する変数 (たとえば <code class="docutils literal notranslate"><span class="pre">MEDIA_URL</span></code>) にアクセスできます。</p></li>
+<li><p>もし <a class="reference internal" href="settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定されている場合(設定モジュール内)、404ビューは使用されず、代わりに URLconf がデバッグ情報と共に表示されます。</p></li>
+</ul>
+</section>
+<section id="s-the-500-server-error-view">
+<span id="s-http-internal-server-error-view"></span><span id="the-500-server-error-view"></span><span id="http-internal-server-error-view"></span><h3>500（サーバーエラー）ビュー<a class="headerlink" href="#the-500-server-error-view" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.defaults.server_error">
+<span class="sig-prename descclassname"><span class="pre">defaults.</span></span><span class="sig-name descname"><span class="pre">server_error</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'500.html'</span></span></em>)<a class="headerlink" href="#django.views.defaults.server_error" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>同様に、Django はビューコードで実行時エラーが発生した場合、特別なケースの動作を実行します。ビューで例外が発生した場合、 Django はデフォルトで <code class="docutils literal notranslate"><span class="pre">django.views.defaults.server_error</span></code> というビューを呼び出します。このビューは &quot;Server Error&quot; というメッセージを表示するか、ルートテンプレートディレクトリにテンプレート <code class="docutils literal notranslate"><span class="pre">500.html</span></code> を作成した場合、それを読み込んでレンダリングします。</p>
+<p>デフォルトの500ビューは <code class="docutils literal notranslate"><span class="pre">500.html</span></code> テンプレートに変数を渡さず、空の <code class="docutils literal notranslate"><span class="pre">Context</span></code> でレンダリングされ、追加エラーの可能性を減らします。</p>
+<p>もし <a class="reference internal" href="settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定されている場合 (設定モジュールで)、500 ビューは使用されず、代わりにトレースバックがデバッグ情報と共に表示されます。</p>
+</section>
+<section id="s-the-403-http-forbidden-view">
+<span id="s-http-forbidden-view"></span><span id="the-403-http-forbidden-view"></span><span id="http-forbidden-view"></span><h3>403 (HTTP Forbidden) ビュー<a class="headerlink" href="#the-403-http-forbidden-view" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.defaults.permission_denied">
+<span class="sig-prename descclassname"><span class="pre">defaults.</span></span><span class="sig-name descname"><span class="pre">permission_denied</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'403.html'</span></span></em>)<a class="headerlink" href="#django.views.defaults.permission_denied" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>404 や 500 のビューと同じように、 Django には 403 Forbidden エラーを扱うビューがあります。ビューで 403 例外が発生した場合、 Django はデフォルトで <code class="docutils literal notranslate"><span class="pre">django.views.defaults.permission_denied</span></code> というビューを呼び出します。</p>
+<p>このビューはルートテンプレートディレクトリにあるテンプレート <code class="docutils literal notranslate"><span class="pre">403.html</span></code> を読み込んでレンダリングします。このファイルが存在しない場合は、代わりに <span class="target" id="index-2"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-15.5.4"><strong>RFC 9110 Section 15.5.4</strong></a> (HTTP 1.1 仕様) に従って &quot;403 Forbidden&quot; というテキストを配信します。テンプレートコンテキストは <code class="docutils literal notranslate"><span class="pre">exception</span></code> を含んでおり、これはビューのトリガーとなった例外の文字列表現です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">django.views.defaults.permission_denied</span></code> は <a class="reference internal" href="exceptions.html#django.core.exceptions.PermissionDenied" title="django.core.exceptions.PermissionDenied"><code class="xref py py-exc docutils literal notranslate"><span class="pre">PermissionDenied</span></code></a> 例外がトリガーとなります。ビューでアクセスを拒否するには、次のようなコードを使用します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">edit</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">pk</span><span class="p">):</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_staff</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PermissionDenied</span>
+    <span class="c1"># ...</span>
+</pre></div>
+</div>
+</section>
+<section id="s-the-400-bad-request-view">
+<span id="s-http-bad-request-view"></span><span id="the-400-bad-request-view"></span><span id="http-bad-request-view"></span><h3>400（bad request）ビュー<a class="headerlink" href="#the-400-bad-request-view" title="Link to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.defaults.bad_request">
+<span class="sig-prename descclassname"><span class="pre">defaults.</span></span><span class="sig-name descname"><span class="pre">bad_request</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exception</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'400.html'</span></span></em>)<a class="headerlink" href="#django.views.defaults.bad_request" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Django で <a class="reference internal" href="exceptions.html#django.core.exceptions.SuspiciousOperation" title="django.core.exceptions.SuspiciousOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SuspiciousOperation</span></code></a> が発生すると、 Django のコンポーネントで処理されるかもしれません (たとえばセッションデータのリセットなど)。特に処理されない場合、 Django は現在のリクエストをサーバエラーではなく「不正なリクエスト」と見なします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">django.views.defaults.bad_request</span></code> は <code class="docutils literal notranslate"><span class="pre">server_error</span></code> ビューとよく似ていますが、エラー状態がクライアント操作の結果であることを示すステータスコード 400 を返します。デフォルトでは、例外メッセージにファイルシステムのパスのような機密情報が含まれている可能性があるため、ビューのトリガーとなった例外に関係するものはテンプレートコンテキストに渡されません。</p>
+<p>また、<code class="docutils literal notranslate"><span class="pre">bad_request</span></code> ビューは <a class="reference internal" href="settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">False</span></code> のときだけ使用されます。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">組み込みのビュー</a><ul>
+<li><a class="reference internal" href="#serving-files-in-development">開発中のファイルの配信</a></li>
+<li><a class="reference internal" href="#error-views">エラー・ビュー</a><ul>
+<li><a class="reference internal" href="#the-404-page-not-found-view">404 (page not found) ビュー</a></li>
+<li><a class="reference internal" href="#the-500-server-error-view">500（サーバーエラー）ビュー</a></li>
+<li><a class="reference internal" href="#the-403-http-forbidden-view">403 (HTTP Forbidden) ビュー</a></li>
+<li><a class="reference internal" href="#the-400-bad-request-view">400（bad request）ビュー</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="validators.html"
+                          title="前の章へ">バリデータ (Validator)</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="../misc/index.html"
+                          title="次の章へ">メタドキュメントとその他</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/views.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="validators.html" title="バリデータ (Validator)">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="../misc/index.html" title="メタドキュメントとその他">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

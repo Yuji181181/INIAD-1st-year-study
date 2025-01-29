@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>FAQ: 管理インタフェース &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="FAQ: コードへの貢献" href="contributing.html" />
+    <link rel="prev" title="FAQ: データベースとモデル" href="models.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="models.html" title="FAQ: データベースとモデル">previous</a>
+     |
+    <a href="index.html" title="Django FAQ よくある質問" accesskey="U">up</a>
+   |
+    <a href="contributing.html" title="FAQ: コードへの貢献">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="faq-admin">
+            
+  <section id="s-faq-the-admin">
+<span id="faq-the-admin"></span><h1>FAQ: 管理インタフェース<a class="headerlink" href="#faq-the-admin" title="Link to this heading">¶</a></h1>
+<section id="s-i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-just-brings-up-the-login-page-again-with-no-error-messages">
+<span id="i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-just-brings-up-the-login-page-again-with-no-error-messages"></span><h2>ログインできません。正しいユーザ名とパスワードを入力したのに、再度ログインページが表示されます。エラーメッセージも出ません。<a class="headerlink" href="#i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-just-brings-up-the-login-page-again-with-no-error-messages" title="Link to this heading">¶</a></h2>
+<p>Django から送信されたクッキーのドメインはお使いのブラウザのドメインと一致していないため、ログインクッキーは正しく設定されていません。 <a class="reference internal" href="../ref/settings.html#std-setting-SESSION_COOKIE_DOMAIN"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SESSION_COOKIE_DOMAIN</span></code></a> をあなたのドメインと同じものに設定してみてください。例えばお使いのブラウザで &quot;<a class="reference external" href="https://www.example.com/admin/">https://www.example.com/admin/</a>&quot; に飛ぶ場合には <code class="docutils literal notranslate"><span class="pre">SESSION_COOKIE_DOMAIN</span> <span class="pre">=</span> <span class="pre">'www.example.com'</span></code> と設定します。</p>
+</section>
+<section id="s-i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-brings-up-the-login-page-again-with-a-please-enter-a-correct-username-and-password-error">
+<span id="i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-brings-up-the-login-page-again-with-a-please-enter-a-correct-username-and-password-error"></span><h2>ログインできません。正しいユーザ名とパスワードを入力したはずなのに、再度ログインページが開き、「正しいユーザ名とパスワードを入力してください」というエラーメッセージが表示されます。<a class="headerlink" href="#i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-brings-up-the-login-page-again-with-a-please-enter-a-correct-username-and-password-error" title="Link to this heading">¶</a></h2>
+<p>ユーザ名とパスワードが本当に正しい場合、ユーザアカウントが <a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.models.User.is_active" title="django.contrib.auth.models.User.is_active"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_active</span></code></a> で、かつ <a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.models.User.is_staff" title="django.contrib.auth.models.User.is_staff"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_staff</span></code></a> が True になっているか確認してください。管理サイトにアクセスできるのは、is_active と is_staff がともに True のユーザだけです。</p>
+</section>
+<section id="s-how-do-i-automatically-set-a-field-s-value-to-the-user-who-last-edited-the-object-in-the-admin">
+<span id="how-do-i-automatically-set-a-field-s-value-to-the-user-who-last-edited-the-object-in-the-admin"></span><h2>管理サイト上で最後にオブジェクトを編集したユーザの情報をあるフィールドに自動的に設定する方法はありますか？<a class="headerlink" href="#how-do-i-automatically-set-a-field-s-value-to-the-user-who-last-edited-the-object-in-the-admin" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin" title="django.contrib.admin.ModelAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></a> クラスが用意しているカスタマイズ用のフックを利用すれば、オブジェクトを保存するときに、リクエストから取り出した情報に基づいてフィールドの値を変更できます。リクエストから現在のユーザを取り出して、 <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.save_model" title="django.contrib.admin.ModelAdmin.save_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_model()</span></code></a> フックをカスタマイズすることで、オブジェクトを編集したユーザをオブジェクトに反映させることができます。 <a class="reference internal" href="../ref/contrib/admin/index.html#model-admin-methods"><span class="std std-ref">ModelAdmin メソッドのドキュメント</span></a> にサンプルがあるので参考にしてください。</p>
+</section>
+<section id="s-how-do-i-limit-admin-access-so-that-objects-can-only-be-edited-by-the-users-who-created-them">
+<span id="how-do-i-limit-admin-access-so-that-objects-can-only-be-edited-by-the-users-who-created-them"></span><h2>管理サイト上で、オブジェクトを最初に作成したユーザだけがオブジェクトを編集できるようにアクセス権を制限するにはどうすればよいですか？<a class="headerlink" href="#how-do-i-limit-admin-access-so-that-objects-can-only-be-edited-by-the-users-who-created-them" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin" title="django.contrib.admin.ModelAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></a> クラスが、管理サイト上の任意のオブジェクトの表示と編集の権限をコントロールするためのカスタマイズ用のフックを提供しています。リクエストから現在のユーザ情報を取り出す同様のトリックを使うことで、 <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.get_queryset" title="django.contrib.admin.ModelAdmin.get_queryset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_queryset()</span></code></a> と <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.has_change_permission" title="django.contrib.admin.ModelAdmin.has_change_permission"><code class="xref py py-meth docutils literal notranslate"><span class="pre">has_change_permission()</span></code></a> を使って、管理サイト上でのオブジェクトの表示と編集の権限をコントロールできます。</p>
+</section>
+<section id="s-my-admin-site-css-and-images-showed-up-fine-using-the-development-server-but-they-re-not-displaying-when-using-mod-wsgi">
+<span id="my-admin-site-css-and-images-showed-up-fine-using-the-development-server-but-they-re-not-displaying-when-using-mod-wsgi"></span><h2>開発サーバでは管理サイトの CSS や画像がうまく表示されるのに、mod_wsgi を使った場合には表示されません。<a class="headerlink" href="#my-admin-site-css-and-images-showed-up-fine-using-the-development-server-but-they-re-not-displaying-when-using-mod-wsgi" title="Link to this heading">¶</a></h2>
+<p>「 <code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code> で Django を使うには？」内の <a class="reference internal" href="../howto/deployment/wsgi/modwsgi.html#serving-the-admin-files"><span class="std std-ref">管理サイト用のファイルを公開する方法</span></a> を参照してください。</p>
+</section>
+<section id="s-my-list-filter-contains-a-manytomanyfield-but-the-filter-doesn-t-display">
+<span id="my-list-filter-contains-a-manytomanyfield-but-the-filter-doesn-t-display"></span><h2>“list_filter” に ManyToManyField を入れたのに、フィルタが表示されません。<a class="headerlink" href="#my-list-filter-contains-a-manytomanyfield-but-the-filter-doesn-t-display" title="Link to this heading">¶</a></h2>
+<p>関連するオブジェクトがない場合、Django は <code class="docutils literal notranslate"><span class="pre">ManyToManyField</span></code> のフィルタをわざわざ表示しません。</p>
+<p>たとえば、<a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.list_filter" title="django.contrib.admin.ModelAdmin.list_filter"><code class="xref py py-attr docutils literal notranslate"><span class="pre">list_filter</span></code></a> に <a class="reference internal" href="../ref/contrib/sites.html"><span class="doc">sites</span></a> が含まれていて、データベースにサイトがない場合、&quot;Site&quot; フィルタは表示されません。その場合、サイトでフィルタリングしても意味がありません。</p>
+</section>
+<section id="s-some-objects-aren-t-appearing-in-the-admin">
+<span id="some-objects-aren-t-appearing-in-the-admin"></span><h2>管理サイトでいくつかのオブジェクトが表示されません。<a class="headerlink" href="#some-objects-aren-t-appearing-in-the-admin" title="Link to this heading">¶</a></h2>
+<p>おかしな行数カウントが発生するのは、ForeignKeyの値が抜けている場合、または ForeignKeyであるフィールドが間違って <a class="reference internal" href="../ref/models/fields.html#django.db.models.Field.null" title="django.db.models.Field.null"><code class="xref py py-attr docutils literal notranslate"><span class="pre">null=False</span></code></a> に設定されていることが原因です。もし <a class="reference internal" href="../ref/models/fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> が存在しないオブジェクトを指しているデータがあり、そのフィールドが <a class="reference internal" href="../ref/contrib/admin/index.html#django.contrib.admin.ModelAdmin.list_display" title="django.contrib.admin.ModelAdmin.list_display"><code class="xref py py-attr docutils literal notranslate"><span class="pre">list_display</span></code></a> に含まれている場合、管理サイトの更新リストには表示されません。なぜならば Django のモデルはデータベースレベルで実装されていない整合性制約を宣言しているからです。</p>
+</section>
+<section id="s-how-can-i-customize-the-functionality-of-the-admin-interface">
+<span id="how-can-i-customize-the-functionality-of-the-admin-interface"></span><h2>管理インターフェイスの機能をカスタマイズしたい場合にはどうすればいいですか？<a class="headerlink" href="#how-can-i-customize-the-functionality-of-the-admin-interface" title="Link to this heading">¶</a></h2>
+<p>いくつかの方法があります。まず、Django が自動的に生成する追加/変更フォームに修正を加えたい場合には、モデルクラス Admin の <a class="reference internal" href="../ref/contrib/admin/index.html#modeladmin-asset-definitions"><span class="std std-ref">js パラメータ</span></a> を介して、ページに好きな JavaScript モジュールを組み込むことができます。このパラメータには、JavaScript モジュールへの URL を表す文字列のリストを指定します。各 URL は、&lt;script&gt; タグを使って管理フォームに埋め込まれます。</p>
+<p>自動生成されたフォームをただ修正するのではなく、より柔軟なカスタマイズをしたければ、admin サイト用のカスタムビューを自分で書くことができます。admin サイト自体が Django で動いているので、自分でカスタムビューを書くことで、認証システムやパーミッションのチェック、その他なんでも好きなことができます。</p>
+<p>管理サイトのデザインをカスタマイズしたいならば、次の質問が参考になります。</p>
+</section>
+<section id="s-the-dynamically-generated-admin-site-is-ugly-how-can-i-change-it">
+<span id="the-dynamically-generated-admin-site-is-ugly-how-can-i-change-it"></span><h2>動的に生成された管理サイトが見にくいのですが、どうすれば修正できますか？<a class="headerlink" href="#the-dynamically-generated-admin-site-is-ugly-how-can-i-change-it" title="Link to this heading">¶</a></h2>
+<p>デフォルトのデザインが好みでなければ、CSS や関連する画像ファイルを編集することで管理サイトの見栄えを変更することができます。サイトは、構造化された HTML とたくさんの CSS のフックを使って構築されているので、スタイルシートを編集すれば、何であっても自由にカスタマイズすることができるはずです。</p>
+</section>
+<section id="s-what-browsers-are-supported-for-using-the-admin">
+<span id="s-admin-browser-support"></span><span id="what-browsers-are-supported-for-using-the-admin"></span><span id="admin-browser-support"></span><h2>管理サイトをサポートしているブラウザを教えてください。<a class="headerlink" href="#what-browsers-are-supported-for-using-the-admin" title="Link to this heading">¶</a></h2>
+<p>admin は、今日のウェブ標準に準拠した最新バージョンのブラウザで完璧に機能します。デスクトップでいうと、Chrome, Edge, Firefox, Opera, Safariなどです。</p>
+<p>モバイルやタブレット端末上でも、adminはウェブ標準に準拠したブラウザにレスポンシブな体験を提供します。これには、AndroidとiOSにおける主なブラウザも含まれています。</p>
+<p>将来の変更によりますが、 <em>もしかしたら</em> ブラウザ間で多少の見た目の違いがあるかもしれません。これらはレンダリングにおける許容範囲内の違いであると考えられています。</p>
+</section>
+<section id="s-what-assistive-technologies-are-supported-for-using-the-admin">
+<span id="what-assistive-technologies-are-supported-for-using-the-admin"></span><h2>管理画面を使う上で、どのような支援技術がサポートされていますか？<a class="headerlink" href="#what-assistive-technologies-are-supported-for-using-the-admin" title="Link to this heading">¶</a></h2>
+<p>管理サイトは、さまざまな支援技術との互換性を考慮していますが、現時点では多くの障害があります。サポート対象は、Dragon、JAWS、NVDA、Orca、TalkBack、Voice Control、VoiceOver iOS、VoiceOver macOS、Windows Contrast Themes、ZoomText、およびスクリーン拡大器といった、主要な支援技術の最新バージョンとなっています。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">FAQ: 管理インタフェース</a><ul>
+<li><a class="reference internal" href="#i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-just-brings-up-the-login-page-again-with-no-error-messages">ログインできません。正しいユーザ名とパスワードを入力したのに、再度ログインページが表示されます。エラーメッセージも出ません。</a></li>
+<li><a class="reference internal" href="#i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-brings-up-the-login-page-again-with-a-please-enter-a-correct-username-and-password-error">ログインできません。正しいユーザ名とパスワードを入力したはずなのに、再度ログインページが開き、「正しいユーザ名とパスワードを入力してください」というエラーメッセージが表示されます。</a></li>
+<li><a class="reference internal" href="#how-do-i-automatically-set-a-field-s-value-to-the-user-who-last-edited-the-object-in-the-admin">管理サイト上で最後にオブジェクトを編集したユーザの情報をあるフィールドに自動的に設定する方法はありますか？</a></li>
+<li><a class="reference internal" href="#how-do-i-limit-admin-access-so-that-objects-can-only-be-edited-by-the-users-who-created-them">管理サイト上で、オブジェクトを最初に作成したユーザだけがオブジェクトを編集できるようにアクセス権を制限するにはどうすればよいですか？</a></li>
+<li><a class="reference internal" href="#my-admin-site-css-and-images-showed-up-fine-using-the-development-server-but-they-re-not-displaying-when-using-mod-wsgi">開発サーバでは管理サイトの CSS や画像がうまく表示されるのに、mod_wsgi を使った場合には表示されません。</a></li>
+<li><a class="reference internal" href="#my-list-filter-contains-a-manytomanyfield-but-the-filter-doesn-t-display">“list_filter” に ManyToManyField を入れたのに、フィルタが表示されません。</a></li>
+<li><a class="reference internal" href="#some-objects-aren-t-appearing-in-the-admin">管理サイトでいくつかのオブジェクトが表示されません。</a></li>
+<li><a class="reference internal" href="#how-can-i-customize-the-functionality-of-the-admin-interface">管理インターフェイスの機能をカスタマイズしたい場合にはどうすればいいですか？</a></li>
+<li><a class="reference internal" href="#the-dynamically-generated-admin-site-is-ugly-how-can-i-change-it">動的に生成された管理サイトが見にくいのですが、どうすれば修正できますか？</a></li>
+<li><a class="reference internal" href="#what-browsers-are-supported-for-using-the-admin">管理サイトをサポートしているブラウザを教えてください。</a></li>
+<li><a class="reference internal" href="#what-assistive-technologies-are-supported-for-using-the-admin">管理画面を使う上で、どのような支援技術がサポートされていますか？</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="models.html"
+                          title="前の章へ">FAQ: データベースとモデル</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="contributing.html"
+                          title="次の章へ">FAQ: コードへの貢献</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/faq/admin.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="models.html" title="FAQ: データベースとモデル">previous</a>
+     |
+    <a href="index.html" title="Django FAQ よくある質問" accesskey="U">up</a>
+   |
+    <a href="contributing.html" title="FAQ: コードへの貢献">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

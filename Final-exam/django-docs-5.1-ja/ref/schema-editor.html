@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>SchemaEditor &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="設定" href="settings.html" />
+    <link rel="prev" title="リクエストとレスポンスのオブジェクト" href="request-response.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="request-response.html" title="リクエストとレスポンスのオブジェクト">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="settings.html" title="設定">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-schema-editor">
+            
+  <section id="s-module-django.db.backends.base.schema">
+<span id="s-schemaeditor"></span><span id="module-django.db.backends.base.schema"></span><span id="schemaeditor"></span><h1><code class="docutils literal notranslate"><span class="pre">SchemaEditor</span></code><a class="headerlink" href="#module-django.db.backends.base.schema" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseDatabaseSchemaEditor</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L76"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Django のマイグレーションシステムは2つの部分に分かれています。データベースに対してどのような操作を実行するべきかを計算してその結果を保管するロジックの部分　(<code class="docutils literal notranslate"><span class="pre">django.db.migrations</span></code>)と、「モデルを作成する」や「フィールドを削除する」といった操作を SQL に変換する、データベースの抽象レイヤーの部分です。後者の仕事を担当するのが、 <code class="docutils literal notranslate"><span class="pre">SchemaEditor</span></code> です。</p>
+<p>Django を使っている普通の開発者が <code class="docutils literal notranslate"><span class="pre">SchemaEditor</span></code> を直接扱うことはほとんどありませんが、自前のマイグレーションシステムを実装したい場合や、より高度なことが必要になった場合には、SQL を書くのではなく、こちらを選びましょう。</p>
+<p>Django のデータベースのバックエンドは、それぞれ対応するバージョンの <code class="docutils literal notranslate"><span class="pre">SchemaEditor</span></code> を提供しており、好きなときに <code class="docutils literal notranslate"><span class="pre">connection.schema_editor()</span></code> コンテキストマネージャを使ってアクセスできます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">connection</span><span class="o">.</span><span class="n">schema_editor</span><span class="p">()</span> <span class="k">as</span> <span class="n">schema_editor</span><span class="p">:</span>
+    <span class="n">schema_editor</span><span class="o">.</span><span class="n">delete_model</span><span class="p">(</span><span class="n">MyModel</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>これは、トランザクションや遅延SQL (<code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> 制約の作成など) のようなものを管理することを可能にするため、コンテキストマネージャを通して使用されなければなりません。</p>
+<p>すべての可能な操作をメソッドとして公開し、変更を適用したい順序で呼び出すべきです。一部の操作や変更の種類は、すべてのデータベースで可能ではありません。例えば、MyISAM は外部キー制約をサポートしていません。</p>
+<p>Django のマイグレーション機能を使うためには、サードパーティ製のデータベースバックエンドを書いたり保守したりする場合、 <code class="docutils literal notranslate"><span class="pre">SchemaEditor</span></code> の実装を提供する必要があります。しかし、データベースが SQL の使用やリレーショナルデザインにおいて比較的標準的である限り、組み込みの Django <code class="docutils literal notranslate"><span class="pre">SchemaEditor</span></code> クラスの一つをサブクラス化して、文法を少し変更するだけで済むはずです。</p>
+<section id="s-methods">
+<span id="methods"></span><h2>メソッド<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h2>
+<section id="s-execute">
+<span id="execute"></span><h3><code class="docutils literal notranslate"><span class="pre">execute()</span></code><a class="headerlink" href="#execute" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.execute">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">execute</span></span>(<em class="sig-param"><span class="n"><span class="pre">sql</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L173"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.execute" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>渡されたSQL文を実行し、パラメータが指定されている場合はそれも適用します。これは、ユーザーが望む場合にSQLを <code class="docutils literal notranslate"><span class="pre">.sql</span></code> ファイルにキャプチャできるように、通常のデータベースカーソルの周りに設定されたラッパーです。</p>
+</section>
+<section id="s-create-model">
+<span id="create-model"></span><h3><code class="docutils literal notranslate"><span class="pre">create_model()</span></code><a class="headerlink" href="#create-model" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.create_model">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">create_model</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L497"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.create_model" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>提供されたモデルのために、データベースに新しいテーブルを作成し、必要に応じてユニーク制約やインデックスも作成します。</p>
+</section>
+<section id="s-delete-model">
+<span id="delete-model"></span><h3><code class="docutils literal notranslate"><span class="pre">delete_model()</span></code><a class="headerlink" href="#delete-model" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.delete_model">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">delete_model</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L532"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.delete_model" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルのテーブルをデータベースから削除し、それに紐づくユニーク制約やインデックスも一緒に削除します。</p>
+</section>
+<section id="s-add-index">
+<span id="add-index"></span><h3><code class="docutils literal notranslate"><span class="pre">add_index()</span></code><a class="headerlink" href="#add-index" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.add_index">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">add_index</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L553"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.add_index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> のテーブルに <code class="docutils literal notranslate"><span class="pre">index</span></code> を追加します。</p>
+</section>
+<section id="s-remove-index">
+<span id="remove-index"></span><h3><code class="docutils literal notranslate"><span class="pre">remove_index()</span></code><a class="headerlink" href="#remove-index" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.remove_index">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">remove_index</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L564"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.remove_index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> のテーブルから <code class="docutils literal notranslate"><span class="pre">index</span></code> を削除します。</p>
+</section>
+<section id="s-rename-index">
+<span id="rename-index"></span><h3><code class="docutils literal notranslate"><span class="pre">rename_index()</span></code><a class="headerlink" href="#rename-index" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.rename_index">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">rename_index</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_index</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L573"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.rename_index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> のテーブルの <code class="docutils literal notranslate"><span class="pre">old_index</span></code> を <code class="docutils literal notranslate"><span class="pre">new_index</span></code> に名前を変更します。</p>
+</section>
+<section id="s-add-constraint">
+<span id="add-constraint"></span><h3><code class="docutils literal notranslate"><span class="pre">add_constraint()</span></code><a class="headerlink" href="#add-constraint" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.add_constraint">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">add_constraint</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L583"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.add_constraint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> のテーブルに <code class="docutils literal notranslate"><span class="pre">constraint</span></code> を追加します。</p>
+</section>
+<section id="s-remove-constraint">
+<span id="remove-constraint"></span><h3><code class="docutils literal notranslate"><span class="pre">remove_constraint()</span></code><a class="headerlink" href="#remove-constraint" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.remove_constraint">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">remove_constraint</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">constraint</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L591"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.remove_constraint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> のテーブルから <code class="docutils literal notranslate"><span class="pre">constraint</span></code> を削除します。</p>
+</section>
+<section id="s-alter-unique-together">
+<span id="alter-unique-together"></span><h3><code class="docutils literal notranslate"><span class="pre">alter_unique_together()</span></code><a class="headerlink" href="#alter-unique-together" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_unique_together">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">alter_unique_together</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_unique_together</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_unique_together</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L597"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_unique_together" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルの <a class="reference internal" href="models/options.html#django.db.models.Options.unique_together" title="django.db.models.Options.unique_together"><code class="xref py py-attr docutils literal notranslate"><span class="pre">unique_together</span></code></a> 値を変更します。これにより、新しい値に一致するまで、モデルのテーブルからユニーク制約が追加または削除されます。</p>
+</section>
+<section id="s-alter-index-together">
+<span id="alter-index-together"></span><h3><code class="docutils literal notranslate"><span class="pre">alter_index_together()</span></code><a class="headerlink" href="#alter-index-together" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_index_together">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">alter_index_together</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_index_together</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_index_together</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L618"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_index_together" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルの <code class="docutils literal notranslate"><span class="pre">index_together</span></code> の値を変更します。これにより、インデックスがモデルのテーブルに追加または削除され、新しい値に一致するようになります。</p>
+</section>
+<section id="s-alter-db-table">
+<span id="alter-db-table"></span><h3><code class="docutils literal notranslate"><span class="pre">alter_db_table()</span></code><a class="headerlink" href="#alter-db-table" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_db_table">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">alter_db_table</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_db_table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_db_table</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L673"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_db_table" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルのテーブル名を <code class="docutils literal notranslate"><span class="pre">old_db_table</span></code> から <code class="docutils literal notranslate"><span class="pre">new_db_table</span></code> に変更します。</p>
+</section>
+<section id="s-alter-db-table-comment">
+<span id="alter-db-table-comment"></span><h3><code class="docutils literal notranslate"><span class="pre">alter_db_table_comment()</span></code><a class="headerlink" href="#alter-db-table-comment" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_db_table_comment">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">alter_db_table_comment</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_db_table_comment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_db_table_comment</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L692"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_db_table_comment" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">model</span></code> のテーブルコメントを <code class="docutils literal notranslate"><span class="pre">new_db_table_comment</span></code> に変更します。</p>
+</section>
+<section id="s-alter-db-tablespace">
+<span id="alter-db-tablespace"></span><h3><code class="docutils literal notranslate"><span class="pre">alter_db_tablespace()</span></code><a class="headerlink" href="#alter-db-tablespace" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_db_tablespace">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">alter_db_tablespace</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_db_tablespace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_db_tablespace</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L702"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_db_tablespace" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルのテーブルをあるテーブル空間から別のテーブル空間に移動します。</p>
+</section>
+<section id="s-add-field">
+<span id="add-field"></span><h3><code class="docutils literal notranslate"><span class="pre">add_field()</span></code><a class="headerlink" href="#add-field" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.add_field">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">add_field</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L713"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.add_field" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルのテーブルにフィールドを表すための列（時には複数）を追加します。フィールドに <code class="docutils literal notranslate"><span class="pre">db_index=True</span></code> や <code class="docutils literal notranslate"><span class="pre">unique=True</span></code> が設定されている場合、インデックスやユニーク制約も追加されます。</p>
+<p>フィールドが <code class="docutils literal notranslate"><span class="pre">through</span></code> の値なしで <code class="docutils literal notranslate"><span class="pre">ManyToManyField</span></code> の場合、カラムを作成する代わりに、リレーションシップを表すためのテーブルを作成します。<code class="docutils literal notranslate"><span class="pre">through</span></code> が提供されている場合、それは何も操作しません。</p>
+<p>フィールドが <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> である場合、これによって外部キー制約もカラムに追加されます。</p>
+</section>
+<section id="s-remove-field">
+<span id="remove-field"></span><h3><code class="docutils literal notranslate"><span class="pre">remove_field()</span></code><a class="headerlink" href="#remove-field" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.remove_field">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">remove_field</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L801"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.remove_field" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>フィールドによって追加された、モデルのテーブルからそのフィールドを表す列、および、そのフィールドに関連するユニーク制約、外部キー制約、インデックスを削除します。</p>
+<p>フィールドが <code class="docutils literal notranslate"><span class="pre">through</span></code> の値なしで ManyToManyField の場合、リレーションシップを追跡するために作成されたテーブルを削除します。 <code class="docutils literal notranslate"><span class="pre">through</span></code> が提供されている場合は何も操作しません。</p>
+</section>
+<section id="s-alter-field">
+<span id="alter-field"></span><h3><code class="docutils literal notranslate"><span class="pre">alter_field()</span></code><a class="headerlink" href="#alter-field" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_field">
+<span class="sig-prename descclassname"><span class="pre">BaseDatabaseSchemaEditor.</span></span><span class="sig-name descname"><span class="pre">alter_field</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_field</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/backends/base/schema.py#L833"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.alter_field" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>この変換により、モデル上のフィールドが古いフィールドから新しいフィールドへと変更されます。これには、カラムの名前の変更 (<a class="reference internal" href="models/fields.html#django.db.models.Field.db_column" title="django.db.models.Field.db_column"><code class="xref py py-attr docutils literal notranslate"><span class="pre">db_column</span></code></a> 属性)、フィールドのタイプの変更 (フィールドクラスが変更された場合)、フィールドの <code class="docutils literal notranslate"><span class="pre">NULL</span></code> ステータスの変更、フィールド専用のユニーク制約やインデックスの追加または削除、プライマリキーの変更、そして <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> 制約の宛先の変更が含まれます。</p>
+<p>これが実行できない最も一般的な変換は、<code class="docutils literal notranslate"><span class="pre">ManyToManyField</span></code> を通常のフィールドに変換すること、またはその逆です。Django はデータを失うことなくこれを行うことができないため、実行を拒否します。代わりに、<a class="reference internal" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.remove_field" title="django.db.backends.base.schema.BaseDatabaseSchemaEditor.remove_field"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove_field()</span></code></a> と <a class="reference internal" href="#django.db.backends.base.schema.BaseDatabaseSchemaEditor.add_field" title="django.db.backends.base.schema.BaseDatabaseSchemaEditor.add_field"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_field()</span></code></a> は別々に呼び出されるべきです。</p>
+<p>データベースが <code class="docutils literal notranslate"><span class="pre">supports_combined_alters</span></code> を持っている場合、Django はこれらの操作をできるだけ一つのデータベースコールで実行しようとします。そうでなければ、変更が必要な場合にはそれぞれの変更に対して個別の ALTER 文を発行しますが、変更が必要ない場合には ALTER を発行しません。</p>
+</section>
+</section>
+<section id="s-attributes">
+<span id="attributes"></span><h2>属性<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h2>
+<p>特に言及されない限り、すべての属性は読み取り専用です。</p>
+<section id="s-connection">
+<span id="connection"></span><h3><code class="docutils literal notranslate"><span class="pre">connection</span></code><a class="headerlink" href="#connection" title="Link to this heading">¶</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.backends.base.schema.SchemaEditor.connection">
+<span class="sig-prename descclassname"><span class="pre">SchemaEditor.</span></span><span class="sig-name descname"><span class="pre">connection</span></span><a class="headerlink" href="#django.db.backends.base.schema.SchemaEditor.connection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>データベースへの  connection オブジェクト。connection の便利な属性に、現在アクセスしているデータベースの名前を特定するのに使える <code class="docutils literal notranslate"><span class="pre">alias</span></code> があります。</p>
+<p>特に、この属性は、<a class="reference internal" href="../howto/writing-migrations.html#data-migrations-and-multiple-databases"><span class="std std-ref">複数のデータベースに対するマイグレーション</span></a> を行っているときに役に立ちます。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">SchemaEditor</span></code></a><ul>
+<li><a class="reference internal" href="#methods">メソッド</a><ul>
+<li><a class="reference internal" href="#execute"><code class="docutils literal notranslate"><span class="pre">execute()</span></code></a></li>
+<li><a class="reference internal" href="#create-model"><code class="docutils literal notranslate"><span class="pre">create_model()</span></code></a></li>
+<li><a class="reference internal" href="#delete-model"><code class="docutils literal notranslate"><span class="pre">delete_model()</span></code></a></li>
+<li><a class="reference internal" href="#add-index"><code class="docutils literal notranslate"><span class="pre">add_index()</span></code></a></li>
+<li><a class="reference internal" href="#remove-index"><code class="docutils literal notranslate"><span class="pre">remove_index()</span></code></a></li>
+<li><a class="reference internal" href="#rename-index"><code class="docutils literal notranslate"><span class="pre">rename_index()</span></code></a></li>
+<li><a class="reference internal" href="#add-constraint"><code class="docutils literal notranslate"><span class="pre">add_constraint()</span></code></a></li>
+<li><a class="reference internal" href="#remove-constraint"><code class="docutils literal notranslate"><span class="pre">remove_constraint()</span></code></a></li>
+<li><a class="reference internal" href="#alter-unique-together"><code class="docutils literal notranslate"><span class="pre">alter_unique_together()</span></code></a></li>
+<li><a class="reference internal" href="#alter-index-together"><code class="docutils literal notranslate"><span class="pre">alter_index_together()</span></code></a></li>
+<li><a class="reference internal" href="#alter-db-table"><code class="docutils literal notranslate"><span class="pre">alter_db_table()</span></code></a></li>
+<li><a class="reference internal" href="#alter-db-table-comment"><code class="docutils literal notranslate"><span class="pre">alter_db_table_comment()</span></code></a></li>
+<li><a class="reference internal" href="#alter-db-tablespace"><code class="docutils literal notranslate"><span class="pre">alter_db_tablespace()</span></code></a></li>
+<li><a class="reference internal" href="#add-field"><code class="docutils literal notranslate"><span class="pre">add_field()</span></code></a></li>
+<li><a class="reference internal" href="#remove-field"><code class="docutils literal notranslate"><span class="pre">remove_field()</span></code></a></li>
+<li><a class="reference internal" href="#alter-field"><code class="docutils literal notranslate"><span class="pre">alter_field()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#attributes">属性</a><ul>
+<li><a class="reference internal" href="#connection"><code class="docutils literal notranslate"><span class="pre">connection</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="request-response.html"
+                          title="前の章へ">リクエストとレスポンスのオブジェクト</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="settings.html"
+                          title="次の章へ">設定</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/schema-editor.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="request-response.html" title="リクエストとレスポンスのオブジェクト">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="settings.html" title="設定">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

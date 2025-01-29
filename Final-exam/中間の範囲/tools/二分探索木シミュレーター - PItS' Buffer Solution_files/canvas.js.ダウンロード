@@ -1,0 +1,430 @@
+var PItS_canvas = PItS_canvas || {};
+
+(function(){
+	const _ = PItS_canvas;
+
+	function getTouchPos(e,canvas){
+		var X = Math.round(e.changedTouches[0].pageX - canvas.getBoundingClientRect().left - window.pageXOffset);
+		var Y = Math.round(e.changedTouches[0].pageY - canvas.getBoundingClientRect().top - window.pageYOffset);
+		return {offsetX:X,offsetY:Y};
+	}
+
+	function onMouseOut(){
+		this.pjt.cursor.X = this.pjt.cursor.Y = this.pjt.dragStartPoint.X = this.pjt.dragStartPoint.Y = -1;
+	}
+
+	function onMouseMove(e){
+		this.pjt.cursor.X = e.offsetX;
+		this.pjt.cursor.Y = e.offsetY;
+	}
+
+	function onClick(e) {
+		const rect = this.pjt.canvas.getBoundingClientRect();
+		const centerX = rect.width / 2;
+		this.pjt.cursor.X = centerX; 
+		this.pjt.cursor.Y = e.offsetY;
+	}
+
+	function onMouseDown(e){
+		this.pjt.dragStartPoint.X = this.pjt.cursor.X = e.offsetX;
+		this.pjt.dragStartPoint.Y = this.pjt.cursor.Y = e.offsetY;
+	}
+
+	function onMouseUp(){
+		this.pjt.dragStartPoint.X = this.pjt.dragStartPoint.Y = -1;
+	}
+
+	function onTouchStart(e){
+		e.preventDefault();
+		if(e.touches.length === 1){
+			const pos = getTouchPos(e,this.pjt.canvas);
+			this.pjt.dragStartPoint.X = this.pjt.cursor.X = pos.offsetX;
+			this.pjt.dragStartPoint.Y = this.pjt.cursor.Y = pos.offsetY;
+		}
+	}
+
+	function onTouchEnd(e){
+		e.preventDefault();
+		if(e.touches.length === 0) this.pjt.dragStartPoint.X = this.pjt.dragStartPoint.Y = this.pjt.cursor.X = this.pjt.cursor.Y = -1;
+	}
+
+	function onTouchMove(e){
+		e.preventDefault();
+		const pos = getTouchPos(e,this.pjt.canvas)
+		this.pjt.cursor.X = pos.offsetX;
+		this.pjt.cursor.Y = pos.offsetY;
+	}
+
+	function onKeyDown(e){
+		if(this.pjt.nowScene === undefined) return;
+		if(this.pjt.nowScene.onKeyDown !== undefined && !e.repeat){
+			this.pjt.nowScene.onKeyDown(e.key);
+		}
+	}
+
+	function onKeyUp(e){
+		if(this.pjt.nowScene === undefined) return;
+		if(this.pjt.nowScene.onKeyUp !== undefined){
+			this.pjt.nowScene.onKeyUp(e.key);
+		}
+	}
+
+	_.Project = class{
+		constructor(canvasId){
+			this.scenes = [];
+			this.sceneId = {};
+			this.canvas = document.getElementById(canvasId);
+			this.canvas.setAttribute("tabindex",-1);
+			this.nowScene;
+			this.cursor = {X: -1, Y: -1};
+			this.dragStartPoint = {X: -1, Y: -1};
+		}
+	};
+
+	_.Project.prototype.appendScene = function(name){
+		if(this.sceneId[name] !== undefined) return null;
+		this.sceneId[name] = this.scenes.length;
+		this.scenes.push(new _.Scene(this));
+		return this.scenes[this.scenes.length-1];
+	};
+
+	_.Project.prototype.getSceneByName = function(name){
+		return this.sceneId[name] === undefined ? undefined : this.scenes[this.sceneId[name]];
+	};
+
+	_.Project.prototype.changeScene = function(name){
+		this.nowScene = this.getSceneByName(name);
+		if(this.nowScene !== undefined && this.nowScene.initialize !== undefined) this.nowScene.initialize();
+	};
+
+	_.Project.prototype.draw = function(){
+		this.canvas.getContext("2d").clearRect(0,0,this.canvas.width,this.canvas.height);
+		this.nowScene.draw();
+	};
+
+	_.Project.prototype.play = function(interval = 20){
+		if(!this.canvas.getContext) return;
+		this.canvas.addEventListener("mouseout",{pjt: this, handleEvent: onMouseOut});
+		this.canvas.addEventListener("mousemove",{pjt: this, handleEvent: onMouseMove});
+		this.canvas.addEventListener("click",{pjt: this, handleEvent: onClick});
+		this.canvas.addEventListener("mousedown",{pjt: this, handleEvent: onMouseDown});
+		this.canvas.addEventListener("mouseup",{pjt: this, handleEvent: onMouseUp});
+		this.canvas.addEventListener("touchstart",{pjt: this, handleEvent: onTouchStart});
+		this.canvas.addEventListener("touchend",{pjt: this, handleEvent: onTouchEnd});
+		this.canvas.addEventListener("touchcancel",{pjt: this, handleEvent: onTouchEnd});
+		this.canvas.addEventListener("touchmove",{pjt: this, handleEvent: onTouchMove});
+		this.canvas.addEventListener("keydown",{pjt: this, handleEvent: onKeyDown});
+		this.canvas.addEventListener("keyup",{pjt: this, handleEvent: onKeyUp});
+		const clickEvent = function(){
+			if(this.pjt.nowScene === undefined) return;
+			for(let i = this.pjt.nowScene.elements.length-1 ; i >= 0 ; --i){
+				if(this.pjt.nowScene.elements[i].onClick !== undefined && this.pjt.nowScene.elements[i].isInternal(this.pjt.cursor)){
+					this.pjt.nowScene.elements[i].onClick();
+					return;
+				}
+			}
+		};
+		const mouseMoveEvent = function(){
+			if(this.pjt.nowScene === undefined) return;
+			for(let i = 0 ; i < this.pjt.nowScene.elements.length ; ++i){
+				if(this.pjt.nowScene.elements[i].onMouseMove !== undefined) this.pjt.nowScene.elements[i].onMouseMove();
+			}
+		};
+		const mouseDownEvent = function(){
+			if(this.pjt.nowScene === undefined) return;
+			for(let i = 0 ; i < this.pjt.nowScene.elements.length ; ++i){
+				if(this.pjt.nowScene.elements[i].onMouseDown !== undefined) this.pjt.nowScene.elements[i].onMouseDown();
+			}
+		};
+		this.canvas.addEventListener("click",{pjt: this, handleEvent: clickEvent});
+		this.canvas.addEventListener("mousedown",{pjt: this, handleEvent: mouseDownEvent});
+		this.canvas.addEventListener("mousemove",{pjt: this, handleEvent: mouseMoveEvent});
+		this.canvas.addEventListener("touchstart",{pjt: this, handleEvent: clickEvent});
+		this.canvas.addEventListener("touchmove",{pjt: this, handleEvent: mouseMoveEvent});
+		const pjt = this;
+		this.loop = setInterval(function(){pjt.draw();},interval);
+	};
+
+	_.Scene = class{
+		constructor(pjt){
+			this.elements = [];
+			this.elementId = {};
+			this.pjt = pjt;
+		}
+	};
+
+	_.Scene.prototype.appendElement = function(name,e){
+		if(this.elementId[name] !== undefined) return null;
+		this.elementId[name] = this.elements.length;
+		e.pjt = this.pjt;
+		e.display = this.pjt.canvas.getContext("2d");
+		this.elements.push(e);
+		return e;
+	};
+
+	_.Scene.prototype.getElementByName = function(){
+		return this.elementId[name] === undefined ? undefined : this.elements[this.elementId[name]];
+	};
+
+	_.Scene.prototype.draw = function(){
+		for(var i = 0 ; i < this.elements.length ; ++i){
+			this.elements[i].draw();
+		}
+	};
+
+	_.Text = class{
+		constructor(chars,X,Y,args={}){
+			this.chars = (typeof(chars) === "function" ? chars : function(){return chars;});
+			this.fill = true;
+			this.posX = X;
+			this.posY = Y;
+			this.opacity = 1.0;
+			this.color = "#FFFFFF";
+			this.font = "12px '???'"
+			this.textAlign = "left";
+			this.textBaseline = "bottom";
+			
+			if(args.fill !== undefined) this.fill = args.fill;
+			if(args.opacity !== undefined) this.opacity = args.opacity;
+			if(args.color !== undefined) this.color = args.color;
+			if(args.font !== undefined) this.font = args.font;
+			if(args.textAlign !== undefined) this.textAlign = args.textAlign;
+			if(args.textBaseline !== undefined) this.textBaseline = args.textBaseline;
+		}
+	};
+
+	_.Text.prototype.draw = function(){
+		this.display.globalAlpha = this.opacity;
+		this.display.font = this.font;
+		this.display.textAlign = this.textAlign;
+		this.display.textBaseline = this.textBaseline;
+		if(this.fill){
+			this.display.fillStyle = this.color;
+			this.display.fillText(this.chars(),this.posX,this.posY);
+		} else {
+			this.display.strokeStyle = this.color;
+			this.display.strokeText(this.chars(),this.posX,this.posY);
+		}
+	};
+	
+	_.Polygon = class{
+		constructor(points,args={}){
+			this.points = points;
+			this.opacity = 1.0;
+			this.lineWidth = 1.0;
+			this.color = "#FFFFFF";
+			this.fill = true;
+			this.close = true;
+
+			if(args.fill !== undefined) this.fill = args.fill;
+			if(args.close !== undefined) this.close = args.close;
+			if(args.opacity !== undefined) this.opacity = args.opacity;
+			if(args.color !== undefined) this.color = args.color;
+			if(args.lineWidth !== undefined) this.lineWidth = args.lineWidth;
+		}
+	};
+
+	_.Polygon.prototype.draw = function(){
+		this.display.globalAlpha = this.opacity;
+		this.display.beginPath();
+		this.display.moveTo(this.points[0][0],this.points[0][1]);
+		for(let i = 1 ; i < this.points.length ; ++i) this.display.lineTo(this.points[i][0],this.points[i][1]);
+		if(this.close) this.display.closePath();
+		if(this.close && this.fill){
+			this.display.fillStyle = this.color;
+			this.display.fill();
+		} else {
+			this.display.strokeStyle = this.color;
+			this.display.lineWidth = this.lineWidth;
+			this.display.stroke();
+		}
+	};
+
+	_.Polygon.prototype.isInternal = function(p){
+		this.display.beginPath();
+		this.display.moveTo(this.points[0][0],this.points[0][1]);
+		for(let i = 1 ; i < this.points.length ; ++i) this.display.lineTo(this.points[i][0],this.points[i][1]);
+		this.display.closePath();
+		return this.display.isPointInPath(p.X,p.Y);
+	}
+
+	_.Circle = class{
+		constructor(X,Y,radius,args={}){
+			this.posX = X;
+			this.posY = Y;
+			this.radius = radius;
+			this.angle = [0, Math.PI*2];
+			this.opacity = 1.0;
+			this.color = "#FFFFFF";
+			this.fill = true;
+			this.lineWidth = 1.0;
+
+			if(args.fill !== undefined) this.fill = args.fill;
+			if(args.opacity !== undefined) this.opacity = args.opacity;
+			if(args.color !== undefined) this.color = args.color;
+			if(args.lineWidth !== undefined) this.lineWidth = args.lineWidth;
+			if(args.angle !== undefined) this.angle = args.angle;
+		}
+	};
+
+	_.Circle.prototype.draw = function(){
+		this.display.globalAlpha = this.opacity;
+		this.display.beginPath();
+		this.display.arc(this.posX, this.posY, this.radius, this.angle[0], this.angle[1], false);
+		if(this.fill){
+			this.display.fillStyle = this.color;
+			this.display.fill();
+		} else {
+			this.display.strokeStyle = this.color;
+			this.display.lineWidth = this.lineWidth;
+			this.display.stroke();
+		}
+	};
+
+	_.Circle.prototype.isInternal = function(p){
+		this.display.beginPath();
+		this.display.arc(this.posX, this.posY, this.radius, 0, Math.PI*2, false);
+		return this.display.isPointInPath(p.X,p.Y);
+	}
+
+	_.Button = class{
+		constructor(shape,text,onClick,args={}){
+			this.shape = shape;
+			this.text = text;
+			this.mouseOverColor = "#FFFFFF";
+			this.mouseOverOpacity = 0.2;
+			this.onClick = onClick;
+
+			if(args.mouseOverColor !== undefined) this.mouseOverColor = args.mouseOverColor;
+			if(args.mouseOverOpacity !== undefined) this.mouseOverOpacity = args.mouseOverOpacity;
+		}
+	};
+
+	_.Button.prototype.isInternal = function(p){return this.shape.isInternal(p);};
+
+	_.Button.prototype.draw = function(){
+		this.shape.pjt = this.pjt;
+		this.text.pjt = this.pjt;
+		this.shape.display = this.display;
+		this.text.display = this.display;
+		this.shape.draw();
+		this.text.draw();
+		if(this.shape.isInternal(this.pjt.cursor)){
+			let color = this.shape.color;
+			let opacity = this.shape.opacity;
+			this.shape.color = this.mouseOverColor;
+			this.shape.opacity = this.mouseOverOpacity;
+			this.shape.draw();
+			this.shape.color = color;
+			this.shape.opacity = opacity;
+		}
+	};
+
+	_.makeBasicButton = function(points,text,onClick,textFont="40px '游明朝'",textColor="#000000",buttonColor="#AFAFAF",args={}){
+		return new _.Button(
+			new _.Polygon([[points[0],points[1]],[points[2],points[1]],[points[2],points[3]],[points[0],points[3]]],{color: buttonColor}),
+			new PItS_canvas.Text(text,(points[0]+points[2])/2,(points[1]+points[3])/2,{textAlign: "center", textBaseline: "middle", font: textFont, color: textColor}),
+			onClick,
+			args
+		);
+	}
+
+	_.Slider = class{
+		constructor(X,Y,thumb,args = {}){
+			this.vertical = true;
+			this.posX = X;
+			this.posY = Y;
+			this.trackWidth = 3;
+			this.min = 0;
+			this.max = 100;
+			this.scale = 5;
+			this.color = "#FFFFFF";
+
+			if(args.vertical !== undefined) this.vertical = args.vertical;
+			if(args.horizontal !== undefined) this.vertical = !args.horizontal;
+			if(args.trackWidth !== undefined) this.trackWidth = args.trackWidth;
+			if(args.min !== undefined) this.min = args.min;
+			if(args.max !== undefined) this.max = args.max;
+			if(args.scale !== undefined) this.scale = args.scale;
+			if(args.color !== undefined) this.color = args.color;
+			this.val = args.val === undefined ? this.min : args.val;
+
+			this.collisionWidth = this.trackWidth;
+
+			this.thumb = {};
+			if(thumb.type === "square"){
+				this.thumb.width = (thumb.width !== undefined ? thumb.width : 10);
+				this.thumb.height = (thumb.height !== undefined ? thumb.height : 10);
+				this.collisionWidth = (this.vertical ? this.thumb.width : this.thumb.height);
+				this.thumb.draw = function(isInternal){
+					this.display.globalAlpha = this.opacity;
+					this.display.fillStyle = this.color;
+					this.display.fillRect(this.posX-this.width/2,this.posY-this.height/2,this.width,this.height);
+					if(isInternal){
+						this.display.globalAlpha = this.mouseOverOpacity;
+						this.display.fillStyle = this.mouseOverColor;
+						this.display.fillRect(this.posX-this.width/2,this.posY-this.height/2,this.width,this.height);
+					}
+				};
+			} else if(thumb.type === "circle"){
+				this.thumb.radius = (thumb.radius !== undefined ? thumb.radius : 5);
+				this.collisionWidth = this.thumb.radius*2;
+				this.thumb.draw = function(isInternal){
+					this.display.globalAlpha = this.opacity;
+					this.display.fillStyle = this.color;
+					this.display.beginPath();
+					this.display.arc(this.posX,this.posY,this.radius,0,Math.PI*2);
+					this.display.fill();
+					if(isInternal){
+						this.display.globalAlpha = this.mouseOverOpacity;
+						this.display.fillStyle = this.mouseOverColor;
+						this.display.beginPath();
+						this.display.arc(this.posX,this.posY,this.radius,0,Math.PI*2);
+						this.display.fill();
+					}
+				}
+			} else {
+				this.thumb = thumb;
+			}
+			this.thumb.posX = X;
+			this.thumb.posY = Y;
+			this.thumb.color = (thumb.color !== undefined ? thumb.color : this.color);
+			this.thumb.opacity = (thumb.opacity !== undefined ? thumb.opacity : 1.0);
+			this.thumb.mouseOverColor = (thumb.mouseOverColor !== undefined ? thumb.mouseOverColor : "#FFFFFF");
+			this.thumb.mouseOverOpacity = (thumb.mouseOverOpacity !== undefined ? thumb.mouseOverOpacity : 0.2);
+		}
+	};
+
+	_.Slider.prototype.draw = function(){
+		this.display.globalAlpha = 0.5;
+		this.display.fillStyle = this.color;
+		var isInternal = this.isInternal(this.pjt.cursor) || this.isInternal(this.pjt.dragStartPoint);
+		if(this.vertical){
+			this.display.fillRect(this.posX,this.posY,this.trackWidth,Math.ceil((this.max-this.min)/this.scale)+1);
+			this.thumb.posX = this.posX + (this.trackWidth-1)/2;
+			this.thumb.posY = this.posY + Math.ceil((this.val-this.min)/this.scale);
+		} else {
+			this.display.fillRect(this.posX,this.posY,Math.ceil((this.max-this.min)/this.scale)+1,this.trackWidth);
+			this.thumb.posX = this.posX + Math.ceil((this.val-this.min)/this.scale);
+			this.thumb.posY = this.posY + (this.trackWidth-1)/2;
+		}
+		this.thumb.pjt = this.pjt;
+		this.thumb.display = this.display;
+		this.thumb.draw(isInternal);
+	};
+
+	_.Slider.prototype.onMouseDown = _.Slider.prototype.onClick = _.Slider.prototype.onMouseMove = function(){
+		if(this.isInternal(this.pjt.dragStartPoint)){
+			if(this.vertical){
+				this.val = Math.max(this.min,Math.min(this.max,this.min+(this.pjt.cursor.Y-this.posY)*this.scale));
+			} else {
+				this.val = Math.max(this.min,Math.min(this.max,(this.pjt.cursor.X-this.posX)*this.scale));
+			}
+		}
+	};
+
+	_.Slider.prototype.isInternal = function(p){
+		if(this.vertical) return this.posX-(this.collisionWidth-this.trackWidth)/2 <= p.X && p.X <= this.posX+(this.collisionWidth+this.trackWidth)/2  && this.posY <= p.Y && p.Y <= this.posY+Math.ceil((this.max-this.min)/this.scale)+1;
+		else return this.posY-(this.collisionWidth-this.trackWidth)/2 <= p.Y && p.Y <= this.posY+(this.collisionWidth+this.trackWidth)/2  && this.posX <= p.X && p.X <= this.posX+Math.ceil((this.max-this.min)/this.scale)+1;
+	};
+}());

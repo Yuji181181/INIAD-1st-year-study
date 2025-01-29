@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!-- カンペに必要そうな資料を洗い出していこうね♡ -->
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="src/highlight/styles/default.css" />
+    <link rel="stylesheet" href="src/css/index.css" />
+    <script src="src/highlight/highlight.js"></script>
+    <script>
+      hljs.initHighlightingOnLoad();
+    </script>
+    <script
+      id="MathJax-script"
+      async
+      src="src/js/tex-mml-chtml.js"
+    ></script>
+    <title>カンペ</title>
+  </head>
+  <body>
+    <section class="title"><h1>CS中間テストのためのカンペ</h1></section>
+    <section class="Keisanryo">
+      <h3>情報量, アルゴリズム, 計算量</h3>
+      <ul>
+        <li>情報量の定義式 \(I = -\log_2 p \, \mathrm{[bit]} \)</li>
+        <li>情報エントロピー\(H = E[I] = -\sum_{n=1}^N p_i \log_2 p_i\)</li>
+        <li>オーダー記法大きい順</li>
+        <ul>
+          <li>指数関数 \(O(C^n)(C>1)\)</li>
+          <li>多項式(べき関数) \(O(n^c)(C>0)\)</li>
+          <li>線形時間 \(O(n)\)</li>
+          <li>準線形時間 \(O(n\log n)\)</li>
+          <li>対数関数 \(O(\log n)\)</li>
+          <li>定数 \(O(1)\)</li>
+        </ul>
+        <li><a href="src/time-complexity.html">計算量の見積もり方</a></li>
+      </ul>
+    </section>
+    <section class="binary_search">
+        <h3>二分探索</h3>
+        <h4>比較した数字と回数を出力</h4>
+        <pre><code>
+        def binary_search(lst, x):
+            start = 0
+            end = len(lst)
+            comparisons = [] 
+            count = 0      
+            if x not in lst:
+                print("対象の数字が見つかりません。")
+                return
+            while start < end:
+                mid = start + (end - start) // 2
+                comparisons.append(lst[mid])
+                count += 1 
+
+                if x > lst[mid]:
+                    start = mid + 1
+                elif x < lst[mid]:
+                    end = mid
+                else:
+                    print("対象の数字が見つかりました。")
+                    print("比較した数字の列:", comparisons)
+                    print("比較回数:", count)
+                    return
+
+        sorted_list = [2, 5, 12, 24, 31, 38, 43, 48, 57, 69, 88, 93, 99]
+        target = 31
+
+        binary_search(sorted_list, target)
+        
+        #対象の数字が見つかりました。
+        #比較した数字の列: [43, 24, 38, 31]
+        #比較回数: 4
+        </code></pre>
+        <ul>
+          <li>計算量 \(O(n\log n)\)</li>
+        </ul>
+    </section>
+    <section class="Sort">
+      <h3>ソートアルゴリズム</h3>
+      <h4>選択ソート</h4>
+      <p>先頭から最小のものを取り出し並べる動作を繰り返す</p>
+      <pre><code>def selection_sort(lst):
+      length = len(lst)
+      for i in range(length):
+        minpos = i
+        for j in range(i + 1, length):
+          if lst[j] < lst[minpos]:
+            minpos = j
+        if i != minpos:
+          tmp = lst[i]
+          lst[i] = lst[minpos]
+          lst[minpos] = tmp
+      </code></pre>
+      <img src="src/img/select1.png">
+      <img src="src/img/select2.png">
+      <ul>
+        <li>計算量 \(O(n^2)\)</li>
+      </ul>
+      <h4>クイックソート</h4>
+      <pre><code>def simple_qsort(lst):
+      if len(lst) <= 1:
+        return lst
+      pivot = lst[0]
+
+      lst1 = [x for x in lst if x < pivot]
+      lst2 = [x for x in lst if x == pivot]
+      lst3 = [x for x in lst if x > pivot]
+
+      return simple_qsort(lst1) + lst2 + simple_qsort(lst3)
+      </code></pre>
+      <img src="src/img/スクリーンショット 2024-11-18 170423.png" />
+      <ul>
+        <li>平均計算量 \(O(n \log n)\)</li>
+        <li>
+          最悪計算量 \(O(n^2)\)
+          (※ピボットが常に最小値が選ばれてしまう時に最悪となる)
+        </li>
+      </ul>
+      <h4>マージソート</h4>
+      <pre><code>
+def msort(lst): 
+        if len(lst) <= 1:
+          return lst
+        lst1 = lst[0: len(lst) // 2]
+        lst2 = lst[len(lst) // 2:]
+
+        sorted_lst1 = msort(lst1)
+        sorted_lst2 = msort(lst2)
+
+        return merge(sorted_lst1, sorted_lst2)
+
+def merge(lst1, lst2):
+        result = []
+        i = 0
+        j = 0
+        while (i < len(lst1)) and (j < len(lst2)):
+            if lst1[i] <= lst2[j]:
+                result.append(lst1[i])
+                i += 1
+            else:
+                result.append(lst2[i])
+                j += 1
+        while i < len(lst2):
+            result.append(lst2[j])
+            j += 1
+        return result
+      </code></pre>
+      <img src="src/img/スクリーンショット 2024-11-18 172609.png" />
+      <ul>
+        <li>平均計算量 \(O(n \log n)\)</li>
+      </ul>
+      <h4>ソートのまとめ</h4>
+      <img src="src/img/スクリーンショット 2024-11-18 172930.png" />
+    </section>
+    <section class="stack_que">
+      <h3>リスト, スタック, キュー</h3>
+      <h4>スタック</h4>
+      <p>食堂のトレーのようなもので、データを積み上げる構造</p>
+      <img src="src/img/スクリーンショット 2024-11-19 140812.png" />
+      <h4>キュー</h4>
+      <p>行列のようなもので、データが列に並ぶような構造</p>
+      <img src="src/img/スクリーンショット 2024-11-19 141743.png" />
+    </section>
+    <section class="Tree">
+      <h3>木構造</h3>
+      <h4>木構造について</h4>
+      <p>深さと高さは0から始まるので矢印を数えるのがベスト</p>
+      <img src="src/img/Tree1.png" />
+      <img src="src/img/image.png" />
+      <ul>
+        <li>親と子</li>
+        <p>
+          つながったノードどうしが親子関係となる.
+          根に近いほうが親でそうでない方が子となる.
+        </p>
+        <li>根と葉</li>
+        <p>
+          親ノードを持たないものを根、子ノードを持たないものを葉と呼ぶ.
+          (この図ではオレンジに囲まれた部分が葉)
+        </p>
+      </ul>
+      <img src="src/img/Tree2.png" />
+      <ul>
+        <li>先祖, 子孫</li>
+        <p>
+          あるノードから見て、親を順にたどると着くノードを先祖,
+          子を順にたどると着くノードを子孫という.
+        </p>
+        <li>兄弟</li>
+        <p>同じを親を持つノードを兄弟という. 左側を兄とする.</p>
+      </ul>
+      <h4>二分木の探索</h4>
+      <img class="smallimg" src="src/img/20200118192915.gif" />
+      <img class="smallimg" src="src/img/20200118192923.gif" />
+      <img class="smallimg" src="src/img/20200118192933.gif" />
+      <h4>ハフマン符号</h4>
+      <p><a href="src/huffman.html">やり方はこれを参照</a></p>
+      <h4>数式の木</h4>
+      <p>中置記法から逆ポーランド記法</p>
+      <ol>
+        <li>数字が来たら縦に重ねていく</li>
+        <li>演算子が来たら重ねた数字の上二つを取り合体する</li>
+        <li>合体したものをまた重ねる</li>
+        <li>それを繰り返していく</li>
+      </ol>
+      <img class="smallimg" src="src/img/アートボード 1.png" />
+    </section>
+    <section class="graph">
+      <h3>グラフ構造</h3>
+      <h4>深さ優先探索</h4>
+      <pre><code>def dfs(node):
+    node.traversed = True
+    print(node, end=", ")
+    
+        for next_node in node.links:
+            if not next_node.traversed:
+                dfs(next_node)
+    
+for node in graph:
+    node.traversed = False
+    
+dfs(a)</code>
+      </code></pre>
+      <h4>幅優先探索</h4>
+      <pre><code>from collections import deque
+
+def bfs(node):
+    q = deque()
+        
+    q.append(node)
+    node.traversed = True
+        
+    while len(q) > 0:
+      node = q.popleft()
+      print(node, end=', ')
+      for next_node in node.links:
+        if not next_node.traversed:
+          q.append(next_node)
+          next_node.traversed = True
+                        
+for node in graph:
+    node.traversed = False
+        
+bfs(a)</code></pre>
+      <h4>ダイクストラ法を用いた最短経路</h4>
+      <pre><code>for i in range(len(G)):
+        sp = nx.shortest_path(G, min(G.nodes), i)
+        w = 0
+        for j in range(len(sp)-1):
+            w += G[sp[j]][sp[j+1]]["weight"]
+        print(f"0から{i}までの重み -> {w}")</code></pre>
+    </section>
+  </body>
+</html>

@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django におけるセキュリティ &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="パフォーマンスと最適化" href="performance.html" />
+    <link rel="prev" title="ページ分割 (Pagination)" href="pagination.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="pagination.html" title="ページ分割 (Pagination)">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="performance.html" title="パフォーマンスと最適化">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-security">
+            
+  <section id="s-security-in-django">
+<span id="security-in-django"></span><h1>Django におけるセキュリティ<a class="headerlink" href="#security-in-django" title="Link to this heading">¶</a></h1>
+<p>このドキュメントは、Django のセキュリティ機能の概要です。Django を利用したサイトを安全なものにするためのヒントを説明します。</p>
+<section id="s-cross-site-scripting-xss-protection">
+<span id="s-cross-site-scripting"></span><span id="cross-site-scripting-xss-protection"></span><span id="cross-site-scripting"></span><h2>クロス・サイト・スクリプティング (XSS) の防御<a class="headerlink" href="#cross-site-scripting-xss-protection" title="Link to this heading">¶</a></h2>
+<p>XSS 攻撃はあるユーザーに対してクライアント用のスクリプトを別のユーザーのブラウザに読み込ませることを可能にしてしまいます。この攻撃は通常他のユーザーに対して選択・表示を行うデータベース内に悪意のあるスクリプトを保存させる、あるいは攻撃者の JavaScript がブラウザで実行されるリンクをユーザーにクリックさせることでなされます。しかしながら、XSS 攻撃はページを読み込む前に十分なサニタイズを行っていなければ、信頼できないクッキーやウェブ・サービスのようなデータが発生の原因となることがあります。</p>
+<p>Django のテンプレートを用いる事で多数の XSS 攻撃に対抗できます。しかしながら、それがどのような防御策が用意でき、またその利用に際する制限について知ることが重要になります。</p>
+<p>Django は HTML に対して特に危険とみなされる <a class="reference internal" href="../ref/templates/language.html#automatic-html-escaping"><span class="std std-ref">特定の文字列のエスケープ</span></a> を行います。この防御によってユーザーは大半の悪意のある入力から守られますが、いつも簡単で容易に利用できる訳ではありません。たとえば、次に示す例では防御がなされません。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;style class={{ var }}&gt;...&lt;/style&gt;
+</pre></div>
+</div>
+<p>もし <code class="docutils literal notranslate"><span class="pre">var</span></code> の値が <code class="docutils literal notranslate"><span class="pre">'class1</span> <span class="pre">onmouseover=javascript:func()'</span></code> にセットされた場合、不完全な HTML をそのブラウザがどのようにレンダリングするかによっては、許可されていない Javascript を実行させる事になります。(このケースであれば属性値のクオートを行えば対処できます)</p>
+<p>カスタム・テンプレート・タグと共に <code class="docutils literal notranslate"><span class="pre">is_safe</span></code> を用いたり、 <a class="reference internal" href="../ref/templates/builtins.html#std-templatefilter-safe"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">safe</span></code></a> テンプレートタグや、 <a class="reference internal" href="../ref/utils.html#module-django.utils.safestring" title="django.utils.safestring: Functions and classes for working with strings that can be displayed safely without further escaping in HTML."><code class="xref py py-mod docutils literal notranslate"><span class="pre">mark_safe</span></code></a> の利用に加えてオートエスケープが無効化されている場合十分な注意を払う必要があります。</p>
+<p>ここまでの内容に加えて、HTML 以外を出力するのにテンプレートシステムを利用している場合、完全に別のエスケープすべき文字や単語が存在するかもしれません。</p>
+<p>HTML をデータベース内に収集、特にその HTML が選択・表示される場合は十分な注意を払う必要があります。</p>
+</section>
+<section id="s-cross-site-request-forgery-csrf-protection">
+<span id="cross-site-request-forgery-csrf-protection"></span><h2>クロス・サイト・リクエスト・フォージェリ(CSRF)の防御<a class="headerlink" href="#cross-site-request-forgery-csrf-protection" title="Link to this heading">¶</a></h2>
+<p>CSRF 攻撃は悪意ある利用者が、あるユーザーが自身で持っている情報や承認を用いずに、そのユーザーの認証情報での処理を発生させてしまう攻撃です。</p>
+<p>Django は大半の CSRF 攻撃に対応したビルトインの防御機構を備え、適切な所で <a class="reference internal" href="../howto/csrf.html#using-csrf"><span class="std std-ref">有効化して利用できます</span></a> 。しかしながら、いかなる緩和策にも制限が存在します。たとえば、CSRF モジュールをグローバルにあるいは特定のビューだけ無効化できます。これは自身が何をしているのか理解している場合のみ行うべきです。もしあなたのサイト内に管理対象外のサブドメインが存在すればそこにも <a class="reference internal" href="../ref/csrf.html#csrf-limitations"><span class="std std-ref">制限</span></a> が存在します。</p>
+<p><a class="reference internal" href="../ref/csrf.html#how-csrf-works"><span class="std std-ref">CSRFプロテクション</span></a> はそれぞれのPOSTリクエストのシークレットを検証することで動作します。これにより、悪意のあるユーザーがあなたのウェブサイトに対してフォームのPOSTを「再送信」することはできず、他のログイン済みユーザーは意識することなくフォームを送信できます。悪意のあるユーザーはCookieを使用したユーザー固有のシークレットを知る必要があります。</p>
+<p><a class="reference internal" href="#security-recommendation-ssl"><span class="std std-ref">HTTPS</span></a> でデプロイした場合、<code class="docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code> は HTTP referer ヘッダが (サブドメインとポートを含め) 同一オリジンの URL にセットされているかをチェックします。HTTPS では強化されたセキュリティを利用できるため、可能な限り安全でないコネクションのリクエストを転送したり、サポートされたブラウザでは HSTS を使用するなどして HTTPS コネクションを使用することが不可欠です。</p>
+<p>どうしても必要という場合を除いて、 <code class="docutils literal notranslate"><span class="pre">csrf_exempt</span></code> デコレータでビューをマークする際には十分注意してください。</p>
+</section>
+<section id="s-sql-injection-protection">
+<span id="s-id1"></span><span id="sql-injection-protection"></span><span id="id1"></span><h2>SQL injectionへの防御<a class="headerlink" href="#sql-injection-protection" title="Link to this heading">¶</a></h2>
+<p>SQL injectionは、悪意ある攻撃者がデータベース任意のSQLコードを実行する攻撃です。これによって、レコードが削除されたり、情報が漏洩する可能性があります。</p>
+<p>Djangoのクエリセットは、クエリのパラメータ化によってクエリを構成するため、SQL injectionから守られています。クエリのSQLコードはそのクエリのパラメータとは独立に定義されています。パラメータはユーザが指定するものも有り、安全ではないので、低レイヤのデータベースドライバーによってエスケープされます。</p>
+<p>Djangoは開発者に、<a class="reference internal" href="db/sql.html#executing-raw-queries"><span class="std std-ref">素のクエリを実行する</span></a> または <a class="reference internal" href="db/sql.html#executing-custom-sql"><span class="std std-ref">カスタムSQLを実行する</span></a> 力も与えています。これらの機能は慎重に使用すべきであり、ユーザーが制御できるパラメータを適切にエスケープすることを常に注意すべきです。さらに、<a class="reference internal" href="../ref/models/querysets.html#django.db.models.query.QuerySet.extra" title="django.db.models.query.QuerySet.extra"><code class="xref py py-meth docutils literal notranslate"><span class="pre">extra()</span></code></a> や <a class="reference internal" href="../ref/models/expressions.html#django.db.models.expressions.RawSQL" title="django.db.models.expressions.RawSQL"><code class="xref py py-class docutils literal notranslate"><span class="pre">RawSQL</span></code></a> を使用する際には注意が必要です。</p>
+</section>
+<section id="s-clickjacking-protection">
+<span id="clickjacking-protection"></span><h2>クリックジャッキング (Clickjacking) に対する防御<a class="headerlink" href="#clickjacking-protection" title="Link to this heading">¶</a></h2>
+<p>クリックジャッキング (Clickjacking) は、悪意のあるサイトが他のサイトをフレームの中に表示するタイプの攻撃です。攻撃の結果、疑いのないユーザーが騙されてターゲットのサイトに対して意図しない操作を行ってしまいます。</p>
+<p>Djangoは <a class="reference internal" href="../ref/clickjacking.html#clickjacking-prevention"><span class="std std-ref">クリックジャッキング保護</span></a> の仕組みを <a class="reference internal" href="../ref/middleware.html#django.middleware.clickjacking.XFrameOptionsMiddleware" title="django.middleware.clickjacking.XFrameOptionsMiddleware"><code class="xref py py-mod docutils literal notranslate"><span class="pre">X-Frame-Options</span> <span class="pre">ミドルウェア</span></code></a> で提供しています。サポートしているブラウザではサイトをフレーム内で描画しないようにします。この保護はビュー単位で無効化できます。あるいは、固定的にヘッダーの値を送信できます。</p>
+<p>サードパーティのサイト上でページをフレーム内に表示する必要がないか、もし合ったとしてもごく少数のセクションしかないようなあらゆるサイトは、このミドルウェアを使用することを強く推奨します。</p>
+</section>
+<section id="s-ssl-https">
+<span id="s-security-recommendation-ssl"></span><span id="ssl-https"></span><span id="security-recommendation-ssl"></span><h2>SSL/HTTPS<a class="headerlink" href="#ssl-https" title="Link to this heading">¶</a></h2>
+<p>セキュリティの観点から、サイトを HTTPS の下でデプロイするのは常に良い選択です。HTTPS がなければ、悪意のあるネットワークユーザーが、クライアント・サーバー間で通信される認証情報やその他あらゆる情報を盗み見たり、場合によっては、<strong>積極的な</strong> ネットワーク攻撃者がどちらの方向でもデータ書き換えが可能になってしまいます。</p>
+<p>HTTPS による保護をサーバー上で有効にするためには、多少の追加作業が必要になります:</p>
+<ul>
+<li><p>必要な場合は、関連する注意点を完全に理解した上で、<a class="reference internal" href="../ref/settings.html#std-setting-SECURE_PROXY_SSL_HEADER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_PROXY_SSL_HEADER</span></code></a> をセットしてください。この設定に失敗すると、CSRF の脆弱性の原因となり、大変な危険につながりかねません！</p></li>
+<li><p><a class="reference internal" href="../ref/settings.html#std-setting-SECURE_SSL_REDIRECT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_SSL_REDIRECT</span></code></a> を <code class="docutils literal notranslate"><span class="pre">True</span></code> にセットして、HTTP によるリクエストが HTTPS にリダイレクトされるようにしてください。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-SECURE_PROXY_SSL_HEADER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_PROXY_SSL_HEADER</span></code></a> の注意点を確認してください。リバースプロキシの場合、メインのウェブサーバーを HTTPS にリダイレクトするよう設定した方が簡単で安全かもしれません。</p>
+</li>
+<li><p>'安全な' クッキーを使用してください。</p>
+<p>ブラウザが最初 HTTP で通信した場合 (これはブラウザのデフォルトの動作です)、既存のクッキーが誰でも見える状態になっている可能性があります。そのため、<a class="reference internal" href="../ref/settings.html#std-setting-SESSION_COOKIE_SECURE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-CSRF_COOKIE_SECURE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_SECURE</span></code></a> を <code class="docutils literal notranslate"><span class="pre">True</span></code> にセットする必要があります。これにより、ブラウザは HTTPS コネクションによるクッキーを送信するようになります。これは、セッションが HTTP では動作せず、 CSRF 保護が HTTP によって受け入れられたあらゆる POST データを防止することを意味します (ただし、HTTP 通信を HTTPS にリダイレクトするよう設定しておけば問題ありません)。</p>
+</li>
+<li><p><a class="reference internal" href="../ref/middleware.html#http-strict-transport-security"><span class="std std-ref">HTTP Strict Transport Security</span></a> (HSTS) を使用してください。</p>
+<p>HSTS は HTTP ヘッダで、特定のサイトに対する以降のコネクションが常に HTTPS を使うことをブラウザに伝えるものです。HTTP から HTTPS にリクエストをリダイレクトさせることと合わせて、コネクションが 1 つ成功したときに提供される SSL の安全性を担保します。 HSTS は、<a class="reference internal" href="../ref/settings.html#std-setting-SECURE_HSTS_SECONDS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_SECONDS</span></code></a>、<a class="reference internal" href="../ref/settings.html#std-setting-SECURE_HSTS_INCLUDE_SUBDOMAINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_INCLUDE_SUBDOMAINS</span></code></a>, と <a class="reference internal" href="../ref/settings.html#std-setting-SECURE_HSTS_PRELOAD"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_PRELOAD</span></code></a>、もしくはウェブサーバ上のどれかで設定されます。</p>
+</li>
+</ul>
+</section>
+<section id="s-host-header-validation">
+<span id="s-host-headers-virtual-hosting"></span><span id="host-header-validation"></span><span id="host-headers-virtual-hosting"></span><h2>Host ヘッダーの検証<a class="headerlink" href="#host-header-validation" title="Link to this heading">¶</a></h2>
+<p>Django はいくつかのケースで、URL を組み立てるためにクライアントから送られてきた <code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダーを使用します。<code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダーの値は、クロス サイト スクリプティング (XSS) 攻撃を回避するためにサニタイズされますが、それでもまだ偽の <code class="docutils literal notranslate"><span class="pre">Host</span></code> 値はクロス サイト リクエスト フォージェリ (CSRF) やキャッシュポイズニング攻撃、メールアドレス内のリンクへのポイズニング等に使用されます。</p>
+<p>一見安全なウェブサーバー設定であっても偽の <code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダーの可能性が残るため、Djangoは <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.get_host" title="django.http.HttpRequest.get_host"><code class="xref py py-meth docutils literal notranslate"><span class="pre">django.http.HttpRequest.get_host()</span></code></a> メソッド内で <code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダーの値を <a class="reference internal" href="../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> 設定で検証します。</p>
+<p>このヘッダの検証は <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.get_host" title="django.http.HttpRequest.get_host"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_host()</span></code></a> メソッドの実行時にのみ適用されます。もし <code class="docutils literal notranslate"><span class="pre">request.META</span></code> から直接 <code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダにアクセスするコードを書いてしまうと、このセキュリティプロテクションを回避してしまうので注意してください。</p>
+<p>より詳しい情報については、<a class="reference internal" href="../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> ドキュメントをご覧ください。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>以前のドキュメントでは、外部から渡される <code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダーを検証して正しい値にするようにウェブサーバーを設定することを推奨していました。これはまだ推奨されますが、多くの一般的なウェブサーバーは <code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダーを正しく検証するように設定できません。例えば、Apacheがそのように設定されたとしても、あなたのDjangoサイトが <code class="docutils literal notranslate"><span class="pre">ServerName</span></code> に設定された非デフォルトの仮想ホストを扱うようにApacheに設定された場合、その仮想ホスト名に一致するような偽の <code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダーを与えたHTTPリクエストを作れます。したがって、ウェブサーバー設定にたよるだけでなく、Djangoの <a class="reference internal" href="../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> に明示的に設定する必要があります。</p>
+</div>
+<p>さらに、Djangoでは <code class="docutils literal notranslate"><span class="pre">X-Forwarded-Host</span></code> ヘッダーのサポートを使いたければ ( <a class="reference internal" href="../ref/settings.html#std-setting-USE_X_FORWARDED_HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_X_FORWARDED_HOST</span></code></a> 設定で)明示的に有効にする必要があります。</p>
+</section>
+<section id="s-referrer-policy">
+<span id="referrer-policy"></span><h2>リファラ ポリシー<a class="headerlink" href="#referrer-policy" title="Link to this heading">¶</a></h2>
+<p>ブラウザは <code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダーを、ユーザーがどのようにしてそのサイトにたどり着いたかについての情報をサイトに送信する手段として使用します。 <em>Referrer Policy</em> を設定することで、どのような状況で <code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダが設定されるかを制限し、ユーザーのプライバシーを守ることができます。詳しくは <a class="reference internal" href="../ref/middleware.html#referrer-policy"><span class="std std-ref">セキュリティミドルウェアのリファレンス</span></a> のリファラポリシーのセクションを参照してください。</p>
+</section>
+<section id="s-cross-origin-opener-policy">
+<span id="cross-origin-opener-policy"></span><h2>クロスオリジン・オープナー・ポリシー<a class="headerlink" href="#cross-origin-opener-policy" title="Link to this heading">¶</a></h2>
+<p>クロスオリジンオープナーポリシー（COOP）ヘッダーは、ブラウザがトップレベルウィンドウを他のドキュメントから隔離し、異なるコンテキストグループに配置することを可能にします。これにより、それらがトップレベルウィンドウと直接的にやり取りすることができなくなります。COOPで保護されたドキュメントがクロスオリジンのポップアップウィンドウを開いた場合、ポップアップの <code class="docutils literal notranslate"><span class="pre">window.opener</span></code> プロパティは <code class="docutils literal notranslate"><span class="pre">null</span></code> になります。COOPはクロスオリジン攻撃から保護します。詳細については、 <a class="reference internal" href="../ref/middleware.html#cross-origin-opener-policy"><span class="std std-ref">セキュリティミドルウェアリファレンスのクロスオリジンオープナーポリシーのセクション</span></a> を参照してください。</p>
+</section>
+<section id="s-session-security">
+<span id="session-security"></span><h2>セッションのセキュリティ<a class="headerlink" href="#session-security" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../ref/csrf.html#csrf-limitations"><span class="std std-ref">CSRF limitation</span></a> が、信頼できないユーザがサブドメインにアクセスできないようにサイトを配置することを要求しているのと同様に、 <a class="reference internal" href="http/sessions.html#module-django.contrib.sessions" title="django.contrib.sessions: Provides session management for Django projects."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.sessions</span></code></a> にも制限があります。詳細は <a class="reference internal" href="http/sessions.html#topics-session-security"><span class="std std-ref">セッション・トピックガイドのセキュリティに関するセクション</span></a> を参照してください。</p>
+</section>
+<section id="s-user-uploaded-content">
+<span id="s-user-uploaded-content-security"></span><span id="user-uploaded-content"></span><span id="user-uploaded-content-security"></span><h2>ユーザーがアップロードしたコンテンツ<a class="headerlink" href="#user-uploaded-content" title="Link to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>以下に説明する問題を回避するには <a class="reference internal" href="../howto/static-files/deployment.html#staticfiles-from-cdn"><span class="std std-ref">クラウドサービスやCDNから静的ファイルを配信する</span></a> ことを検討してください。</p>
+</div>
+<ul>
+<li><p>あなたのサイトがファイルのアップロードを受け入れる場合、サービス拒否 (DOS) 攻撃を防ぐために、Webサーバの設定でこれらのアップロードを適切なサイズに制限することを強くお勧めします。Apache では <a class="reference external" href="https://httpd.apache.org/docs/2.4/mod/core.html#limitrequestbody">LimitRequestBody</a> ディレクティブを使って簡単に設定できます。</p></li>
+<li><p>独自の静的ファイルを提供している場合は、Apache の <code class="docutils literal notranslate"><span class="pre">mod_php</span></code> のような、静的ファイルをコードとして実行するハンドラが無効になっていることを確認してください。特別に細工されたファイルをアップロードしてリクエストすることで、ユーザが任意のコードを実行できるようになるのは望ましくありません。</p></li>
+<li><p>Django のメディアアップロード処理には、セキュリティのベストプラクティスに従わない方法でメディアが提供された場合、いくつかの脆弱性があります。具体的には、有効な PNG ヘッダの後に悪意のある HTML が続く場合、HTML ファイルを画像としてアップロードできます。このファイルは、 Django が <a class="reference internal" href="../ref/models/fields.html#django.db.models.ImageField" title="django.db.models.ImageField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ImageField</span></code></a> の画像処理 (Pillow) に使っているライブラリの検証を通過します。このファイルがユーザに表示されるとき、 Web サーバの種類や設定によっては HTML として表示されるかもしれません。</p>
+<p>フレームワークレベルですべてのユーザーがアップロードしたファイルの内容を安全に検証するための完璧な技術的な解決策はありません。ただし、これらの攻撃を緩和できるいくつかの手順があります:</p>
+<ol class="arabic simple">
+<li><p>ある種の攻撃は、ユーザがアップロードしたコンテンツを常に異なるトップレベルまたはセカンドレベルドメインから提供することで防ぐことができます。これにより、クロスサイトスクリプティングのような <a class="reference external" href="https://en.wikipedia.org/wiki/Same-origin_policy">same-origin policy</a> の保護によってブロックされる攻撃を防ぐことができます。例えば、あなたのサイトが <code class="docutils literal notranslate"><span class="pre">example.com</span></code> で運営されている場合、アップロードされたコンテンツ（<a class="reference internal" href="../ref/settings.html#std-setting-MEDIA_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_URL</span></code></a> 設定）は <code class="docutils literal notranslate"><span class="pre">usercontent-example.com</span></code> のようなドメインから提供されることが望ましいです。 <code class="docutils literal notranslate"><span class="pre">usercontent.example.com</span></code> のようなサブドメインからコンテンツを提供するだけでは十分ではありません。</p></li>
+<li><p>さらに、アプリケーションは、ユーザーがアップロードしたファイルに対して許可されるファイル拡張子のリストを定義し、そのようなファイルのみを提供するように Web サーバーを設定することもできます。</p></li>
+</ol>
+</li>
+</ul>
+</section>
+<section id="s-additional-security-topics">
+<span id="s-id2"></span><span id="additional-security-topics"></span><span id="id2"></span><h2>その他のセキュリティトピック<a class="headerlink" href="#additional-security-topics" title="Link to this heading">¶</a></h2>
+<p>Django は、「箱から出してすぐに」優れたセキュリティ保護を提供しますが、アプリケーションを適切にデプロイし、Web サーバやオペレーティングシステム、その他のコンポーネントのセキュリティ保護を利用することが重要です。</p>
+<ul class="simple">
+<li><p>PythonコードがWebサーバのルートの外にあることを確認してください。こうすることで、Pythonコードが誤ってプレーンテキストとして提供されない（あるいは誤って実行されない）ようになります。</p></li>
+<li><p><a class="reference internal" href="../ref/models/fields.html#file-upload-security"><span class="std std-ref">ユーザがアップロードしたファイル</span></a> には注意してください。</p></li>
+<li><p>Djangoはユーザーを認証するためのリクエストの制限を行いません。認証システムへの総当たり攻撃から保護するためには、これらのリクエストを制限するためのDjangoプラグインやWebサーバーモジュールを導入することを検討してください。</p></li>
+<li><p>あなたの <a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY_FALLBACKS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY_FALLBACKS</span></code></a> を秘密にしておいてください。</p></li>
+<li><p>ファイアウォールを使用して、キャッシュシステムとデータベースへのアクセスを制限することをお勧めします。</p></li>
+<li><p>Open Web Application Security Project (OWASP) の <a class="reference external" href="https://owasp.org/Top10/">Top 10 list</a> を見てください。OWASP は、Web アプリケーションによくある脆弱性をいくつか挙げています。Django には、いくつかの問題に対処するためのツールがありますが、それ以外はプロジェクトの設計で考慮する必要があります。</p></li>
+<li><p>Mozilla は <a class="reference external" href="https://infosec.mozilla.org/guidelines/web_security.html">web security</a> に関する様々なトピックについて議論しています。彼らのページには、どのようなシステムにも適用できるセキュリティの原則も含まれています。</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Django におけるセキュリティ</a><ul>
+<li><a class="reference internal" href="#cross-site-scripting-xss-protection">クロス・サイト・スクリプティング (XSS) の防御</a></li>
+<li><a class="reference internal" href="#cross-site-request-forgery-csrf-protection">クロス・サイト・リクエスト・フォージェリ(CSRF)の防御</a></li>
+<li><a class="reference internal" href="#sql-injection-protection">SQL injectionへの防御</a></li>
+<li><a class="reference internal" href="#clickjacking-protection">クリックジャッキング (Clickjacking) に対する防御</a></li>
+<li><a class="reference internal" href="#ssl-https">SSL/HTTPS</a></li>
+<li><a class="reference internal" href="#host-header-validation">Host ヘッダーの検証</a></li>
+<li><a class="reference internal" href="#referrer-policy">リファラ ポリシー</a></li>
+<li><a class="reference internal" href="#cross-origin-opener-policy">クロスオリジン・オープナー・ポリシー</a></li>
+<li><a class="reference internal" href="#session-security">セッションのセキュリティ</a></li>
+<li><a class="reference internal" href="#user-uploaded-content">ユーザーがアップロードしたコンテンツ</a></li>
+<li><a class="reference internal" href="#additional-security-topics">その他のセキュリティトピック</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="pagination.html"
+                          title="前の章へ">ページ分割 (Pagination)</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="performance.html"
+                          title="次の章へ">パフォーマンスと最適化</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topics/security.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="pagination.html" title="ページ分割 (Pagination)">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="performance.html" title="パフォーマンスと最適化">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>コードのコミット &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="ドキュメントを書く" href="writing-documentation.html" />
+    <link rel="prev" title="JavaScript code" href="writing-code/javascript.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);(function($) {
+    $(document).ready(function() {
+        $(".c-tab-unix").on("click", function() {
+            $("section.c-content-unix").show();
+            $("section.c-content-win").hide();
+            $(".c-tab-unix").prop("checked", true);
+        });
+        $(".c-tab-win").on("click", function() {
+            $("section.c-content-win").show();
+            $("section.c-content-unix").hide();
+            $(".c-tab-win").prop("checked", true);
+        });
+    });
+})(jQuery);</script>
+<link rel="stylesheet" href="../../_static/console-tabs.css">
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="writing-code/javascript.html" title="JavaScript code">previous</a>
+     |
+    <a href="../index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="writing-documentation.html" title="ドキュメントを書く">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="internals-contributing-committing-code">
+            
+  <section id="s-committing-code">
+<span id="committing-code"></span><h1>コードのコミット<a class="headerlink" href="#committing-code" title="Link to this heading">¶</a></h1>
+<p>このセクションは、マージする人や、コードがどのように Django にコミットされるのかに興味のある人向けのものです。もしあなたが Django にコードを貢献したいコミュニティメンバーなら、代わりに <a class="reference internal" href="writing-code/working-with-git.html"><span class="doc">Working with Git and GitHub</span></a> を見てください。</p>
+<section id="s-handling-pull-requests">
+<span id="s-id1"></span><span id="handling-pull-requests"></span><span id="id1"></span><h2>プルリクエストの取り扱い<a class="headerlink" href="#handling-pull-requests" title="Link to this heading">¶</a></h2>
+<p>Django は GitHub でホストされているので、パッチはプルリクエストの形で提供されます。</p>
+<p>プルリクエストをコミットする際には、個々のコミットが以下に説明するコミットガイドラインに合致していることを確認してください。コントリビューターは可能な限り最高のプルリクエストを提供することが期待されています。実際には、コミットガイドラインに精通しているであろうマージャーが、自分自身でコミットを標準に近づけることを決定するかもしれません。</p>
+<p>JenkinsやGitHubのアクションに、OracleやSeleniumのような自動で実行されないプルリクエストビルダーを使ってプルリクエストをテストさせたいかもしれません。手順については <a class="reference external" href="https://code.djangoproject.com/wiki/CI">CI wiki page</a> を参照してください。</p>
+<p>ローカルでプルリクエストをチェックすることが多くなったら、この git エイリアスが役立つでしょう:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[alias]</span>
+<span class="w">    </span><span class="na">pr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">!sh -c \&quot;git fetch upstream pull/${1}/head:pr/${1} &amp;&amp; git checkout pr/${1}\&quot;</span>
+</pre></div>
+</div>
+<p>これを <code class="docutils literal notranslate"><span class="pre">~/.gitconfig</span></code> に追加し、 <code class="docutils literal notranslate"><span class="pre">upstream</span></code> を <code class="docutils literal notranslate"><span class="pre">django/django</span></code> に設定してください。そして、 <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">pr</span> <span class="pre">####</span></code> を実行すると、対応するプルリクエストをチェックアウトできます。</p>
+<p>この時点で、コードに手を加えることができます。 <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">rebase</span> <span class="pre">-i</span></code> と <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">commit</span> <span class="pre">--amend</span></code> を使って、コミットの品質が期待通りのものであることを確認しましょう。準備ができたら次のようにします:</p>
+<div class="console-block" id="console-block-0">
+<input class="c-tab-unix" id="c-tab-0-unix" type="radio" name="console-0" checked>
+<label for="c-tab-0-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-0-win" type="radio" name="console-0">
+<label for="c-tab-0-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-0-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="c1"># Pull in the latest changes from main.</span>
+<span class="gp">$ </span>git<span class="w"> </span>checkout<span class="w"> </span>main
+<span class="gp">$ </span>git<span class="w"> </span>pull<span class="w"> </span>upstream<span class="w"> </span>main
+<span class="gp">$ </span><span class="c1"># Rebase the pull request on main.</span>
+<span class="gp">$ </span>git<span class="w"> </span>checkout<span class="w"> </span>pr/####
+<span class="gp">$ </span>git<span class="w"> </span>rebase<span class="w"> </span>main
+<span class="gp">$ </span>git<span class="w"> </span>checkout<span class="w"> </span>main
+<span class="gp">$ </span><span class="c1"># Merge the work as &quot;fast-forward&quot; to main to avoid a merge commit.</span>
+<span class="gp">$ </span><span class="c1"># (in practice, you can omit &quot;--ff-only&quot; since you just rebased)</span>
+<span class="gp">$ </span>git<span class="w"> </span>merge<span class="w"> </span>--ff-only<span class="w"> </span>pr/XXXX
+<span class="gp">$ </span><span class="c1"># If you&#39;re not sure if you did things correctly, check that only the</span>
+<span class="gp">$ </span><span class="c1"># changes you expect will be pushed to upstream.</span>
+<span class="gp">$ </span>git<span class="w"> </span>push<span class="w"> </span>--dry-run<span class="w"> </span>upstream<span class="w"> </span>main
+<span class="gp">$ </span><span class="c1"># Push!</span>
+<span class="gp">$ </span>git<span class="w"> </span>push<span class="w"> </span>upstream<span class="w"> </span>main
+<span class="gp">$ </span><span class="c1"># Delete the pull request branch.</span>
+<span class="gp">$ </span>git<span class="w"> </span>branch<span class="w"> </span>-d<span class="w"> </span>pr/xxxx
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-0-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> <span class="c1">REM Pull in the latest changes from main.</span>
+<span class="gp">...\&gt;</span> git checkout main
+<span class="gp">...\&gt;</span> git pull upstream main
+<span class="gp">...\&gt;</span> <span class="c1">REM Rebase the pull request on main.</span>
+<span class="gp">...\&gt;</span> git checkout pr/####
+<span class="gp">...\&gt;</span> git rebase main
+<span class="gp">...\&gt;</span> git checkout main
+<span class="gp">...\&gt;</span> <span class="c1">REM Merge the work as &quot;fast-forward&quot; to main to avoid a merge commit.</span>
+<span class="gp">...\&gt;</span> <span class="c1">REM (in practice, you can omit &quot;--ff-only&quot; since you just rebased)</span>
+<span class="gp">...\&gt;</span> git merge --ff-only pr/XXXX
+<span class="gp">...\&gt;</span> <span class="c1">REM If you&#39;re not sure if you did things correctly, check that only the</span>
+<span class="gp">...\&gt;</span> <span class="c1">REM changes you expect will be pushed to upstream.</span>
+<span class="gp">...\&gt;</span> git push --dry-run upstream main
+<span class="gp">...\&gt;</span> <span class="c1">REM Push!</span>
+<span class="gp">...\&gt;</span> git push upstream main
+<span class="gp">...\&gt;</span> <span class="c1">REM Delete the pull request branch.</span>
+<span class="gp">...\&gt;</span> git branch -d pr/xxxx
+</pre></div>
+</section>
+</div>
+<p>ブランチを強制的にプッシュします。これにより、メインとブランチのコミットハッシュが一致するようになり、プルリクエストが自動的にクローズされます。</p>
+<p>プルリクエストを複数のコミットとしてマージする必要がない場合は、GitHub の &quot;Squash and merge&quot; ボタンを使ってください。コミットメッセージを <a class="reference internal" href="#committing-guidelines"><span class="std std-ref">ガイドライン</span></a> に合うように必要に応じて編集し、メッセージの最初の行に自動的に付加されるプルリクエスト番号を削除します。</p>
+<p>プルリクエストのコミット履歴を書き換えるとき、その目的は Django のコミット履歴をできるだけ有用なものにすることです:</p>
+<ul class="simple">
+<li><p>パッチに前後のコミットが含まれている場合は、それらをひとつに書き換えてください。たとえば、あるコミットでコードが追加され、2番目のコミットで最初のコミットで発生した文体上の問題が修正された場合、マージする前にそれらのコミットをひとつにまとめる必要があります。</p></li>
+<li><p>異なるコミットへの変更を論理的なグループ分けで分ける: ファイルへの他の変更と同時にスタイルのクリーンアップを行う場合、変更を 2 つの異なるコミットに分けることで、履歴のレビューがしやすくなります。</p></li>
+<li><p>プルリクエスト内の上流ブランチのマージに注意してください。</p></li>
+<li><p>コミットするたびに、テストをパスし、ドキュメントをビルドしなければなりません。テストもドキュメントも警告を出すべきではありません。</p></li>
+<li><p>些細なパッチや小さなパッチは通常1つのコミットで行うのがベストです。中規模から大規模の作業については、理にかなっていれば複数のコミットに分けても構いません。</p></li>
+</ul>
+<p>実用性は純粋さに勝るので、プルリクエストに対してどの程度履歴を加工するかは各マージャー次第です。主なポイントは、コミュニティを巻き込むこと、仕事を終わらせること、そして使えるコミット履歴を持つことです。</p>
+</section>
+<section id="s-committing-guidelines">
+<span id="s-id2"></span><span id="committing-guidelines"></span><span id="id2"></span><h2>コミットガイドライン<a class="headerlink" href="#committing-guidelines" title="Link to this heading">¶</a></h2>
+<p>また、Django の Git リポジトリにコードをコミットする際には、以下のガイドラインに従ってください:</p>
+<ul>
+<li><p>強制プッシュによって <code class="docutils literal notranslate"><span class="pre">django/django</span></code> ブランチの公開履歴を変更してはいけません。どうしても必要な場合 (例えばセキュリティ上の理由) は、まずチームと話し合ってください。</p></li>
+<li><p>中規模から大規模な変更については、変更する前に <a class="reference external" href="https://forum.djangoproject.com/">Django Forum</a> や <a class="reference internal" href="../mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a> メーリングリストで議論してください。</p>
+<p>もしあなたが何かを提起し、誰もそれに応じなかったとしても、 誰もそれに異議を唱えなかったからと言って、あなたのアイデアが素晴らしく、 すぐに実装されるべきであると思わないでください。誰もがメーリングリストでの議論をすぐに読む時間があるとは限りません。なので、返事が来るまでに2、3日待たなければならないかもしれません。</p>
+</li>
+<li><p>コミットメッセージは、現在形ではなく過去形で詳細を書いてください。</p>
+<ul class="simple">
+<li><p>良い例: &quot;Fixed Unicode bug in RSS API.&quot;</p></li>
+<li><p>悪い例: &quot;Fixes Unicode bug in RSS API.&quot;</p></li>
+<li><p>悪い例: &quot;Fixing Unicode bug in RSS API.&quot;</p></li>
+</ul>
+<p>コミットメッセージは、最大72文字の行で記述するべきです。件名の行があり、空行で区切った後に72文字の行で段落を構成します。これらの制限は厳格ではありません。件名に関しては、短い方が良いです。コミットメッセージの本文では、詳細な情報が少ない情報よりも好ましいです:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Fixed #18307 -- Added git workflow guidelines.
+
+Refactored the Django&#39;s documentation to remove mentions of SVN
+specific tasks. Added guidelines of how to use Git, GitHub, and
+how to use pull request together with Trac instead.
+</pre></div>
+</div>
+<p>&quot;Thanks A for the report and B for review.&quot; のように、コミットメッセージでコントリビューターをクレジットしてください。git の <a class="reference external" href="https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors">Co-Authored-By</a> を適切に使用してください。</p>
+</li>
+<li><p>ブランチへのコミットの場合は、コミットメッセージの前にブランチ名をつけます。たとえば &quot;[1.4.x] Fixed #xxxxx -- Added support for mind reading.&quot; のようにします。</p></li>
+<li><p>コミットは、意味のある最も細かい変更に限定しましょう。つまり、大きなコミットをたまに行うのではなく、小さなコミットをまめに行うようにしましょう。たとえば、機能Xの実装にライブラリYへの小さな変更が必要な場合、まずライブラリYへの変更をコミットし、その後、別のコミットで機能Xをコミットします。これは、皆があなたの変更に追いつくのに*大いに役立ちます*。</p></li>
+<li><p>機能変更からバグ修正を分けてください。バグ修正は <a class="reference internal" href="../release-process.html#supported-versions-policy"><span class="std std-ref">サポートバージョン</span></a> に基づいて安定ブランチにバックポートする必要があることがあるためです。</p></li>
+<li><p>あなたのコミットが Django <a class="reference external" href="https://code.djangoproject.com/">ticket tracker</a> のチケットをクローズする場合、コミットメッ セージを &quot;Fixed #xxxxx&quot; というテキストで始めます。例:  &quot;Fixed #123 -- Added whizbang feature.&quot;。 Trac では、この形式のコミットメッセージは自動的に参照されたチケットをクローズし、完全なコミットメッセージとともにコメントを投稿するように設定しています。</p>
+<p>好奇心旺盛な方のために、私たちはこのために <a class="reference external" href="https://github.com/trac-hacks/trac-github">Trac plugin</a> を使っています。</p>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>Trac との統合はプルリクエストについて何も知らないことに注意してください。そのため、コミットメッセージに &quot;closes #400&quot; と書いてプルリクエストをクローズしようとすると、GitHub はプルリクエストをクローズしますが、Trac プラグインは Trac で同じ番号のチケットをクローズしません。</p>
+</div>
+<ul>
+<li><p>あなたのコミットが Django <a class="reference external" href="https://code.djangoproject.com/">ticket tracker</a> のチケットを参照しているものの、そのチケットを <em>クローズ</em> はしていない場合、&quot;Refs #xxxxx &quot;というフレーズを含めてください。&quot;xxxxx &quot;はあなたのコミットが参照しているチケットの番号です。これで自動的に適切なチケットにコメントが投稿されます。</p></li>
+<li><p>このパターンを使ってバックポートのコミットメッセージを書いてください:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&lt;Django version&gt;] Fixed &lt;ticket&gt; -- &lt;description&gt;
+
+Backport of &lt;revision&gt; from &lt;branch&gt;.
+</pre></div>
+</div>
+<p>例えば:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[1.3.x] Fixed #17028 -- Changed diveintopython.org -&gt; diveintopython.net.
+
+Backport of 80c0cbf1c97047daed2c5b41b296bbc56fe1d7e3 from main.
+</pre></div>
+</div>
+<p>` これを自動化するスクリプト &lt;<a class="reference external" href="https://code.djangoproject.com/wiki/MergerTips#AutomatingBackports">https://code.djangoproject.com/wiki/MergerTips#AutomatingBackports</a>&gt;`_ が wiki にあります。</p>
+<p>コミットによってリグレッションが修正された場合は、その旨をコミットメッセージに含めてください:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>Regression in 6ecccad711b52f9273b1acb07a57d3f806e93928.
+</pre></div>
+</div>
+<p>(リグレッションが取り込まれたコミットハッシュを使用します)。</p>
+</li>
+</ul>
+</section>
+<section id="s-reverting-commits">
+<span id="reverting-commits"></span><h2>コミットの取り消し<a class="headerlink" href="#reverting-commits" title="Link to this heading">¶</a></h2>
+<p>完璧な人はいません。間違ったコミットがなされることもあります。</p>
+<p>しかし、ミスが起こらないように最大限の努力をしましょう。私たちに差し戻しポリシーがあるからといって、可能な限り最高の品質を目指すあなたの責任が緩和されるわけではありません。本当に: 自分の仕事をダブルチェックするか、そもそもコミットする**前に**別のマージャーにチェックしてもらいましょう！</p>
+<p>誤ったコミットが発見された場合は、以下のガイドラインに従ってください:</p>
+<ul class="simple">
+<li><p>可能であれば、元の作者に自分のコミットを差し戻してもらいましょう。</p></li>
+<li><p>原作者の許可なく、他の作者の変更を元に戻さないでください。</p></li>
+<li><p>git revert を使用します。これは逆コミットを行いますが、元のコミットはコミット履歴に残ります。</p></li>
+<li><p>元の作者に連絡が取れない場合（合理的な時間内に ― 1日程度 ―） かつ問題が深刻である場合（クラッシュバグ、主要なテストの失敗など）、<a class="reference external" href="https://forum.djangoproject.com/">Django Forum</a> や <a class="reference internal" href="../mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a> メーリングリストで異議申し立てを求め、反対意見がなければ revert してください。</p></li>
+<li><p>問題が小さい場合（例えば、機能フリーズ後の機能コミット）は、そのまま待ちましょう。</p></li>
+<li><p>もしマージャーとリバーターになる人の間で意見の相違があれば、 <a class="reference external" href="https://forum.djangoproject.com/">Django Forum</a> や <a class="reference internal" href="../mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a> メーリングリストで解決してみてください。合意が得られない場合は、投票にかけるべきです。</p></li>
+<li><p>もしそのコミットが、確認され、公開されたセキュリティ脆弱性を含んでいた場合、そのコミットは誰の許可も得ずに即座に差し戻されるかもしれません。</p></li>
+<li><p>リリースブランチのメンテナは、そのコミットがリリースブランチを壊してしまった場合、許可なくリリースブランチへのコミットを取り消すことができます。</p></li>
+<li><p>誤ってトピックブランチを <code class="docutils literal notranslate"><span class="pre">django/django</span></code> にプッシュした場合は、削除してください。例えば、 <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">upstream</span> <span class="pre">feature_antigravity</span></code> を実行した場合は、逆のプッシュを行ってください: <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">push</span> <span class="pre">upstream</span> <span class="pre">:feature_antigravity</span></code> 。</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">コードのコミット</a><ul>
+<li><a class="reference internal" href="#handling-pull-requests">プルリクエストの取り扱い</a></li>
+<li><a class="reference internal" href="#committing-guidelines">コミットガイドライン</a></li>
+<li><a class="reference internal" href="#reverting-commits">コミットの取り消し</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="writing-code/javascript.html"
+                          title="前の章へ">JavaScript code</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="writing-documentation.html"
+                          title="次の章へ">ドキュメントを書く</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/internals/contributing/committing-code.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="writing-code/javascript.html" title="JavaScript code">previous</a>
+     |
+    <a href="../index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="writing-documentation.html" title="ドキュメントを書く">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

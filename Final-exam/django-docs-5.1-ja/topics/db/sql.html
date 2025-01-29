@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>素の SQL 文の実行 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="データベースのトランザクション" href="transactions.html" />
+    <link rel="prev" title="マネージャ" href="managers.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="managers.html" title="マネージャ">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="transactions.html" title="データベースのトランザクション">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-db-sql">
+            
+  <section id="s-performing-raw-sql-queries">
+<span id="performing-raw-sql-queries"></span><h1>素の SQL 文の実行<a class="headerlink" href="#performing-raw-sql-queries" title="Link to this heading">¶</a></h1>
+<p>Django は素の SQL を処理する方法を 2 つ提供しています。あなたは素のクエリを実行するために <a class="reference internal" href="#performing-raw-queries">perform raw queries and return model instances</a> <a class="reference internal" href="#django.db.models.Manager.raw" title="django.db.models.Manager.raw"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Manager.raw()</span></code></a> を使うか、あるいはモデル層の利用を完全に避けてカスタムのSQLを直接実行する <a class="reference internal" href="#executing-custom-sql-directly">execute custom SQL directly</a> ことができます。</p>
+<div class="admonition-explore-the-orm-before-using-raw-sql admonition">
+<p class="admonition-title">素のSQLを使う前にORMを調べましょう！</p>
+<p>Django ORM は、素の SQL を書かずにクエリを表現するための多くのツールを提供しています。たとえば、次のようなものです。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../ref/models/querysets.html"><span class="doc">QuerySet API</span></a> は広範囲の用途をカバーしています。</p></li>
+<li><p>多くの組み込みの <a class="reference internal" href="../../ref/models/database-functions.html"><span class="doc">データベース関数</span></a> を使用して、<a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet.annotate" title="django.db.models.query.QuerySet.annotate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">アノテーション</span></code></a> と <a class="reference internal" href="aggregation.html"><span class="doc">集計</span></a> を行うことができます。それらを超えて、<a class="reference internal" href="../../ref/models/expressions.html"><span class="doc">独自のクエリ式</span></a> を作成することもできます。</p></li>
+</ul>
+<p>素のSQLを使う前に、 <a class="reference internal" href="index.html"><span class="doc">ORM</span></a> を調べてください。ORMがあなたのユースケースをサポートしているかどうか、 <a class="reference internal" href="../../faq/help.html"><span class="doc">サポートチャンネル</span></a> で尋ねてみてください。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>直接 SQL を書く場合はいつでも十分警戒するべきです。利用者が <code class="docutils literal notranslate"><span class="pre">params</span></code> を利用する事で任意に設定可能な全てのパラメータは必ず、SQL インジェクション攻撃から防御するために適切にエスケープすべきです。詳細は <a class="reference internal" href="../security.html#sql-injection-protection"><span class="std std-ref">SQL インジェクションに対する防御</span></a> を参照してください。</p>
+</div>
+<section id="s-performing-raw-queries">
+<span id="s-executing-raw-queries"></span><span id="performing-raw-queries"></span><span id="executing-raw-queries"></span><h2>素のクエリを実行する<a class="headerlink" href="#performing-raw-queries" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">raw()</span></code> マネージャメソッドは素の SQL 文を処理してモデルのインスタンスを返させる場合に利用できます:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.Manager.raw">
+<span class="sig-prename descclassname"><span class="pre">Manager.</span></span><span class="sig-name descname"><span class="pre">raw</span></span>(<em class="sig-param"><span class="n"><span class="pre">raw_query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">translations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.db.models.Manager.raw" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>このメソッドは素の SQL クエリを受け取り、実行し、 <code class="docutils literal notranslate"><span class="pre">django.db.models.query.RawQuerySet</span></code> インスタンスを返します。この <code class="docutils literal notranslate"><span class="pre">RawQuerySet</span></code> インスタンスは通常の <a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet" title="django.db.models.query.QuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></a> のようにイテレートしてオブジェクトインスタンスを生成できます。</p>
+<p>これは例で説明するのが一番わかりやすいでしょう。次のようなモデルがあるとします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="n">birth_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このとき、以下のように独自の SQL を実行できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM myapp_person&quot;</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">John Smith</span>
+<span class="go">Jane Jones</span>
+</pre></div>
+</div>
+<p>この例はたいしてエキサイティングではありません。これは <code class="docutils literal notranslate"><span class="pre">Person.objects.all()</span></code> を実行したのと全く同じです。しかしながら、 <code class="docutils literal notranslate"><span class="pre">raw()</span></code> はその機能を極めて強力なものにする数々のオプションを備えています。</p>
+<div class="admonition-model-table-names admonition">
+<p class="admonition-title">モデルのテーブル名</p>
+<p>この例で示したモデル <code class="docutils literal notranslate"><span class="pre">Person</span></code> のテーブル名はどのようにして得られたのでしょうか？</p>
+<p>デフォルトでは、Django はモデルの &quot;app label&quot; (<code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">startapp</span></code> で使った名前) とモデルのクラス名をアンダースコアでつないで、データベースのテーブル名を決定します。たとえば、<code class="docutils literal notranslate"><span class="pre">Person</span></code> モデルは <code class="docutils literal notranslate"><span class="pre">myapp</span></code> という名前のアプリの中にあると仮定しているので、そのテーブルは <code class="docutils literal notranslate"><span class="pre">myapp_person</span></code> となります。</p>
+<p>詳細に関しては、手動でデータベースのテーブル名を設定できる <a class="reference internal" href="../../ref/models/options.html#django.db.models.Options.db_table" title="django.db.models.Options.db_table"><code class="xref py py-attr docutils literal notranslate"><span class="pre">db_table</span></code></a> オプションのドキュメントを参照してください。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p><code class="docutils literal notranslate"><span class="pre">.raw()</span></code> に対して渡された SQL 文はチェックされません。Django はそこに記述された内容によってデータベースが行を返す事を期待しますが、それを強制する処理は行いません。もし記述したクエリが行を返さない場合、(おそらく不可解な)例外が発生します。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>もしあなたが MySQL でクエリを処理する場合は、複数の型を扱う際に MySQL の暗黙的な型変換が予期しない結果をもたらす場合がある事に注意してください。もし文字列型で定義したカラムに対し、数値型の値で問い合わせた場合、MySQL は比較処理を行う前にテーブル上の全ての値の型を数値型に変換します。例えば <code class="docutils literal notranslate"><span class="pre">'abc'</span></code>、 <code class="docutils literal notranslate"><span class="pre">'def'</span></code> といった値が含まれているテーブルに対して <code class="docutils literal notranslate"><span class="pre">WHERE</span> <span class="pre">mycolumn=0</span></code> という条件での問い合わせを行うと、両方の行がマッチします。これを防ぐため、クエリの値を利用する前に適切な型キャストを行ってください。</p>
+</div>
+<section id="s-mapping-query-fields-to-model-fields">
+<span id="mapping-query-fields-to-model-fields"></span><h3>クエリのフィールドをモデルのフィールドにマップする<a class="headerlink" href="#mapping-query-fields-to-model-fields" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">raw()</span></code> は自動的にクエリのフィールドをモデルのフィールドにマップします。</p>
+<p>クエリのフィールドの順番は重要ではありません。つまり、以下のクエリはどちらも同じように動作します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT id, first_name, last_name, birth_date FROM myapp_person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT last_name, birth_date, first_name, id FROM myapp_person&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>マッチングは名前によって行われます。つまり、SQL の <code class="docutils literal notranslate"><span class="pre">AS</span></code> 句を使用して、クエリのフィールドをモデルのフィールドにマッピングできます。もし、他のテーブルで <code class="docutils literal notranslate"><span class="pre">Person</span></code> のデータがあれば、簡単に <code class="docutils literal notranslate"><span class="pre">Person</span></code> のインスタンスにマッピングできます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span>
+<span class="gp">... </span><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="sd">    SELECT first AS first_name,</span>
+<span class="gp">... </span><span class="sd">           last AS last_name,</span>
+<span class="gp">... </span><span class="sd">           bd AS birth_date,</span>
+<span class="gp">... </span><span class="sd">           pk AS id,</span>
+<span class="gp">... </span><span class="sd">    FROM some_other_table</span>
+<span class="gp">... </span><span class="sd">    &quot;&quot;&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>名称が一致している限り、そのモデルのインスタンスは適切に生成されます。</p>
+<p>あるいは、 <code class="docutils literal notranslate"><span class="pre">raw()</span></code> の引数 <code class="docutils literal notranslate"><span class="pre">translations</span></code> を使って、クエリのフィールドをモデルのフィールドにマッピングすることもできます。これはクエリのフィールド名とモデルのフィールド名をマッピングした辞書です。たとえば、上記のクエリは次のように書くこともできます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">name_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;first&quot;</span><span class="p">:</span> <span class="s2">&quot;first_name&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">:</span> <span class="s2">&quot;last_name&quot;</span><span class="p">,</span> <span class="s2">&quot;bd&quot;</span><span class="p">:</span> <span class="s2">&quot;birth_date&quot;</span><span class="p">,</span> <span class="s2">&quot;pk&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM some_other_table&quot;</span><span class="p">,</span> <span class="n">translations</span><span class="o">=</span><span class="n">name_map</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="s-index-lookups">
+<span id="index-lookups"></span><h3>インデックスの利用<a class="headerlink" href="#index-lookups" title="Link to this heading">¶</a></h3>
+<p>raw() はインデックスをサポートしているので、最初の結果だけが必要な場合はこう書きます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">first_person</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM myapp_person&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>ただし、インデックス作成とスライスはデータベースレベルでは実行されません。データベースに多数の Person オブジェクトがある場合は、SQL レベルでクエリを制限する方が効率的です:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">first_person</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM myapp_person LIMIT 1&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="s-deferring-model-fields">
+<span id="deferring-model-fields"></span><h3>モデルのフィールドの遅延評価<a class="headerlink" href="#deferring-model-fields" title="Link to this heading">¶</a></h3>
+<p>モデルのフィールドは省略可能です:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">people</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT id, first_name FROM myapp_person&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>上記のクエリから得られる <code class="docutils literal notranslate"><span class="pre">Person</span></code> オブジェクトは遅延評価されるモデルのインスタンスになります(<a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet.defer" title="django.db.models.query.QuerySet.defer"><code class="xref py py-meth docutils literal notranslate"><span class="pre">defer()</span></code></a> を参照)。これはクエリから省略されたフィールドが要求に応じて読み出される事を意味します。以下はその例になります:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT id, first_name FROM myapp_person&quot;</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span>  <span class="c1"># This will be retrieved by the original query</span>
+<span class="gp">... </span>        <span class="n">p</span><span class="o">.</span><span class="n">last_name</span><span class="p">,</span>  <span class="c1"># This will be retrieved on demand</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">John Smith</span>
+<span class="go">Jane Jones</span>
+</pre></div>
+</div>
+<p>見た目上は、そのクエリが名前と苗字を両方取得しているように見えます。しかし、この例は実際には 3 つのクエリを発行しています。名前だけが <code class="docutils literal notranslate"><span class="pre">raw()</span></code> 内のクエリによって取得され、苗字は両方とも表示される時点でその都度取得されました。</p>
+<p>省略できないフィールドが一つだけあります。プライマリキーのフィールドです。Django はモデルのインスタンスの識別にプライマリキーを利用するので、素のクエリには必ず含む必要があります。もしプライマリキーを入れ忘れると、 <a class="reference internal" href="../../ref/exceptions.html#django.core.exceptions.FieldDoesNotExist" title="django.core.exceptions.FieldDoesNotExist"><code class="xref py py-class docutils literal notranslate"><span class="pre">FieldDoesNotExist</span></code></a> 例外が発生します。</p>
+</section>
+<section id="s-adding-annotations">
+<span id="adding-annotations"></span><h3>付加情報（アノテーション）の追加<a class="headerlink" href="#adding-annotations" title="Link to this heading">¶</a></h3>
+<p>モデル内に定義されていないフィールドを含んだクエリを実行する事もできます。例えば、 <a class="reference external" href="https://www.postgresql.org/docs/current/functions-datetime.html">PostgreSQL's age() function</a> によってデータベース上で計算された年齢とともに人物の一覧を取得できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">people</span> <span class="o">=</span> <span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT *, age(birth_date) AS age FROM myapp_person&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">people</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">age</span><span class="p">))</span>
+<span class="gp">...</span>
+<span class="go">John is 37.</span>
+<span class="go">Jane is 42.</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<p>代わりに <a class="reference internal" href="../../ref/models/expressions.html#func-expressions"><span class="std std-ref">Func() 式</span></a> を使うことで、素の SQL を使ってアノテーションを計算するのを避けることができます。</p>
+</section>
+<section id="s-passing-parameters-into-raw">
+<span id="passing-parameters-into-raw"></span><h3><code class="docutils literal notranslate"><span class="pre">raw()</span></code> にパラメータを渡す<a class="headerlink" href="#passing-parameters-into-raw" title="Link to this heading">¶</a></h3>
+<p>パラメータを用いたクエリを使用する場合は、<code class="docutils literal notranslate"><span class="pre">raw()</span></code> に対して <code class="docutils literal notranslate"><span class="pre">params</span></code> 引数を利用できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lname</span> <span class="o">=</span> <span class="s2">&quot;Doe&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM myapp_person WHERE last_name = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">lname</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">params</span></code> はパラメータのリストもしくは辞書です。リストの場合は <code class="docutils literal notranslate"><span class="pre">%s</span></code> というプレースホルダーを使い、辞書の場合は <code class="docutils literal notranslate"><span class="pre">%(key)s</span></code> というプレースホルダーを使います ( <code class="docutils literal notranslate"><span class="pre">key</span></code> は辞書のキーに置き換えられます)、データベースエンジンを意識する必要はありません。このようなプレースホルダは <code class="docutils literal notranslate"><span class="pre">params</span></code> 引数のパラメータに置き換えられます。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>SQLite バックエンドにおいて辞書はサポートされていません。パラメータはリストで渡す必要があります。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p><strong>素のSQLクエリで文字列書式を使用したり、SQL文字列で引用符プレースホルダを使用しないでください。</strong></p>
+<p>上記のクエリをこう書きたくなる誘惑に駆られるでしょう:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM myapp_person WHERE last_name = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">lname</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Person</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>また、クエリはこのように書くべきだと思うかもしれません（ <code class="docutils literal notranslate"><span class="pre">%s</span></code> を引用符で囲む）:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM myapp_person WHERE last_name = &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span>
+</pre></div>
+</div>
+<p><strong>どちらのミスも犯してはなりません。</strong></p>
+<p><a class="reference internal" href="../security.html#sql-injection-protection"><span class="std std-ref">SQL injectionへの防御</span></a> で議論されているように、<code class="docutils literal notranslate"><span class="pre">params</span></code> 引数を使用し、プレースホルダーを引用符で囲まないことで、攻撃者が任意のSQLをデータベースに注入する、一般的な脆弱性である <a class="reference external" href="https://en.wikipedia.org/wiki/SQL_injection">SQL injection attacks</a> から保護されます。文字列補間を使用したり、プレースホルダーを引用符で囲んだりすると、SQLインジェクションのリスクがあります。</p>
+</div>
+</section>
+</section>
+<section id="s-executing-custom-sql-directly">
+<span id="s-executing-custom-sql"></span><span id="executing-custom-sql-directly"></span><span id="executing-custom-sql"></span><h2>独自の SQL を直接実行する<a class="headerlink" href="#executing-custom-sql-directly" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="#django.db.models.Manager.raw" title="django.db.models.Manager.raw"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Manager.raw()</span></code></a> でも要求を満たせない場合があります:きれいにモデルにマップできないクエリを扱ったり、<code class="docutils literal notranslate"><span class="pre">UPDATE</span></code>、 <code class="docutils literal notranslate"><span class="pre">INSERT</span></code> あるいは <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> を直接実行したりする必要が有るかもしれません。</p>
+<p>こういったケースでは、モデル層を完全に迂回してデータベースにいつでも直接アクセスできます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">django.db.connection</span></code> オブジェクトは、デフォルトのデータベースコネクションを表します。データベースコネクションを利用するには、カーソルオブジェクトを取得するため <code class="docutils literal notranslate"><span class="pre">connection.cursor()</span></code> を呼び出してください。そして、<code class="docutils literal notranslate"><span class="pre">cursor.execute(sql,</span> <span class="pre">[params])</span></code> を呼び出して SQL を実行した後、<code class="docutils literal notranslate"><span class="pre">cursor.fetchone()</span></code> もしくは <code class="docutils literal notranslate"><span class="pre">cursor.fetchall()</span></code> が結果の行を返します。</p>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">connection</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_custom_sql</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;UPDATE bar SET foo = 1 WHERE baz = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baz</span><span class="p">])</span>
+        <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT foo FROM bar WHERE baz = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">baz</span><span class="p">])</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">row</span>
+</pre></div>
+</div>
+<p>SQLインジェクションから保護するために、SQL文字列の <code class="docutils literal notranslate"><span class="pre">%s</span></code> プレースホルダの前後に引用符を含めてはいけません。</p>
+<p>もしリテラルなパーセント記号をクエリ中で使いたい場合、パラメータを渡す際に二重に記述する必要が有る事に注意してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT foo FROM bar WHERE baz = &#39;30%&#39;&quot;</span><span class="p">)</span>
+<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT foo FROM bar WHERE baz = &#39;30</span><span class="si">%%</span><span class="s2">&#39; AND id = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="multi-db.html"><span class="doc">2 つ以上のデータベース</span></a> を利用している場合、特定のコネクション (とカーソル) を取得するのに <code class="docutils literal notranslate"><span class="pre">django.db.connections</span></code> を利用できます。<code class="docutils literal notranslate"><span class="pre">django.db.connections</span></code> は、エイリアスを指定することで特定のコネクションを得られる、辞書に似たオブジェクトです。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">connections</span>
+
+<span class="k">with</span> <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;my_db_alias&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+    <span class="c1"># Your code here</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>デフォルトでは、Python データベース API は返す結果にフィールド名を含まず、つまり <code class="docutils literal notranslate"><span class="pre">辞書</span></code> でなく、 <code class="docutils literal notranslate"><span class="pre">リスト</span></code> の値として結果を返します。処理能力とメモリを少々利用して、次のような処理を用いる事で結果を <code class="docutils literal notranslate"><span class="pre">辞書</span></code> として得られます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">dictfetchall</span><span class="p">(</span><span class="n">cursor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return all rows from a cursor as a dict.</span>
+<span class="sd">    Assume the column names are unique.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">columns</span><span class="p">,</span> <span class="n">row</span><span class="p">))</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()]</span>
+</pre></div>
+</div>
+<p>別の選択肢は Python 標準ライブラリに含まれる <a class="reference external" href="https://docs.python.org/3/library/collections.html#collections.namedtuple" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">collections.namedtuple()</span></code></a> を利用する事です。<code class="docutils literal notranslate"><span class="pre">namedtuple</span></code> は属性を指定して値へのアクセスが可能なタプルに似たオブジェクトです; 加えてインデックスが利用でき、イテレート可能でもあります。取得した結果は不変であり属性名もしくはインデックスでアクセスできて便利です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">namedtuple</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">namedtuplefetchall</span><span class="p">(</span><span class="n">cursor</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return all rows from a cursor as a namedtuple.</span>
+<span class="sd">    Assume the column names are unique.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span>
+    <span class="n">nt_result</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Result&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">col</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">desc</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">nt_result</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">dictfetchall()</span></code> と <code class="docutils literal notranslate"><span class="pre">namedtuplefetchall()</span></code> の例は、異なるテーブルの列をカーソルは区別できないため、一意な列名を想定しています。</p>
+<p>この3つの違いの例を挙げましょう:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT id, parent_id FROM test LIMIT 2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+<span class="go">((54360982, None), (54360880, None))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT id, parent_id FROM test LIMIT 2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dictfetchall</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
+<span class="go">[{&#39;parent_id&#39;: None, &#39;id&#39;: 54360982}, {&#39;parent_id&#39;: None, &#39;id&#39;: 54360880}]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT id, parent_id FROM test LIMIT 2&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">namedtuplefetchall</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span>
+<span class="go">[Result(id=54360982, parent_id=None), Result(id=54360880, parent_id=None)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span>
+<span class="go">54360982</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="go">54360982</span>
+</pre></div>
+</div>
+<section id="s-connections-and-cursors">
+<span id="connections-and-cursors"></span><h3>コネクションとカーソル<a class="headerlink" href="#connections-and-cursors" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">connection</span></code> と <code class="docutils literal notranslate"><span class="pre">cursor</span></code> の実装は <span class="target" id="index-2"></span><a class="pep reference external" href="https://peps.python.org/pep-0249/"><strong>PEP 249</strong></a> に規定された Python DB-API の基準にほぼ完全に準拠しています — <a class="reference internal" href="transactions.html"><span class="doc">トランザクション操作</span></a> は例外となります。</p>
+<p>Python DB-API に精通していない場合、<code class="docutils literal notranslate"><span class="pre">cursor.execute()</span></code> 内の SQL 文には直接値を追加せずに、<code class="docutils literal notranslate"><span class="pre">&quot;%s&quot;</span></code> というプレースホルダーを利用する事に注意してください。この手法を用いる事で、内部で動作しているデータベースライブラリは自動的に必要に応じて値のエスケープを行ってくれます。</p>
+<p>加えて Django はプレースホルダーとして Python に内蔵された SQLite モジュールで用いられる <code class="docutils literal notranslate"><span class="pre">&quot;?&quot;</span></code> でなく <code class="docutils literal notranslate"><span class="pre">&quot;%s&quot;</span></code> を期待して動作する事にも注意してください。これは全体の調和と健全性のためです。</p>
+<p>コンテキストマネージャとしてのカーソルの利用:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>これは以下と同じです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">c</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">c</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="s-calling-stored-procedures">
+<span id="calling-stored-procedures"></span><h4>ストアドプロシージャの呼び出し<a class="headerlink" href="#calling-stored-procedures" title="Link to this heading">¶</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.CursorWrapper.callproc">
+<span class="sig-prename descclassname"><span class="pre">CursorWrapper.</span></span><span class="sig-name descname"><span class="pre">callproc</span></span>(<em class="sig-param"><span class="n"><span class="pre">procname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kparams</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.db.models.CursorWrapper.callproc" title="Link to this definition">¶</a></dt>
+<dd><p>与えられた名前のストアドプロシージャを呼び出します。入力パラメータのシーケンス (<code class="docutils literal notranslate"><span class="pre">params</span></code>) または辞書 (<code class="docutils literal notranslate"><span class="pre">kparams</span></code>) を指定できます。ほとんどのデータベースは <code class="docutils literal notranslate"><span class="pre">kparams</span></code> をサポートしていません。Django の組み込みバックエンドでは、 Oracle だけがサポートしています。</p>
+<p>たとえば、Oracleデータベースで次のようなストアドプロシージャがあるとします:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">PROCEDURE</span><span class="w"> </span><span class="ss">&quot;TEST_PROCEDURE&quot;</span><span class="p">(</span><span class="n">v_i</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">,</span><span class="w"> </span><span class="n">v_text</span><span class="w"> </span><span class="n">NVARCHAR2</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span><span class="w"> </span><span class="k">AS</span>
+<span class="w">    </span><span class="n">p_i</span><span class="w"> </span><span class="nb">INTEGER</span><span class="p">;</span>
+<span class="w">    </span><span class="n">p_text</span><span class="w"> </span><span class="n">NVARCHAR2</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>
+<span class="k">BEGIN</span>
+<span class="w">    </span><span class="n">p_i</span><span class="w"> </span><span class="p">:</span><span class="o">=</span><span class="w"> </span><span class="n">v_i</span><span class="p">;</span>
+<span class="w">    </span><span class="n">p_text</span><span class="w"> </span><span class="p">:</span><span class="o">=</span><span class="w"> </span><span class="n">v_text</span><span class="p">;</span>
+<span class="w">    </span><span class="p">...</span>
+<span class="k">END</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>これは以下のコードで呼び出すことができます。:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+    <span class="n">cursor</span><span class="o">.</span><span class="n">callproc</span><span class="p">(</span><span class="s2">&quot;test_procedure&quot;</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;test&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">素の SQL 文の実行</a><ul>
+<li><a class="reference internal" href="#performing-raw-queries">素のクエリを実行する</a><ul>
+<li><a class="reference internal" href="#mapping-query-fields-to-model-fields">クエリのフィールドをモデルのフィールドにマップする</a></li>
+<li><a class="reference internal" href="#index-lookups">インデックスの利用</a></li>
+<li><a class="reference internal" href="#deferring-model-fields">モデルのフィールドの遅延評価</a></li>
+<li><a class="reference internal" href="#adding-annotations">付加情報（アノテーション）の追加</a></li>
+<li><a class="reference internal" href="#passing-parameters-into-raw"><code class="docutils literal notranslate"><span class="pre">raw()</span></code> にパラメータを渡す</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#executing-custom-sql-directly">独自の SQL を直接実行する</a><ul>
+<li><a class="reference internal" href="#connections-and-cursors">コネクションとカーソル</a><ul>
+<li><a class="reference internal" href="#calling-stored-procedures">ストアドプロシージャの呼び出し</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="managers.html"
+                          title="前の章へ">マネージャ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="transactions.html"
+                          title="次の章へ">データベースのトランザクション</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/db/sql.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="managers.html" title="マネージャ">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="transactions.html" title="データベースのトランザクション">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

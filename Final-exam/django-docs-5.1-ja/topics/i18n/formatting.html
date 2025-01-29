@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>表示形式のローカライズ &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="タイムゾーン" href="timezones.html" />
+    <link rel="prev" title="翻訳" href="translation.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="translation.html" title="翻訳">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="timezones.html" title="タイムゾーン">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-i18n-formatting">
+            
+  <section id="s-format-localization">
+<span id="format-localization"></span><h1>表示形式のローカライズ<a class="headerlink" href="#format-localization" title="Link to this heading">¶</a></h1>
+<section id="s-overview">
+<span id="overview"></span><h2>概要<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Django の表示形式システムは、カレント <a class="reference internal" href="index.html#term-locale-name"><span class="xref std std-term">ロケール</span></a> に合った表示形式を使って日付、時刻、数値をテンプレート内で表示することができます。また、フォームでのローカライズされた入力も処理します。</p>
+<p>同じコンテンツにアクセスする2人のユーザーが、現在のロケールのフォーマットに応じて、日付、時刻、数字を異なる方法で表示することがあります。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>3桁区切りを使用した数値フォーマットを有効にするには、設定ファイルで <a class="reference internal" href="../../ref/settings.html#std-setting-USE_THOUSAND_SEPARATOR"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_THOUSAND_SEPARATOR</span> <span class="pre">=</span> <span class="pre">True</span></code></a> を設定する必要があります。別の方法として、 <a class="reference internal" href="../../ref/contrib/humanize.html#std-templatefilter-intcomma"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">intcomma</span></code></a> を使ってテンプレート内で数値をフォーマットすることもできます。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>関連する <a class="reference internal" href="../../ref/settings.html#std-setting-USE_I18N"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_I18N</span></code></a> 設定があり、 Django が翻訳を有効にするかどうかを制御します。詳しくは <a class="reference internal" href="translation.html"><span class="doc">翻訳</span></a> を参照してください。</p>
+</div>
+</section>
+<section id="s-locale-aware-input-in-forms">
+<span id="locale-aware-input-in-forms"></span><h2>フォームでのロケールを認識する入力<a class="headerlink" href="#locale-aware-input-in-forms" title="Link to this heading">¶</a></h2>
+<p>表示形式機能が有効のとき、Django がフォーム内で日付、時刻、数値を描画する際に、ローカライズされた表示形式を使用できます。フォームにデータが入力されたとき、ユーザによって使用される表示形式を推測し、異なるロケールに対する異なる表示形式を試みることを意味します。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>Django は、データを描画するために使うものに対して、データを表示するための異なる表示形式を使います。特に、日付を描画するための表示形式は、<code class="docutils literal notranslate"><span class="pre">%a</span></code> (省略された曜日名)、<code class="docutils literal notranslate"><span class="pre">%A</span></code> (曜日名), <code class="docutils literal notranslate"><span class="pre">%b</span></code> (省略された月名)、<code class="docutils literal notranslate"><span class="pre">%B</span></code> (月名)、<code class="docutils literal notranslate"><span class="pre">%p</span></code> (AM/PM) を使うことができません。</p>
+</div>
+<p>フォームフィールドの入出力データをローカライズするには <code class="docutils literal notranslate"><span class="pre">localize</span></code> 引数を使います:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CashRegisterForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">product</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">()</span>
+    <span class="n">revenue</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">DecimalField</span><span class="p">(</span><span class="n">max_digits</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">localize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="s-controlling-localization-in-templates">
+<span id="s-topic-l10n-templates"></span><span id="controlling-localization-in-templates"></span><span id="topic-l10n-templates"></span><h2>テンプレート内でローカライズをコントロールする<a class="headerlink" href="#controlling-localization-in-templates" title="Link to this heading">¶</a></h2>
+<p>Django はテンプレートで値を出力するときは常にロケール固有の書式を使おうとし ます。</p>
+<p>しかし、ローカライズされた値を使うことが適切ではないこともあります -- 例えば、機械が読み込むためにデザインされた JavaScript や XML を出力している場合、どんなときでも非ローカルの値が必要でしょう。また、全ての場所でローカライズを適用するのではなく、特定のテンプレートだけで使いたいときもあるかもしれません。</p>
+<p>ローカライズの仕様について細かいコントロールをするために、Django は <code class="docutils literal notranslate"><span class="pre">l10n</span></code> テンプレートライブラリを提供しています。これは、以下のタグやフィルタを含んでいます。</p>
+<section id="s-template-tags">
+<span id="template-tags"></span><h3>テンプレートタグ<a class="headerlink" href="#template-tags" title="Link to this heading">¶</a></h3>
+<section id="s-localize">
+<span id="s-std-templatetag-localize"></span><span id="localize"></span><span id="std-templatetag-localize"></span><h4><code class="docutils literal notranslate"><span class="pre">localize</span></code><a class="headerlink" href="#localize" title="Link to this heading">¶</a></h4>
+<p>ブロック内で、テンプレート変数のローカライズを有効化または無効化します。</p>
+<p>テンプレートブロックのローカライズを有効または無効にするには、次のようにします:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">l10n</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">localize</span> <span class="nv">on</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">value</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endlocalize</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">localize</span> <span class="nv">off</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">value</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endlocalize</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>ローカライズが無効化されている場合、<a class="reference internal" href="../../ref/settings.html#settings-l10n"><span class="std std-ref">localization settings</span></a> のフォーマットが適用されます。</p>
+<p>各変数ベースで同じ仕事をするテンプレートフィルタについて、<a class="reference internal" href="#std-templatefilter-localize"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">localize</span></code></a> と <a class="reference internal" href="#std-templatefilter-unlocalize"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">unlocalize</span></code></a> を参照してください。</p>
+</section>
+</section>
+<section id="s-template-filters">
+<span id="template-filters"></span><h3>テンプレートフィルタ<a class="headerlink" href="#template-filters" title="Link to this heading">¶</a></h3>
+<section id="s-std-templatefilter-localize">
+<span id="s-id1"></span><span id="std-templatefilter-localize"></span><span id="id1"></span><h4><code class="docutils literal notranslate"><span class="pre">localize</span></code><a class="headerlink" href="#std-templatefilter-localize" title="Link to this heading">¶</a></h4>
+<p>単数のローカライズを強制します。</p>
+<p>例えば次のようにします:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">l10n</span> <span class="cp">%}</span>
+
+<span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">localize</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>単数のローカライズを無効化するには、<a class="reference internal" href="#std-templatefilter-unlocalize"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">unlocalize</span></code></a> を使ってください。テンプレートの大きな範囲を通じてローカライズをコントロールするには、<a class="reference internal" href="#std-templatetag-localize"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">localize</span></code></a> テンプレートタグを使ってください。</p>
+</section>
+<section id="s-unlocalize">
+<span id="s-std-templatefilter-unlocalize"></span><span id="unlocalize"></span><span id="std-templatefilter-unlocalize"></span><h4><code class="docutils literal notranslate"><span class="pre">unlocalize</span></code><a class="headerlink" href="#unlocalize" title="Link to this heading">¶</a></h4>
+<p>単数形がローカライズされずに表示されるように強制します。</p>
+<p>例えば次のようにします:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">l10n</span> <span class="cp">%}</span>
+
+<span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">unlocalize</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>単数のローカライズを強制するには、<a class="reference internal" href="#std-templatefilter-localize"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">localize</span></code></a> を使ってください。テンプレートの大きな範囲を通じてローカライズをコントロールするには、<a class="reference internal" href="#std-templatetag-localize"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">localize</span></code></a> テンプレートタグを使ってください。</p>
+<p>数値（<code class="docutils literal notranslate"><span class="pre">int</span></code>、<code class="docutils literal notranslate"><span class="pre">float</span></code>、または <code class="docutils literal notranslate"><span class="pre">Decimal</span></code>）に対して、<a class="reference internal" href="../../ref/settings.html#settings-l10n"><span class="std std-ref">localization settings</span></a> のフォーマットを適用した文字列表現を返します。</p>
+</section>
+</section>
+</section>
+<section id="s-creating-custom-format-files">
+<span id="s-custom-format-files"></span><span id="creating-custom-format-files"></span><span id="custom-format-files"></span><h2>独自の表示形式ファイルを作成する<a class="headerlink" href="#creating-custom-format-files" title="Link to this heading">¶</a></h2>
+<p>Django は多くのロケール用のフォーマット定義を提供していますが、自分のロケール用のフォーマットファイルが存在しなかったり、いくつかの値を上書きしたりするために、自分でフォーマット定義を作りたいこともあるでしょう。</p>
+<p>カスタムフォーマットを使用するには、まずフォーマットファイルを置くパスを指定します。 そのためには <a class="reference internal" href="../../ref/settings.html#std-setting-FORMAT_MODULE_PATH"><code class="xref std std-setting docutils literal notranslate"><span class="pre">FORMAT_MODULE_PATH</span></code></a> 設定をフォーマットファイルが存在するパッケージに設定します、例えば次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FORMAT_MODULE_PATH</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;mysite.formats&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;some_app.formats&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>ファイルはこのディレクトリに直接置くのではなく、ロケールと同じ名前のディレクトリに置き、 <code class="docutils literal notranslate"><span class="pre">formats.py</span></code> という名前にする必要があります。 <code class="docutils literal notranslate"><span class="pre">django.utils.formats.get_format()</span></code> (<a class="reference internal" href="../../ref/templates/builtins.html#std-templatefilter-date"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">date</span></code></a> テンプレートフィルタで使用されます) に文字列を渡すと、中の値が公開される可能性があるので、これらのファイルに機密情報を書かないように注意してください。</p>
+<p>英語のフォーマットをカスタマイズするには、このような構造が必要です:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>mysite/
+    formats/
+        __init__.py
+        en/
+            __init__.py
+            formats.py
+</pre></div>
+</div>
+<p>ここで <code class="file docutils literal notranslate"><span class="pre">formats.py</span></code> はカスタムフォーマットの定義を含んでいます。たとえば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">THOUSAND_SEPARATOR</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\xa0</span><span class="s2">&quot;</span>
+</pre></div>
+</div>
+<p>上記のようにすると、英語のデフォルトであるコンマの代わりに、区切りのないスペース（Unicode <code class="docutils literal notranslate"><span class="pre">00A0</span></code>）を3桁区切りとして使うことができます。</p>
+</section>
+<section id="s-limitations-of-the-provided-locale-formats">
+<span id="limitations-of-the-provided-locale-formats"></span><h2>提供されているロケール表示形式の限界<a class="headerlink" href="#limitations-of-the-provided-locale-formats" title="Link to this heading">¶</a></h2>
+<p>いくつかのロケールは、数字に対して文脈依存の表示形式を使います。これは、Django のローカライズシステムでは自動的に扱うことはできません。</p>
+<section id="s-switzerland-german">
+<span id="switzerland-german"></span><h3>スイス (ドイツ語)<a class="headerlink" href="#switzerland-german" title="Link to this heading">¶</a></h3>
+<p>スイスの数値の表示形式は、対象となる数字の種類によって決まります。貨幣の値に対しては、カンマが 1000 区切りに使われ、小数点が小数区切りに使われます。他の数字に対しては、カンマは小数区切りとして使われ、空白が 1000 区切りとして使われます。Django によって提供されるロケール表示形式は、一般的な区切り文字、つまり小数にはカンマそして1000 区切りには空白を使用します。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">表示形式のローカライズ</a><ul>
+<li><a class="reference internal" href="#overview">概要</a></li>
+<li><a class="reference internal" href="#locale-aware-input-in-forms">フォームでのロケールを認識する入力</a></li>
+<li><a class="reference internal" href="#controlling-localization-in-templates">テンプレート内でローカライズをコントロールする</a><ul>
+<li><a class="reference internal" href="#template-tags">テンプレートタグ</a><ul>
+<li><a class="reference internal" href="#localize"><code class="docutils literal notranslate"><span class="pre">localize</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#template-filters">テンプレートフィルタ</a><ul>
+<li><a class="reference internal" href="#std-templatefilter-localize"><code class="docutils literal notranslate"><span class="pre">localize</span></code></a></li>
+<li><a class="reference internal" href="#unlocalize"><code class="docutils literal notranslate"><span class="pre">unlocalize</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#creating-custom-format-files">独自の表示形式ファイルを作成する</a></li>
+<li><a class="reference internal" href="#limitations-of-the-provided-locale-formats">提供されているロケール表示形式の限界</a><ul>
+<li><a class="reference internal" href="#switzerland-german">スイス (ドイツ語)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="translation.html"
+                          title="前の章へ">翻訳</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="timezones.html"
+                          title="次の章へ">タイムゾーン</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/i18n/formatting.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="translation.html" title="翻訳">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="timezones.html" title="タイムゾーン">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

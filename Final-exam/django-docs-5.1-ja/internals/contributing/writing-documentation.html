@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ドキュメントを書く &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="Django のローカライズ" href="localizing.html" />
+    <link rel="prev" title="コードのコミット" href="committing-code.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);(function($) {
+    $(document).ready(function() {
+        $(".c-tab-unix").on("click", function() {
+            $("section.c-content-unix").show();
+            $("section.c-content-win").hide();
+            $(".c-tab-unix").prop("checked", true);
+        });
+        $(".c-tab-win").on("click", function() {
+            $("section.c-content-win").show();
+            $("section.c-content-unix").hide();
+            $(".c-tab-win").prop("checked", true);
+        });
+    });
+})(jQuery);</script>
+<link rel="stylesheet" href="../../_static/console-tabs.css">
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="committing-code.html" title="コードのコミット">previous</a>
+     |
+    <a href="../index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="localizing.html" title="Django のローカライズ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="internals-contributing-writing-documentation">
+            
+  <section id="s-writing-documentation">
+<span id="writing-documentation"></span><h1>ドキュメントを書く<a class="headerlink" href="#writing-documentation" title="Link to this heading">¶</a></h1>
+<p>私たちはドキュメントの一貫性と読みやすさを重要視しています。結局のところ、Django はジャーナリズムの環境で作られました！ですから、私たちはコードを扱うようにドキュメントを扱います。できるだけ頻繁に改善することを目指しています。</p>
+<p>ドキュメンテーションの変更には、一般的に2つの形式があります:</p>
+<ul class="simple">
+<li><p>全般的な改善: 誤字脱字の修正、エラーの修正、より分かりやすい文章とより多くの例による説明の改善。</p></li>
+<li><p>新機能: 前回のリリース以降にフレームワークに追加された機能のドキュメントです。</p></li>
+</ul>
+<p>このセクションでは、ライターが最も有用でミスの少ない方法で文書の変更を行う方法について説明します。</p>
+<section id="s-the-django-documentation-process">
+<span id="the-django-documentation-process"></span><h2>Django のドキュメント作成プロセス<a class="headerlink" href="#the-django-documentation-process" title="Link to this heading">¶</a></h2>
+<p>Django のドキュメントは、 <a class="reference external" href="https://docs.djangoproject.com/">https://docs.djangoproject.com/</a> で HTML として読まれることを想定していますが、柔軟性を最大にするために、 reStructuredText マークアップ言語で書かれたプレーンテキストファイルの集合として編集しています。</p>
+<p>私たちは開発版のリポジトリで作業します。なぜなら、最新かつ最高のドキュメントがあり、最新かつ最高のコードがあるからです。</p>
+<p>また、マージャーの判断で、ドキュメントの修正や改良を最後のリリースブランチにバックポートします。これは、最終リリースのドキュメントが最新で正しい方が有利だからです (<a class="reference internal" href="../../intro/whatsnext.html#differences-between-doc-versions"><span class="std std-ref">バージョンごとの違い</span></a> を参照してください)。</p>
+<p>Django のドキュメンテーションは <a class="reference external" href="https://www.sphinx-doc.org/">Sphinx</a> ドキュメンテーションシステムを使っ ており、<a class="reference external" href="https://docutils.sourceforge.io/">docutils</a> をベースにしています。基本的な考え方は、軽く整形されたプレーンテキストのドキュメントを HTML や PDF などの出力形式に変換するというものです。</p>
+<p>Sphinxには <code class="docutils literal notranslate"><span class="pre">sphinx-build</span></code> コマンドがあり、 reStructuredText を他のフォーマット、例えば HTML や PDF に変換できます。このコマンドは設定可能ですが、Djangoのドキュメンテーションには <code class="docutils literal notranslate"><span class="pre">Makefile</span></code> があり、より短い <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> コマンドを提供しています。</p>
+</section>
+<section id="s-how-the-documentation-is-organized">
+<span id="how-the-documentation-is-organized"></span><h2>ドキュメントの構成<a class="headerlink" href="#how-the-documentation-is-organized" title="Link to this heading">¶</a></h2>
+<p>ドキュメントはいくつかのカテゴリーに分類されています:</p>
+<ul>
+<li><p><a class="reference internal" href="../../intro/index.html"><span class="doc">チュートリアル</span></a> は、何かを作るための一連のステップを読者に手取り足取り教えてくれます。</p>
+<p>チュートリアルで重要なことは、読者に自信を持たせるために、できればできるだけ早い段階で、何か役に立つことを達成させることです。</p>
+<p>解決しようとしている問題の性質を説明することで、読者がこれから達成しようとしていることを理解できるようにしてください。物事がどう機能するかについての説明から始める必要はありません。重要なのは読者が何をするかであり、あなたが説明する内容ではありません。行ったことを振り返り、その後で説明することは時に有用です。</p>
+</li>
+<li><p><a class="reference internal" href="../../topics/index.html"><span class="doc">トピックガイド</span></a> は、概念や主題をかなり高いレベルで説明することを目的としています。</p>
+<p>参考資料を繰り返すのではなく、リンクさせましょう。自分にとっては基本的なことでも、他の人には必要な説明かもしれません。</p>
+<p>背景となる文脈を提供することで、初心者がトピックをすでに知っている事柄と結びつけることができます。</p>
+</li>
+<li><p><a class="reference internal" href="../../ref/index.html"><span class="doc">リファレンスガイド</span></a> には API の技術的なリファレンスが含まれています。Django の内部的な仕組みや使い方を説明しています。</p>
+<p>参考資料は主題にしっかりと焦点を絞ってください。読者はすでに基本的な概念を理解しているが、 Django がどのようにそれを行うかを知るか、思い出す必要があると仮定してください。</p>
+<p>リファレンスガイドは、一般的な説明をする場所ではありません。基本的な概念を説明する場合は、その資料をトピックガイドに移すとよいでしょう。</p>
+</li>
+<li><p><a class="reference internal" href="../../howto/index.html"><span class="doc">How-to ガイド</span></a> は鍵となる主題に関して、いくつかのステップを踏んで説明しているレシピ集です。</p>
+<p>ハウツーガイドで最も重要なのは、ユーザが何を達成したいかです。ハウツーは常に、 Django が何をどのように実装しているかという内部的な詳細に焦点を当てるよりも、結果指向であるべきです。</p>
+<p>これらのガイドはチュートリアルよりも高度で、Django がどのように動作するかについて、ある程度の知識があることを前提としています。読者はチュートリアルに従ったことがあると仮定し、同じ内容を繰り返すのではなく、適切なチュートリアルに戻ることを躊躇しないでください。</p>
+</li>
+</ul>
+</section>
+<section id="s-how-to-start-contributing-documentation">
+<span id="how-to-start-contributing-documentation"></span><h2>ドキュメントの寄稿を始めるには<a class="headerlink" href="#how-to-start-contributing-documentation" title="Link to this heading">¶</a></h2>
+<section id="s-clone-the-django-repository-to-your-local-machine">
+<span id="clone-the-django-repository-to-your-local-machine"></span><h3>Django リポジトリをローカルマシンにクローンします。<a class="headerlink" href="#clone-the-django-repository-to-your-local-machine" title="Link to this heading">¶</a></h3>
+<p>ドキュメントへの貢献を始めたい場合は、ソースコードリポジトリから Django の開発版を入手してください (<a class="reference internal" href="../../topics/install.html#installing-development-version"><span class="std std-ref">開発バージョンをインストールする</span></a> を参照してください):</p>
+<div class="console-block" id="console-block-0">
+<input class="c-tab-unix" id="c-tab-0-unix" type="radio" name="console-0" checked>
+<label for="c-tab-0-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-0-win" type="radio" name="console-0">
+<label for="c-tab-0-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-0-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/django/django.git
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-0-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> git clone https://github.com/django/django.git
+</pre></div>
+</section>
+</div>
+<p>これらの変更を提出するつもりなら、代わりに Django リポジトリをフォークして、このフォークをクローンすると便利かもしれません。</p>
+</section>
+<section id="s-set-up-a-virtual-environment-and-install-dependencies">
+<span id="set-up-a-virtual-environment-and-install-dependencies"></span><h3>仮想環境のセットアップと依存関係のインストール<a class="headerlink" href="#set-up-a-virtual-environment-and-install-dependencies" title="Link to this heading">¶</a></h3>
+<p>仮想環境を作成してアクティブにし、依存関係をインストールします:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv
+$<span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+$<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>docs/requirements.txt
+</pre></div>
+</div>
+</section>
+<section id="s-build-the-documentation-locally">
+<span id="build-the-documentation-locally"></span><h3>ドキュメントをローカルでビルドする<a class="headerlink" href="#build-the-documentation-locally" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">docs</span></code> ディレクトリから HTML 出力をビルドできます:</p>
+<div class="console-block" id="console-block-1">
+<input class="c-tab-unix" id="c-tab-1-unix" type="radio" name="console-1" checked>
+<label for="c-tab-1-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-1-win" type="radio" name="console-1">
+<label for="c-tab-1-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-1-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>docs
+<span class="gp">$ </span>make<span class="w"> </span>html
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-1-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> <span class="k">cd</span> docs
+<span class="gp">...\&gt;</span> make.bat html
+</pre></div>
+</section>
+</div>
+<p>ローカルにビルドされたドキュメントは <code class="docutils literal notranslate"><span class="pre">_build/html/index.html</span></code> にアクセスできるようになり、どのウェブブラウザでも閲覧できるようになりますが、 <a class="reference external" href="https://docs.djangoproject.com/">docs.djangoproject.com</a> にあるドキュメントとは異なるテーマで表示されます。これはOKです！あなたのローカルマシンで変更がうまくいけば、 ウェブサイトでもうまくいくでしょう。</p>
+</section>
+<section id="s-making-edits-to-the-documentation">
+<span id="making-edits-to-the-documentation"></span><h3>ドキュメントの編集<a class="headerlink" href="#making-edits-to-the-documentation" title="Link to this heading">¶</a></h3>
+<p>ソースファイルは <code class="docutils literal notranslate"><span class="pre">docs/</span></code> ディレクトリにある <code class="docutils literal notranslate"><span class="pre">.txt</span></code> ファイルです。</p>
+<p>これらのファイルはreStructuredTextマークアップ言語で書かれています。マークアップを学ぶには <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index" title="(in Sphinx v8.2.0)"><span class="xref std std-ref">reStructuredText reference</span></a> を参照してください。</p>
+<p>このページを編集するには、例えば <a class="extlink-source reference external" href="https://github.com/django/django/blob/main/docs/internals/contributing/writing-documentation.txt">docs/internals/contributing/writing-documentation.txt</a> というファイルを編集し、 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">html</span></code> でHTMLを再構築します。</p>
+</section>
+<section id="s-spelling-check">
+<span id="s-documentation-spelling-check"></span><span id="spelling-check"></span><span id="documentation-spelling-check"></span><h3>スペルチェック<a class="headerlink" href="#spelling-check" title="Link to this heading">¶</a></h3>
+<p>ドキュメントをコミットする前に、スペルチェッカーを実行することをお勧めします。まず <a class="extlink-pypi reference external" href="https://pypi.org/project/sphinxcontrib-spelling/">sphinxcontrib-spelling</a> をインストールする必要があります。そして、 <code class="docutils literal notranslate"><span class="pre">docs</span></code> ディレクトリから、 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">spelling</span></code> を実行してください。間違っている単語があれば、その単語が含まれるファイルと行番号が <code class="docutils literal notranslate"><span class="pre">_build/spelling/output.txt</span></code> に保存されます。</p>
+<p>誤検出（実際には正しいのに検出されたエラー）が発生した場合は、以下のいずれかを行ってください:</p>
+<ul class="simple">
+<li><p>インラインコードやブランド・技術名は、ダブルグレイブアクセント（``）で囲んでください。</p></li>
+<li><p>スペルチェッカーが認識する同義語を探します。</p></li>
+<li><p>あなたが使っている単語が正しいと確信できる場合のみ、その単語を <code class="docutils literal notranslate"><span class="pre">docs/spelling_wordlist</span></code> に追加してください（リストはアルファベット順にしてください）。</p></li>
+</ul>
+</section>
+<section id="s-link-check">
+<span id="s-documentation-link-check"></span><span id="link-check"></span><span id="documentation-link-check"></span><h3>リンクの確認<a class="headerlink" href="#link-check" title="Link to this heading">¶</a></h3>
+<p>ドキュメントのリンクが壊れたり、正規のリンクでなくなったりすることがあります。Sphinxはドキュメントのリンクが機能しているかどうかをチェックするビルダーを提供しています。docsディレクトリから、 <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">linkcheck</span></code> を実行してください。出力はターミナルに出力されますが、 <code class="docutils literal notranslate"><span class="pre">_build/linkcheck/output.txt</span></code> や <code class="docutils literal notranslate"><span class="pre">_build/linkcheck/output.json</span></code> にも出力されます。</p>
+<p>ステータスが &quot;working &quot;のエントリーは問題ありませんが、&quot;unchecked &quot;または &quot;ignored &quot;のエントリーは、チェックできないか、設定の無視ルールにマッチしているため、スキップされています。</p>
+<p>ステータスが &quot;broken&quot; のエントリは修正する必要があります。 &quot;redirected&quot; のステータスを持つものは、正規の場所を指すように更新する必要があるかもしれません。例えば、スキームが <code class="docutils literal notranslate"><span class="pre">http://</span></code> → <code class="docutils literal notranslate"><span class="pre">https://</span></code> に変更された場合などです。場合によっては、&quot;redirected&quot; リンクを更新したくないこともあります。例えば、常にドキュメントの最新版や安定版を指すように書き換えたい場合などです。例えば、 <code class="docutils literal notranslate"><span class="pre">/en/stable/</span></code> → <code class="docutils literal notranslate"><span class="pre">/en/3.2/</span></code> のようにです。</p>
+</section>
+</section>
+<section id="s-writing-style">
+<span id="writing-style"></span><h2>執筆スタイル<a class="headerlink" href="#writing-style" title="Link to this heading">¶</a></h2>
+<p>&quot;セッション・クッキーを持つユーザ&quot; のような、仮想的な人物を指して代名詞を使うときは、下記のようなものの代わりに、性別に中立な代名詞(they/their/them)を使うべきです。:</p>
+<ul class="simple">
+<li><p>he や she... they を使います。</p></li>
+<li><p>him や her... them を使います。</p></li>
+<li><p>his や her... their を使います。</p></li>
+<li><p>his や hers... theirs を使います。</p></li>
+<li><p>himself や herself... themselves を使います。</p></li>
+</ul>
+<p>「簡単に」、「単に」、「ただ」、「単に」、「単純に」など、作業や操作の難しさを最小化するような言葉はなるべく使わないようにしましょう。人々の経験とあなたの期待とは一致しないかもしれませんし、暗示されているような「簡単な」「単純な」ステップを見つけられなかったときに、不満を抱くかもしれません。</p>
+</section>
+<section id="s-commonly-used-terms">
+<span id="commonly-used-terms"></span><h2>よく使われる用語<a class="headerlink" href="#commonly-used-terms" title="Link to this heading">¶</a></h2>
+<p>ここでは、ドキュメントの中でよく使われる用語についてのスタイルガイドラインを示します:</p>
+<ul class="simple">
+<li><p><strong>Django</strong> -- このフレームワークを指すときは、Django を大文字にします。Python のコードと djangoproject.com のロゴの中だけ小文字です。</p></li>
+<li><p><strong>email</strong> -- ハイフンなし。</p></li>
+<li><p><strong>HTTP</strong> -- 予想される発音は &quot;Aitch Tee Tee Pee &quot;なので、&quot;a &quot;ではなく &quot;an &quot;を前に置くべきです。</p></li>
+<li><p><strong>MySQL</strong>, <strong>PostgreSQL</strong>, <strong>SQLite</strong></p></li>
+<li><p><strong>SQL</strong> -- SQLを指す場合、&quot;sequel &quot;ではなく、&quot;Ess Queue Ell &quot;と発音します。したがって、&quot;Returns an SQL expression &quot;のようなフレーズでは、&quot;SQL &quot;の前に &quot;an &quot;を付けるべきであり、&quot;a &quot;を付けるべきではありません。</p></li>
+<li><p><strong>Python</strong> -- 言語を指すときは、Pythonを大文字にします。</p></li>
+<li><p><strong>realize</strong>, <strong>customize</strong>, <strong>initialize</strong> など。接尾辞は &quot;ise&quot; ではなく、アメリカの &quot;ize&quot; を使います。</p></li>
+<li><p><strong>subclass</strong> -- 動詞（「そのモデルをサブクラス化する」）としても名詞（「サブクラスを作成する」）としても、ハイフンなしの1語です。</p></li>
+<li><p><strong>the web</strong>, <strong>web framework</strong> -- 大文字ではありません。</p></li>
+<li><p><strong>website</strong> -- 大文字にせず、1語にしてください。</p></li>
+</ul>
+</section>
+<section id="s-django-specific-terminology">
+<span id="django-specific-terminology"></span><h2>Django 特有の用語<a class="headerlink" href="#django-specific-terminology" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p><strong>model</strong> -- 大文字ではありません。</p></li>
+<li><p><strong>template</strong> -- 大文字ではありません。</p></li>
+<li><p><strong>URLconf</strong> -- &quot;conf &quot;の前にはスペースを入れず、大文字を3文字使います。</p></li>
+<li><p><strong>view</strong> -- 大文字ではありません。</p></li>
+</ul>
+</section>
+<section id="s-guidelines-for-restructuredtext-files">
+<span id="guidelines-for-restructuredtext-files"></span><h2>reStructuredText ファイルのガイドライン<a class="headerlink" href="#guidelines-for-restructuredtext-files" title="Link to this heading">¶</a></h2>
+<p>このガイドラインは、reST（reStructuredText）文書の書式を規定しています:</p>
+<ul>
+<li><p>セクションのタイトルでは、最初の単語と固有名詞のみ先頭を大文字にします。</p></li>
+<li><p>コード例が2行に分割されると著しく読みにくくなる場合や、その他の正当な理由がある場合を除き、ドキュメントは80文字の幅で折り返します。</p></li>
+<li><p>ドキュメントを書いたり編集したりするときに心に留めておくべきことは、セマンティックなマークアップは多ければ多いほど良いということです。よって:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>Add <span class="s">``django.contrib.auth``</span> to your <span class="s">``INSTALLED_APPS``</span>...
+</pre></div>
+</div>
+<p>このように書くより、次のように書くほうが役立ちます:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>Add <span class="na">:mod:</span><span class="nv">`django.contrib.auth`</span> to your <span class="na">:setting:</span><span class="nv">`INSTALLED_APPS`</span>...
+</pre></div>
+</div>
+<p>これは、Sphinxが後者のために適切なリンクを生成してくれるからです。</p>
+<p>ターゲットの前に <code class="docutils literal notranslate"><span class="pre">~</span></code> (チルダ) を付けると、そのパスの「最後の部分」だけを取得できます。つまり、 <code class="docutils literal notranslate"><span class="pre">:mod:`~django.contrib.auth`</span></code> は &quot;auth&quot; というタイトルのリンクを表示します。</p>
+</li>
+<li><p>すべての Python コードブロックは <a class="extlink-pypi reference external" href="https://pypi.org/project/blacken-docs/">blacken-docs</a> の自動フォーマットを使ってフォーマットされるべきです。これは <code class="docutils literal notranslate"><span class="pre">pre-commit</span></code> が設定されていれば実行されます。</p></li>
+<li><p>PythonとSphinxのドキュメントを参照するには、 <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#module-sphinx.ext.intersphinx" title="(in Sphinx v8.2.0)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">intersphinx</span></code></a> を使用してください。</p></li>
+<li><p>リテラルブロックには <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">code-block::</span> <span class="pre">&lt;lang&gt;</span></code> を追加して、ハイライトされるようにします。 <code class="docutils literal notranslate"><span class="pre">::</span></code> （2つのコロン）を使用した自動ハイライトに頼るほうがいいでしょう。これには、コードに無効な構文が含まれていてハイライトされないような場合に利点があります。たとえば <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">code-block::</span> <span class="pre">python</span></code> を追加すると、無効な構文があっても強制的にハイライトされます。</p></li>
+<li><p>可読性を向上させるために、 <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">note::</span></code> の代わりに <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">admonition::</span> <span class="pre">Descriptive</span> <span class="pre">title</span></code> を使用してください。これらのボックスは控えめに使用してください。</p></li>
+<li><p>これらの見出しスタイルを使用してください:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="gh">===</span>
+<span class="gh">One</span>
+<span class="gh">===</span>
+
+<span class="gh">Two</span>
+<span class="gh">===</span>
+
+<span class="gh">Three</span>
+<span class="gh">-----</span>
+
+<span class="gh">Four</span>
+<span class="gh">~~~~</span>
+
+<span class="gh">Five</span>
+<span class="gh">^^^^</span>
+</pre></div>
+</div>
+</li>
+<li><p>RFCを参照するには <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#role-rfc" title="(in Sphinx v8.2.0)"><code class="xref rst rst-role docutils literal notranslate"><span class="pre">:rfc:</span></code></a> を使い、可能であれば関連するセクションにリンクするようにしてください。例えば、 <code class="docutils literal notranslate"><span class="pre">:rfc:`2324#section-2.3.2`</span></code> や <code class="docutils literal notranslate"><span class="pre">:rfc:`Custom</span> <span class="pre">link</span> <span class="pre">text</span> <span class="pre">&lt;2324#section-2.3.2&gt;`</span></code> を使用します。</p></li>
+<li><p>Python Enhancement Proposal (PEP) を参照するには <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#role-pep" title="(in Sphinx v8.2.0)"><code class="xref rst rst-role docutils literal notranslate"><span class="pre">:pep:</span></code></a> を使い、可能であれば関連するセクションにリンクするようにしてください。例えば、 <code class="docutils literal notranslate"><span class="pre">:pep:`20#easter-egg`</span></code> や <code class="docutils literal notranslate"><span class="pre">:pep:`Easter</span> <span class="pre">Egg</span> <span class="pre">&lt;20#easter-egg&gt;`</span></code> を使います。</p></li>
+<li><p>コードの例で値が引用符で囲まれていない限り、MIMEタイプを参照するには <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/roles.html#role-mimetype" title="(in Sphinx v8.2.0)"><code class="xref rst rst-role docutils literal notranslate"><span class="pre">:mimetype:</span></code></a> を使用します。</p></li>
+<li><p>環境変数を参照するには <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/referencing.html#role-envvar" title="(in Sphinx v8.2.0)"><code class="xref rst rst-role docutils literal notranslate"><span class="pre">:envvar:</span></code></a> を使います。また、 <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/domains/standard.html#directive-envvar" title="(in Sphinx v8.2.0)"><code class="xref rst rst-dir docutils literal notranslate"><span class="pre">..</span> <span class="pre">envvar::</span></code></a> を使って、その環境変数のドキュメントへの参照を定義する必要があるかもしれません。</p></li>
+</ul>
+</section>
+<section id="s-django-specific-markup">
+<span id="django-specific-markup"></span><h2>Django 固有のマークアップ<a class="headerlink" href="#django-specific-markup" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index" title="(in Sphinx v8.2.0)"><span class="xref std std-ref">Sphinx's built-in markup</span></a> 以外にも、Djangoドキュメントではいくつかの追加拡張を利用しています：</p>
+<ul>
+<li><p>設定:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">setting</span><span class="p">::</span> INSTALLED_APPS
+</pre></div>
+</div>
+<p>設定にリンクするには <code class="docutils literal notranslate"><span class="pre">:setting:`INSTALLED_APPS`</span></code> を使用します。</p>
+</li>
+<li><p>テンプレートタグ:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">templatetag</span><span class="p">::</span> regroup
+</pre></div>
+</div>
+<p>リンクするには <code class="docutils literal notranslate"><span class="pre">:ttag:`regroup`</span></code> を使います。</p>
+</li>
+<li><p>テンプレートフィルタ:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">templatefilter</span><span class="p">::</span> linebreaksbr
+</pre></div>
+</div>
+<p>リンクするには <code class="docutils literal notranslate"><span class="pre">:tfilter:`linebreaksbr`</span></code> を使います。</p>
+</li>
+<li><p>フィールドのルックアップ (例 <code class="docutils literal notranslate"><span class="pre">Foo.objects.filter(bar__exact=whatever)</span></code>):</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">fieldlookup</span><span class="p">::</span> exact
+</pre></div>
+</div>
+<p>リンクするには <code class="docutils literal notranslate"><span class="pre">:lookup:`exact`</span></code> を使います。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dango-admin</span></code> コマンド:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">django-admin</span><span class="p">::</span> migrate
+</pre></div>
+</div>
+<p>リンクするには <code class="docutils literal notranslate"><span class="pre">:djadmin:`migrate`</span></code> を使用します。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">django-admin</span></code> のコマンドラインオプション:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">django-admin-option</span><span class="p">::</span> --traceback
+</pre></div>
+</div>
+<p>リンクするには、 <code class="docutils literal notranslate"><span class="pre">:option:`command_name</span> <span class="pre">--traceback`</span></code> を使います（ <code class="docutils literal notranslate"><span class="pre">--verbosity</span></code> のようなすべてのコマンドに共通するオプションの場合は <code class="docutils literal notranslate"><span class="pre">command_name</span></code> を省略することもできます）。</p>
+</li>
+<li><p>Trac チケットへのリンク (通常、パッチリリースノート用に予約されています):</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="na">:ticket:</span><span class="nv">`12345`</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>Django のドキュメントでは、 <code class="docutils literal notranslate"><span class="pre">djangoo-admin</span></code> や <code class="docutils literal notranslate"><span class="pre">manage.py</span></code>, <code class="docutils literal notranslate"><span class="pre">python</span></code> などのコマンドラインの例をドキュメント化するために、カスタム の <code class="docutils literal notranslate"><span class="pre">console</span></code> ディレクティブを使っています。例）HTML ドキュメントでは、2 つのタブの UI を表示し、1 つのタブでは Unix スタイルのコマンドプロンプトを表示し、2 番目のタブでは Windows プロンプトを表示します。</p>
+<p>例えば、次のような断片を:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>use this command:
+
+<span class="p">..</span> <span class="ow">code-block</span><span class="p">::</span> console
+
+    $ python manage.py shell
+</pre></div>
+</div>
+<p>このように置き換えることができます:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>use this command:
+
+<span class="p">..</span> <span class="ow">console</span><span class="p">::</span>
+
+    $ python manage.py shell
+</pre></div>
+</div>
+<p>下記の2点に注意してください:</p>
+<ul class="simple">
+<li><p>通常、 <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">code-block::</span> <span class="pre">console</span></code> ディレクティブの出現箇所を置き換えることになります。</p></li>
+<li><p>コード例の実際の内容を変更する必要はありません。Unixライクな環境（つまり、 <code class="docutils literal notranslate"><span class="pre">'$'</span></code> というプロンプト記号、ファイルシステムパスコンポーネントの区切りとしての <code class="docutils literal notranslate"><span class="pre">'/'</span></code> など）を前提にしたまま記述します。</p></li>
+</ul>
+<p>上の例では、2つのタブを持つコード例ブロックがレンダリングされます。最初のタブは:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>shell
+</pre></div>
+</div>
+<p>(<code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">code-block::</span> <span class="pre">console</span></code> がレンダリングするものと変わりません)。</p>
+<p>２つめのタブは次のようになります:</p>
+<div class="highlight-doscon notranslate"><div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py shell
+</pre></div>
+</div>
+</section>
+<section id="s-documenting-new-features">
+<span id="s-id3"></span><span id="documenting-new-features"></span><span id="id3"></span><h2>新機能のドキュメントを書く<a class="headerlink" href="#documenting-new-features" title="Link to this heading">¶</a></h2>
+<p>私たちの新機能に関するポリシーは以下のとおりです:</p>
+<blockquote>
+<div><p>新機能のドキュメントはすべて、Django の開発版でしか利用できない機能を明確に指定するように書くべきです。ドキュメントの読者は開発版ではなく、最新のリリースを使っていると仮定してください。</p>
+</div></blockquote>
+<p>新機能をマークするには、その機能のドキュメントの前に &quot;<code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">versionadded::</span> <span class="pre">X.Y</span></code>&quot; を付与し、必須の空白行とオプションの説明（インデントされたもの）を続けます。</p>
+<p>APIへの一般的な改善や強調すべきその他の変更には、 &quot;<code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">versionchanged::</span> <span class="pre">X.Y</span></code>&quot; ディレクティブを使用してください（上述の &quot;<code class="docutils literal notranslate"><span class="pre">versionadded</span></code>&quot; と同じフォーマットです）。</p>
+<p>これらの <code class="docutils literal notranslate"><span class="pre">versionadded</span></code> と <code class="docutils literal notranslate"><span class="pre">versionchanged</span></code> ブロックは &quot;自己完結型&quot; であるべきです。言い換えると、これらの注釈は2つのリリースの間だけ残しておくために、周囲のテキストをリフローしたり、インデントを変更したり、編集したりすることなく、注釈とその内容を削除できればいいのです。例えば、新機能や変更された機能の説明全体をブロックに入れる代わりに、次のようにします:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">class</span><span class="p">::</span> Author(first_name, last_name, middle_name=None)
+
+    A person who writes books.
+
+    <span class="s">``first_name``</span> is ...
+
+<span class="c">    ...</span>
+
+<span class="c">    ``middle_name`` is ...</span>
+
+<span class="c">    .. versionchanged:: A.B</span>
+
+<span class="c">        The ``middle_name`` argument was added.</span>
+</pre></div>
+</div>
+<p>changed 注釈ノートはセクションの上ではなく、一番下に配置します。</p>
+<p>また、 <code class="docutils literal notranslate"><span class="pre">versionadded</span></code> や <code class="docutils literal notranslate"><span class="pre">versionchanged</span></code> ブロックの外側で Django の特定のバージョンを参照するのは避けてください。ブロックの中であっても、これらのアノテーションはそれぞれ &quot;New in Django A.B:&quot; や &quot;Changed in Django A.B&quot; としてレンダリングされるので、そうするのは冗長な場合が多いです。</p>
+<p>関数や属性などが追加された場合は、このように <code class="docutils literal notranslate"><span class="pre">versionadded</span></code> 注釈を使っても構いません:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">attribute</span><span class="p">::</span> Author.middle_name
+
+<span class="p">    ..</span> <span class="ow">versionadded</span><span class="p">::</span> A.B
+
+    An author&#39;s middle name.
+</pre></div>
+</div>
+<p>この <code class="docutils literal notranslate"><span class="pre">..</span> <span class="pre">versionadded::</span> <span class="pre">A.B</span></code> 注釈は、インデントを変更することなく削除できます。</p>
+</section>
+<section id="s-minimizing-images">
+<span id="minimizing-images"></span><h2>画像を縮小する<a class="headerlink" href="#minimizing-images" title="Link to this heading">¶</a></h2>
+<p>可能な限り画像圧縮を最適化してください。 PNG ファイルの場合は、 OptiPNG と AdvanceCOMP の <code class="docutils literal notranslate"><span class="pre">advpng</span></code> を使用してください:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>docs
+<span class="gp">$ </span>optipng<span class="w"> </span>-o7<span class="w"> </span>-zm1-9<span class="w"> </span>-i0<span class="w"> </span>-strip<span class="w"> </span>all<span class="w"> </span><span class="sb">`</span>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-not<span class="w"> </span>-path<span class="w"> </span><span class="s2">&quot;./_build/*&quot;</span><span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.png&quot;</span><span class="sb">`</span>
+<span class="gp">$ </span>advpng<span class="w"> </span>-z4<span class="w"> </span><span class="sb">`</span>find<span class="w"> </span>.<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-not<span class="w"> </span>-path<span class="w"> </span><span class="s2">&quot;./_build/*&quot;</span><span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.png&quot;</span><span class="sb">`</span>
+</pre></div>
+</div>
+<p>これは OptiPNG バージョン 0.7.5 に基づいています。古いバージョンは、<code class="docutils literal notranslate"><span class="pre">-strip</span> <span class="pre">all</span></code> オプションが非可逆であることに文句を言うかもしれません。</p>
+</section>
+<section id="s-an-example">
+<span id="an-example"></span><h2>例<a class="headerlink" href="#an-example" title="Link to this heading">¶</a></h2>
+<p>それぞれの例がどのように連携するのか、簡単な例を見てみましょう:</p>
+<ul>
+<li><p>まず、 <code class="docutils literal notranslate"><span class="pre">ref/settings.txt</span></code> ドキュメント全体のレイアウトはこのようになっています:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="gh">========</span>
+<span class="gh">Settings</span>
+<span class="gh">========</span>
+
+<span class="c">...</span>
+
+<span class="p">..</span> <span class="nt">_available-settings:</span>
+
+<span class="gh">Available settings</span>
+<span class="gh">==================</span>
+
+<span class="c">...</span>
+
+<span class="p">..</span> <span class="nt">_deprecated-settings:</span>
+
+<span class="gh">Deprecated settings</span>
+<span class="gh">===================</span>
+
+<span class="c">...</span>
+</pre></div>
+</div>
+</li>
+<li><p>次に、 <code class="docutils literal notranslate"><span class="pre">topics/settings.txt</span></code> ドキュメントには以下のような内容が含まれるかもしれません:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span>You can access a :ref:`listing of all available settings
+<span class="nt">&lt;available-settings&gt;</span>`. For a list of deprecated settings see
+<span class="na">:ref:</span><span class="nv">`deprecated-settings`</span>.
+
+You can find both in the :doc:`settings reference document
+<span class="nt">&lt;/ref/settings&gt;</span>`.
+</pre></div>
+</div>
+<p>別のドキュメント全体へのリンクを作成したい場合は Sphinx の <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/referencing.html#role-doc" title="(in Sphinx v8.2.0)"><code class="xref rst rst-role docutils literal notranslate"><span class="pre">doc</span></code></a> クロスリファレンス要素を使用し、ドキュメント内の任意の場所へのリンクを作成したい場合は <a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/referencing.html#role-ref" title="(in Sphinx v8.2.0)"><code class="xref rst rst-role docutils literal notranslate"><span class="pre">ref</span></code></a> 要素を使用します。</p>
+</li>
+<li><p>次に、設定がどのようにアノテーションされているかに注目してください:</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="p">..</span> <span class="ow">setting</span><span class="p">::</span> ADMINS
+
+<span class="gh">ADMINS</span>
+<span class="gh">======</span>
+
+Default: <span class="s">``[]``</span> (Empty list)
+
+A list of all the people who get code error notifications. When
+<span class="s">``DEBUG=False``</span> and a view raises an exception, Django will email these people
+with the full exception information. Each member of the list should be a tuple
+of (Full name, email address). Example<span class="se">::</span>
+
+<span class="s">    [(&quot;John&quot;, &quot;john@example.com&quot;), (&quot;Mary&quot;, &quot;mary@example.com&quot;)]</span>
+
+Note that Django will email <span class="ge">*all*</span> of these people whenever an error happens.
+See <span class="na">:doc:</span><span class="nv">`/howto/error-reporting`</span> for more information.
+</pre></div>
+</div>
+<p>これにより、以降のヘッダが <code class="docutils literal notranslate"><span class="pre">ADMINS</span></code> という設定の &quot;正規の&quot; ターゲットとしてマークアップされます。これは <code class="docutils literal notranslate"><span class="pre">ADMINS</span></code> について話すときはいつでも <code class="docutils literal notranslate"><span class="pre">:setting:`ADMINS`</span></code> を使って参照できることを意味します。</p>
+</li>
+</ul>
+<p>これが基本的な組み立て方です。</p>
+</section>
+<section id="s-translating-documentation">
+<span id="translating-documentation"></span><h2>ドキュメントを翻訳する<a class="headerlink" href="#translating-documentation" title="Link to this heading">¶</a></h2>
+<p>ドキュメントを他の言語に翻訳したい場合は <a class="reference internal" href="localizing.html#translating-documentation"><span class="std std-ref">Django ドキュメントのローカライズ</span></a> を参照してください。</p>
+</section>
+<section id="s-django-admin-man-page">
+<span id="s-django-admin-manpage"></span><span id="django-admin-man-page"></span><span id="django-admin-manpage"></span><h2><code class="docutils literal notranslate"><span class="pre">dango-admin</span></code> の man ページ<a class="headerlink" href="#django-admin-man-page" title="Link to this heading">¶</a></h2>
+<p>Sphinxは <a class="reference internal" href="../../ref/django-admin.html"><span class="doc">django-admin</span></a> コマンドのマニュアルページを生成できます。これは <code class="docutils literal notranslate"><span class="pre">docs/conf.py</span></code> で設定します。他のドキュメントの出力とは異なり、このマニュアルページは <code class="docutils literal notranslate"><span class="pre">docs/man/django-admin.1</span></code> として Django リポジトリやリリースに含める必要があります。ドキュメントを更新する際に、このファイルを更新する必要はありません。</p>
+<p>最新版の man ページを作成するには、 <code class="docutils literal notranslate"><span class="pre">docs</span></code> ディレクトリで <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">man</span></code> を実行してください。新しい man ページは <code class="docutils literal notranslate"><span class="pre">docs/_build/man/django-admin.1</span></code> に作成されます。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ドキュメントを書く</a><ul>
+<li><a class="reference internal" href="#the-django-documentation-process">Django のドキュメント作成プロセス</a></li>
+<li><a class="reference internal" href="#how-the-documentation-is-organized">ドキュメントの構成</a></li>
+<li><a class="reference internal" href="#how-to-start-contributing-documentation">ドキュメントの寄稿を始めるには</a><ul>
+<li><a class="reference internal" href="#clone-the-django-repository-to-your-local-machine">Django リポジトリをローカルマシンにクローンします。</a></li>
+<li><a class="reference internal" href="#set-up-a-virtual-environment-and-install-dependencies">仮想環境のセットアップと依存関係のインストール</a></li>
+<li><a class="reference internal" href="#build-the-documentation-locally">ドキュメントをローカルでビルドする</a></li>
+<li><a class="reference internal" href="#making-edits-to-the-documentation">ドキュメントの編集</a></li>
+<li><a class="reference internal" href="#spelling-check">スペルチェック</a></li>
+<li><a class="reference internal" href="#link-check">リンクの確認</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#writing-style">執筆スタイル</a></li>
+<li><a class="reference internal" href="#commonly-used-terms">よく使われる用語</a></li>
+<li><a class="reference internal" href="#django-specific-terminology">Django 特有の用語</a></li>
+<li><a class="reference internal" href="#guidelines-for-restructuredtext-files">reStructuredText ファイルのガイドライン</a></li>
+<li><a class="reference internal" href="#django-specific-markup">Django 固有のマークアップ</a></li>
+<li><a class="reference internal" href="#documenting-new-features">新機能のドキュメントを書く</a></li>
+<li><a class="reference internal" href="#minimizing-images">画像を縮小する</a></li>
+<li><a class="reference internal" href="#an-example">例</a></li>
+<li><a class="reference internal" href="#translating-documentation">ドキュメントを翻訳する</a></li>
+<li><a class="reference internal" href="#django-admin-man-page"><code class="docutils literal notranslate"><span class="pre">dango-admin</span></code> の man ページ</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="committing-code.html"
+                          title="前の章へ">コードのコミット</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="localizing.html"
+                          title="次の章へ">Django のローカライズ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/internals/contributing/writing-documentation.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="committing-code.html" title="コードのコミット">previous</a>
+     |
+    <a href="../index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="localizing.html" title="Django のローカライズ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

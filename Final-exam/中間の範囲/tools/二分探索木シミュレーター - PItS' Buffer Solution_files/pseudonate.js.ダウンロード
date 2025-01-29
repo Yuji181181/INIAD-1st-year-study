@@ -1,0 +1,37 @@
+function pseudonate_submit(){
+	if(!document.pseudonate.reportValidity()) {
+		return;
+	}
+	const body = new FormData;
+	const amount = document.pseudonate.amount.value;
+	body.set("amount", amount);
+	body.set("access_token", access_token);
+	body.set("pd_token", pd_token);
+	const path = new URL("/programs/pseudonate.php", location.origin);
+	const div = document.getElementById("pseudonate");
+	const msg = div.querySelector(".pseudonate_msg");
+	msg.textContent = "処理中...";
+	fetch(path, {
+		method: "POST",
+		mode: "same-origin",
+		body: body
+	}).then((response) => {
+		const form = div.querySelector("form");
+		if(form) {
+			form.remove();
+			if(response.ok) {
+				msg.textContent = amount + "冂の寄付モドキありがとうございます！";
+			} else if(response.status === 400) {
+				msg.textContent = "サイトの不具合により誤ったデータが送信されました。また後日お試しください。";
+			} else if(response.status === 500) {
+				msg.textContent = "サーバーでエラーが発生しました。また後日お試しください。"
+			} else {
+				msg.textContent = "不明なエラーが発生しました。また後日お試しください。"
+			}
+		}
+	}).catch((err) => {
+		if(err.name === "TypeError") {
+			msg.textContent = "通信エラーが発生しました。インターネットに接続しているかを確認してください。";
+		}
+	});
+}

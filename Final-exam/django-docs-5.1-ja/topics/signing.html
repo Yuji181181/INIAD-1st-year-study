@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>暗号署名 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="メールを送信する" href="email.html" />
+    <link rel="prev" title="条件付きのビュー処理" href="conditional-view-processing.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="conditional-view-processing.html" title="条件付きのビュー処理">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="email.html" title="メールを送信する">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-signing">
+            
+  <section id="s-module-django.core.signing">
+<span id="s-cryptographic-signing"></span><span id="module-django.core.signing"></span><span id="cryptographic-signing"></span><h1>暗号署名<a class="headerlink" href="#module-django.core.signing" title="Link to this heading">¶</a></h1>
+<p>ウェブアプリケーションのセキュリティの黄金律は、信頼できない情報源からのデータを決して信頼しないことです。時には、信頼されていない媒体を通してデータを渡すことが有用な場合もあります。暗号的に署名された値は、改ざんが検知されることを前提に、信頼されていない経路を安全に通過させることができます。</p>
+<p>Django は、値の署名に関する低レベル API と、Web アプリケーションでの署名の最も一般的な用途の一つである署名付きクッキーの設定と読み取りに関する高レベル API の両方を提供しています。</p>
+<p>また、以下のような場合にも署名が役に立つでしょう:</p>
+<ul class="simple">
+<li><p>パスワードを紛失したユーザーに送信する「アカウントの回復」URLの生成。</p></li>
+<li><p>非表示のフォームフィールドに保存されたデータが改ざんされていないことの確認。</p></li>
+<li><p>保護されたリソースへの一時的なアクセスを許可するためのワンタイムシークレットURLの生成。例えばユーザーが料金を支払ったダウンロード可能なファイルなど。</p></li>
+</ul>
+<section id="s-protecting-secret-key-and-secret-key-fallbacks">
+<span id="protecting-secret-key-and-secret-key-fallbacks"></span><h2><code class="docutils literal notranslate"><span class="pre">SECRET_KEY</span></code> と <code class="docutils literal notranslate"><span class="pre">SECRET_KEY_FALLBACKS</span></code> の保護<a class="headerlink" href="#protecting-secret-key-and-secret-key-fallbacks" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../ref/django-admin.html#django-admin-startproject"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">startproject</span></code></a> によって新しいプロジェクトを作る際、 <code class="docutils literal notranslate"><span class="pre">settings.py</span></code> が生成され、ランダムな <a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a> を得ます。この値が、署名されたデータを安全に保つ鍵になります。このキーを安全に保存するとこは極めて重要で、さもなければ攻撃を行うひとたちが彼らの署名を生成するのにも使えるからです。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY_FALLBACKS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY_FALLBACKS</span></code></a> は秘密鍵のローテーションに使用できます。この値はデータへの署名には使用されませんが、指定された場合は署名されたデータを検証するために使用されるので、安全に保つ必要があります。</p>
+</section>
+<section id="s-using-the-low-level-api">
+<span id="using-the-low-level-api"></span><h2>低レベルの API を利用する<a class="headerlink" href="#using-the-low-level-api" title="Link to this heading">¶</a></h2>
+<p>Django の署名メソッドは <code class="docutils literal notranslate"><span class="pre">django.core.signing</span></code> モジュールにあります。値に署名するには、まず <code class="docutils literal notranslate"><span class="pre">Signer</span></code> インスタンスを作成します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.signing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Signer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span> <span class="o">=</span> <span class="n">Signer</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="s2">&quot;My string&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span>
+<span class="go">&#39;My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w&#39;</span>
+</pre></div>
+</div>
+<p>署名が文字列の最後にコロンに続いて付加されます。元の値を取得するには、<code class="docutils literal notranslate"><span class="pre">unsign</span></code> メソッドを使用します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">unsign</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">&#39;My string&#39;</span>
+</pre></div>
+</div>
+<p>もし <code class="docutils literal notranslate"><span class="pre">sign</span></code> に文字列でない値を渡すと、その値は署名される前に強制的に文字列に変換され、<code class="docutils literal notranslate"><span class="pre">unsign</span></code> の結果にはその文字列の値が返されます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">signed</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">unsign</span><span class="p">(</span><span class="n">signed</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">original</span>
+<span class="go">&#39;2.5&#39;</span>
+</pre></div>
+</div>
+<p>リスト、タプル、辞書を保護したい場合は 、<code class="docutils literal notranslate"><span class="pre">sign_object()</span></code> と <code class="docutils literal notranslate"><span class="pre">unsign_object()</span></code> メソッドを使います。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">signed_obj</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">sign_object</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello!&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signed_obj</span>
+<span class="go">&#39;eyJtZXNzYWdlIjoiSGVsbG8hIn0:Xdc-mOFDjs22KsQAqfVfi8PQSPdo3ckWJxPWwQOFhR4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">unsign_object</span><span class="p">(</span><span class="n">signed_obj</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj</span>
+<span class="go">{&#39;message&#39;: &#39;Hello!&#39;}</span>
+</pre></div>
+</div>
+<p>詳細は <a class="reference internal" href="#signing-complex-data"><span class="std std-ref">複雑なデータ構造の保護</span></a> を参照してください。</p>
+<p>何らかの理由により署名の値が書き換わってしまった場合、<code class="docutils literal notranslate"><span class="pre">django.core.signing.BadSignature</span></code> 例外が起こります。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">signing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">+=</span> <span class="s2">&quot;m&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">try</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">original</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">unsign</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">except</span> <span class="n">signing</span><span class="o">.</span><span class="n">BadSignature</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Tampering detected!&quot;</span><span class="p">)</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>デフォルトでは、<code class="docutils literal notranslate"><span class="pre">Signer</span></code> クラスは <a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a> 設定の値を署名生成に利用します。次のように <code class="docutils literal notranslate"><span class="pre">Signer</span></code> のコンストラクタに任意の値を渡すことで、異なる秘密鍵を使用することもできます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span> <span class="o">=</span> <span class="n">Signer</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="s2">&quot;my-other-secret&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="s2">&quot;My string&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span>
+<span class="go">&#39;My string:EkfQJafvGyiofrdGnuthdxImIJw&#39;</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.core.signing.Signer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Signer</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">':'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/signing.py#L177"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.signing.Signer" title="Link to this definition">¶</a></dt>
+<dd><p>署名の生成に <code class="docutils literal notranslate"><span class="pre">key</span></code> を使用し、値の区切りに <code class="docutils literal notranslate"><span class="pre">sep</span></code> を使用する signer （署名器）を返します。 <code class="docutils literal notranslate"><span class="pre">sep</span></code> には <span class="target" id="index-2"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc4648.html#section-5"><strong>URL セーフな base64 英数字</strong></a> を使用することはできません。このアルファベットには英数字、ハイフン、アンダースコアが含まれます。 <code class="docutils literal notranslate"><span class="pre">algorithm</span></code> は <a class="reference external" href="https://docs.python.org/3/library/hashlib.html#module-hashlib" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">hashlib</span></code></a> がサポートするアルゴリズムでなければなりません。デフォルトは <code class="docutils literal notranslate"><span class="pre">'sha256'</span></code> です。<code class="docutils literal notranslate"><span class="pre">fallback_keys</span></code> は署名されたデータを検証するために使用する追加の値のリストです。デフォルトは <a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY_FALLBACKS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY_FALLBACKS</span></code></a> です。</p>
+</dd></dl>
+
+<section id="s-using-the-salt-argument">
+<span id="using-the-salt-argument"></span><h3><code class="docutils literal notranslate"><span class="pre">salt</span></code> 引数を使用する<a class="headerlink" href="#using-the-salt-argument" title="Link to this heading">¶</a></h3>
+<p>特定の文字列が出現するたびに同じ署名ハッシュを使用したくない場合は、オプションで <code class="docutils literal notranslate"><span class="pre">Signer</span></code> クラスの引数 <code class="docutils literal notranslate"><span class="pre">salt</span></code> を使用できます。ソルトを使用すると、署名ハッシュ関数にソルトと <a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a> の両方をシードにします:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span> <span class="o">=</span> <span class="n">Signer</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="s2">&quot;My string&quot;</span><span class="p">)</span>
+<span class="go">&#39;My string:GdMGD6HNQ_qdgxYP8yBZAdAIV1w&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">sign_object</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello!&quot;</span><span class="p">})</span>
+<span class="go">&#39;eyJtZXNzYWdlIjoiSGVsbG8hIn0:Xdc-mOFDjs22KsQAqfVfi8PQSPdo3ckWJxPWwQOFhR4&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span> <span class="o">=</span> <span class="n">Signer</span><span class="p">(</span><span class="n">salt</span><span class="o">=</span><span class="s2">&quot;extra&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="s2">&quot;My string&quot;</span><span class="p">)</span>
+<span class="go">&#39;My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">unsign</span><span class="p">(</span><span class="s2">&quot;My string:Ee7vGi-ING6n02gkcJ-QLHg6vFw&quot;</span><span class="p">)</span>
+<span class="go">&#39;My string&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">sign_object</span><span class="p">({</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Hello!&quot;</span><span class="p">})</span>
+<span class="go">&#39;eyJtZXNzYWdlIjoiSGVsbG8hIn0:-UWSLCE-oUAHzhkHviYz3SOZYBjFKllEOyVZNuUtM-I&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">unsign_object</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;eyJtZXNzYWdlIjoiSGVsbG8hIn0:-UWSLCE-oUAHzhkHviYz3SOZYBjFKllEOyVZNuUtM-I&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">{&#39;message&#39;: &#39;Hello!&#39;}</span>
+</pre></div>
+</div>
+<p>この方法でソルトを使用すると、異なる署名が異なる名前空間に配置されます。 ある名前空間（特定のソルト値）に由来する署名は、異なるソルト設定を使用している別の名前空間で、同じ平文文字列を検証するためには使用できません。その結果、攻撃者がコードのある場所で生成された署名付き文字列を、異なるソルトを使用して署名を生成（検証）している別のコードの入力として使うことを防止できます。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a> とは異なり、salt 引数は秘密にする必要はありません。</p>
+</section>
+<section id="s-verifying-timestamped-values">
+<span id="verifying-timestamped-values"></span><h3>タイムスタンプ値の検証<a class="headerlink" href="#verifying-timestamped-values" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">TimestampSigner</span></code> は <a class="reference internal" href="#django.core.signing.Signer" title="django.core.signing.Signer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Signer</span></code></a> のサブクラスで、値に署名されたタイムスタンプを追加します。これにより、署名された値が指定された期間内に作成されたことを確認できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.signing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TimestampSigner</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span> <span class="o">=</span> <span class="n">TimestampSigner</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="s2">&quot;hello&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span>
+<span class="go">&#39;hello:1NMg5H:oPVuCqlJWmChm1rA2lyTUtelC-c&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">unsign</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="go">&#39;hello&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">unsign</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">max_age</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="go">SignatureExpired: Signature age 15.5289158821 &gt; 10 seconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">unsign</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">max_age</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="go">&#39;hello&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">unsign</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">max_age</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">20</span><span class="p">))</span>
+<span class="go">&#39;hello&#39;</span>
+</pre></div>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.core.signing.TimestampSigner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TimestampSigner</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">':'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sha256'</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/signing.py#L254"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.signing.TimestampSigner" title="Link to this definition">¶</a></dt>
+<dd><dl class="py method">
+<dt class="sig sig-object py" id="django.core.signing.TimestampSigner.sign">
+<span class="sig-name descname"><span class="pre">sign</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/signing.py#L258"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.signing.TimestampSigner.sign" title="Link to this definition">¶</a></dt>
+<dd><p>値 <code class="docutils literal notranslate"><span class="pre">value</span></code> に署名し、現在のタイムスタンプを追加します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.signing.TimestampSigner.unsign">
+<span class="sig-name descname"><span class="pre">unsign</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/signing.py#L262"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.signing.TimestampSigner.unsign" title="Link to this definition">¶</a></dt>
+<dd><p>値が <code class="docutils literal notranslate"><span class="pre">max_age</span></code> 秒前より後に署名されたことを確認します。パラメータ <code class="docutils literal notranslate"><span class="pre">max_age</span></code> には整数または <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.timedelta</span></code></a> オブジェクトを指定します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.signing.TimestampSigner.sign_object">
+<span class="sig-name descname"><span class="pre">sign_object</span></span>(<em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">JSONSerializer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="headerlink" href="#django.core.signing.TimestampSigner.sign_object" title="Link to this definition">¶</a></dt>
+<dd><p>複雑なデータ構造（例えば、リスト、タプル、または辞書）をエンコードし、オプションで圧縮し、現在のタイムスタンプを追加し署名します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.signing.TimestampSigner.unsign_object">
+<span class="sig-name descname"><span class="pre">unsign_object</span></span>(<em class="sig-param"><span class="n"><span class="pre">signed_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">JSONSerializer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.core.signing.TimestampSigner.unsign_object" title="Link to this definition">¶</a></dt>
+<dd><p>値が <code class="docutils literal notranslate"><span class="pre">signed_obj</span></code> 秒前より後に署名されたことを確認します。パラメータ <code class="docutils literal notranslate"><span class="pre">max_age</span></code> には整数または <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.timedelta</span></code></a> オブジェクトを指定します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-protecting-complex-data-structures">
+<span id="s-signing-complex-data"></span><span id="protecting-complex-data-structures"></span><span id="signing-complex-data"></span><h3>複雑なデータ構造の保護<a class="headerlink" href="#protecting-complex-data-structures" title="Link to this heading">¶</a></h3>
+<p>リスト、タプル、辞書を保護したい場合は、 <code class="docutils literal notranslate"><span class="pre">Signer.sign_object()</span></code> と <code class="docutils literal notranslate"><span class="pre">unsign_object()</span></code> メソッド、あるいは署名モジュールの <code class="docutils literal notranslate"><span class="pre">dumps()</span></code> や <code class="docutils literal notranslate"><span class="pre">loads()</span></code> 関数 (<code class="docutils literal notranslate"><span class="pre">TimestampSigner(salt='django.core.signing').sign_object()/unsign_object()</span></code> のショートカットです) を使って保護できます。これらは JSON シリアライズを使っています。JSONにすることで、 <a class="reference internal" href="../ref/settings.html#std-setting-SECRET_KEY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a> が盗まれても、攻撃者が pickle フォーマットを悪用して任意のコマンドを実行できないようにします:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">signing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span> <span class="o">=</span> <span class="n">signing</span><span class="o">.</span><span class="n">TimestampSigner</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">signer</span><span class="o">.</span><span class="n">sign_object</span><span class="p">({</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span>
+<span class="go">&#39;eyJmb28iOiJiYXIifQ:1kx6R3:D4qGKiptAqo5QW9iv4eNLc6xl4RwiFfes6oOcYhkYnc&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signer</span><span class="o">.</span><span class="n">unsign_object</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="go">{&#39;foo&#39;: &#39;bar&#39;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">signing</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span>
+<span class="go">&#39;eyJmb28iOiJiYXIifQ:1kx6Rf:LBB39RQmME-SRvilheUe5EmPYRbuDBgQp2tCAi7KGLk&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signing</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="go">{&#39;foo&#39;: &#39;bar&#39;}</span>
+</pre></div>
+</div>
+<p>JSONの性質上（ネイティブではリストとタプルの区別がありません）、タプルを渡すと <code class="docutils literal notranslate"><span class="pre">signing.loads(object)</span></code> からリストが返されます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">signing</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">value</span> <span class="o">=</span> <span class="n">signing</span><span class="o">.</span><span class="n">dumps</span><span class="p">((</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signing</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+<span class="go">[&#39;a&#39;, &#39;b&#39;, &#39;c&#39;]</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.core.signing.dumps">
+<span class="sig-name descname"><span class="pre">dumps</span></span>(<em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'django.core.signing'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">JSONSerializer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/signing.py#L131"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.signing.dumps" title="Link to this definition">¶</a></dt>
+<dd><p>URL セーフな、署名付き base64 圧縮 JSON 文字列を返します。シリアライズされたオブジェクトは <a class="reference internal" href="#django.core.signing.TimestampSigner" title="django.core.signing.TimestampSigner"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimestampSigner</span></code></a> を使って署名されます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.core.signing.loads">
+<span class="sig-name descname"><span class="pre">loads</span></span>(<em class="sig-param"><span class="n"><span class="pre">string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'django.core.signing'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serializer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">JSONSerializer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fallback_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/signing.py#L155"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.signing.loads" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">dumps()</span></code> の逆で、署名に失敗した場合に <code class="docutils literal notranslate"><span class="pre">BadSignature</span></code> を返します。指定された場合は <code class="docutils literal notranslate"><span class="pre">max_age</span></code> (秒単位) をチェックします。</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">暗号署名</a><ul>
+<li><a class="reference internal" href="#protecting-secret-key-and-secret-key-fallbacks"><code class="docutils literal notranslate"><span class="pre">SECRET_KEY</span></code> と <code class="docutils literal notranslate"><span class="pre">SECRET_KEY_FALLBACKS</span></code> の保護</a></li>
+<li><a class="reference internal" href="#using-the-low-level-api">低レベルの API を利用する</a><ul>
+<li><a class="reference internal" href="#using-the-salt-argument"><code class="docutils literal notranslate"><span class="pre">salt</span></code> 引数を使用する</a></li>
+<li><a class="reference internal" href="#verifying-timestamped-values">タイムスタンプ値の検証</a></li>
+<li><a class="reference internal" href="#protecting-complex-data-structures">複雑なデータ構造の保護</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="conditional-view-processing.html"
+                          title="前の章へ">条件付きのビュー処理</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="email.html"
+                          title="次の章へ">メールを送信する</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topics/signing.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="conditional-view-processing.html" title="条件付きのビュー処理">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="email.html" title="メールを送信する">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

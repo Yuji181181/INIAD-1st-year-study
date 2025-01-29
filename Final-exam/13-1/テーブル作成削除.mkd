@@ -1,0 +1,85 @@
+# テーブルの作成と削除方法
+
+## テーブルの作成方法
+
+1. **SQLの`CREATE TABLE`コマンドを使用**
+   - 新しいテーブルを作成するには、`CREATE TABLE`コマンドを用いる。
+   - 各列の名前、データ型、制約（例：主キー、外部キー）を指定可能。"カラム名 データ型 制約,"
+   - SQLiteでは、テーブル名の大文字小文字は区別されません。
+   # 構文,
+     - PRIMARY KEY 主キーを設定
+     - NOT NULL
+     - UNIQUE 値がカラム内で重複禁止
+     - DEFAULT デフォルト値を指定
+     - FOREIGN KEY 外部キーを設定
+
+   # 作成例 
+   CREATE TABLE employees (
+   id INTEGER PRIMARY KEY,         -- 社員ID（主キー）
+   name TEXT NOT NULL,             -- 名前（NULL禁止）
+   age INTEGER,                    -- 年齢
+   department TEXT                 -- 部署名
+);
+
+| カラム名      | データ型  | 制約       |
+|--------------|----------|------------|
+| id           | INTEGER  | PRIMARY KEY |
+| name         | TEXT     | NOT NULL    |
+| age          | INTEGER  | なし        |
+| department   | TEXT     | なし        |
+    
+
+
+2. **GUIツールでの作成**
+   - **DB Browser for SQLite**を使用する場合、以下の手順を行います:
+     - 「Database Structure」タブ内の「Create Table」ボタンをクリック。
+     - または「Edit」メニューから「Create Table」を選択。
+
+3. **外部キーや制約の設定**
+   # なぜ使う
+   - 1つのテーブルが別のテーブルの行（データ）を参照するため.
+   # 外部キーの動作設定（ON DELETE / ON UPDATE）
+   - CASCADE	親テーブルのデータが削除/更新された場合、子テーブルのデータも削除/更新される。
+   - SET NULL	親テーブルのデータが削除/更新された場合、子テーブルの外部キーがNULLになる。
+   - SET DEFAULT	親テーブルのデータが削除/更新された場合、子テーブルの外部キーがデフォルト値に設定される。
+   - RESTRICT	親テーブルのデータが参照されている限り、削除/更新を禁止する（デフォルト動作）。
+   - NO ACTION	制約の検証が行われるが、トリガーやタイミングに応じた動作を延期する。
+   
+   # 例
+ - 親テーブル（customers）
+   CREATE TABLE customers (
+    customer_id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL
+);
+   - 子テーブル（orders）
+   CREATE TABLE orders (
+    order_id INTEGER PRIMARY KEY,
+    customer_id INTEGER,
+    order_date DATE NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
+
+
+
+
+
+
+
+## テーブルの削除方法
+
+1. **SQLの`DROP TABLE`コマンドを使用**
+   - 不要なテーブルを削除するには`DROP TABLE`を使います。
+   - 例:
+     
+     DROP TABLE table_name;
+   
+   - **注意:** この操作は**取り消し不可**です。
+
+2. **GUIツールでの削除**
+   - 「Database Structure」タブで削除したいテーブルを右クリックし、「Delete」を選択。
+
+3. **注意点**
+   - 外部キー制約が有効な場合、子テーブルに影響を与える可能性があるため、事前に確認が必要です。
+

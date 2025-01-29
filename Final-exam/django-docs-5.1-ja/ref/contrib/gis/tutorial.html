@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GeoDjango チュートリアル &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="GeoDjango のインストール" href="install/index.html" />
+    <link rel="prev" title="GeoDjango" href="index.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);(function($) {
+    $(document).ready(function() {
+        $(".c-tab-unix").on("click", function() {
+            $("section.c-content-unix").show();
+            $("section.c-content-win").hide();
+            $(".c-tab-unix").prop("checked", true);
+        });
+        $(".c-tab-win").on("click", function() {
+            $("section.c-content-win").show();
+            $("section.c-content-unix").hide();
+            $(".c-tab-win").prop("checked", true);
+        });
+    });
+})(jQuery);</script>
+<link rel="stylesheet" href="../../../_static/console-tabs.css">
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="GeoDjango">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="install/index.html" title="GeoDjango のインストール">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-gis-tutorial">
+            
+  <section id="s-geodjango-tutorial">
+<span id="geodjango-tutorial"></span><h1>GeoDjango チュートリアル<a class="headerlink" href="#geodjango-tutorial" title="Link to this heading">¶</a></h1>
+<section id="s-introduction">
+<span id="introduction"></span><h2>はじめに<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>GeoDjangoは、Django用の標準のcontribモジュールであり、それを世界クラスの地理情報Webフレームワークに変えます。GeoDjangoは、位置情報サービスなどの地理情報Webアプリケーションを作成するのを可能な限り簡単にすることを目指しています。その特徴は次のとおりです:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://www.ogc.org/">OGC</a> ジオメトリとラスターデータ用のDjangoモデルフィールド。</p></li>
+<li><p>空間データのクエリと操作のための Django の ORM の拡張機能。</p></li>
+<li><p>GISジオメトリとラスタの操作、およびさまざまな形式のデータ操作のための、疎結合の高レベルPythonインターフェース。</p></li>
+<li><p>admin アプリケーションからジオメトリフィールドを編集する</p></li>
+</ul>
+<p>このチュートリアルは Django に慣れていることを前提にしています。従って、 Django が初めての方は、まず <a class="reference internal" href="../../../intro/tutorial01.html"><span class="doc">通常のチュートリアル</span></a> を読んで Django に慣れてください。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>GeoDjangoには、Django の要件以上の追加要件があります。詳細は <a class="reference internal" href="install/index.html"><span class="doc">インストールのドキュメント</span></a> を参照してください。</p>
+</div>
+<p>このチュートリアルでは、地理情報を表示するためのウェブアプリケーションの作成方法を説明します。このチュートリアルでは、<a class="reference external" href="https://web.archive.org/web/20240123190237/https://thematicmapping.org/downloads/world_borders.php">world borders</a> <a class="footnote-reference brackets" href="#id11" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> を表示します。このチュートリアルで使用されるコードの一部は、<a class="reference external" href="https://code.google.com/archive/p/geodjango-basic-apps">GeoDjango basic apps</a> プロジェクトから取得されたか、その影響を受けています。 <a class="footnote-reference brackets" href="#id12" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>チュートリアルの各セクションを順を追って進んでください。</p>
+</div>
+</section>
+<section id="s-setting-up">
+<span id="setting-up"></span><h2>セットアップ<a class="headerlink" href="#setting-up" title="Link to this heading">¶</a></h2>
+<section id="s-create-a-spatial-database">
+<span id="create-a-spatial-database"></span><h3>空間データベースを作成する<a class="headerlink" href="#create-a-spatial-database" title="Link to this heading">¶</a></h3>
+<p>通常、特別な設定は必要ないので、他のプロジェクトと同じようにデータベースを作成できます。選択したデータベースについて、いくつかのヒントを提供します:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="install/postgis.html"><span class="doc">PostGIS のインストール</span></a></p></li>
+<li><p><a class="reference internal" href="install/spatialite.html"><span class="doc">SpatiaLite のインストール</span></a></p></li>
+</ul>
+</section>
+<section id="s-create-a-new-project">
+<span id="create-a-new-project"></span><h3>新しいプロジェクトを作成する<a class="headerlink" href="#create-a-new-project" title="Link to this heading">¶</a></h3>
+<p>標準の <code class="docutils literal notranslate"><span class="pre">django-admin</span></code> スクリプトを使って、 <code class="docutils literal notranslate"><span class="pre">geodjango</span></code> というプロジェクトを作成します:</p>
+<div class="console-block" id="console-block-0">
+<input class="c-tab-unix" id="c-tab-0-unix" type="radio" name="console-0" checked>
+<label for="c-tab-0-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-0-win" type="radio" name="console-0">
+<label for="c-tab-0-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-0-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>django-admin<span class="w"> </span>startproject<span class="w"> </span>geodjango
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-0-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> django-admin startproject geodjango
+</pre></div>
+</section>
+</div>
+<p>これで新しいプロジェクトが初期化されます。ここで、 <code class="docutils literal notranslate"><span class="pre">geodjango</span></code> プロジェクトの中に <code class="docutils literal notranslate"><span class="pre">world</span></code> Django アプリケーションを作成します:</p>
+<div class="console-block" id="console-block-1">
+<input class="c-tab-unix" id="c-tab-1-unix" type="radio" name="console-1" checked>
+<label for="c-tab-1-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-1-win" type="radio" name="console-1">
+<label for="c-tab-1-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-1-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>geodjango
+<span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>startapp<span class="w"> </span>world
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-1-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> <span class="k">cd</span> geodjango
+<span class="gp">...\&gt;</span> py manage.py startapp world
+</pre></div>
+</section>
+</div>
+</section>
+<section id="s-configure-settings-py">
+<span id="configure-settings-py"></span><h3><code class="docutils literal notranslate"><span class="pre">settings.py</span></code> の設定<a class="headerlink" href="#configure-settings-py" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">geodjango</span></code> プロジェクトの設定は <code class="docutils literal notranslate"><span class="pre">geodjango/settings.py</span></code> ファイルに保存されています。データベース接続設定を編集して、自分の環境に合わせてください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ENGINE&quot;</span><span class="p">:</span> <span class="s2">&quot;django.contrib.gis.db.backends.postgis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;geodjango&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;USER&quot;</span><span class="p">:</span> <span class="s2">&quot;geo&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>さらに、 <a class="reference internal" href="../../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 設定を変更して、 <a class="reference internal" href="../admin/index.html#module-django.contrib.admin" title="django.contrib.admin: Django's admin site."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.admin</span></code></a>, <a class="reference internal" href="index.html#module-django.contrib.gis" title="django.contrib.gis: Geographic Information System (GIS) extensions for Django"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.gis</span></code></a>, <code class="docutils literal notranslate"><span class="pre">world</span></code> (新しく作成したアプリケーション) を含めるようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;django.contrib.admin&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.auth&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.contenttypes&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.sessions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.messages&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.staticfiles&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.gis&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;world&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-geographic-data">
+<span id="geographic-data"></span><h2>地理データ<a class="headerlink" href="#geographic-data" title="Link to this heading">¶</a></h2>
+<section id="s-worldborders">
+<span id="s-id3"></span><span id="worldborders"></span><span id="id3"></span><h3>世界の国境<a class="headerlink" href="#worldborders" title="Link to this heading">¶</a></h3>
+<p>世界の国境データはこの <a class="reference external" href="https://web.archive.org/web/20231220150759/https://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip">zip file</a> にあります。アプリケーション <code class="docutils literal notranslate"><span class="pre">world</span></code> に <code class="docutils literal notranslate"><span class="pre">data</span></code> ディレクトリを作成し、国境データをダウンロードして解凍してください。GNU/Linuxプラットフォームでは、以下のコマンドを使用します:</p>
+<div class="console-block" id="console-block-2">
+<input class="c-tab-unix" id="c-tab-2-unix" type="radio" name="console-2" checked>
+<label for="c-tab-2-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-2-win" type="radio" name="console-2">
+<label for="c-tab-2-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-2-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>mkdir<span class="w"> </span>world/data
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>world/data
+<span class="gp">$ </span>wget<span class="w"> </span>https://web.archive.org/web/20231220150759/https://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
+<span class="gp">$ </span>unzip<span class="w"> </span>TM_WORLD_BORDERS-0.3.zip
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>../..
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-2-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> <span class="k">mkdir</span> world\data
+<span class="gp">...\&gt;</span> <span class="k">cd</span> world\data
+<span class="gp">...\&gt;</span> wget https://web.archive.org/web/20231220150759/https://thematicmapping.org/downloads/TM_WORLD_BORDERS-0.3.zip
+<span class="gp">...\&gt;</span> unzip TM_WORLD_BORDERS-0.3.zip
+<span class="gp">...\&gt;</span> <span class="k">cd</span> ..\..
+</pre></div>
+</section>
+</div>
+<p>このZIPファイルには、最も一般的な地理空間データ形式の1つである <a class="reference external" href="https://en.wikipedia.org/wiki/Shapefile">ESRI Shapefile</a> として知られているデータファイルが含まれています。解凍すると、world borders データセットには以下の拡張子のファイルが含まれます:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">.shp</span></code>: 世界の国境のジオメトリのベクトルデータを保持します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.shx</span></code>: <code class="docutils literal notranslate"><span class="pre">.shp</span></code> に保存されているジオメトリのための空間インデックスファイル。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.dbf</span></code>: 整数や文字列フィールドなどの非ジオメトリ属性データを保持するデータベースファイル。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.prj</span></code>: シェープファイルに格納されている地理データの空間参照情報が含まれています。</p></li>
+</ul>
+</section>
+<section id="s-use-ogrinfo-to-examine-spatial-data">
+<span id="use-ogrinfo-to-examine-spatial-data"></span><h3><code class="docutils literal notranslate"><span class="pre">ogrinfo</span></code> を使って空間データを調べる<a class="headerlink" href="#use-ogrinfo-to-examine-spatial-data" title="Link to this heading">¶</a></h3>
+<p>GDAL の <code class="docutils literal notranslate"><span class="pre">ogrinfo</span></code> ユーティリティを使うと、シェープファイルやその他のベクトルデータソースのメタデータを調べることができます:</p>
+<div class="console-block" id="console-block-3">
+<input class="c-tab-unix" id="c-tab-3-unix" type="radio" name="console-3" checked>
+<label for="c-tab-3-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-3-win" type="radio" name="console-3">
+<label for="c-tab-3-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-3-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ogrinfo<span class="w"> </span>world/data/TM_WORLD_BORDERS-0.3.shp
+<span class="go">INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp&#39;</span>
+<span class="go">      using driver `ESRI Shapefile&#39; successful.</span>
+<span class="go">1: TM_WORLD_BORDERS-0.3 (Polygon)</span>
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-3-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> ogrinfo world\data\TM_WORLD_BORDERS-0.3.shp
+<span class="go">INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp&#39;</span>
+<span class="go">      using driver `ESRI Shapefile&#39; successful.</span>
+<span class="go">1: TM_WORLD_BORDERS-0.3 (Polygon)</span>
+</pre></div>
+</section>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">ogrinfo</span></code> によると、シェープファイルには1つのレイヤーがあり、そのレイヤーにはポリゴンデータが含まれています。詳細を知るために、レイヤー名を指定して <code class="docutils literal notranslate"><span class="pre">-so</span></code> オプションを使用して重要なサマリ情報のみを取得します:</p>
+<div class="console-block" id="console-block-4">
+<input class="c-tab-unix" id="c-tab-4-unix" type="radio" name="console-4" checked>
+<label for="c-tab-4-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-4-win" type="radio" name="console-4">
+<label for="c-tab-4-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-4-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ogrinfo<span class="w"> </span>-so<span class="w"> </span>world/data/TM_WORLD_BORDERS-0.3.shp<span class="w"> </span>TM_WORLD_BORDERS-0.3
+<span class="go">INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp&#39;</span>
+<span class="go">      using driver `ESRI Shapefile&#39; successful.</span>
+
+<span class="go">Layer name: TM_WORLD_BORDERS-0.3</span>
+<span class="go">Geometry: Polygon</span>
+<span class="go">Feature Count: 246</span>
+<span class="go">Extent: (-180.000000, -90.000000) - (180.000000, 83.623596)</span>
+<span class="go">Layer SRS WKT:</span>
+<span class="go">GEOGCS[&quot;GCS_WGS_1984&quot;,</span>
+<span class="go">    DATUM[&quot;WGS_1984&quot;,</span>
+<span class="go">        SPHEROID[&quot;WGS_1984&quot;,6378137.0,298.257223563]],</span>
+<span class="go">    PRIMEM[&quot;Greenwich&quot;,0.0],</span>
+<span class="go">    UNIT[&quot;Degree&quot;,0.0174532925199433]]</span>
+<span class="go">FIPS: String (2.0)</span>
+<span class="go">ISO2: String (2.0)</span>
+<span class="go">ISO3: String (3.0)</span>
+<span class="go">UN: Integer (3.0)</span>
+<span class="go">NAME: String (50.0)</span>
+<span class="go">AREA: Integer (7.0)</span>
+<span class="go">POP2005: Integer (10.0)</span>
+<span class="go">REGION: Integer (3.0)</span>
+<span class="go">SUBREGION: Integer (3.0)</span>
+<span class="go">LON: Real (8.3)</span>
+<span class="go">LAT: Real (7.3)</span>
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-4-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> ogrinfo -so world\data\TM_WORLD_BORDERS-0.3.shp TM_WORLD_BORDERS-0.3
+<span class="go">INFO: Open of `world/data/TM_WORLD_BORDERS-0.3.shp&#39;</span>
+<span class="go">      using driver `ESRI Shapefile&#39; successful.</span>
+
+<span class="go">Layer name: TM_WORLD_BORDERS-0.3</span>
+<span class="go">Geometry: Polygon</span>
+<span class="go">Feature Count: 246</span>
+<span class="go">Extent: (-180.000000, -90.000000) - (180.000000, 83.623596)</span>
+<span class="go">Layer SRS WKT:</span>
+<span class="go">GEOGCS[&quot;GCS_WGS_1984&quot;,</span>
+<span class="go">    DATUM[&quot;WGS_1984&quot;,</span>
+<span class="go">        SPHEROID[&quot;WGS_1984&quot;,6378137.0,298.257223563]],</span>
+<span class="go">    PRIMEM[&quot;Greenwich&quot;,0.0],</span>
+<span class="go">    UNIT[&quot;Degree&quot;,0.0174532925199433]]</span>
+<span class="go">FIPS: String (2.0)</span>
+<span class="go">ISO2: String (2.0)</span>
+<span class="go">ISO3: String (3.0)</span>
+<span class="go">UN: Integer (3.0)</span>
+<span class="go">NAME: String (50.0)</span>
+<span class="go">AREA: Integer (7.0)</span>
+<span class="go">POP2005: Integer (10.0)</span>
+<span class="go">REGION: Integer (3.0)</span>
+<span class="go">SUBREGION: Integer (3.0)</span>
+<span class="go">LON: Real (8.3)</span>
+<span class="go">LAT: Real (7.3)</span>
+</pre></div>
+</section>
+</div>
+<p>この詳細なサマリー情報には、レイヤー内のフィーチャ数 (246)、データの地理的範囲、空間参照システム (&quot;SRS WKT&quot;)、および各属性フィールドの型情報が記載されています。たとえば、<code class="docutils literal notranslate"><span class="pre">FIPS:</span> <span class="pre">String</span> <span class="pre">(2.0)</span></code> は、 <code class="docutils literal notranslate"><span class="pre">FIPS</span></code> 文字列フィールドの最大長が2であることを示しています。同様に、 <code class="docutils literal notranslate"><span class="pre">LON:</span> <span class="pre">Real</span> <span class="pre">(8.3)</span></code> は、最大8桁までの浮動小数点フィールドで、小数点以下3桁までの数字を保持します。</p>
+</section>
+</section>
+<section id="s-geographic-models">
+<span id="geographic-models"></span><h2>地理情報モデル<a class="headerlink" href="#geographic-models" title="Link to this heading">¶</a></h2>
+<section id="s-defining-a-geographic-model">
+<span id="defining-a-geographic-model"></span><h3>地理情報モデルを定義する<a class="headerlink" href="#defining-a-geographic-model" title="Link to this heading">¶</a></h3>
+<p>さて、 <code class="docutils literal notranslate"><span class="pre">ogrinfo</span></code> を使ってデータセットを調べたので、このデータを表す GeoDjango モデルを作成しましょう:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WorldBorder</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># Regular Django fields corresponding to the attributes in the</span>
+    <span class="c1"># world borders shapefile.</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">pop2005</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="s2">&quot;Population 2005&quot;</span><span class="p">)</span>
+    <span class="n">fips</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;FIPS Code&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">iso2</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;2 Digit ISO&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">iso3</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="s2">&quot;3 Digit ISO&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">un</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="s2">&quot;United Nations Code&quot;</span><span class="p">)</span>
+    <span class="n">region</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="s2">&quot;Region Code&quot;</span><span class="p">)</span>
+    <span class="n">subregion</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="s2">&quot;Sub-Region Code&quot;</span><span class="p">)</span>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+
+    <span class="c1"># GeoDjango-specific: a geometry field (MultiPolygonField)</span>
+    <span class="n">mpoly</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">MultiPolygonField</span><span class="p">()</span>
+
+    <span class="c1"># Returns the string representation of the model.</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">models</span></code> モジュールが <code class="docutils literal notranslate"><span class="pre">django.contrib.gis.db</span></code> からインポートされていることに注意してください。</p>
+<p>ジオメトリフィールドのデフォルトの空間参照系は WGS84 です (<a class="reference external" href="https://en.wikipedia.org/wiki/SRID">SRID</a> は 4326 を意味します) 。つまり、フィールドの座標は度単位の経度、緯度のペアです。別の座標系を使用するには、<code class="docutils literal notranslate"><span class="pre">srid</span></code> 引数を使用してジオメトリフィールドの SRID を設定します。座標系の EPSG コードを表す整数を使用します。</p>
+</section>
+<section id="s-run-migrate">
+<span id="run-migrate"></span><h3><code class="docutils literal notranslate"><span class="pre">migrate</span></code> を実行する<a class="headerlink" href="#run-migrate" title="Link to this heading">¶</a></h3>
+<p>モデルを定義した後、データベースと同期する必要があります。まず、データベースマイグレーションを作成してください:</p>
+<div class="console-block" id="console-block-5">
+<input class="c-tab-unix" id="c-tab-5-unix" type="radio" name="console-5" checked>
+<label for="c-tab-5-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-5-win" type="radio" name="console-5">
+<label for="c-tab-5-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-5-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>makemigrations
+<span class="go">Migrations for &#39;world&#39;:</span>
+<span class="go">  world/migrations/0001_initial.py:</span>
+<span class="go">    + Create model WorldBorder</span>
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-5-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py makemigrations
+<span class="go">Migrations for &#39;world&#39;:</span>
+<span class="go">  world/migrations/0001_initial.py:</span>
+<span class="go">    + Create model WorldBorder</span>
+</pre></div>
+</section>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">WorldBorder</span></code> モデルのテーブルを生成するSQLを見てみましょう:</p>
+<div class="console-block" id="console-block-6">
+<input class="c-tab-unix" id="c-tab-6-unix" type="radio" name="console-6" checked>
+<label for="c-tab-6-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-6-win" type="radio" name="console-6">
+<label for="c-tab-6-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-6-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>sqlmigrate<span class="w"> </span>world<span class="w"> </span><span class="m">0001</span>
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-6-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py sqlmigrate world 0001
+</pre></div>
+</section>
+</div>
+<p>このコマンドを実行すると、次の出力が生成されるはずです:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">BEGIN</span><span class="p">;</span>
+<span class="c1">--</span>
+<span class="c1">-- Create model WorldBorder</span>
+<span class="c1">--</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="ss">&quot;world_worldborder&quot;</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="ss">&quot;id&quot;</span><span class="w"> </span><span class="nb">bigint</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="k">GENERATED</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">IDENTITY</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;name&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;area&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;pop2005&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;fips&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;iso2&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;iso3&quot;</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;un&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;region&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;subregion&quot;</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;lon&quot;</span><span class="w"> </span><span class="n">double</span><span class="w"> </span><span class="k">precision</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">    </span><span class="ss">&quot;lat&quot;</span><span class="w"> </span><span class="n">double</span><span class="w"> </span><span class="k">precision</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="w">    </span><span class="ss">&quot;mpoly&quot;</span><span class="w"> </span><span class="n">geometry</span><span class="p">(</span><span class="n">MULTIPOLYGON</span><span class="p">,</span><span class="mi">4326</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span>
+<span class="p">)</span>
+<span class="p">;</span>
+<span class="k">CREATE</span><span class="w"> </span><span class="k">INDEX</span><span class="w"> </span><span class="ss">&quot;world_worldborder_mpoly_id&quot;</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="ss">&quot;world_worldborder&quot;</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">GIST</span><span class="w"> </span><span class="p">(</span><span class="ss">&quot;mpoly&quot;</span><span class="p">);</span>
+<span class="k">COMMIT</span><span class="p">;</span>
+</pre></div>
+</div>
+<p>これが正しければ、 <a class="reference internal" href="../../django-admin.html#django-admin-migrate"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">migrate</span></code></a> を実行して、このテーブルをデータベースに作成してください。</p>
+<div class="console-block" id="console-block-7">
+<input class="c-tab-unix" id="c-tab-7-unix" type="radio" name="console-7" checked>
+<label for="c-tab-7-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-7-win" type="radio" name="console-7">
+<label for="c-tab-7-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-7-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>migrate
+<span class="go">Operations to perform:</span>
+<span class="go">  Apply all migrations: admin, auth, contenttypes, sessions, world</span>
+<span class="go">Running migrations:</span>
+<span class="go">  ...</span>
+<span class="go">  Applying world.0001_initial... OK</span>
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-7-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py migrate
+<span class="go">Operations to perform:</span>
+<span class="go">  Apply all migrations: admin, auth, contenttypes, sessions, world</span>
+<span class="go">Running migrations:</span>
+<span class="go">  ...</span>
+<span class="go">  Applying world.0001_initial... OK</span>
+</pre></div>
+</section>
+</div>
+</section>
+</section>
+<section id="s-importing-spatial-data">
+<span id="importing-spatial-data"></span><h2>空間データをインポートする<a class="headerlink" href="#importing-spatial-data" title="Link to this heading">¶</a></h2>
+<p>このセクションでは、 <a class="reference internal" href="layermapping.html"><span class="doc">LayerMapping データインポートユーティリティ</span></a> を使用して、GeoDjangoモデルを介して世界の国境のシェープファイルをデータベースにインポートする方法を紹介します。</p>
+<p>空間データベースにデータをインポートする方法は色々あります。GeoDjango に含まれるツール以外にも、以下のような方法があります:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://gdal.org/programs/ogr2ogr.html">ogr2ogr</a> は、GDAL に含まれるコマンドラインユーティリティであり、多くのベクトルデータ形式を PostGIS、MySQL、および Oracle データベースにインポートできます。</p></li>
+<li><p><a class="reference external" href="https://postgis.net/docs/using_postgis_dbmanagement.html#shp2pgsql_usage">shp2pgsql</a>: このユーティリティはPostGISに含まれ、ESRI shapefileをPostGISにインポートします。</p></li>
+</ul>
+<section id="s-gdal-interface">
+<span id="s-gdalinterface"></span><span id="gdal-interface"></span><span id="gdalinterface"></span><h3>GDAL インターフェース<a class="headerlink" href="#gdal-interface" title="Link to this heading">¶</a></h3>
+<p>先ほど、 <code class="docutils literal notranslate"><span class="pre">ogrinfo</span></code> を使って世界の国境のシェープファイルの中身を調べましたね。GeoDjango には、GDAL の強力な OGR ライブラリへの Pythonic インタフェースも含まれており、 OGR がサポートしている全てのベクトルデータソースを扱うことができます。</p>
+<p>まず、Django シェルを起動します:</p>
+<div class="console-block" id="console-block-8">
+<input class="c-tab-unix" id="c-tab-8-unix" type="radio" name="console-8" checked>
+<label for="c-tab-8-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-8-win" type="radio" name="console-8">
+<label for="c-tab-8-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-8-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>shell
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-8-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py shell
+</pre></div>
+</section>
+</div>
+<p>チュートリアルの最初の方で <a class="reference internal" href="#worldborders"><span class="std std-ref">世界の国境</span></a> データをダウンロードしている場合は、Pythonの <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> を使用してそのパスを指定できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">world</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">world_shp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">world</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;TM_WORLD_BORDERS-0.3.shp&quot;</span>
+</pre></div>
+</div>
+<p>ここで、GeoDjango の <a class="reference internal" href="gdal.html#django.contrib.gis.gdal.DataSource" title="django.contrib.gis.gdal.DataSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataSource</span></code></a> インタフェースを使って、 world borders shapefile を開いてください:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.gdal</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataSource</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ds</span> <span class="o">=</span> <span class="n">DataSource</span><span class="p">(</span><span class="n">world_shp</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">ds</span><span class="p">)</span>
+<span class="go">/ ... /geodjango/world/data/TM_WORLD_BORDERS-0.3.shp (ESRI Shapefile)</span>
+</pre></div>
+</div>
+<p>データソースオブジェクトは異なるレイヤーの地理空間フィーチャを持つことができます。しかし、シェープファイルは 1 つのレイヤーしか持つことができません:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ds</span><span class="p">))</span>
+<span class="go">1</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lyr</span> <span class="o">=</span> <span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lyr</span><span class="p">)</span>
+<span class="go">TM_WORLD_BORDERS-0.3</span>
+</pre></div>
+</div>
+<p>レイヤーのジオメトリタイプと、含まれているフィーチャの数を確認できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lyr</span><span class="o">.</span><span class="n">geom_type</span><span class="p">)</span>
+<span class="go">Polygon</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lyr</span><span class="p">))</span>
+<span class="go">246</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>残念ながら、シェープファイルのデータ形式では、ジオメトリのタイプをより細かく指定することはできません。このシェープファイルは、他の多くのファイル同様、ポリゴンではなく、 <code class="docutils literal notranslate"><span class="pre">MultiPolygon</span></code> ジオメトリを含んでいます。GeoDjango の <code class="docutils literal notranslate"><span class="pre">MultiPolygonField</span></code> は <code class="docutils literal notranslate"><span class="pre">Polygon</span></code> 型のジオメトリを受け付けますが、 <code class="docutils literal notranslate"><span class="pre">PolygonField</span></code> は <code class="docutils literal notranslate"><span class="pre">MultiPolygon</span></code> 型のジオメトリを受け付けません。これが、上で定義した <code class="docutils literal notranslate"><span class="pre">WorldBorder</span></code> モデルが <code class="docutils literal notranslate"><span class="pre">MultiPolygonField</span></code> を使用している理由です。</p>
+</div>
+<p><a class="reference internal" href="gdal.html#django.contrib.gis.gdal.Layer" title="django.contrib.gis.gdal.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> には関連付けられた空間参照システムも存在する場合があります。もしそうであれば、<code class="docutils literal notranslate"><span class="pre">srs</span></code> 属性は <a class="reference internal" href="gdal.html#django.contrib.gis.gdal.SpatialReference" title="django.contrib.gis.gdal.SpatialReference"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpatialReference</span></code></a> オブジェクトを返します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">srs</span> <span class="o">=</span> <span class="n">lyr</span><span class="o">.</span><span class="n">srs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">srs</span><span class="p">)</span>
+<span class="go">GEOGCS[&quot;WGS 84&quot;,</span>
+<span class="go">DATUM[&quot;WGS_1984&quot;,</span>
+<span class="go">    SPHEROID[&quot;WGS 84&quot;,6378137,298.257223563,</span>
+<span class="go">        AUTHORITY[&quot;EPSG&quot;,&quot;7030&quot;]],</span>
+<span class="go">    AUTHORITY[&quot;EPSG&quot;,&quot;6326&quot;]],</span>
+<span class="go">PRIMEM[&quot;Greenwich&quot;,0,</span>
+<span class="go">    AUTHORITY[&quot;EPSG&quot;,&quot;8901&quot;]],</span>
+<span class="go">UNIT[&quot;degree&quot;,0.0174532925199433,</span>
+<span class="go">    AUTHORITY[&quot;EPSG&quot;,&quot;9122&quot;]],</span>
+<span class="go">AXIS[&quot;Latitude&quot;,NORTH],</span>
+<span class="go">AXIS[&quot;Longitude&quot;,EAST],</span>
+<span class="go">AUTHORITY[&quot;EPSG&quot;,&quot;4326&quot;]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">srs</span><span class="o">.</span><span class="n">proj</span>  <span class="c1"># PROJ representation</span>
+<span class="go">&#39;+proj=longlat +datum=WGS84 +no_defs&#39;</span>
+</pre></div>
+</div>
+<p>このシェープファイルは一般的なWGS84空間参照システム、つまりデータは度の単位で経度緯度の組を使用しています。</p>
+<p>さらに、シェープファイルは追加データを含む属性フィールドもサポートしています。以下はWorld Bordersレイヤーのフィールドです:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">lyr</span><span class="o">.</span><span class="n">fields</span><span class="p">)</span>
+<span class="go">[&#39;FIPS&#39;, &#39;ISO2&#39;, &#39;ISO3&#39;, &#39;UN&#39;, &#39;NAME&#39;, &#39;AREA&#39;, &#39;POP2005&#39;, &#39;REGION&#39;, &#39;SUBREGION&#39;, &#39;LON&#39;, &#39;LAT&#39;]</span>
+</pre></div>
+</div>
+<p>以下のコードで、各フィールドに関連するOGRタイプ (整数や文字列など) を調べることができます:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="n">fld</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">fld</span> <span class="ow">in</span> <span class="n">lyr</span><span class="o">.</span><span class="n">field_types</span><span class="p">]</span>
+<span class="go">[&#39;OFTString&#39;, &#39;OFTString&#39;, &#39;OFTString&#39;, &#39;OFTInteger&#39;, &#39;OFTString&#39;, &#39;OFTInteger&#39;, &#39;OFTInteger64&#39;, &#39;OFTInteger&#39;, &#39;OFTInteger&#39;, &#39;OFTReal&#39;, &#39;OFTReal&#39;]</span>
+</pre></div>
+</div>
+<p>レイヤー内の各フィーチャをイテレートし、フィーチャのジオメトリ (<code class="docutils literal notranslate"><span class="pre">geom</span></code> 属性でアクセス) とフィーチャの属性フィールド (<code class="docutils literal notranslate"><span class="pre">get()</span></code> メソッドで <strong>値</strong> にアクセス) の両方から情報を抽出できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="n">lyr</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NAME&quot;</span><span class="p">),</span> <span class="n">feat</span><span class="o">.</span><span class="n">geom</span><span class="o">.</span><span class="n">num_points</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">Guernsey 18</span>
+<span class="go">Jersey 26</span>
+<span class="go">South Georgia South Sandwich Islands 338</span>
+<span class="go">Taiwan 363</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="gdal.html#django.contrib.gis.gdal.Layer" title="django.contrib.gis.gdal.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> オブジェクトはスライス可能です。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">lyr</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<span class="go">[&lt;django.contrib.gis.gdal.feature.Feature object at 0x2f47690&gt;, &lt;django.contrib.gis.gdal.feature.Feature object at 0x2f47650&gt;]</span>
+</pre></div>
+</div>
+<p>また、個々のフィーチャは、フィーチャ ID で検索できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feat</span> <span class="o">=</span> <span class="n">lyr</span><span class="p">[</span><span class="mi">234</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">feat</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NAME&quot;</span><span class="p">))</span>
+<span class="go">San Marino</span>
+</pre></div>
+</div>
+<p>国境ジオメトリは、WKT および GeoJSON としてエクスポートできます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">geom</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">geom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">wkt</span><span class="p">)</span>
+<span class="go">POLYGON ((12.415798 43.957954,12.450554 ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
+<span class="go">{ &quot;type&quot;: &quot;Polygon&quot;, &quot;coordinates&quot;: [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...</span>
+</pre></div>
+</div>
+</section>
+<section id="s-layermapping">
+<span id="layermapping"></span><h3><code class="docutils literal notranslate"><span class="pre">LayerMapping</span></code><a class="headerlink" href="#layermapping" title="Link to this heading">¶</a></h3>
+<p>データをインポートするには、Pythonスクリプト内で <code class="docutils literal notranslate"><span class="pre">LayerMapping</span></code> を使用します。次のコードを含む <code class="docutils literal notranslate"><span class="pre">world</span></code> アプリケーション内に <code class="docutils literal notranslate"><span class="pre">load.py</span></code> というファイルを作成してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">LayerMapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorldBorder</span>
+
+<span class="n">world_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;fips&quot;</span><span class="p">:</span> <span class="s2">&quot;FIPS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;iso2&quot;</span><span class="p">:</span> <span class="s2">&quot;ISO2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;iso3&quot;</span><span class="p">:</span> <span class="s2">&quot;ISO3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;un&quot;</span><span class="p">:</span> <span class="s2">&quot;UN&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;NAME&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;area&quot;</span><span class="p">:</span> <span class="s2">&quot;AREA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pop2005&quot;</span><span class="p">:</span> <span class="s2">&quot;POP2005&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;REGION&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;subregion&quot;</span><span class="p">:</span> <span class="s2">&quot;SUBREGION&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lon&quot;</span><span class="p">:</span> <span class="s2">&quot;LON&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="s2">&quot;LAT&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;mpoly&quot;</span><span class="p">:</span> <span class="s2">&quot;MULTIPOLYGON&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">world_shp</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;data&quot;</span> <span class="o">/</span> <span class="s2">&quot;TM_WORLD_BORDERS-0.3.shp&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">lm</span> <span class="o">=</span> <span class="n">LayerMapping</span><span class="p">(</span><span class="n">WorldBorder</span><span class="p">,</span> <span class="n">world_shp</span><span class="p">,</span> <span class="n">world_mapping</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">lm</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>何が起こっているかについての、ちょっとしたノート:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">world_mapping</span></code> 辞書の各キーは <code class="docutils literal notranslate"><span class="pre">WorldBorder</span></code> モデル内のフィールドに対応します。値はデータが読み込まれる shapefile フィールドの名前です。</p></li>
+<li><p>ジオメトリフィールドのキー <code class="docutils literal notranslate"><span class="pre">mpoly</span></code> は <code class="docutils literal notranslate"><span class="pre">MULTIPOLYGON</span></code> で、 GeoDjango がこのフィールドをインポートするジオメトリタイプです。シェープファイル内の単純なポリゴンも、データベースに挿入する前に自動的にコレクションに変換されます。</p></li>
+<li><p>シェープファイルへのパスは絶対パスではないことに注意してください。つまり、 <code class="docutils literal notranslate"><span class="pre">world</span></code> アプリケーション ( <code class="docutils literal notranslate"><span class="pre">data</span></code> サブディレクトリを含む) を別の場所に移動しても、スクリプトは動作します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">transform</span></code> キーワードは <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定されています。なぜなら、shapefile のデータは変換する必要がないためです。これはすでに WGS84 (SRID=4326) であるからです。</p></li>
+</ul>
+<p>その後、<code class="docutils literal notranslate"><span class="pre">geodjango</span></code> プロジェクトディレクトリから Django シェルを呼び出してください。</p>
+<div class="console-block" id="console-block-9">
+<input class="c-tab-unix" id="c-tab-9-unix" type="radio" name="console-9" checked>
+<label for="c-tab-9-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-9-win" type="radio" name="console-9">
+<label for="c-tab-9-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-9-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>shell
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-9-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py shell
+</pre></div>
+</section>
+</div>
+<p>次に、<code class="docutils literal notranslate"><span class="pre">load</span></code> モジュールをインポートし、 <code class="docutils literal notranslate"><span class="pre">run</span></code> ルーチンを呼び出して、 <code class="docutils literal notranslate"><span class="pre">LayerMapping</span></code> が作業を行う様子を見てください:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">world</span><span class="w"> </span><span class="kn">import</span> <span class="n">load</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">load</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+<section id="s-try-ogrinspect">
+<span id="s-ogrinspect-intro"></span><span id="try-ogrinspect"></span><span id="ogrinspect-intro"></span><h3><code class="docutils literal notranslate"><span class="pre">ogrinspect</span></code> を試す<a class="headerlink" href="#try-ogrinspect" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="layermapping.html"><span class="doc">LayerMapping データインポートユーティリティ</span></a> で地理情報モデルを定義し、データをインポートする方法を説明しましたが、 <a class="reference internal" href="commands.html#django-admin-ogrinspect"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">ogrinspect</span></code></a> 管理コマンドを使用することで、このプロセスをさらに自動化できます。 <a class="reference internal" href="commands.html#django-admin-ogrinspect"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">ogrinspect</span></code></a> コマンドは GDAL がサポートするベクトルデータソース (例えばシェープファイル) をイントロスペクトし、モデル定義と <code class="docutils literal notranslate"><span class="pre">LayerMapping</span></code> 辞書を自動的に生成します。</p>
+<p>コマンドの一般的な使用法は以下の通りです:</p>
+<div class="console-block" id="console-block-10">
+<input class="c-tab-unix" id="c-tab-10-unix" type="radio" name="console-10" checked>
+<label for="c-tab-10-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-10-win" type="radio" name="console-10">
+<label for="c-tab-10-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-10-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>ogrinspect<span class="w"> </span><span class="o">[</span>options<span class="o">]</span><span class="w"> </span>&lt;data_source&gt;<span class="w"> </span>&lt;model_name&gt;<span class="w"> </span><span class="o">[</span>options<span class="o">]</span>
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-10-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py ogrinspect [options] <span class="p">&lt;</span>data_source<span class="p">&gt;</span> &lt;model_name<span class="p">&gt;</span> [options]
+</pre></div>
+</section>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">data_source</span></code> は GDAL がサポートするデータソースへのパスであり、 <code class="docutils literal notranslate"><span class="pre">model_name</span></code> はモデルに使用する名前である。コマンドラインオプションを使用すると、モデルの生成方法をさらに定義できます。</p>
+<p>たとえば、以下のコマンドを実行すると、ほぼ先ほど作成した <code class="docutils literal notranslate"><span class="pre">WorldBorder</span></code> モデルとマッピング辞書を自動的に再現します。</p>
+<div class="console-block" id="console-block-11">
+<input class="c-tab-unix" id="c-tab-11-unix" type="radio" name="console-11" checked>
+<label for="c-tab-11-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-11-win" type="radio" name="console-11">
+<label for="c-tab-11-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-11-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>ogrinspect<span class="w"> </span>world/data/TM_WORLD_BORDERS-0.3.shp<span class="w"> </span>WorldBorder<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--srid<span class="o">=</span><span class="m">4326</span><span class="w"> </span>--mapping<span class="w"> </span>--multi
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-11-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py ogrinspect world\data\TM_WORLD_BORDERS-0.3.shp WorldBorder \
+    --srid=4326 --mapping --multi
+</pre></div>
+</section>
+</div>
+<p>上記のコマンドラインオプションに関していくつかの注意点があります:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">--srid=4326</span></code> オプションは、地理フィールドのSRIDを設定します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--mapping</span></code> オプションは、<code class="docutils literal notranslate"><span class="pre">ogrinspect</span></code> に、 <a class="reference internal" href="layermapping.html#django.contrib.gis.utils.LayerMapping" title="django.contrib.gis.utils.LayerMapping"><code class="xref py py-class docutils literal notranslate"><span class="pre">LayerMapping</span></code></a> と一緒に使用するマッピング辞書を生成するよう指示します。</p></li>
+<li><p>オプション <code class="docutils literal notranslate"><span class="pre">--multi</span></code> を指定すると、地理フィールドが単なる <a class="reference internal" href="model-api.html#django.contrib.gis.db.models.PolygonField" title="django.contrib.gis.db.models.PolygonField"><code class="xref py py-class docutils literal notranslate"><span class="pre">PolygonField</span></code></a> ではなく <a class="reference internal" href="model-api.html#django.contrib.gis.db.models.MultiPolygonField" title="django.contrib.gis.db.models.MultiPolygonField"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiPolygonField</span></code></a> になります。</p></li>
+</ul>
+<p>このコマンドは次のような出力をします。GeoDjango アプリケーションの <code class="docutils literal notranslate"><span class="pre">models.py</span></code> に直接コピーできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># This is an auto-generated Django model module created by ogrinspect.</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WorldBorder</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">fips</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">iso2</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">iso3</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">un</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">pop2005</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">region</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">subregion</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FloatField</span><span class="p">()</span>
+    <span class="n">geom</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">MultiPolygonField</span><span class="p">(</span><span class="n">srid</span><span class="o">=</span><span class="mi">4326</span><span class="p">)</span>
+
+
+<span class="c1"># Auto-generated `LayerMapping` dictionary for WorldBorder model</span>
+<span class="n">worldborders_mapping</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;fips&quot;</span><span class="p">:</span> <span class="s2">&quot;FIPS&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;iso2&quot;</span><span class="p">:</span> <span class="s2">&quot;ISO2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;iso3&quot;</span><span class="p">:</span> <span class="s2">&quot;ISO3&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;un&quot;</span><span class="p">:</span> <span class="s2">&quot;UN&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;NAME&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;area&quot;</span><span class="p">:</span> <span class="s2">&quot;AREA&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pop2005&quot;</span><span class="p">:</span> <span class="s2">&quot;POP2005&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;region&quot;</span><span class="p">:</span> <span class="s2">&quot;REGION&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;subregion&quot;</span><span class="p">:</span> <span class="s2">&quot;SUBREGION&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lon&quot;</span><span class="p">:</span> <span class="s2">&quot;LON&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;lat&quot;</span><span class="p">:</span> <span class="s2">&quot;LAT&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;geom&quot;</span><span class="p">:</span> <span class="s2">&quot;MULTIPOLYGON&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-spatial-queries">
+<span id="spatial-queries"></span><h2>空間クエリ<a class="headerlink" href="#spatial-queries" title="Link to this heading">¶</a></h2>
+<section id="s-spatial-lookups">
+<span id="spatial-lookups"></span><h3>空間のルックアップ (Spatial Lookup)<a class="headerlink" href="#spatial-lookups" title="Link to this heading">¶</a></h3>
+<p>GeoDjango は Django の ORM に空間ルックアップを追加します。たとえば、特定の地点を含む <code class="docutils literal notranslate"><span class="pre">WorldBorder</span></code> テーブルの国を見つけることができます。まず、管理シェルを起動してください:</p>
+<div class="console-block" id="console-block-12">
+<input class="c-tab-unix" id="c-tab-12-unix" type="radio" name="console-12" checked>
+<label for="c-tab-12-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-12-win" type="radio" name="console-12">
+<label for="c-tab-12-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-12-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>shell
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-12-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py shell
+</pre></div>
+</section>
+</div>
+<p>ここで、注目するポイント <a class="footnote-reference brackets" href="#id13" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a> を定義します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pnt_wkt</span> <span class="o">=</span> <span class="s2">&quot;POINT(-95.3385 29.7245)&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">pnt_wkt</span></code> 文字列は、経度 -95.3385 度、緯度 29.7245 度にある点を表します。この幾何情報は Well Known Text (WKT) として知られる形式で表されており、これは Open Geospatial Consortium (OGC) によって発行された標準です。 <a class="footnote-reference brackets" href="#id14" id="id8" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a> <code class="docutils literal notranslate"><span class="pre">WorldBorder</span></code> モデルをインポートし、<code class="docutils literal notranslate"><span class="pre">pnt_wkt</span></code> をパラメータとして使用して <code class="docutils literal notranslate"><span class="pre">contains</span></code> ルックアップを実行します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">world.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorldBorder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBorder</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">mpoly__contains</span><span class="o">=</span><span class="n">pnt_wkt</span><span class="p">)</span>
+<span class="go">&lt;QuerySet [&lt;WorldBorder: United States&gt;]&gt;</span>
+</pre></div>
+</div>
+<p>ここでは、米国の国境という1つのモデルのみを持つ <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を取得しました (まさに期待通りです)。</p>
+<p>同様に、 <a class="reference internal" href="geos.html"><span class="doc">GEOS ジオメトリオブジェクト</span></a> を使用することもできます。ここでは、 <code class="docutils literal notranslate"><span class="pre">intersects</span></code> 空間ルックアップと <code class="docutils literal notranslate"><span class="pre">get</span></code> メソッドを組み合わせて、クエリセットの代わりにサンマリノの <code class="docutils literal notranslate"><span class="pre">WorldBorder</span></code> インスタンスのみを取得できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.geos</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pnt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">12.4604</span><span class="p">,</span> <span class="mf">43.9420</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">WorldBorder</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">mpoly__intersects</span><span class="o">=</span><span class="n">pnt</span><span class="p">)</span>
+<span class="go">&lt;WorldBorder: San Marino&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">contains</span></code> と <code class="docutils literal notranslate"><span class="pre">intersects</span></code> のルックアップは利用可能なクエリの一部です。 <a class="reference internal" href="db-api.html"><span class="doc">GeoDjango データベース API</span></a> のドキュメントにはさらに多くの内容があります。</p>
+</section>
+<section id="s-automatic-spatial-transformations">
+<span id="s-id9"></span><span id="automatic-spatial-transformations"></span><span id="id9"></span><h3>座標系の自動変換<a class="headerlink" href="#automatic-spatial-transformations" title="Link to this heading">¶</a></h3>
+<p>空間クエリを実行する際、GeoDjango は、異なる座標系のジオメトリを自動的に変換します。次の例では、座標は <a class="reference external" href="https://spatialreference.org/ref/epsg/32140/">EPSG SRID 32140</a> 、テキサス州南部に固有の座標系であり、単位は <strong>度</strong> ではなく <strong>メートル</strong> で表されます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.geos</span><span class="w"> </span><span class="kn">import</span> <span class="n">GEOSGeometry</span><span class="p">,</span> <span class="n">Point</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pnt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">954158.1</span><span class="p">,</span> <span class="mf">4215137.1</span><span class="p">,</span> <span class="n">srid</span><span class="o">=</span><span class="mi">32140</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">pnt</span></code> は、SRIDを含むWKTの拡張形式であるEWKTで構築することもできることに注意してください。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pnt</span> <span class="o">=</span> <span class="n">GEOSGeometry</span><span class="p">(</span><span class="s2">&quot;SRID=32140;POINT(954158.1 4215137.1)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>GeoDjango の ORM は、ジオメトリの値を自動的に変換 SQL でラップし、開発者がより高い抽象度で作業できるようにします:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span> <span class="o">=</span> <span class="n">WorldBorder</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">mpoly__intersects</span><span class="o">=</span><span class="n">pnt</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">qs</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>  <span class="c1"># Generating the SQL</span>
+<span class="go">SELECT &quot;world_worldborder&quot;.&quot;id&quot;, &quot;world_worldborder&quot;.&quot;name&quot;, &quot;world_worldborder&quot;.&quot;area&quot;,</span>
+<span class="go">&quot;world_worldborder&quot;.&quot;pop2005&quot;, &quot;world_worldborder&quot;.&quot;fips&quot;, &quot;world_worldborder&quot;.&quot;iso2&quot;,</span>
+<span class="go">&quot;world_worldborder&quot;.&quot;iso3&quot;, &quot;world_worldborder&quot;.&quot;un&quot;, &quot;world_worldborder&quot;.&quot;region&quot;,</span>
+<span class="go">&quot;world_worldborder&quot;.&quot;subregion&quot;, &quot;world_worldborder&quot;.&quot;lon&quot;, &quot;world_worldborder&quot;.&quot;lat&quot;,</span>
+<span class="go">&quot;world_worldborder&quot;.&quot;mpoly&quot; FROM &quot;world_worldborder&quot;</span>
+<span class="go">WHERE ST_Intersects(&quot;world_worldborder&quot;.&quot;mpoly&quot;, ST_Transform(%s, 4326))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span>  <span class="c1"># printing evaluates the queryset</span>
+<span class="go">&lt;QuerySet [&lt;WorldBorder: United States&gt;]&gt;</span>
+</pre></div>
+</div>
+<div class="admonition-raw-queries admonition" id="gis-raw-sql">
+<p class="admonition-title">素のクエリ</p>
+<p><a class="reference internal" href="../../../topics/db/sql.html"><span class="doc">素のクエリ</span></a> を使用する際は、ジオメトリフィールドをラップして、そのフィールド値が GEOS に認識されるようにする必要があります。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">connection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># or if you&#39;re querying a non-default database:</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">connections</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">connection</span> <span class="o">=</span> <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;your_gis_db_alias&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">City</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">raw</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;SELECT id, name, </span><span class="si">%s</span><span class="s2"> as point from myapp_city&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">connection</span><span class="o">.</span><span class="n">ops</span><span class="o">.</span><span class="n">select</span> <span class="o">%</span> <span class="s2">&quot;point&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>素のクエリを使うのは、自分が何をしているのかよく分かっている場合に限定されるべきです。</p>
+</div>
+</section>
+<section id="s-lazy-geometries">
+<span id="lazy-geometries"></span><h3>ジオメトリの遅延評価<a class="headerlink" href="#lazy-geometries" title="Link to this heading">¶</a></h3>
+<p>GeoDjango はジオメトリを標準化されたテキスト表現で読み込みます。ジオメトリフィールドに最初にアクセスすると、 GeoDjango は <a class="reference internal" href="geos.html#django.contrib.gis.geos.GEOSGeometry" title="django.contrib.gis.geos.GEOSGeometry"><code class="xref py py-class docutils literal notranslate"><span class="pre">GEOSGeometry</span></code></a> オブジェクトを生成し、よく使われる地理空間フォーマット用のシリアライズプロパティなどの強力な機能を公開します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">sm</span> <span class="o">=</span> <span class="n">WorldBorder</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;San Marino&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sm</span><span class="o">.</span><span class="n">mpoly</span>
+<span class="go">&lt;MultiPolygon object at 0x24c6798&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sm</span><span class="o">.</span><span class="n">mpoly</span><span class="o">.</span><span class="n">wkt</span>  <span class="c1"># WKT</span>
+<span class="go">MULTIPOLYGON (((12.4157980000000006 43.9579540000000009, 12.4505540000000003 43.9797209999999978, ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sm</span><span class="o">.</span><span class="n">mpoly</span><span class="o">.</span><span class="n">wkb</span>  <span class="c1"># WKB (as Python binary buffer)</span>
+<span class="go">&lt;read-only buffer for 0x1fe2c70, size -1, offset 0 at 0x2564c40&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sm</span><span class="o">.</span><span class="n">mpoly</span><span class="o">.</span><span class="n">geojson</span>  <span class="c1"># GeoJSON</span>
+<span class="go">&#39;{ &quot;type&quot;: &quot;MultiPolygon&quot;, &quot;coordinates&quot;: [ [ [ [ 12.415798, 43.957954 ], [ 12.450554, 43.979721 ], ...</span>
+</pre></div>
+</div>
+<p>これには、GEOSライブラリが提供するすべての高度な幾何演算へのアクセスが含まれます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pnt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">12.4604</span><span class="p">,</span> <span class="mf">43.9420</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sm</span><span class="o">.</span><span class="n">mpoly</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">pnt</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pnt</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">sm</span><span class="o">.</span><span class="n">mpoly</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</section>
+<section id="s-geographic-annotations">
+<span id="geographic-annotations"></span><h3>地理情報のアノテーション<a class="headerlink" href="#geographic-annotations" title="Link to this heading">¶</a></h3>
+<p>GeoDjangoでは、距離などの地理情報アノテーションを計算するための一連の操作 (交差、差分など) を提供しています。詳細は、 <a class="reference internal" href="functions.html"><span class="doc">地理情報データベース関数</span></a> ドキュメントを参照してください。</p>
+</section>
+</section>
+<section id="s-putting-your-data-on-the-map">
+<span id="putting-your-data-on-the-map"></span><h2>データを地図上に配置する<a class="headerlink" href="#putting-your-data-on-the-map" title="Link to this heading">¶</a></h2>
+<section id="s-geographic-admin">
+<span id="geographic-admin"></span><h3>地理情報の Admin<a class="headerlink" href="#geographic-admin" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../admin/index.html"><span class="doc">Django の admin アプリケーション</span></a> はジオメトリフィールドの編集をサポートしています。</p>
+<section id="s-basics">
+<span id="basics"></span><h4>基本<a class="headerlink" href="#basics" title="Link to this heading">¶</a></h4>
+<p>Django のadmin アプリケーションでは、ユーザが JavaScript のスリッピーマップ (<a class="reference external" href="https://openlayers.org/">OpenLayers</a> を利用) 上でジオメトリを作成したり変更したりできます。</p>
+<p>さあ、始めましょう。次のコードを含む <code class="docutils literal notranslate"><span class="pre">world</span></code> アプリケーション内に <code class="docutils literal notranslate"><span class="pre">admin.py</span></code> という名前のファイルを作成します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorldBorder</span>
+
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">WorldBorder</span><span class="p">,</span> <span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>次に、 <code class="docutils literal notranslate"><span class="pre">geodjango</span></code> アプリケーションフォルダにある <code class="docutils literal notranslate"><span class="pre">urls.py</span></code> を以下のように編集してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">include</span><span class="p">,</span> <span class="n">path</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;admin/&quot;</span><span class="p">,</span> <span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">urls</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>admin ユーザーを作成します:</p>
+<div class="console-block" id="console-block-13">
+<input class="c-tab-unix" id="c-tab-13-unix" type="radio" name="console-13" checked>
+<label for="c-tab-13-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-13-win" type="radio" name="console-13">
+<label for="c-tab-13-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-13-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>createsuperuser
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-13-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py createsuperuser
+</pre></div>
+</section>
+</div>
+<p>次に、Django 開発サーバを起動します:</p>
+<div class="console-block" id="console-block-14">
+<input class="c-tab-unix" id="c-tab-14-unix" type="radio" name="console-14" checked>
+<label for="c-tab-14-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-14-win" type="radio" name="console-14">
+<label for="c-tab-14-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-14-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>manage.py<span class="w"> </span>runserver
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-14-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py manage.py runserver
+</pre></div>
+</section>
+</div>
+<p>最後に <code class="docutils literal notranslate"><span class="pre">http://localhost:8000/admin/</span></code> にアクセスし、先ほど作成したユーザーでログインします。 <code class="docutils literal notranslate"><span class="pre">WorldBorder</span></code> のエントリーをブラウズし、ポリゴンをクリックして頂点を好きな位置までドラッグすることで、境界線を編集できます。</p>
+</section>
+<section id="s-gismodeladmin">
+<span id="gismodeladmin"></span><h4><code class="docutils literal notranslate"><span class="pre">GISModelAdmin</span></code><a class="headerlink" href="#gismodeladmin" title="Link to this heading">¶</a></h4>
+<p><a class="reference internal" href="admin.html#django.contrib.gis.admin.GISModelAdmin" title="django.contrib.gis.admin.GISModelAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">GISModelAdmin</span></code></a> を使用すると、GeoDjango は admin アプリケーションで <a class="reference external" href="https://www.openstreetmap.org/">OpenStreetMap</a> レイヤーを使用します。これにより、 <a class="reference internal" href="../admin/index.html#django.contrib.admin.ModelAdmin" title="django.contrib.admin.ModelAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelAdmin</span></code></a> が使用する <a class="reference external" href="http://web.archive.org/web/20201024202709/https://earth-info.nga.mil/publications/vmap0.html">Vector Map Level 0</a> WMSデータセット (<a class="reference external" href="https://www.osgeo.org/">OSGeo</a> でホストされている) よりも、より多くのコンテキスト (通りや通路の詳細を含む) が提供されます。</p>
+<p>PROJの座標変換ファイルがインストールされている必要があります (詳しくは <a class="reference internal" href="install/geolibs.html#proj4"><span class="std std-ref">PROJ installation instructions</span></a> を参照してください) 。</p>
+<p>この要件を満たしている場合は、 <code class="docutils literal notranslate"><span class="pre">admin.py</span></code> ファイルで <code class="docutils literal notranslate"><span class="pre">GISModelAdmin</span></code> オプションクラスを使用してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">WorldBorder</span><span class="p">,</span> <span class="n">admin</span><span class="o">.</span><span class="n">GISModelAdmin</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">脚注</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id11" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>このデータセットの提供およびメンテナンスをしてくれた <a class="reference external" href="https://mastermaps.net/">mastermaps.net</a> の Bjørn Sandvik 氏に特別な感謝を申し上げます。</p>
+</aside>
+<aside class="footnote brackets" id="id12" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
+<p>GeoDjango の基本アプリは、Dane Springmeyer、Josh Livni、およびChristopher Schmidt によって記述されました。</p>
+</aside>
+<aside class="footnote brackets" id="id13" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id7">3</a><span class="fn-bracket">]</span></span>
+<p>このポイントは <a class="reference external" href="https://www.law.uh.edu/">ヒューストン大学法科大学院</a> です。</p>
+</aside>
+<aside class="footnote brackets" id="id14" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">4</a><span class="fn-bracket">]</span></span>
+<p>Open Geospatial Consortium, Inc, <a class="reference external" href="https://www.ogc.org/standards/sfs">OpenGIS Simple Feature Specification For SQL</a>.</p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">GeoDjango チュートリアル</a><ul>
+<li><a class="reference internal" href="#introduction">はじめに</a></li>
+<li><a class="reference internal" href="#setting-up">セットアップ</a><ul>
+<li><a class="reference internal" href="#create-a-spatial-database">空間データベースを作成する</a></li>
+<li><a class="reference internal" href="#create-a-new-project">新しいプロジェクトを作成する</a></li>
+<li><a class="reference internal" href="#configure-settings-py"><code class="docutils literal notranslate"><span class="pre">settings.py</span></code> の設定</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geographic-data">地理データ</a><ul>
+<li><a class="reference internal" href="#worldborders">世界の国境</a></li>
+<li><a class="reference internal" href="#use-ogrinfo-to-examine-spatial-data"><code class="docutils literal notranslate"><span class="pre">ogrinfo</span></code> を使って空間データを調べる</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geographic-models">地理情報モデル</a><ul>
+<li><a class="reference internal" href="#defining-a-geographic-model">地理情報モデルを定義する</a></li>
+<li><a class="reference internal" href="#run-migrate"><code class="docutils literal notranslate"><span class="pre">migrate</span></code> を実行する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#importing-spatial-data">空間データをインポートする</a><ul>
+<li><a class="reference internal" href="#gdal-interface">GDAL インターフェース</a></li>
+<li><a class="reference internal" href="#layermapping"><code class="docutils literal notranslate"><span class="pre">LayerMapping</span></code></a></li>
+<li><a class="reference internal" href="#try-ogrinspect"><code class="docutils literal notranslate"><span class="pre">ogrinspect</span></code> を試す</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#spatial-queries">空間クエリ</a><ul>
+<li><a class="reference internal" href="#spatial-lookups">空間のルックアップ (Spatial Lookup)</a></li>
+<li><a class="reference internal" href="#automatic-spatial-transformations">座標系の自動変換</a></li>
+<li><a class="reference internal" href="#lazy-geometries">ジオメトリの遅延評価</a></li>
+<li><a class="reference internal" href="#geographic-annotations">地理情報のアノテーション</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#putting-your-data-on-the-map">データを地図上に配置する</a><ul>
+<li><a class="reference internal" href="#geographic-admin">地理情報の Admin</a><ul>
+<li><a class="reference internal" href="#basics">基本</a></li>
+<li><a class="reference internal" href="#gismodeladmin"><code class="docutils literal notranslate"><span class="pre">GISModelAdmin</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="index.html"
+                          title="前の章へ">GeoDjango</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="install/index.html"
+                          title="次の章へ">GeoDjango のインストール</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/gis/tutorial.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="GeoDjango">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="install/index.html" title="GeoDjango のインストール">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

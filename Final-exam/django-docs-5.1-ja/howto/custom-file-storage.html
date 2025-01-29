@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>カスタムのストレージクラスを書く &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="Django FAQ よくある質問" href="../faq/index.html" />
+    <link rel="prev" title="カスタム django-admin コマンドの作り方" href="custom-management-commands.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="custom-management-commands.html" title="カスタム &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django-admin&lt;/span&gt;&lt;/code&gt; コマンドの作り方">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="../faq/index.html" title="Django FAQ よくある質問">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-custom-file-storage">
+            
+  <section id="s-how-to-write-a-custom-storage-class">
+<span id="how-to-write-a-custom-storage-class"></span><h1>カスタムのストレージクラスを書く<a class="headerlink" href="#how-to-write-a-custom-storage-class" title="Link to this heading">¶</a></h1>
+<p>たとえばリモートシステム上にファイルを保存する場合、カスタムストレージクラスを定義することで、カスタムファイルストレージを作成することが可能です。使用するには以下の手順に従ってください。</p>
+<ol class="arabic">
+<li><p>カスタムストレージシステムは <code class="docutils literal notranslate"><span class="pre">django.core.files.storage.Storage</span></code> のサブクラスでなければなりません。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.files.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">Storage</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyStorage</span><span class="p">(</span><span class="n">Storage</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+</li>
+<li><p>Django は引数なしでストレージシステムをインスタンス化できなければなりません。これは、次のように <code class="docutils literal notranslate"><span class="pre">django.conf.settings</span></code> からすべての設定を取る必要があることを意味します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.files.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">Storage</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyStorage</span><span class="p">(</span><span class="n">Storage</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">option</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">option</span><span class="p">:</span>
+            <span class="n">option</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">CUSTOM_STORAGE_OPTIONS</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+</li>
+<li><p>カスタムストレージクラスには <a class="reference internal" href="#django.core.files.storage._open" title="django.core.files.storage._open"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_open()</span></code></a> と <a class="reference internal" href="#django.core.files.storage._save" title="django.core.files.storage._save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">_save()</span></code></a> メソッドが必要です。さらにストレージに必要なメソッドが他にもあれば定義します。こういったメソッドに関しては以降を参照してください。</p>
+<p>さらにカスタムクラスがローカルファイルストレージを提供する場合は、 <code class="docutils literal notranslate"><span class="pre">path()</span></code> メソッドをオーバーライドする必要があります。</p>
+</li>
+<li><p>ストレージクラスは <a class="reference internal" href="../topics/migrations.html#custom-deconstruct-method"><span class="std std-ref">deconstructible</span></a> でなければならないので、マイグレーションのフィールドで使われたときにそれはシリアライズすることができます。フィールドがそれ自身 <a class="reference internal" href="../topics/migrations.html#migration-serializing"><span class="std std-ref">serializable</span></a> である引数を持つ限り、これのために <code class="docutils literal notranslate"><span class="pre">django.utils.deconstruct.deconstructible</span></code> クラスデコレータを使うことができます (それが FileSystemStorage で Django が使うものです)。</p></li>
+</ol>
+<p>デフォルトにおいて、以下に示すメソッドは <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> を発生させます。したがって一般的にオーバーライドする必要があります。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../ref/files/storage.html#django.core.files.storage.Storage.delete" title="django.core.files.storage.Storage.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Storage.delete()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../ref/files/storage.html#django.core.files.storage.Storage.exists" title="django.core.files.storage.Storage.exists"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Storage.exists()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../ref/files/storage.html#django.core.files.storage.Storage.listdir" title="django.core.files.storage.Storage.listdir"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Storage.listdir()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../ref/files/storage.html#django.core.files.storage.Storage.size" title="django.core.files.storage.Storage.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Storage.size()</span></code></a></p></li>
+<li><p><a class="reference internal" href="../ref/files/storage.html#django.core.files.storage.Storage.url" title="django.core.files.storage.Storage.url"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Storage.url()</span></code></a></p></li>
+</ul>
+<p>ただし上のメソッドはすべてが必要というわけでもないため、意図的に省略することもできます。もし例外が発生してもそのメソッドを未実装のままにしておくことも可能であり、それでもストレージを動作させることはできます。</p>
+<p>特定のストレージバックエンドにおける内容一覧の取得には相当な手間がかかる、ということがわかったとします。その場合は <code class="docutils literal notranslate"><span class="pre">Storage.listdir()</span></code> の実装をしなくても構いません。</p>
+<p>バックエンドとして、単にファイル出力だけを扱うものであったとします。この場合は、上のメソッドをすべて実装する必要がありません。</p>
+<p>結局、上のメソッドを実装するかどうかは開発者次第です。メソッドのどれかを未実装のままにしておくというのは、一部分のみの (場合によっては壊れたままの) インターフェースとするということです。</p>
+<p>カスタムストレージオブジェクトに固有のフックメソッドを用意することもあるでしょう。以下があります。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.files.storage._open">
+<span class="sig-name descname"><span class="pre">_open</span></span>(<em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rb'</span></span></em>)<a class="headerlink" href="#django.core.files.storage._open" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><strong>必須</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">Storage.open()</span></code> から呼び出されます。このストレージクラスにとって、ファイルを開くために実際に用いられる機能となります。バックエンドストレージシステムに固有のロジックを実装して、特定サブクラスのオブジェクトを戻り値としたい場合も多くありますが、このメソッドは必ず <code class="docutils literal notranslate"><span class="pre">File</span></code> オブジェクトを戻り値としなければなりません。ファイルが存在しない場合は、 <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></a> 例外が発生します。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.files.storage._save">
+<span class="sig-name descname"><span class="pre">_save</span></span>(<em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content</span></span></em>)<a class="headerlink" href="#django.core.files.storage._save" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">Storage.save()</span></code> から呼び出されます。<code class="docutils literal notranslate"><span class="pre">name</span></code> は <code class="docutils literal notranslate"><span class="pre">get_valid_name()</span></code> や <code class="docutils literal notranslate"><span class="pre">get_available_name()</span></code> を通じて得られたものであり、<code class="docutils literal notranslate"><span class="pre">content</span></code> は <code class="docutils literal notranslate"><span class="pre">File</span></code> オブジェクトそのものです。</p>
+<p>戻り値は、実際に保存されたファイルの名前です (通常は処理された <code class="docutils literal notranslate"><span class="pre">name</span></code> ですが、ストレージがファイル名を変更する必要がある場合には、新たな名前を返す必要があります)。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.files.storage.get_valid_name">
+<span class="sig-name descname"><span class="pre">get_valid_name</span></span>(<em class="sig-param"><span class="n"><span class="pre">name</span></span></em>)<a class="headerlink" href="#django.core.files.storage.get_valid_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>ベースとなるストレージシステムで使用するのに適したファイル名を返します。このメソッドに渡される <code class="docutils literal notranslate"><span class="pre">name</span></code> 引数は、サーバに送信された元のファイル名か、 <code class="docutils literal notranslate"><span class="pre">upload_to</span></code> が呼び出し可能オブジェクトの場合、そのメソッドがパス情報を削除した後に返すファイル名です。非標準文字を安全なファイル名に変換する方法をカスタマイズするには、これをオーバーライドします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Storage</span></code> において実装されているコードにおいては、元々のファイル名の中から、アルファベット、数字、ピリオド、アンダースコアのみが保持され、それ以外は取り除かれます。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.files.storage.get_alternative_name">
+<span class="sig-name descname"><span class="pre">get_alternative_name</span></span>(<em class="sig-param"><span class="n"><span class="pre">file_root</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_ext</span></span></em>)<a class="headerlink" href="#django.core.files.storage.get_alternative_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>&quot;file_root&quot;と&quot;file_ext&quot;のパラメーターを基に新たなファイルネームを返します。デフォルトでは、ファイルネームの拡張子の前にアンダーバーとランダムな7文字の英数字の文字列を加えます。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.files.storage.get_available_name">
+<span class="sig-name descname"><span class="pre">get_available_name</span></span>(<em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.core.files.storage.get_available_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>ストレージシステムにおいて利用可能なファイル名を返します。これは指定されたファイル名をできるかぎり考慮に入れた名称です。本メソッドに受け渡される <code class="docutils literal notranslate"><span class="pre">name</span></code> 引数は、上に示した <code class="docutils literal notranslate"><span class="pre">get_valid_name()</span></code> メソッドを用いて、ストレージシステムが扱うファイル名として正常化されたものにします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">max_length</span></code> を指定した場合、ファイル名の長さはそれを越えないようにします。適切に一致するファイル名が見つからなかった場合は、例外 <a class="reference internal" href="../ref/exceptions.html#django.core.exceptions.SuspiciousOperation" title="django.core.exceptions.SuspiciousOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SuspiciousFileOperation</span></code></a> が発生します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">name</span></code> というファイルが既に存在する場合、 <code class="docutils literal notranslate"><span class="pre">get_alternative_name()</span></code> が代わりの名前を得るために呼び出されます。</p>
+<section id="s-use-your-custom-storage-engine">
+<span id="s-using-custom-storage-engine"></span><span id="use-your-custom-storage-engine"></span><span id="using-custom-storage-engine"></span><h2>カスタムのストレージエンジンを使用する<a class="headerlink" href="#use-your-custom-storage-engine" title="Link to this heading">¶</a></h2>
+<p>Django でカスタムストレージを使うための最初のステップは、利用するファイルストレージバックエンドを Django に伝えることです。これは <a class="reference internal" href="../ref/settings.html#std-setting-STORAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STORAGES</span></code></a> 設定で行います。この設定は、Django を通して特定のストレージを参照するためのエイリアスを、ストレージバックエンドを定義する辞書にマッピングします。この辞書の内部的な設定については、 <a class="reference internal" href="../ref/settings.html#std-setting-STORAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STORAGES</span></code></a> ドキュメントで詳しく説明しています。</p>
+<p>ストレージには、エイリアスである <a class="reference internal" href="../ref/files/storage.html#django.core.files.storage.storages" title="django.core.files.storage.storages"><code class="xref py py-data docutils literal notranslate"><span class="pre">django.core.files.storage.storages</span></code></a> 辞書からアクセスできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.files.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">storages</span>
+
+<span class="n">example_storage</span> <span class="o">=</span> <span class="n">storages</span><span class="p">[</span><span class="s2">&quot;example&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">カスタムのストレージクラスを書く</a><ul>
+<li><a class="reference internal" href="#use-your-custom-storage-engine">カスタムのストレージエンジンを使用する</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="custom-management-commands.html"
+                          title="前の章へ">カスタム <code class="docutils literal notranslate"><span class="pre">django-admin</span></code> コマンドの作り方</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="../faq/index.html"
+                          title="次の章へ">Django FAQ よくある質問</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/custom-file-storage.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="custom-management-commands.html" title="カスタム &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django-admin&lt;/span&gt;&lt;/code&gt; コマンドの作り方">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="../faq/index.html" title="Django FAQ よくある質問">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

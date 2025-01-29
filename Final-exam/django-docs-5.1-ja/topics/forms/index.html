@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>フォームを使う &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="フォームセット (Formset)" href="formsets.html" />
+    <link rel="prev" title="セッションの使いかた" href="../http/sessions.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../http/sessions.html" title="セッションの使いかた">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="formsets.html" title="フォームセット (Formset)">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-forms-index">
+            
+  <section id="s-working-with-forms">
+<span id="working-with-forms"></span><h1>フォームを使う<a class="headerlink" href="#working-with-forms" title="Link to this heading">¶</a></h1>
+<div class="admonition-about-this-document admonition">
+<p class="admonition-title">このドキュメントについて</p>
+<p>このドキュメントでは、Web フォームの基本と、それらを Django で扱う方法を紹介しています。より詳しく知りたいときは、フォーム API の特定の領域、 <a class="reference internal" href="../../ref/forms/api.html"><span class="doc">フォーム API</span></a> 、 <a class="reference internal" href="../../ref/forms/fields.html"><span class="doc">フォーム フィールド</span></a> または <a class="reference internal" href="../../ref/forms/validation.html"><span class="doc">フォームとフィールドのバリデーション</span></a> をご覧ください。</p>
+</div>
+<p>あなたの作ろうとしているウェブサイトやアプリケーションが、単にコンテンツを公開したり訪問者からのインプットを受け付けないサイトでない限り、フォームを理解し利用する必要があります。</p>
+<p>Django はフォームの構築を助けるさまざまなツールやライブラリを提供しています。これらを利用することで、サイト訪問者からデータの入力を受け入れ、そのデータを処理したあと、入力に応じたレスポンスを返すことができるようになります。</p>
+<section id="s-html-forms">
+<span id="html-forms"></span><h2>HTML フォーム<a class="headerlink" href="#html-forms" title="Link to this heading">¶</a></h2>
+<p>HTMLでは、フォームは <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;...&lt;/form&gt;</span></code> 内の要素の集まりで、訪問者によるテキスト入力、オプション選択、オブジェクトやコントロールの操作などを可能にし、これらの情報をサーバーに送り返します。</p>
+<p>いくつかのフォームインターフェイスの要素、例えばテキストインプットやチェックボックスは、とてもシンプルで HTML 自体に組み込まれています。そのほかに、とても複雑な要素もあります; Date ピッカーをポップアップさせたり、スライダーを動かしコントロールを操作するようなインターフェイスは、一般的に HTML フォームの <code class="docutils literal notranslate"><span class="pre">1</span></code> 要素だけではなく JavaScriptと CSS を使って実現されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;input&gt;</span></code> 要素に加えて、フォームには次の 2 つのことを指定しなければなりません。</p>
+<ul class="simple">
+<li><p><em>どこで</em>: ユーザーのインプットに対応するデータの宛先となるべきURL</p></li>
+<li><p><em>どのように</em>: データが返される方法として使われる HTTP メソッド</p></li>
+</ul>
+<p>例として、Django admin にあるいくつかの <code class="docutils literal notranslate"><span class="pre">&lt;input&gt;</span></code> 要素のログインフォームを見てみましょう。ユーザー名のための <code class="docutils literal notranslate"><span class="pre">type=&quot;text&quot;</span></code> 、パスワードのための <code class="docutils literal notranslate"><span class="pre">type=&quot;password&quot;</span></code>、そしてログインボタンのための <code class="docutils literal notranslate"><span class="pre">type=&quot;submit&quot;</span></code> があります。他にも Django が次の行動を決めるために使われる、ユーザーからは見えない隠しテキストフィールドもあります。</p>
+<p>また、フォームのデータが <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;</span></code> の <code class="docutils literal notranslate"><span class="pre">action</span></code> 属性によって指定された URL - <code class="docutils literal notranslate"><span class="pre">/admin/</span></code> - に送信されるべきこと、そして <code class="docutils literal notranslate"><span class="pre">method</span></code> 属性によって指定されたHTTP メカニズム - <code class="docutils literal notranslate"><span class="pre">post</span></code> - を使って送信されるべきこともブラウザーに伝えています。</p>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;input</span> <span class="pre">type=&quot;submit&quot;</span> <span class="pre">value=&quot;Log</span> <span class="pre">in&quot;&gt;</span></code> 要素がトリガーされると、データは <code class="docutils literal notranslate"><span class="pre">/admin/</span></code> に返されます。</p>
+<section id="s-get-and-post">
+<span id="get-and-post"></span><h3><code class="docutils literal notranslate"><span class="pre">GET</span></code> と <code class="docutils literal notranslate"><span class="pre">POST</span></code><a class="headerlink" href="#get-and-post" title="Link to this heading">¶</a></h3>
+<p>フォームを扱うときに使用する HTTP メソッドは、<code class="docutils literal notranslate"><span class="pre">GET</span></code> と <code class="docutils literal notranslate"><span class="pre">POST</span></code> だけです。</p>
+<p>Django のログインフォームは、<code class="docutils literal notranslate"><span class="pre">POST</span></code> メソッドを使って返されます。この中で、ブラウザがフォームデータをひとまとめにし、送信用にエンコードし、サーバーに送った上で、サーバーからの応答を受け取ります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">GET</span></code> は、対照的に、送信されたデータを文字列に添付し、URL を構成するために使います。URL はデータが送られるべきアドレスのほか、データキーと値を含みます。実際に、Django ドキュメンテーションで何かを検索してみると、フォーム <code class="docutils literal notranslate"><span class="pre">https://docs.djangoproject.com/search/?q=forms&amp;release=1</span></code> といった URL が生成されるのが分かるでしょう。</p>
+<p><code class="docutils literal notranslate"><span class="pre">GET</span></code> と <code class="docutils literal notranslate"><span class="pre">POST</span></code> は、一般的には異なる目的に使われます。</p>
+<p>システムの状態を変更する可能性のあるあらゆるリクエスト（例えばデータベース内での変更を行うリクエスト）では <code class="docutils literal notranslate"><span class="pre">POST</span></code> を使うべきです。 <code class="docutils literal notranslate"><span class="pre">GET</span></code> は、システムの状態に影響を与えないリクエストにのみ使われるべきです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">GET</span></code> はパスワードフォームには不適です。なぜならば、パスワードが URL 内はもちろんのこと、ブラウザーの履歴やサーバーログといったプレーンテキストの中すべてに表示されるからです。大量のデータや、画像のようなバイナリデータにも不適です。<code class="docutils literal notranslate"><span class="pre">GET</span></code> リクエストを admin フォームのために使ような Web アプリケーションは、セキュリティ上のリスクです: 攻撃者がシステムの繊細な部分へのアクセス権を得るために、フォームのリクエストを偽装することは簡単なのです。Django の <a class="reference internal" href="../../ref/csrf.html"><span class="doc">CSRF 保護</span></a> のような他の保護と組み合わされた <code class="docutils literal notranslate"><span class="pre">POST</span></code> は、アクセスをより適切にコントロールできるようにします。</p>
+<p>一方で、 <code class="docutils literal notranslate"><span class="pre">GET</span></code> は Web 検索フォームのようなものに適しています。なぜならば、 <code class="docutils literal notranslate"><span class="pre">GET</span></code> リクエストを表現している URL は、簡単にブックマーク、共有、再送信ができるからです。</p>
+</section>
+</section>
+<section id="s-django-s-role-in-forms">
+<span id="django-s-role-in-forms"></span><h2>フォームにおける Django の役割<a class="headerlink" href="#django-s-role-in-forms" title="Link to this heading">¶</a></h2>
+<p>フォームを扱うのは大変な仕事です。Django admin を考えてみると、複数の異なるタイプのデータの、たくさんのアイテムがフォーム内に表示されるために準備を必要とし、HTML としてレンダリングされ、便利なインターフェイスを使って編集され、サーバーに返され、検証され、クリーンアップされます。そして、保存されたり次の処理のために値が渡されたりするのです。</p>
+<p>Django のフォーム機能は、この仕事のうち膨大な部分を簡素化・自動化します。そしてさらに、多くのプログラマーたちが自分自身でコードを書くよりも安全にこれらを実現します。</p>
+<p>Django は、フォームに含まれる仕事のうち、3つのまったく異なるパーツを扱います:</p>
+<ul class="simple">
+<li><p>データがレンダリングできるように準備し、再構成すること</p></li>
+<li><p>データのために HTML フォームを生成すること</p></li>
+<li><p>クライアントから送信されたフォームとデータを受け取り、処理すること</p></li>
+</ul>
+<p>これら全ては手動でコードに書くことが <em>できます</em> が、Django がこれらすべてをうまく処理します。</p>
+</section>
+<section id="s-forms-in-django">
+<span id="forms-in-django"></span><h2>Django におけるフォーム<a class="headerlink" href="#forms-in-django" title="Link to this heading">¶</a></h2>
+<p>HTML フォームについては簡単に説明しましたが、HTML <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;</span></code> は必要となる仕掛けの一部分に過ぎません。</p>
+<p>Web アプリケーションの文脈では、 form という言葉は HTML <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;</span></code>、フォームを提供する Django の <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a>、データが送信されたときに返された体系化されたデータ、もしくは端末相互間で動くこれらパーツの集合を意味するでしょう。</p>
+<section id="s-the-django-form-class">
+<span id="the-django-form-class"></span><h3>Django の <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> クラス<a class="headerlink" href="#the-django-form-class" title="Link to this heading">¶</a></h3>
+<p>このコンポーネントシステムの中心は、Django の <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> クラスです。 Django モデルがオブジェクトの論理構造、その動作、そしてその部分が私たちに表現される方法を記述するのと同じように、 <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> クラスはフォームを記述し、それがどのように動作し表示されるかを決定します。</p>
+<p>モデルクラスのフィールドがデータベースのフィールドにマッピングされるのと同様に、フォームクラスのフィールドはHTMLフォームの <code class="docutils literal notranslate"><span class="pre">&lt;input&gt;</span></code> 要素にマッピングされます。 (<a class="reference internal" href="modelforms.html#django.forms.ModelForm" title="django.forms.ModelForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelForm</span></code></a> はモデルクラスのフィールドを <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> 経由でHTMLフォームの <code class="docutils literal notranslate"><span class="pre">&lt;input&gt;</span></code> 要素にマッピングします。これがDjango admin サイトの基盤です。)</p>
+<p>フォームのフィールド自体はクラスです; フォームが送信されたとき、フォームデータを管理し、検証を実施します。 <a class="reference internal" href="../../ref/forms/fields.html#django.forms.DateField" title="django.forms.DateField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateField</span></code></a> と <a class="reference internal" href="../../ref/forms/fields.html#django.forms.FileField" title="django.forms.FileField"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileField</span></code></a> は、非常に異なる種類のデータを扱い、異なることをしなければなりません。</p>
+<p>フォームフィールドは、HTML &quot;ウィジェット”（ユーザーインターフェイスの装置の一つです）としてブラウザ内のユーザーに表されます。それぞれのフィールドタイプは、適切なデフォルトの <a class="reference internal" href="../../ref/forms/widgets.html"><span class="doc">ウィジェットクラス</span></a> を持っていますが、これらは必要に応じてオーバーライドできます。</p>
+</section>
+<section id="s-instantiating-processing-and-rendering-forms">
+<span id="instantiating-processing-and-rendering-forms"></span><h3>フォームをインスタンス化し、処理し、レンダリングする<a class="headerlink" href="#instantiating-processing-and-rendering-forms" title="Link to this heading">¶</a></h3>
+<p>Django でオブジェクトをレンダリングするとき、通常は次のような手順を取ります。</p>
+<ol class="arabic simple">
+<li><p>ビューの中でオブジェクトを取得する (例えば、データベースからオブジェクトを取得する)</p></li>
+<li><p>オブジェクトをテンプレートのコンテキストに引き渡す</p></li>
+<li><p>テンプレートの変数を使って、オブジェクトを HTML マークアップに展開する</p></li>
+</ol>
+<p>テンプレートの中でフォームをレンダリングすることは、他のあらゆる種類のオブジェクトをレンダリングする働きとほとんど同じですが、いくつかの重要な違いがあります。</p>
+<p>データを持たないモデルインスタンスのケースでは、テンプレート内で何かをするのが有益であることはほとんどありません。一方、未入力のフォームをレンダリングすることはまったく合理的です - これは、ユーザーに入力してほしいときに行うことです。</p>
+<p>したがって、ビューの中でモデルインスタンスを扱うときには、一般的にデータベースから取り出します。フォームを処理するときには、一般的にビューの中でインスタンス化します。</p>
+<p>フォームをインスタンス化するときは、空のままにするか、あらかじめ入力しておくことができます。たとえば:</p>
+<ul class="simple">
+<li><p>保存されたモデルインスタンスからのデータ (編集のための admin フォームの場合のように)</p></li>
+<li><p>他のソースから照合したデータ</p></li>
+<li><p>前回の HTML フォーム送信から受信したデータ</p></li>
+</ul>
+<p>最後のケースが最も興味深いです。なぜならば、それはユーザーが単にウェブサイトを見るだけでなく、情報を送り返すことができるようにするからです。</p>
+</section>
+</section>
+<section id="s-building-a-form">
+<span id="building-a-form"></span><h2>フォームを作る<a class="headerlink" href="#building-a-form" title="Link to this heading">¶</a></h2>
+<section id="s-the-work-that-needs-to-be-done">
+<span id="the-work-that-needs-to-be-done"></span><h3>すべきこと<a class="headerlink" href="#the-work-that-needs-to-be-done" title="Link to this heading">¶</a></h3>
+<p>ユーザーの名前を取得するために、ウェブサイトで簡単なフォームを作ることを考えてみましょう:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/your-name/&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;your_name&quot;</span><span class="p">&gt;</span>Your name: <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;your_name&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;your_name&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">current_name</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;OK&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>これは、<code class="docutils literal notranslate"><span class="pre">POST</span></code> メソッドを使って、URL <code class="docutils literal notranslate"><span class="pre">/your-name/</span></code> にフォームデータを返すよう、ブラウザに通知します。テキストフィールド、&quot;Your name:&quot; ラベル、そして &quot;OK&quot; ボタンを表示します。テンプレートのコンテキストが <code class="docutils literal notranslate"><span class="pre">current_name</span></code> 変数を含む場合は、 <code class="docutils literal notranslate"><span class="pre">your_name</span></code> フィールドをあらかじめ入力するために使われます。</p>
+<p>HTML フォームを含むテンプレートをレンダリングし、 <code class="docutils literal notranslate"><span class="pre">current_name</span></code> フィールドを適切に提供するビューが必要になります。</p>
+<p>フォームが送信されるとき、サーバーに送信される <code class="docutils literal notranslate"><span class="pre">POST</span></code> リクエストは、フォームのデータを含みます。</p>
+<p>今度は、その <code class="docutils literal notranslate"><span class="pre">/your-name/</span></code> URL と対応するビューも必要です。このURLは、リクエストの中から適切なキー/値のペアを見つけ、それらを処理します。</p>
+<p>これは非常にシンプルなフォームです。実践では、1つのフォームが数十または数百のフィールドを含んでいて、しかも多くがあらかじめ入力されている必要があるかもしれません。また、操作が完了する前にユーザーが何回も編集と送信を繰り返すことも考えられます。</p>
+<p>フォームが送信される前でも、ブラウザ上で多少の検証が必要となるかもしれません; ユーザーがカレンダーから日付を選ぶといったような、より複雑なフィールドを使うこともあるでしょう。</p>
+<p>Django にこれらを任せると、比較的簡単に実現させることができます。</p>
+</section>
+<section id="s-building-a-form-in-django">
+<span id="building-a-form-in-django"></span><h3>Django でフォームを作る<a class="headerlink" href="#building-a-form-in-django" title="Link to this heading">¶</a></h3>
+<section id="s-the-form-class">
+<span id="the-form-class"></span><h4><a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> クラス<a class="headerlink" href="#the-form-class" title="Link to this heading">¶</a></h4>
+<p>HTML フォームをどのように見せたいかは、すでに分かっています。Django で実現するためのスタート地点は以下の通りです:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">forms.py</span></code></span><a class="headerlink" href="#id3" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">NameForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">your_name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s2">&quot;Your name&quot;</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>これは、単一のフィールド (<code class="docutils literal notranslate"><span class="pre">your_name</span></code>) で <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> クラスを定義します。人間が読みやすいラベルをフィールドに適用してあり、このラベルはレンダリングされたときに <code class="docutils literal notranslate"><span class="pre">&lt;label&gt;</span></code> の中に表示されます (このケースでは、仮にラベルの指定を省略したとしても、実際には指定した <a class="reference internal" href="../../ref/forms/fields.html#django.forms.Field.label" title="django.forms.Field.label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code></a> が自動的に生成されるラベルと同じではありますが)。</p>
+<p>フィールドの最大文字数は <a class="reference internal" href="../../ref/forms/fields.html#django.forms.CharField.max_length" title="django.forms.CharField.max_length"><code class="xref py py-attr docutils literal notranslate"><span class="pre">max_length</span></code></a> によって定義されます。これは2つのことをします。HTML の <code class="docutils literal notranslate"><span class="pre">&lt;input&gt;</span></code> に <code class="docutils literal notranslate"><span class="pre">maxlength=&quot;100&quot;</span></code> を配置します (そしてブラウザはユーザーがこの数値以上の文字数をそもそも入力できないようにするはずです). これはさらに、Django がブラウザからフォームを受け取ったときにデータの文字数を検証することも意味します。</p>
+<p><a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> インスタンスは、すべてのフィールドに対して検証ルーチンを実行する <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form.is_valid" title="django.forms.Form.is_valid"><code class="xref py py-meth docutils literal notranslate"><span class="pre">is_valid()</span></code></a> メソッドを持ちます。このメソッドが呼ばれたとき、全てのフィールドが有効なデータを持っていれば、メソッドは次のように動作します。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code> を返します</p></li>
+<li><p>フォームのデータを <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form.cleaned_data" title="django.forms.Form.cleaned_data"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cleaned_data</span></code></a> 属性に配置します</p></li>
+</ul>
+<p>フォーム全体は、初めてレンダリングされたとき、次のような見た目になります。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;your_name&quot;</span><span class="p">&gt;</span>Your name: <span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">input</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;your_name&quot;</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;text&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;your_name&quot;</span> <span class="na">maxlength</span><span class="o">=</span><span class="s">&quot;100&quot;</span> <span class="na">required</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">&lt;form&gt;</span></code> や送信ボタンを含んで <strong>いない</strong> ことに注意してください。私たち自身が、これらをテンプレート内で提供する必要があります。</p>
+</section>
+<section id="s-the-view">
+<span id="s-using-a-form-in-a-view"></span><span id="the-view"></span><span id="using-a-form-in-a-view"></span><h4>ビュー<a class="headerlink" href="#the-view" title="Link to this heading">¶</a></h4>
+<p>Django ウェブサイトに送り返されたフォームで他は、ビューによって処理されます。通常、ビューはフォームを発行したビューと同じものです。これは、いくつかの同じロジックを再利用することを可能にします。</p>
+<p>フォームを処理するためには、フォームを発行したいと考えているURLに対して、ビューの中でインスタンス化する必要があります。</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">views.py</span></code></span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponseRedirect</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.forms</span><span class="w"> </span><span class="kn">import</span> <span class="n">NameForm</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_name</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># if this is a POST request we need to process the form data</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="c1"># create a form instance and populate it with data from the request:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">NameForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+        <span class="c1"># check whether it&#39;s valid:</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="c1"># process the data in form.cleaned_data as required</span>
+            <span class="c1"># ...</span>
+            <span class="c1"># redirect to a new URL:</span>
+            <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="s2">&quot;/thanks/&quot;</span><span class="p">)</span>
+
+    <span class="c1"># if a GET (or any other method) we&#39;ll create a blank form</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">NameForm</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;name.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">form</span><span class="p">})</span>
+</pre></div>
+</div>
+</div>
+<p>もし <code class="docutils literal notranslate"><span class="pre">GET</span></code> とともにビューにたどり着いた場合は、空のフォームインスタンスを生成し、レンダリングのためテンプレートの context に配置します。これは、初めて URL を訪れたときに起こると考えられることです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">POST</span></code> リクエストを使ってフォームが送信された場合は、ビューはもう一度フォームインスタンスを生成し、リクエストからのデータを格納します: <code class="docutils literal notranslate"><span class="pre">form</span> <span class="pre">=</span> <span class="pre">NameForm(request.POST)</span></code> これは &quot;フォームにデータをバインドする&quot; と呼ばれます (そして &quot;バインドされた&quot; フォームとなりました)。</p>
+<p>フォームの <code class="docutils literal notranslate"><span class="pre">is_valid()</span></code> メソッドを呼び出します。もし <code class="docutils literal notranslate"><span class="pre">True</span></code> でない場合、フォームをとともにテンプレートに戻ります。この時、フォームはもはや空 (<em>バインドされていない</em>) ではないため、HTMLフォームには前回送信されたデータが入力され、必要に応じて編集や修正が可能になります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">is_valid()</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合は、 <code class="docutils literal notranslate"><span class="pre">cleaned_data</span></code> 属性で検証済みのフォームデータを見出すことができます。このデータは、データベースを更新するために使ったり、次に進むための HTTP リダイレクトをブラウザに送る前に、何らかの処理をできます。</p>
+</section>
+<section id="s-the-template">
+<span id="s-topics-forms-index-basic-form-template"></span><span id="the-template"></span><span id="topics-forms-index-basic-form-template"></span><h4>テンプレート<a class="headerlink" href="#the-template" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">name.html</span></code> テンプレートですべきことは多くありません。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;/your-name/&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span><span class="p">&gt;</span>
+    <span class="cp">{%</span> <span class="k">csrf_token</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">form</span> <span class="cp">}}</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Submit&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>すべてのフォームのフィールドと属性は、Django のテンプレート言語によって、この <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">form</span> <span class="pre">}}</span></code> から HTML マークアップに展開されます。</p>
+<div class="admonition-forms-and-cross-site-request-forgery-protection admonition">
+<p class="admonition-title">フォームとクロスサイトリクエストフォージェリ保護</p>
+<p>Djangoには、使いやすい <a class="reference internal" href="../../ref/csrf.html"><span class="doc">クロスサイトリクエストフォージェリ対策</span></a> が含まれています。CSRF保護が有効な状態で <code class="docutils literal notranslate"><span class="pre">POST</span></code> 経由でフォームを送信する場合、先の例のように <a class="reference internal" href="../../ref/templates/builtins.html#std-templatetag-csrf_token"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">csrf_token</span></code></a> テンプレートタグを使用する必要があります。しかし、CSRF保護はテンプレート内のフォームに直接結びついているわけではないため、このタグはこのドキュメントの以下の例からは省略されます。</p>
+</div>
+<div class="admonition-html5-input-types-and-browser-validation admonition">
+<p class="admonition-title">HTML5 の input の種類とブラウザ検証</p>
+<p>フォームが <a class="reference internal" href="../../ref/forms/fields.html#django.forms.URLField" title="django.forms.URLField"><code class="xref py py-class docutils literal notranslate"><span class="pre">URLField</span></code></a> 、 <a class="reference internal" href="../../ref/forms/fields.html#django.forms.EmailField" title="django.forms.EmailField"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailField</span></code></a> もしくは何か数値のフィールドタイプを含むとき、Django は <code class="docutils literal notranslate"><span class="pre">url</span></code>、 <code class="docutils literal notranslate"><span class="pre">email</span></code>、 <code class="docutils literal notranslate"><span class="pre">number</span></code> という HTML5 の input タイプを使います。デフォルトでは、ブラウザはこれらのフィールドにブラウザ自身の検証を適用します。これらは Django の検証より厳密かもしれません。このような動作を無効化したいときは、 <code class="docutils literal notranslate"><span class="pre">form</span></code> タグの <code class="docutils literal notranslate"><span class="pre">novalidate</span></code> 属性をセットするか、フィールドで <a class="reference internal" href="../../ref/forms/widgets.html#django.forms.TextInput" title="django.forms.TextInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextInput</span></code></a> のような異なるウィジェットを指定してください。</p>
+</div>
+<p>これで、Django の <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> によって記述され, ビューによって処理され、HTML <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;</span></code> としてレンダリングされた Web フォームを動かせるようになりました。</p>
+<p>始めるために必要なことは以上ですが、フォームフレームワークはまだまだ多くのことを用意しています。上記で説明してきた基本が理解できたら、フォームシステムのほかの機能を理解し、もう少しだけ根本的な仕組みを身につける準備をするようお勧めします。</p>
+</section>
+</section>
+</section>
+<section id="s-more-about-django-form-classes">
+<span id="more-about-django-form-classes"></span><h2>Django の <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code></a> クラスの詳細<a class="headerlink" href="#more-about-django-form-classes" title="Link to this heading">¶</a></h2>
+<p>すべてのフォームクラスは、<a class="reference internal" href="../../ref/forms/api.html#django.forms.Form" title="django.forms.Form"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.Form</span></code></a> ないし <a class="reference internal" href="modelforms.html#django.forms.ModelForm" title="django.forms.ModelForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.ModelForm</span></code></a> のサブクラスとして作成されています。<code class="docutils literal notranslate"><span class="pre">ModelForm</span></code> も <code class="docutils literal notranslate"><span class="pre">Form</span></code> のサブクラスとして考えられます。<code class="docutils literal notranslate"><span class="pre">Form</span></code> や <code class="docutils literal notranslate"><span class="pre">ModelForm</span></code> は実際には (プライベートの) <code class="docutils literal notranslate"><span class="pre">BaseForm</span></code> クラスを継承していますが、 実装の詳細が重要になることはほとんどありません。</p>
+<div class="admonition-models-and-forms admonition">
+<p class="admonition-title">モデルとフォーム</p>
+<p>実のところDjango モデルを直接追加または編集するためにフォームを使用する場合、<a class="reference internal" href="modelforms.html"><span class="doc">ModelForm</span></a> は <code class="docutils literal notranslate"><span class="pre">Model</span></code> クラスから適切なフィールドと属性とともにフォームを作成するため、時間、労力、コードを大幅に節約できます。</p>
+</div>
+<section id="s-bound-and-unbound-form-instances">
+<span id="bound-and-unbound-form-instances"></span><h3>バインドされた (bound) および バインドされていない (unbound) フォームインスタンス<a class="headerlink" href="#bound-and-unbound-form-instances" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../../ref/forms/api.html#ref-forms-api-bound-unbound"><span class="std std-ref">バインドされた (bound) フォームとバインドされていない (unbound) フォーム</span></a> の区別は重要です:</p>
+<ul class="simple">
+<li><p>バインドされていない (unboundの) フォームには連結したデータがありません。ユーザーにレンダリングするとき、空ないしデフォルト値となります。</p></li>
+<li><p>バインドされた (bound の) フォームは送信されたデータを持っており、したがってデータの有効性を検証できます。無効なバインドされたフォームがレンダリングされている場合、ユーザーがデータを修正できるようにエラーメッセージを表示できます。</p></li>
+</ul>
+<p>フォームの <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form.is_bound" title="django.forms.Form.is_bound"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_bound</span></code></a> 属性で、フォームにデータがバインドされている (bound) かどうかを調べることができます。</p>
+</section>
+<section id="s-more-on-fields">
+<span id="more-on-fields"></span><h3>フィールドについて<a class="headerlink" href="#more-on-fields" title="Link to this heading">¶</a></h3>
+<p>上記の最低限の例よりも実用的なフォームを考えましょう。個人のウェブサイトで &quot;お問い合わせ&quot; 機能を実装します:</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">forms.py</span></code></span><a class="headerlink" href="#id5" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ContactForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">Textarea</span><span class="p">)</span>
+    <span class="n">sender</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+    <span class="n">cc_myself</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>前回の例では、<a class="reference internal" href="../../ref/forms/fields.html#django.forms.CharField" title="django.forms.CharField"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a> の <code class="docutils literal notranslate"><span class="pre">your_name</span></code> という単一のフィールドを扱いました。今回は 4 つのフィールドがあります: <code class="docutils literal notranslate"><span class="pre">subject</span></code>、<code class="docutils literal notranslate"><span class="pre">message</span></code>、<code class="docutils literal notranslate"><span class="pre">sender</span></code>、<code class="docutils literal notranslate"><span class="pre">cc_myself</span></code> です。 <a class="reference internal" href="../../ref/forms/fields.html#django.forms.CharField" title="django.forms.CharField"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a>、<a class="reference internal" href="../../ref/forms/fields.html#django.forms.EmailField" title="django.forms.EmailField"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailField</span></code></a>、<a class="reference internal" href="../../ref/forms/fields.html#django.forms.BooleanField" title="django.forms.BooleanField"><code class="xref py py-class docutils literal notranslate"><span class="pre">BooleanField</span></code></a> は利用可能なフィールドタイプのうちの3つに過ぎません。すべての種類は <a class="reference internal" href="../../ref/forms/fields.html"><span class="doc">フォーム フィールド</span></a> から確認できます。</p>
+<section id="s-widgets">
+<span id="widgets"></span><h4>ウィジェット<a class="headerlink" href="#widgets" title="Link to this heading">¶</a></h4>
+<p>各フォームのフィールドは対応する <a class="reference internal" href="../../ref/forms/widgets.html"><span class="doc">Widget クラス</span></a> を持ち、順に <code class="docutils literal notranslate"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></code> のような HTML フォームウィジェットと対応します。</p>
+<p>多くの場合、フィールドは最適なデフォルトウィジェットを持っています。例えば、<a class="reference internal" href="../../ref/forms/fields.html#django.forms.CharField" title="django.forms.CharField"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a> は <a class="reference internal" href="../../ref/forms/widgets.html#django.forms.TextInput" title="django.forms.TextInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextInput</span></code></a> ウィジェットを持ち、HTML 内で <code class="docutils literal notranslate"><span class="pre">&lt;input</span> <span class="pre">type=&quot;text&quot;&gt;</span></code> を生成します。代わりに <code class="docutils literal notranslate"><span class="pre">&lt;textarea&gt;</span></code> が必要な場合、<code class="docutils literal notranslate"><span class="pre">message</span></code> フィールドで行っているように、フォームフィールドを定義する際に適切なウィジェットを指定してください。</p>
+</section>
+<section id="s-field-data">
+<span id="field-data"></span><h4>フィールドデータ<a class="headerlink" href="#field-data" title="Link to this heading">¶</a></h4>
+<p>フォームで送信されたデータが何であっても、<code class="docutils literal notranslate"><span class="pre">is_valid()</span></code> を呼び出して正常に検証されると (そして <code class="docutils literal notranslate"><span class="pre">is_valid()</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> を返すと)、検証されたフォームデータは <code class="docutils literal notranslate"><span class="pre">form.cleaned_data</span></code> ディクショナリに格納されます。 このデータは Python の型に適宜変換されています。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>この時点では、<code class="docutils literal notranslate"><span class="pre">request.POST</span></code> から検証前のデータを取り出せますが、検証済みのデータを使うのがよい方法です。</p>
+</div>
+<p>上の連絡先フォームの例では、<code class="docutils literal notranslate"><span class="pre">cc_myself</span></code> はブール値になります。 同様に、<a class="reference internal" href="../../ref/forms/fields.html#django.forms.IntegerField" title="django.forms.IntegerField"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerField</span></code></a> や <a class="reference internal" href="../../ref/forms/fields.html#django.forms.FloatField" title="django.forms.FloatField"><code class="xref py py-class docutils literal notranslate"><span class="pre">FloatField</span></code></a> などのフィールドは、それぞれ値を Python の <code class="docutils literal notranslate"><span class="pre">int</span></code> および <code class="docutils literal notranslate"><span class="pre">float</span></code> に変換します。</p>
+<p>このフォームを処理するビューで、フォームデータを処理する方法は次のとおりです。</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">views.py</span></code></span><a class="headerlink" href="#id6" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">send_mail</span>
+
+<span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">]</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">]</span>
+    <span class="n">sender</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;sender&quot;</span><span class="p">]</span>
+    <span class="n">cc_myself</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s2">&quot;cc_myself&quot;</span><span class="p">]</span>
+
+    <span class="n">recipients</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;info@example.com&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">cc_myself</span><span class="p">:</span>
+        <span class="n">recipients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sender</span><span class="p">)</span>
+
+    <span class="n">send_mail</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">recipients</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="s2">&quot;/thanks/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Django からメールを送信するのに詳しくは <a class="reference internal" href="../email.html"><span class="doc">メールを送信する</span></a> をご覧ください。</p>
+</div>
+<p>一部のフィールドタイプでは、余分な処理が必要になります。 たとえば、フォームを使用してアップロードされたファイルは、別々に処理する必要があります (<code class="docutils literal notranslate"><span class="pre">request.POST</span></code> ではなく、<code class="docutils literal notranslate"><span class="pre">request.FILES</span></code> から取得できます)。 フォームでファイルのアップロードを処理する方法の詳細については、<a class="reference internal" href="../../ref/forms/api.html#binding-uploaded-files"><span class="std std-ref">アップロードされたファイルをフォームにバインドする</span></a> を参照してください。</p>
+</section>
+</section>
+</section>
+<section id="s-working-with-form-templates">
+<span id="working-with-form-templates"></span><h2>フォームテンプレートを扱う<a class="headerlink" href="#working-with-form-templates" title="Link to this heading">¶</a></h2>
+<p>フォームをテンプレートにするために必要なことは、フォームインスタンスをテンプレートコンテキストに配置することだけです。 なのでフォームがコンテキストで <code class="docutils literal notranslate"><span class="pre">form</span></code> が呼ばれる場合、 <code class="docutils literal notranslate"><span class="pre">{{form}}</span></code> はその <code class="docutils literal notranslate"><span class="pre">&lt;label&gt;</span></code> 要素と <code class="docutils literal notranslate"><span class="pre">&lt;input&gt;</span></code> 要素を適切にレンダリングします。</p>
+<div class="admonition-additional-form-template-furniture admonition">
+<p class="admonition-title">フォームテンプレート部品の追加</p>
+<p>フォームの出力に、 <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;</span></code> や送信ボタンを含んで <strong>いない</strong> ことに注意してください。これらはテンプレート内で提供する必要があります。</p>
+</div>
+<section id="s-reusable-form-templates">
+<span id="s-id1"></span><span id="reusable-form-templates"></span><span id="id1"></span><h3>再利用可能なフォームテンプレート<a class="headerlink" href="#reusable-form-templates" title="Link to this heading">¶</a></h3>
+<p>フォームをレンダリングする際の HTML 出力は、テンプレートによって生成されます。適切なテンプレートファイルを作成し、カスタムの <a class="reference internal" href="../../ref/settings.html#std-setting-FORM_RENDERER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">FORM_RENDERER</span></code></a> を設定して、 <a class="reference internal" href="../../ref/forms/renderers.html#django.forms.renderers.BaseRenderer.form_template_name" title="django.forms.renderers.BaseRenderer.form_template_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">form_template_name</span></code></a> をサイト全体で使用することで、これを制御できます。また、フォームの <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form.template_name" title="django.forms.Form.template_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">template_name</span></code></a> 属性をオーバーライドして、カスタムテンプレートを使ってフォームをレンダリングしたり、 <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form.render" title="django.forms.Form.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Form.render()</span></code></a> に直接テンプレート名を渡して、フォームごとにカスタマイズすることもできます。</p>
+<p>以下の例では <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">form</span> <span class="pre">}}</span></code> が <code class="docutils literal notranslate"><span class="pre">form_snippet.html</span></code> テンプレートの出力としてレンダリングされます。</p>
+<p>テンプレートで次のようにしてください:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span># In your template:
+<span class="cp">{{</span> <span class="nv">form</span> <span class="cp">}}</span>
+
+# In form_snippet.html:
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">field</span> <span class="k">in</span> <span class="nv">form</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+        <span class="cp">{{</span> <span class="nv">field.errors</span> <span class="cp">}}</span>
+        <span class="cp">{{</span> <span class="nv">field.label_tag</span> <span class="cp">}}</span> <span class="cp">{{</span> <span class="nv">field</span> <span class="cp">}}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>それから <a class="reference internal" href="../../ref/settings.html#std-setting-FORM_RENDERER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">FORM_RENDERER</span></code></a> の設定を行います:</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">settings.py</span></code></span><a class="headerlink" href="#id7" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.forms.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplatesSetting</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomFormRenderer</span><span class="p">(</span><span class="n">TemplatesSetting</span><span class="p">):</span>
+    <span class="n">form_template_name</span> <span class="o">=</span> <span class="s2">&quot;form_snippet.html&quot;</span>
+
+
+<span class="n">FORM_RENDERER</span> <span class="o">=</span> <span class="s2">&quot;project.settings.CustomFormRenderer&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>... または単一のフォームの場合:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;form_snippet.html&quot;</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>... あるいは、 <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form.render" title="django.forms.Form.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Form.render()</span></code></a> にテンプレート名を渡すことで、フォームインスタンスの単一のレンダリングを行います。これをビューで使用する例を示します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">MyForm</span><span class="p">()</span>
+    <span class="n">rendered_form</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;form_snippet.html&quot;</span><span class="p">)</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;form&quot;</span><span class="p">:</span> <span class="n">rendered_form</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;index.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>詳しくは、 <a class="reference internal" href="../../ref/forms/api.html#ref-forms-api-outputting-html"><span class="std std-ref">フォームをHTMLとしてアウトプットする</span></a> を参照してください。</p>
+</section>
+<section id="s-reusable-field-group-templates">
+<span id="s-id2"></span><span id="reusable-field-group-templates"></span><span id="id2"></span><h3>再利用可能なフィールドグループテンプレート<a class="headerlink" href="#reusable-field-group-templates" title="Link to this heading">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<p>各フィールドはフォームの属性として利用可能で、テンプレート内で <code class="docutils literal notranslate"><span class="pre">{{form.name_of_field</span> <span class="pre">}}</span></code> を使用します。フィールドには <a class="reference internal" href="../../ref/forms/api.html#django.forms.BoundField.as_field_group" title="django.forms.BoundField.as_field_group"><code class="xref py py-meth docutils literal notranslate"><span class="pre">as_field_group()</span></code></a> メソッドがあり、フィールドの関連要素、ラベル、ウィジェット、エラー、ヘルプテキストをグループとしてレンダリングします。</p>
+<p>これにより、フィールド要素を必要なレイアウトに配置する汎用テンプレートを書くことができます。たとえば:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">form.non_field_errors</span> <span class="cp">}}</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+  <span class="cp">{{</span> <span class="nv">form.subject.as_field_group</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+  <span class="cp">{{</span> <span class="nv">form.message.as_field_group</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+  <span class="cp">{{</span> <span class="nv">form.sender.as_field_group</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+  <span class="cp">{{</span> <span class="nv">form.cc_myself.as_field_group</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>Django はデフォルトで、 <code class="docutils literal notranslate"><span class="pre">&quot;django/forms/field.html&quot;</span></code> テンプレートを使います。これはデフォルトの <code class="docutils literal notranslate"><span class="pre">&quot;django/forms/div.html&quot;</span></code> フォームスタイルで使うように設計されています。</p>
+<p>デフォルトのテンプレートは、プロジェクトレベルの <a class="reference internal" href="../../ref/settings.html#std-setting-FORM_RENDERER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">FORM_RENDERER</span></code></a> で <a class="reference internal" href="../../ref/forms/renderers.html#django.forms.renderers.BaseRenderer.field_template_name" title="django.forms.renderers.BaseRenderer.field_template_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">field_template_name</span></code></a> を指定することでカスタマイズできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.forms.renderers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplatesSetting</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomFormRenderer</span><span class="p">(</span><span class="n">TemplatesSetting</span><span class="p">):</span>
+    <span class="n">field_template_name</span> <span class="o">=</span> <span class="s2">&quot;field_snippet.html&quot;</span>
+</pre></div>
+</div>
+<p>... または単一のフィールドの場合:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">template_name</span><span class="o">=</span><span class="s2">&quot;my_custom_template.html&quot;</span><span class="p">)</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>... <a class="reference internal" href="../../ref/forms/api.html#django.forms.BoundField.render" title="django.forms.BoundField.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundField.render()</span></code></a> を呼び出してテンプレート名を指定することで、リクエストごとに指定することもできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">ContactForm</span><span class="p">()</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">form</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">]</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;subject&quot;</span><span class="p">:</span> <span class="n">subject</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="s2">&quot;my_custom_template.html&quot;</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;index.html&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="s-rendering-fields-manually">
+<span id="rendering-fields-manually"></span><h3>フィールドを手動でレンダリングする<a class="headerlink" href="#rendering-fields-manually" title="Link to this heading">¶</a></h3>
+<p>フィールドのレンダリングをより細かく制御することも可能です。おそらくこれはカスタムフィールドテンプレートになるでしょう。しかし、フォームのフィールド属性から直接アクセスすることもできます。たとえば:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">form.non_field_errors</span> <span class="cp">}}</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.subject.errors</span> <span class="cp">}}</span>
+    <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">form.subject.id_for_label</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span>Email subject:<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.subject</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.message.errors</span> <span class="cp">}}</span>
+    <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">form.message.id_for_label</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span>Your message:<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.message</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.sender.errors</span> <span class="cp">}}</span>
+    <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">form.sender.id_for_label</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span>Your email address:<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.sender</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.cc_myself.errors</span> <span class="cp">}}</span>
+    <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">form.cc_myself.id_for_label</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span>CC yourself?<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.cc_myself</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>完全な <code class="docutils literal notranslate"><span class="pre">&lt;label&gt;</span></code> 要素は、 <a class="reference internal" href="../../ref/forms/api.html#django.forms.BoundField.label_tag" title="django.forms.BoundField.label_tag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">label_tag()</span></code></a> を使用して生成することもできます。 例えば次のようにできます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+    <span class="cp">{{</span> <span class="nv">form.subject.errors</span> <span class="cp">}}</span>
+    <span class="cp">{{</span> <span class="nv">form.subject.label_tag</span> <span class="cp">}}</span>
+    <span class="cp">{{</span> <span class="nv">form.subject</span> <span class="cp">}}</span>
+<span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<section id="s-rendering-form-error-messages">
+<span id="rendering-form-error-messages"></span><h4>フォームのエラーメッセージをレンダリングする<a class="headerlink" href="#rendering-form-error-messages" title="Link to this heading">¶</a></h4>
+<p>この柔軟性の代償として、少し作業が増えます。これまでは、フォームエラーの表示方法について心配する必要はありませんでした。この例では、各フィールドのエラーと、フォーム全体のエラーを確実に処理しなければなりません。フォームの一番上にある <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">form.non_field_errors</span> <span class="pre">}}</span></code> と、各フィールドのエラーのテンプレートルックアップに注目してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">form.name_of_field.errors</span> <span class="pre">}}</span></code> を使用すると、フォームエラーのリストが順序なしリストとして表示されます。これは次のようになります:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">ul</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;errorlist&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Sender is required.<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>このリストには <code class="docutils literal notranslate"><span class="pre">errorlist</span></code> というCSSクラスがあり、見た目をカスタマイズできます。もしエラーの表示をさらにカスタマイズしたい場合は、ループさせることでカスタマイズできます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">form.subject.errors</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">ol</span><span class="p">&gt;</span>
+    <span class="cp">{%</span> <span class="k">for</span> <span class="nv">error</span> <span class="k">in</span> <span class="nv">form.subject.errors</span> <span class="cp">%}</span>
+        <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;&lt;</span><span class="nt">strong</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">error</span><span class="o">|</span><span class="nf">escape</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">strong</span><span class="p">&gt;&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+    <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+    <span class="p">&lt;/</span><span class="nt">ol</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>非フィールドエラー(および/または <code class="docutils literal notranslate"><span class="pre">form.as_p()</span></code> のようなヘルパーを使用したときにフォームの先頭にレンダリングされる隠しフィールドエラー)は、フィールド固有のエラーと区別するために <code class="docutils literal notranslate"><span class="pre">nonfield</span></code> という追加のクラスでレンダリングされます。例えば、 <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">form.non_field_errors</span> <span class="pre">}}</span></code> は以下のようになります:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">ul</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;errorlist nonfield&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Generic validation error<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>エラー、スタイリング、テンプレートでのフォーム属性の扱いについては <a class="reference internal" href="../../ref/forms/api.html"><span class="doc">フォーム API</span></a> を参照してください。</p>
+</section>
+</section>
+<section id="s-looping-over-the-form-s-fields">
+<span id="looping-over-the-form-s-fields"></span><h3>フォームのフィールドをループする<a class="headerlink" href="#looping-over-the-form-s-fields" title="Link to this heading">¶</a></h3>
+<p>フォームフィールドごとに同じ HTML を使用している場合、 <code class="docutils literal notranslate"><span class="pre">{％</span> <span class="pre">for</span> <span class="pre">％}</span></code> ループを使用して各フィールドを順番にループすることで、重複するコードを減らすことができます。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">field</span> <span class="k">in</span> <span class="nv">form</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+        <span class="cp">{{</span> <span class="nv">field.errors</span> <span class="cp">}}</span>
+        <span class="cp">{{</span> <span class="nv">field.label_tag</span> <span class="cp">}}</span> <span class="cp">{{</span> <span class="nv">field</span> <span class="cp">}}</span>
+        <span class="cp">{%</span> <span class="k">if</span> <span class="nv">field.help_text</span> <span class="cp">%}</span>
+          <span class="p">&lt;</span><span class="nt">p</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;help&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">field.auto_id</span> <span class="cp">}}</span><span class="s">_helptext&quot;</span><span class="p">&gt;</span>
+            <span class="cp">{{</span> <span class="nv">field.help_text</span><span class="o">|</span><span class="nf">safe</span> <span class="cp">}}</span>
+          <span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field</span> <span class="pre">}}</span></code> の有用な属性は次のとおりです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.errors</span> <span class="pre">}}</span></code></dt><dd><p>このフィールドに対応するバリデーションエラーを含む <code class="docutils literal notranslate"><span class="pre">&lt;ul</span> <span class="pre">class=&quot;errorlist&quot;&gt;</span></code> を出力します。エラーの表示は <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">for</span> <span class="pre">error</span> <span class="pre">in</span> <span class="pre">field.errors</span> <span class="pre">%}</span></code> ループでカスタマイズできます。この場合、ループ内の各オブジェクトはエラーメッセージを含む文字列となります。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.field</span> <span class="pre">}}</span></code></dt><dd><p><a class="reference internal" href="../../ref/forms/api.html#django.forms.BoundField" title="django.forms.BoundField"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundField</span></code></a> がラップするフォームクラスの <a class="reference internal" href="../../ref/forms/fields.html#django.forms.Field" title="django.forms.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> 。 <a class="reference internal" href="../../ref/forms/fields.html#django.forms.Field" title="django.forms.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> 属性にアクセスするために使用できます。  例: <code class="docutils literal notranslate"><span class="pre">{{char_field.field.max_length}}</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.help_text</span> <span class="pre">}}</span></code></dt><dd><p>フィールドに関連付けられたヘルプテキスト。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.html_name</span> <span class="pre">}}</span></code></dt><dd><p>input要素のnameフィールドで使用されるフィールドの名前。 フォームのプレフィックスが設定されていれば考慮に入れます。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.id_for_label</span> <span class="pre">}}</span></code></dt><dd><p>フィールドに使用されるID(上記の例では <code class="docutils literal notranslate"><span class="pre">id_email</span></code>)。 ラベルを手動で作成する場合は、<code class="docutils literal notranslate"><span class="pre">label_tag</span></code> の代わりにこのラベルを使用します。 たとえば、インラインJavaScriptがあり、フィールドのIDをハードコーディングしないようにしたい場合にも便利です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.is_hidden</span> <span class="pre">}}</span></code></dt><dd><p>この属性は、フォームフィールドがhiddenフィールドの場合はTrue、それ以外の場合はFalseです。 テンプレート変数としては特に有用ではありませんが、以下のような条件テストに役立ちます。</p>
+</dd>
+</dl>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">field.is_hidden</span> <span class="cp">%}</span>
+   <span class="c">{# Do something special #}</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.label</span> <span class="pre">}}</span></code></dt><dd><p>フィールドのラベル。例) <code class="docutils literal notranslate"><span class="pre">Email</span> <span class="pre">address</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.label_tag</span> <span class="pre">}}</span></code></dt><dd><p>フィールドのラベルは、適切なHTMLの <code class="docutils literal notranslate"><span class="pre">&lt;label&gt;</span></code> タグで囲まれています。 これにはフォームの <a class="reference internal" href="../../ref/forms/api.html#django.forms.Form.label_suffix" title="django.forms.Form.label_suffix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">label_suffix</span></code></a> が含まれます。 たとえば、デフォルトの <code class="docutils literal notranslate"><span class="pre">label_suffix</span></code> は次のようになります。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;id_email&quot;</span><span class="p">&gt;</span>Email address:<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.legend_tag</span> <span class="pre">}}</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">field.label_tag</span></code> と似ていますが、 <code class="docutils literal notranslate"><span class="pre">&lt;label&gt;</span></code> の代わりに <code class="docutils literal notranslate"><span class="pre">&lt;legend&gt;</span></code> タグを使用します。複数の入力を <code class="docutils literal notranslate"><span class="pre">&lt;fieldset&gt;</span></code> でラップしたウィジェット用です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.use_fieldset</span> <span class="pre">}}</span></code></dt><dd><p>この属性は、フォームフィールドのウィジェットが複数の入力を含み、アクセシビリティを向上させるために <code class="docutils literal notranslate"><span class="pre">&lt;fieldset&gt;</span></code> と <code class="docutils literal notranslate"><span class="pre">&lt;legend&gt;</span></code> で意味的にグループ化されるべき場合に <code class="docutils literal notranslate"><span class="pre">True</span></code> になります。テンプレートでの使用例:</p>
+</dd>
+</dl>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">field.use_fieldset</span> <span class="cp">%}</span>
+  <span class="p">&lt;</span><span class="nt">fieldset</span><span class="p">&gt;</span>
+  <span class="cp">{%</span> <span class="k">if</span> <span class="nv">field.label</span> <span class="cp">%}{{</span> <span class="nv">field.legend_tag</span> <span class="cp">}}{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
+  <span class="cp">{%</span> <span class="k">if</span> <span class="nv">field.label</span> <span class="cp">%}{{</span> <span class="nv">field.label_tag</span> <span class="cp">}}{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<span class="cp">{{</span> <span class="nv">field</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">if</span> <span class="nv">field.use_fieldset</span> <span class="cp">%}</span><span class="p">&lt;/</span><span class="nt">fieldset</span><span class="p">&gt;</span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">field.value</span> <span class="pre">}}</span></code></dt><dd><p>フィールドの値。例:  <code class="docutils literal notranslate"><span class="pre">someone&#64;example.com</span></code></p>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>属性とメソッドの完全な一覧については、 <a class="reference internal" href="../../ref/forms/api.html#django.forms.BoundField" title="django.forms.BoundField"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundField</span></code></a> を参照してください。</p>
+</div>
+<section id="s-looping-over-hidden-and-visible-fields">
+<span id="looping-over-hidden-and-visible-fields"></span><h4>Hidden および可視のフィールドをループする<a class="headerlink" href="#looping-over-hidden-and-visible-fields" title="Link to this heading">¶</a></h4>
+<p>Django のデフォルトのフォームレイアウトに頼るのではなく、手作業でテンプレートに フォームをレイアウトする場合、 <code class="docutils literal notranslate"><span class="pre">&lt;input</span> <span class="pre">type=&quot;hidden&quot;&gt;</span></code> フィールドを、隠しフィールドとは異なるように扱いたいかもしれません。例えば、隠しフィールドは何も表示しないので、エラーメッセージをフィールドの「隣」に置くとユーザを混乱させる可能性があります。</p>
+<p>Django は、隠しフィールドと可視フィールドを個別にループできる 2 つのメソッ ドをフォームに提供しています。 <code class="docutils literal notranslate"><span class="pre">hidden_fields()</span></code> と <code class="docutils literal notranslate"><span class="pre">visible_fields()</span></code> です。以下は、この 2 つのメソッドを使い、前述の例を修正したものです:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="c">{# Include the hidden fields #}</span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">hidden</span> <span class="k">in</span> <span class="nv">form.hidden_fields</span> <span class="cp">%}</span>
+<span class="cp">{{</span> <span class="nv">hidden</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="c">{# Include the visible fields #}</span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">field</span> <span class="k">in</span> <span class="nv">form.visible_fields</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">div</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;fieldWrapper&quot;</span><span class="p">&gt;</span>
+        <span class="cp">{{</span> <span class="nv">field.errors</span> <span class="cp">}}</span>
+        <span class="cp">{{</span> <span class="nv">field.label_tag</span> <span class="cp">}}</span> <span class="cp">{{</span> <span class="nv">field</span> <span class="cp">}}</span>
+    <span class="p">&lt;/</span><span class="nt">div</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>この例では隠しフィールドのエラーは処理しません。通常、隠しフィールドのエラーはフォームが改ざんされているサインです。しかし、これらのフォームエラーのためにエラー表示を挿入することも簡単にできます。</p>
+</section>
+</section>
+</section>
+<section id="s-further-topics">
+<span id="further-topics"></span><h2>その他のトピック<a class="headerlink" href="#further-topics" title="Link to this heading">¶</a></h2>
+<p>ここまでで基本的なことをカバーしますが、フォームはもっと多くのことができます。</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="formsets.html">フォームセット (Formset)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#using-initial-data-with-a-formset">フォームセットで初期データを指定する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#limiting-the-maximum-number-of-forms">フォームの最大表示数を制限する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#limiting-the-maximum-number-of-instantiated-forms">インスタンス化できるフォームの数を制限する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#formset-validation">フォームセットのバリデーション</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#validating-the-number-of-forms-in-a-formset">フォームセット内のフォームの数を検証する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#dealing-with-ordering-and-deletion-of-forms">フォームのソートと削除に対応させる</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#adding-additional-fields-to-a-formset">フォームセットにフィールドを追加する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#passing-custom-parameters-to-formset-forms">フォームセットのフォームにカスタムパラメータを渡す</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#customizing-a-formset-s-prefix">フォームセットのプレフィックスをカスタマイズする</a></li>
+<li class="toctree-l2"><a class="reference internal" href="formsets.html#using-a-formset-in-views-and-templates">ビューとテンプレートでフォームセットを使う</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modelforms.html">モデルからフォームを作成する</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modelforms.html#modelform"><code class="docutils literal notranslate"><span class="pre">ModelForm</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelforms.html#model-formsets">モデルのフォームセット</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modelforms.html#inline-formsets">インラインフォームセット</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="media.html">フォームアセット (<code class="docutils literal notranslate"><span class="pre">Media</span></code> クラス)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="media.html#assets-as-a-static-definition">定数として定義されたアセット</a></li>
+<li class="toctree-l2"><a class="reference internal" href="media.html#media-as-a-dynamic-property">動的プロパティとしての <code class="docutils literal notranslate"><span class="pre">Media</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="media.html#paths-in-asset-definitions">アセット定義内のパス</a></li>
+<li class="toctree-l2"><a class="reference internal" href="media.html#media-objects"><code class="docutils literal notranslate"><span class="pre">Media</span></code> objects</a></li>
+<li class="toctree-l2"><a class="reference internal" href="media.html#media-on-forms">フォームの <code class="docutils literal notranslate"><span class="pre">Media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<dl class="simple">
+<dt><a class="reference internal" href="../../ref/forms/index.html"><span class="doc">フォームのリファレンス</span></a></dt><dd><p>フォームフィールド、フォームウィジェット、フォームとフィールドの検証など、APIリファレンス全体をカバーします。</p>
+</dd>
+</dl>
+</div>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">フォームを使う</a><ul>
+<li><a class="reference internal" href="#html-forms">HTML フォーム</a><ul>
+<li><a class="reference internal" href="#get-and-post"><code class="docutils literal notranslate"><span class="pre">GET</span></code> と <code class="docutils literal notranslate"><span class="pre">POST</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#django-s-role-in-forms">フォームにおける Django の役割</a></li>
+<li><a class="reference internal" href="#forms-in-django">Django におけるフォーム</a><ul>
+<li><a class="reference internal" href="#the-django-form-class">Django の <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> クラス</a></li>
+<li><a class="reference internal" href="#instantiating-processing-and-rendering-forms">フォームをインスタンス化し、処理し、レンダリングする</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-a-form">フォームを作る</a><ul>
+<li><a class="reference internal" href="#the-work-that-needs-to-be-done">すべきこと</a></li>
+<li><a class="reference internal" href="#building-a-form-in-django">Django でフォームを作る</a><ul>
+<li><a class="reference internal" href="#the-form-class"><code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> クラス</a></li>
+<li><a class="reference internal" href="#the-view">ビュー</a></li>
+<li><a class="reference internal" href="#the-template">テンプレート</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#more-about-django-form-classes">Django の <code class="xref py py-class docutils literal notranslate"><span class="pre">Form</span></code> クラスの詳細</a><ul>
+<li><a class="reference internal" href="#bound-and-unbound-form-instances">バインドされた (bound) および バインドされていない (unbound) フォームインスタンス</a></li>
+<li><a class="reference internal" href="#more-on-fields">フィールドについて</a><ul>
+<li><a class="reference internal" href="#widgets">ウィジェット</a></li>
+<li><a class="reference internal" href="#field-data">フィールドデータ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#working-with-form-templates">フォームテンプレートを扱う</a><ul>
+<li><a class="reference internal" href="#reusable-form-templates">再利用可能なフォームテンプレート</a></li>
+<li><a class="reference internal" href="#reusable-field-group-templates">再利用可能なフィールドグループテンプレート</a></li>
+<li><a class="reference internal" href="#rendering-fields-manually">フィールドを手動でレンダリングする</a><ul>
+<li><a class="reference internal" href="#rendering-form-error-messages">フォームのエラーメッセージをレンダリングする</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#looping-over-the-form-s-fields">フォームのフィールドをループする</a><ul>
+<li><a class="reference internal" href="#looping-over-hidden-and-visible-fields">Hidden および可視のフィールドをループする</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#further-topics">その他のトピック</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="../http/sessions.html"
+                          title="前の章へ">セッションの使いかた</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="formsets.html"
+                          title="次の章へ">フォームセット (Formset)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/forms/index.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../http/sessions.html" title="セッションの使いかた">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="formsets.html" title="フォームセット (Formset)">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>メーリングリストとフォーラム &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="Django プロジェクトの組織" href="organization.html" />
+    <link rel="prev" title="チケットをトリアージする" href="contributing/triaging-tickets.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="contributing/triaging-tickets.html" title="チケットをトリアージする">previous</a>
+     |
+    <a href="index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="organization.html" title="Django プロジェクトの組織">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="internals-mailing-lists">
+            
+  <section id="s-mailing-lists-and-forum">
+<span id="mailing-lists-and-forum"></span><h1>メーリングリストとフォーラム<a class="headerlink" href="#mailing-lists-and-forum" title="Link to this heading">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">重要</p>
+<p>セキュリティイシューは <a class="reference external" href="mailto:security&#37;&#52;&#48;djangoproject&#46;com">security<span>&#64;</span>djangoproject<span>&#46;</span>com</a> に <strong>のみ</strong> 報告してください。これは長年にわたり信頼性の高いDjango開発者のみに公開されているプライベートなリストであり、そのアーカイブは公開されていません。詳細は <a class="reference internal" href="security.html"><span class="doc">our security policies</span></a> を見てください。</p>
+</div>
+<section id="s-django-forum">
+<span id="django-forum"></span><h2>Django フォーラム<a class="headerlink" href="#django-forum" title="Link to this heading">¶</a></h2>
+<p>Djangoには <a class="reference external" href="https://forum.djangoproject.com">official Forum</a> があり、そこで質問を投稿したり聞いたりすることができます。</p>
+<p>ディスカッションにはいくつかのカテゴリがあります:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://forum.djangoproject.com/c/users/6">Using Django</a>: Djangoのインストール、使用方法、デバッグに関する質問をするためのものです。</p></li>
+<li><p><a class="reference external" href="https://forum.djangoproject.com/c/internals/5">Internals</a>: Django自体の開発に関する議論のためのもの。</p></li>
+</ul>
+<p>さらに、Djangoには誰でも参加できるいくつかの公式メーリングリストがGoogleグループで提供されています。</p>
+</section>
+<section id="s-django-users">
+<span id="s-django-users-mailing-list"></span><span id="django-users"></span><span id="django-users-mailing-list"></span><h2><code class="docutils literal notranslate"><span class="pre">django-users</span></code><a class="headerlink" href="#django-users" title="Link to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference external" href="https://forum.djangoproject.com">official Forum</a> の <a class="reference external" href="https://forum.djangoproject.com/c/users/6">Using Django</a> カテゴリは、使用方法に関する質問をするための優先される場所となりました。</p>
+</div>
+<p>ここは、Djangoのインストール、使用、またはデバッグに関する質問をする場所です。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>最初にこのリストにメールを送信する場合、メールは最初に受け入れられる必要がありますので、 <a class="reference internal" href="../faq/help.html#message-does-not-appear-on-django-users"><span class="std std-ref">すぐに表示されなくても</span></a> 心配しないでください。</p>
+</div>
+<ul class="simple">
+<li><p><a class="reference external" href="https://groups.google.com/g/django-users">django-users mailing archive</a></p></li>
+<li><p><a class="reference external" href="mailto:django-users+subscribe&#37;&#52;&#48;googlegroups&#46;com">django-users subscription email address</a></p></li>
+<li><p><a class="reference external" href="mailto:django-users&#37;&#52;&#48;googlegroups&#46;com">django-users posting email</a></p></li>
+</ul>
+</section>
+<section id="s-django-developers">
+<span id="s-django-developers-mailing-list"></span><span id="django-developers"></span><span id="django-developers-mailing-list"></span><h2><code class="docutils literal notranslate"><span class="pre">django-developers</span></code><a class="headerlink" href="#django-developers" title="Link to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference external" href="https://forum.djangoproject.com">official Forum</a> の <a class="reference external" href="https://forum.djangoproject.com/c/internals/5">Internals</a> カテゴリは、Django の開発について議論するための優先される場所となりました。</p>
+</div>
+<p>Django自体の開発に関する議論はここで行われます。</p>
+<p>貢献方法についての質問をする前に、 <a class="reference internal" href="contributing/index.html"><span class="doc">Django へのコントリビュート</span></a> を読んでください。そこにはよくある質問の答えが書かれています。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>技術サポートを求める場合は、 <a class="reference internal" href="#django-users-mailing-list"><span class="std std-ref">django-users メーリングリスト</span></a> を活用してください。このリストでの質問は不適切です。</p>
+</div>
+<ul class="simple">
+<li><p><a class="reference external" href="https://groups.google.com/g/django-developers">django-developers mailing archive</a></p></li>
+<li><p><a class="reference external" href="mailto:django-developers+subscribe&#37;&#52;&#48;googlegroups&#46;com">django-developers subscription email address</a></p></li>
+<li><p><a class="reference external" href="mailto:django-developers&#37;&#52;&#48;googlegroups&#46;com">django-developers posting email</a></p></li>
+</ul>
+</section>
+<section id="s-django-announce">
+<span id="s-django-announce-mailing-list"></span><span id="django-announce"></span><span id="django-announce-mailing-list"></span><h2><code class="docutils literal notranslate"><span class="pre">django-announce</span></code><a class="headerlink" href="#django-announce" title="Link to this heading">¶</a></h2>
+<p>非常に少ないトラフィックのメーリングリストで、<a class="reference internal" href="security.html#security-disclosure"><span class="std std-ref">今後のセキュリティリリース</span></a> 、Djangoの新リリース、そしてセキュリティアドバイザリに関する告知を行います。</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://groups.google.com/g/django-announce">django-announce mailing archive</a></p></li>
+<li><p><a class="reference external" href="mailto:django-announce+subscribe&#37;&#52;&#48;googlegroups&#46;com">django-announce subscription email address</a></p></li>
+<li><p><a class="reference external" href="mailto:django-announce&#37;&#52;&#48;googlegroups&#46;com">django-announce posting email</a></p></li>
+</ul>
+</section>
+<section id="s-django-updates">
+<span id="s-django-updates-mailing-list"></span><span id="django-updates"></span><span id="django-updates-mailing-list"></span><h2><code class="docutils literal notranslate"><span class="pre">django-updates</span></code><a class="headerlink" href="#django-updates" title="Link to this heading">¶</a></h2>
+<p>すべてのチケット更新はこのリストに自動的にメールされ、開発者や関心のあるコミュニティメンバーによって追跡されます。</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://groups.google.com/g/django-updates">django-updates mailing archive</a></p></li>
+<li><p><a class="reference external" href="mailto:django-updates+subscribe&#37;&#52;&#48;googlegroups&#46;com">django-updates subscription email address</a></p></li>
+<li><p><a class="reference external" href="mailto:django-updates&#37;&#52;&#48;googlegroups&#46;com">django-updates posting email</a></p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">メーリングリストとフォーラム</a><ul>
+<li><a class="reference internal" href="#django-forum">Django フォーラム</a></li>
+<li><a class="reference internal" href="#django-users"><code class="docutils literal notranslate"><span class="pre">django-users</span></code></a></li>
+<li><a class="reference internal" href="#django-developers"><code class="docutils literal notranslate"><span class="pre">django-developers</span></code></a></li>
+<li><a class="reference internal" href="#django-announce"><code class="docutils literal notranslate"><span class="pre">django-announce</span></code></a></li>
+<li><a class="reference internal" href="#django-updates"><code class="docutils literal notranslate"><span class="pre">django-updates</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="contributing/triaging-tickets.html"
+                          title="前の章へ">チケットをトリアージする</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="organization.html"
+                          title="次の章へ">Django プロジェクトの組織</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/internals/mailing-lists.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="contributing/triaging-tickets.html" title="チケットをトリアージする">previous</a>
+     |
+    <a href="index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="organization.html" title="Django プロジェクトの組織">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

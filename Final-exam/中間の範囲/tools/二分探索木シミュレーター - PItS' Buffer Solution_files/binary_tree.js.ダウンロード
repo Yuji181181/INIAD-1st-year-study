@@ -1,0 +1,511 @@
+const project = new PItS_canvas.Project("binary_search_tree_simulator");
+const main = project.appendScene("main");
+const project2 = new PItS_canvas.Project("bsts_controller");
+const controller = project2.appendScene("controller");
+
+const nil = {key: "nil", val: 0, child: [null,null]};
+
+class Node{
+	constructor(key){
+		this.key = key;
+		this.child = [nil,nil];
+		this.moving = false;
+		const this_obj = this;
+		this.shape = new PItS_canvas.Circle(0,0,30,{color: "#000000", fill: false, lineWidth: 2.0});
+		this.edge = [new PItS_canvas.Polygon([[0,0],[0,0]],{color: "#000000", close: false, lineWidth: 2.0}),
+					 new PItS_canvas.Polygon([[0,0],[0,0]],{color: "#000000", close: false, lineWidth: 2.0})];
+		this.text_key = new PItS_canvas.Text(function(){return this_obj.key;},0,0,{color: "#000000", textAlign: "center", font: "bold 20px '明朝ゴシック'"});
+		this.text_val = new PItS_canvas.Text(function(){return this_obj.val === undefined ? "" : this_obj.val;},0,0,{color: "#000000", textAlign: "center", font: "bold 20px '明朝ゴシック'"});
+	}
+}
+
+Node.prototype.draw = function(d,duration,doMove){
+	this.shape.display = this.display;
+	this.text_key.display = this.display;
+	this.text_val.display = this.display;
+	if(this.posX === undefined){
+		this.posX = this.nextX;
+		this.posY = this.nextY;
+	} else {
+		if(!this.moving && (this.posX !== this.nextX || this.posY !== this.nextY)){
+			this.dX = (this.nextX - this.posX) / (duration*2); this.dY = (this.nextY - this.posY) / (duration*2);
+			this.counter = 0;
+			this.moving = true;
+		}
+		if(this.moving && doMove){
+			if(this.counter === duration*2-1){
+				this.posX = this.nextX;
+				this.posY = this.nextY;
+				this.moving = false;
+			} else {
+				this.posX += this.dX;
+				this.posY += this.dY;
+				this.counter++;
+			}
+		}
+	}
+	this.shape.posX = this.posX; this.shape.posY = this.posY;
+	this.text_key.posX = this.posX; this.text_key.posY = this.posY - 3;
+	this.text_val.posX = this.posX; this.text_val.posY = this.posY + 23;
+	this.shape.draw();
+	this.text_key.draw();
+	this.text_val.draw();
+	for(let i = 0 ; i < 2 ; ++i){
+		if(this.child[i] === nil){
+			this.edge[i].points = [[this.posX,this.posY+30],[this.posX+(2*i-1)*d,this.posY+90]];
+		} else {
+			this.child[i].nextX = this.nextX + (2*i-1) * d; this.child[i].nextY = this.nextY + 120;
+			this.child[i].display = this.display;
+			this.child[i].draw(d/2,duration,doMove);
+			this.edge[i].points = [[this.posX,this.posY+30],[this.child[i].posX,this.child[i].posY-30]];
+			this.edge[i].display = this.display;
+			this.edge[i].draw();
+		}
+	}
+}
+
+class BinaryTree{
+	constructor(){
+		this.child = [nil];
+		this.edge = [{points: [[400,30],[400,30]]}];
+		this.rootd = 160;
+		this.rootX = 400;
+		this.rootY = 60;
+		this.duration = 25;
+		this.mode = "normal";
+		this.query = [];
+		this.queryID = 0;
+		this.commandID = 0;
+		this.history = [nil];
+		this.command = [];
+		this.stack = [];
+		const this_obj = this;
+		this.queryText = new PItS_canvas.Text(function(){return (this_obj.queryID+1) + ": " + this_obj.query[this_obj.queryID][0] + " " + this_obj.query[this_obj.queryID][1];},10,40,{color: "#000000", font: "bold 28px '明朝ゴシック'"});
+		this.focusNode = new PItS_canvas.Circle(0,0,30,{color: "#FF0000", fill: false, lineWidth: 2.0, opacity: 0});
+		this.focusEdge = new PItS_canvas.Polygon([[0,0],[0,0]],{color: "#FF0000", close: false, lineWidth: 2.0, opacity: 0});
+		this.counter = 0;
+		this.paused = false;
+		this.step = false;
+	}
+}
+
+BinaryTree.prototype.initVal = {AVL:1};
+
+BinaryTree.prototype.draw = function(){
+	let newMode = document.getElementsByName("mode_list")[0].value
+	if(this.mode !== newMode){
+		this.mode = newMode;
+		this.rebuild();
+	}
+	if(this.child[0] !== nil){
+		this.child[0].display = this.display;
+		this.child[0].nextX = this.rootX; this.child[0].nextY = this.rootY;
+		this.child[0].draw(this.rootd,this.duration,!this.paused);
+	}
+	if(this.queryID === this.query.length) return;
+	let com = this.command[this.queryID][this.commandID];
+	if(!this.paused){
+		if(this.counter === 0) this.duration = 50 - Math.floor(speedSlider.val/2);
+		++this.counter;
+		let prev = this.stack.slice(-1)[0];
+		const this_obj = this;
+		let setFocusParent = function(rate){
+			this_obj.focusNode.posX = this_obj.focus.posX;
+			this_obj.focusNode.posY = this_obj.focus.posY;
+			this_obj.focusNode.angle = [Math.PI*(0.5-rate),Math.PI*(0.5+rate)];
+			let e = this_obj.focus.edge[com.dir].points;
+			this_obj.focusEdge.points = e.concat();
+			this_obj.focusEdge.points[1][0] -= (e[1][0] - e[0][0]) * rate;
+			this_obj.focusEdge.points[1][1] -= (e[1][1] - e[0][1]) * rate;
+		};
+		let setFocusChild = function(rate){
+			this_obj.focusNode.posX = this_obj.focus.child[com.dir].posX;
+			this_obj.focusNode.posY = this_obj.focus.child[com.dir].posY;
+			this_obj.focusNode.angle = [Math.PI*(1.5-rate),Math.PI*(1.5+rate)];
+			let e = this_obj.focus.edge[com.dir].points;
+			this_obj.focusEdge.points = e.concat();
+			this_obj.focusEdge.points[0][0] += (e[1][0] - e[0][0]) * rate;
+			this_obj.focusEdge.points[0][1] += (e[1][1] - e[0][1]) * rate;
+		};
+		if(com.main === "begin"){
+			this.duration = 50 - Math.floor(speedSlider.val/2);
+			if(this.counter > this.duration){
+				this.counter = 0;
+				++this.commandID;
+				this.focus = this;
+				this.stack = [];
+				this.eraseTarget = null;
+				this.focusNode.angle = [0,0];
+				this.focusNode.opacity = 1;
+				this.focusEdge.points = [[0,0],[0,0]];
+				this.focusEdge.opacity = 1;
+			}
+		} else if(com.main === "end"){
+			this.rootd = 160;
+			this.rootX = 400;
+			this.rootY = 60;
+			this.focusNode.posX = this.focus.posX;
+			this.focusNode.posY = this.focus.posY;
+			if(this.counter <= this.duration){
+				let rate = Math.min(this.focusNode.opacity, 1 - this.counter / this.duration);
+				this.focusNode.opacity = rate;
+				this.focusEdge.opacity = rate;
+			} else if(this.counter === this.duration*3){
+				this.counter = 0;
+				++this.queryID;
+				this.commandID = 0;
+				return;
+			}
+		} else if(com.main === "forward" || com.main === "insert"){
+			if(this.counter === 1 && com.main === "forward" && this.stack[2] !== undefined){
+				this.rootd *= 2;
+				this.rootX = 400+(this.rootX-400)*2+(this.stack.slice(-2)[0][1] === 0 ? 400 : -400);
+				this.rootY -= 120;
+			}
+			if(this.counter <= this.duration+1){
+				setFocusParent(1-(this.counter-1)/this.duration);
+			} else if(this.counter <= this.duration*2+1){
+				let rate = (this.counter-1)/this.duration-1;
+				if(com.main === "insert"){
+					if(this.counter === this.duration+2){
+						let c = this.focus.child[com.dir] = new Node(com.key);
+						c.val = com.val;
+						c.shape.opacity = 0;
+						c.text_key.opacity = 0;
+						c.text_val.opacity = 0;
+					}
+					this.focus.child[com.dir].text_key.opacity = rate;
+					this.focus.child[com.dir].text_val.opacity = rate;
+				}
+				setFocusChild(rate);
+			} else {
+				this.counter = 0;
+				++this.commandID;
+				this.stack.push([this.focus,com.dir]);
+				this.focus = this.focus.child[com.dir];
+				if(com.main === "insert"){
+					this.focus.shape.opacity = 1;
+				}
+			}
+		} else if(com.main === "backward"){
+			if(this.counter === 1){
+				if(this.stack[2] !== undefined && this.focus.posY < 240){
+					this.rootd /= 2;
+					this.rootX = (this.rootX-400+(this.stack.slice(-2)[0][1] === 0 ? -400 : 400))/2 + 400;
+					this.rootY += 120;
+				}
+				this.focus = prev[0];
+				this.stack.pop();
+			} else if(this.counter <= this.duration+1){
+				let rate = 1-(this.counter-1)/this.duration;
+				setFocusChild(rate);
+				this.focus.text_val.opacity = rate;
+			} else if(this.counter <= this.duration*2+1){
+				if(this.counter === this.duration+2) this.updateVal(this.focus);
+				let rate = (this.counter-1)/this.duration-1
+				setFocusParent(rate);
+				this.focus.text_val.opacity = rate;
+				this.focusNode.opacity = 1;
+			} else {
+				this.counter = 0;
+				++this.commandID;
+				this.focusEdge.opacity = 1;
+			}
+		} else if(com.main === "rotate"){
+			if(this.counter <= this.duration){
+				let rate = this.counter/this.duration;
+				let colorR = Math.round(255 * rate);
+				let colorG = Math.round(127 * rate);
+				let colorHex = "#" + ("00"+colorR.toString(16)).slice(-2) + ("00"+colorG.toString(16)).slice(-2) + "00";
+				this.focus.shape.color = colorHex;
+				this.focus.child[com.dir].shape.color = colorHex;
+				this.focusNode.opacity = 1-rate;
+				prev[0].edge[prev[1]].opacity = 1-rate;
+				this.focus.edge[com.dir].opacity = 1-rate;
+				this.focus.child[com.dir].edge[1-com.dir].opacity = 1-rate;
+				this.focus.text_val.opacity = 1-rate;
+				this.focus.child[com.dir].text_val.opacity = 1-rate;
+				if(com.double){
+					this.focus.child[com.dir].child[1-com.dir].shape.color = colorHex;
+					this.focus.child[com.dir].child[1-com.dir].edge[0].opacity = 1-rate;
+					this.focus.child[com.dir].child[1-com.dir].edge[1].opacity = 1-rate;
+					this.focus.child[com.dir].child[1-com.dir].text_val.opacity = 1-rate;
+				}
+			} else if(this.counter <= this.duration*5){
+			} else if(this.counter <= this.duration*6){
+				let rate = this.counter/this.duration-5;
+				let colorR = Math.round(255 * (1-rate));
+				let colorG = Math.round(127 * (1-rate));
+				let colorHex = "#" + ("00"+colorR.toString(16)).slice(-2) + ("00"+colorG.toString(16)).slice(-2) + "00";
+				this.focus.shape.color = colorHex;
+				this.focus.child[1-com.dir].shape.color = colorHex;
+				this.focusNode.opacity = rate;
+				prev[0].edge[prev[1]].opacity = rate;
+				this.focus.edge[1-com.dir].opacity = rate;
+				this.focus.child[1-com.dir].edge[com.dir].opacity = rate;
+				this.focus.text_val.opacity = rate;
+				this.focus.child[1-com.dir].text_val.opacity = rate;
+				if(com.double){
+					this.focus.child[com.dir].shape.color = colorHex;
+					this.focus.edge[com.dir].opacity = rate;
+					this.focus.child[com.dir].edge[1-com.dir].opacity = rate;
+					this.focus.child[com.dir].text_val.opacity = rate;
+				}
+			} else {
+				this.counter = 0;
+				++this.commandID;
+			}
+			if(com.double && this.counter === this.duration){
+				let m = this.focus.child[com.dir];
+				let n = m.child[1-com.dir];
+				m.child[1-com.dir] = n.child[com.dir];
+				n.child[com.dir] = m;
+				this.focus.child[com.dir] = n;
+				this.updateVal(n.child[com.dir]);
+			}
+			if((!com.double && this.counter === this.duration) || this.counter === this.duration*3){
+				let m = this.focus.child[com.dir];
+				this.focus.child[com.dir] = m.child[1-com.dir];
+				m.child[1-com.dir] = this.focus;
+				prev[0].child[prev[1]] = this.focus = m;
+				this.updateVal(this.focus.child[1-com.dir]);
+				this.updateVal(this.focus);
+				this.counter = this.duration*3;
+			}
+		} else if(com.main === "mark"){
+			this.counter = 0;
+			++this.commandID;
+			this.eraseTarget = this.focus;
+			this.eraseTarget.shape.color = "#FF7F00";
+		} else if(com.main === "erase"){
+			if(this.counter <= this.duration){
+				let rate = this.counter / this.duration;
+				prev[0].edge[prev[1]].opacity = 1-rate;
+				this.focusNode.opacity = 1-rate;
+				this.focus.shape.opacity = 1-rate;
+				this.focus.edge[0].opacity = 1-rate;
+				this.focus.edge[1].opacity = 1-rate;
+				this.focus.text_key.opacity = 1-rate;
+				this.focus.text_val.opacity = 1-rate;
+				if(com.swap){
+					let colorR = Math.round(255 * (1-rate));
+					let colorG = Math.round(127 * (1-rate));
+					this.eraseTarget.shape.color = "#" + ("00"+colorR.toString(16)).slice(-2) + ("00"+colorG.toString(16)).slice(-2) + "00";
+					let this_obj = this.focus;
+					let new_text_key = new PItS_canvas.Text(function(){return this_obj.key;},this.eraseTarget.text_key.posX,this.eraseTarget.text_key.posY,{color: "#000000", textAlign: "center", font: "bold 20px '明朝ゴシック'", opacity: rate});
+					new_text_key.display = this.display;
+					new_text_key.draw();
+					this.eraseTarget.text_key.opacity = 1-rate;
+					this.eraseTarget.text_val.opacity = 1-rate;
+					if(this.counter === this.duration){
+						this.eraseTarget.key = this.focus.key;
+						this.eraseTarget.text_key.opacity = 1;
+						this.eraseTarget.text_val.opacity = 1;
+					}
+				}
+			} else if(this.counter <= this.duration*3+1){
+				prev[0].child[prev[1]] = this.focus.child[com.dir];
+			} else if(this.counter <= this.duration*4+1){
+				let rate = (this.counter - this.duration*3 - 1) / this.duration;
+				prev[0].edge[prev[1]].opacity = rate;
+			} else {
+				this.counter = 0;
+				++this.commandID;
+				this.focusEdge.opacity = 0;
+			}
+		}
+		if(this.step && this.counter === 0){
+			this.paused = true;
+			this.step = false;
+		}
+	}
+	if(com.main !== "begin"){
+		this.focusNode.display = this.display;
+		this.focusEdge.display = this.display;
+		this.queryText.display = this.display;
+		this.focusNode.draw();
+		this.focusEdge.draw();
+		this.queryText.draw();
+	}
+};
+
+BinaryTree.prototype.updateVal = function(node){
+	if(this.mode === "AVL"){
+		node.val = Math.max(node.child[0].val,node.child[1].val)+1;
+	}
+}
+
+BinaryTree.prototype.rotate = function(node,i){
+	let m = node.child[i];
+	node.child[i] = m.child[1-i];
+	m.child[1-i] = node;
+	return m;
+};
+
+BinaryTree.prototype.checkRotate = function(node,com,backtrack){
+	let prevVal = node.val;
+	if(this.mode === "AVL"){
+		let d = node.child[0].val-node.child[1].val;
+		let i = d > 1 ? 0 : d < -1 ? 1 : -1;
+		if(i >= 0){
+			let b = node.child[i].child[i].val < node.child[i].child[1-i].val;
+			if(b){
+				node.child[i] = this.rotate(node.child[i],1-i);
+				this.updateVal(node.child[i].child[i]);
+			}
+			com.push({main: "rotate", dir: i, double: b});
+			node = this.rotate(node,i);
+			this.updateVal(node.child[1-i]);
+		}
+		this.updateVal(node);
+	}
+	backtrack.fin = prevVal === node.val;
+	return node;
+};
+
+BinaryTree.prototype.insert = function(node,com,key,backtrack={fin:this.mode === "normal"}){
+	if(node.key === "nil"){
+		let val = this.initVal[this.mode];
+		com.push({main: "insert", dir: com.pop().dir, key: key, val: val});
+		return {key: key, val: val, child: [nil,nil]};
+	}
+	if(node.key === key){
+		backtrack.fin = true;
+		return node;
+	}
+	let i = node.key > key ? 0 : 1;
+	com.push({main: "forward", dir: i});
+	node.child[i] = this.insert(node.child[i],com,key,backtrack);
+	if(!backtrack.fin){
+		com.push({main: "backward", dir: i});
+		return this.checkRotate(node,com,backtrack);
+	}
+	return node;
+}
+
+BinaryTree.prototype.erase = function(node,com,key,target,backtrack={fin:this.mode === "normal"}){
+	if(node.key === key){
+		if(node.child[0].key === "nil"){
+			com.push({main: "erase", dir: 1});
+			return node.child[1];
+		}
+		if(node.child[1].key === "nil"){
+			com.push({main: "erase", dir: 0});
+			return node.child[0];
+		}
+		com.push({main: "mark"});
+		com.push({main: "forward", dir: 1});
+		node.child[1] = this.erase(node.child[1],com,key,node,backtrack);
+		if(!backtrack.fin){
+			com.push({main: "backward", dir: 1});
+			return this.checkRotate(node,com,backtrack);
+		}
+	} else {
+		let i = node.key > key ? 0 : 1;
+		if(node.child[i].key === "nil"){
+			if(target === undefined){
+				backtrack.fin = true;
+				return node;
+			}
+			com.push({main: "erase", dir: 1-i, swap: true});
+			target.key = node.key;
+			return node.child[1-i];
+		}
+		com.push({main: "forward", dir: i});
+		node.child[i] = this.erase(node.child[i],com,key,target,backtrack);
+		if(!backtrack.fin){
+			com.push({main: "backward", dir: i});
+			return this.checkRotate(node,com,backtrack)
+		}
+	}
+	return node;
+}
+
+BinaryTree.prototype.appendQuery = function(query,key){
+	let key_int = parseInt(key,10);
+	if(isNaN(key_int) || key_int < 0 || 999 < key_int) return;
+	let opt = document.createElement("option");
+	opt.value = this.query.length+1;
+	opt.appendChild(document.createTextNode(opt.value+": "+query+" "+key_int));
+	document.getElementsByName("query_list")[0].appendChild(opt);
+	this.query.push([query,key_int]);
+	let newNode = JSON.parse(JSON.stringify(this.history.slice(-1)[0]));
+	let com = [{main: "begin"}, {main: "forward", dir: 0}];
+	if(query === "insert"){
+		newNode = this.insert(newNode,com,key_int);
+	} else if(query === "erase"){
+		if(newNode.key !== "nil") newNode = this.erase(newNode,com,key_int);
+	}
+	com.push({main: "end"});
+	this.history.push(newNode);
+	this.command.push(com);
+};
+
+BinaryTree.prototype.queryJump = function(){
+	let pos = parseInt(document.getElementsByName("query_list")[0].value);
+	if(isNaN(pos)) return;
+	this.paused = true;
+	this.counter = 10000;
+	this.commandID = 0;
+	let makeNode = function(tree){
+		if(tree.key === "nil") return nil;
+		let node = new Node(tree.key);
+		node.val = tree.val;
+		node.child[0] = makeNode(tree.child[0]);
+		node.child[1] = makeNode(tree.child[1]);
+		return node;
+	}
+	this.child[0] = makeNode(this.history[pos]);
+	this.queryID = pos;
+	this.rootd = 160;
+	this.rootX = 400;
+	this.rootY = 60;
+}
+
+BinaryTree.prototype.queryClear = function(){
+	this.paused = true;
+	this.child = [nil];
+	this.query = [];
+	this.queryID = 0;
+	this.commandID = 0;
+	this.history = [nil];
+	this.command = [];
+	let queryList = document.getElementsByName("query_list")[0];
+	while(queryList.lastElementChild.value !== "0"){
+		queryList.removeChild(queryList.lastElementChild);
+	}
+};
+
+BinaryTree.prototype.rebuild = function(){
+	let qlist = this.query;
+	this.queryClear();
+	for(let i = 0 ; qlist[i] !== undefined ; ++i) this.appendQuery(qlist[i][0],qlist[i][1]);
+};
+
+let tree = main.appendElement("tree",new BinaryTree());
+let speedText = controller.appendElement("speed_text", new PItS_canvas.Text("speed",20,20,{color: "#000000", textAlign: "left", font: "bold 16px '明朝体'"}));
+let speedSlider = controller.appendElement("speed_slider", new PItS_canvas.Slider(28,30,{type: "circle", radius: 8},{color: "#000000", min: 0, max: 99, scale: 1, val: 50, horizontal: true, trackWidth: 5}));
+let pauseButton = controller.appendElement("pause_button", new PItS_canvas.Button(new PItS_canvas.Polygon([[141,23],[161,23],[161,43],[141,43]],{color: "#000000"}),
+										{play: new PItS_canvas.Polygon([[146,25],[146,41],[159,33]],{color: "#FFFFFF"}),
+										 pause1: new PItS_canvas.Polygon([[144,25],[144,41],[149,41],[149,25]],{color: "#FFFFFF"}),
+										 pause2: new PItS_canvas.Polygon([[153,25],[153,41],[158,41],[158,25]],{color: "#FFFFFF"}),
+										 draw: function(){
+											if(tree.paused){this.play.display = this.display; this.play.draw();}
+											else{this.pause1.display = this.pause2.display = this.display; this.pause1.draw(); this.pause2.draw();}
+										}}, function(){tree.paused = !tree.paused;}));
+let stepText = controller.appendElement("step_text", new PItS_canvas.Text("step",229,20,{color: "#000000", textAlign: "left", font: "bold 16px '明朝体'"}));
+let stepButton = controller.appendElement("step_button", new PItS_canvas.Button(new PItS_canvas.Polygon([[229,23],[249,23],[249,43],[229,43]],{color: "#000000"}),
+										{head: new PItS_canvas.Polygon([[238,25],[238,41],[248,33]],{color: "#FFFFFF"}),
+										 shaft: new PItS_canvas.Polygon([[231,30],[239,30],[239,36],[231,36]],{color: "#FFFFFF"}),
+										 draw: function(){
+											this.head.display = this.shaft.display = this.display; this.head.draw(); this.shaft.draw();
+										}}, function(){tree.paused = false; tree.step = true;}));
+
+project.changeScene("main");
+project.play();
+project2.changeScene("controller");
+project2.play();
+
+document.query_form.action = "javascript:tree.queryJump()";
+document.query_form2.action = "javascript:tree.appendQuery(document.query_form2.query,document.query_form2.key.value)";
+document.query_form3.action = "javascript:tree.queryClear()";

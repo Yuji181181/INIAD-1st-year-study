@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>シグナル &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="システムチェックフレームワーク" href="checks.html" />
+    <link rel="prev" title="Djangoの設定" href="settings.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="settings.html" title="Djangoの設定">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="checks.html" title="システムチェックフレームワーク">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-signals">
+            
+  <section id="s-module-django.dispatch">
+<span id="s-signals"></span><span id="module-django.dispatch"></span><span id="signals"></span><h1>シグナル<a class="headerlink" href="#module-django.dispatch" title="Link to this heading">¶</a></h1>
+<p>Django には &quot;シグナルディスパッチャ&quot; があり、フレームワークの他の場所でアクションが発生したときに、ほかのアプリケーションが通知を受けるのを助けてくれます。簡単に言うと、シグナルは特定の <em>送り手</em> が、あるアクションが発生したことを一連の <em>受け手</em> に通知できるようにします。特に、多くのコードが同じイベントに関連している場合に便利です。</p>
+<p>例えば、サードパーティのアプリを登録して、設定変更の通知を受けることができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">AppConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">setting_changed</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting changed!&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyAppConfig</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">):</span>
+    <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">setting_changed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">my_callback</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Django の <a class="reference internal" href="../ref/signals.html"><span class="doc">組み込みのシグナル</span></a> は、ユーザコードに特定のアクションを通知します。</p>
+<p>また、独自のカスタムシグナルを定義して送信することもできます。以下の <a class="reference internal" href="#defining-and-sending-signals"><span class="std std-ref">シグナルの定義と送信</span></a> を参照してください。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>シグナルは疎結合のように見えますが、すぐに理解や調整、デバッグが難しいコードにつながります。</p>
+<p>可能であれば、シグナルでディスパッチするのではなく、処理コードを直接呼び出すことを選ぶべきです。</p>
+</div>
+<section id="s-listening-to-signals">
+<span id="listening-to-signals"></span><h2>シグナルを待ち受ける<a class="headerlink" href="#listening-to-signals" title="Link to this heading">¶</a></h2>
+<p>シグナルを受信するには、 <a class="reference internal" href="#django.dispatch.Signal.connect" title="django.dispatch.Signal.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Signal.connect()</span></code></a> メソッドを使って <em>receiver</em> 関数を登録します。シグナルが送信されると、レシーバ関数が呼び出されます。シグナルのすべてのレシーバ関数は、登録された順番に1つずつ呼び出されます。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.dispatch.Signal.connect">
+<span class="sig-prename descclassname"><span class="pre">Signal.</span></span><span class="sig-name descname"><span class="pre">connect</span></span>(<em class="sig-param"><span class="n"><span class="pre">receiver</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weak</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dispatch_uid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/dispatch/dispatcher.py#L50"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.dispatch.Signal.connect" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receiver</strong> -- このシグナルに接続されるコールバック関数です。詳しくは <a class="reference internal" href="#receiver-functions"><span class="std std-ref">レシーバ関数</span></a> を参照してください。</p></li>
+<li><p><strong>sender</strong> -- シグナルを受信する送信者を指定します。詳しくは <a class="reference internal" href="#connecting-to-specific-signals"><span class="std std-ref">特定の送信者によって送られたシグナルに接続する</span></a> を参照してください。</p></li>
+<li><p><strong>weak</strong> -- Django はデフォルトでシグナルハンドラを弱い参照として保存します。従って、レシーバがローカル関数の場合、ガベージコレクションされる可能性 があります。これを防ぐには、シグナルの <code class="docutils literal notranslate"><span class="pre">connect()</span></code> メソッドを呼び出すときに <code class="docutils literal notranslate"><span class="pre">weak=False</span></code> を渡してください。</p></li>
+<li><p><strong>dispatch_uid</strong> -- シグナルが重複して送信される可能性がある場合の、シグナル受信機の一意な識別子。詳しくは <a class="reference internal" href="#preventing-duplicate-signals"><span class="std std-ref">重複したシグナルを防止する</span></a> を参照してください。</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>HTTP リクエストが終了するたびに呼び出されるシグナルを登録することで、この仕組みを見てみましょう。ここでは <a class="reference internal" href="../ref/signals.html#django.core.signals.request_finished" title="django.core.signals.request_finished"><code class="xref py py-data docutils literal notranslate"><span class="pre">request_finished</span></code></a> シグナルに接続します。</p>
+<section id="s-receiver-functions">
+<span id="s-id1"></span><span id="receiver-functions"></span><span id="id1"></span><h3>レシーバ関数<a class="headerlink" href="#receiver-functions" title="Link to this heading">¶</a></h3>
+<p>まず、レシーバ関数を定義する必要があります。レシーバはPythonの関数やメソッドであれば何でもかまいません:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Request finished!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この関数は <code class="docutils literal notranslate"><span class="pre">sender</span></code> 引数とワイルドカードキーワード引数 (<code class="docutils literal notranslate"><span class="pre">**kwargs</span></code>) を取ることに注意してください。すべてのシグナルハンドラはこれらの引数を取らなければなりません。</p>
+<p>送信者については <a class="reference internal" href="#connecting-to-specific-signals"><span class="std std-ref">もう少し後で</span></a> 見るので、今は <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> 引数を見てください。すべてのシグナルはキーワード引数を送信し、いつでもそのキーワード引数を変更できます。 <a class="reference internal" href="../ref/signals.html#django.core.signals.request_finished" title="django.core.signals.request_finished"><code class="xref py py-data docutils literal notranslate"><span class="pre">request_finished</span></code></a> の場合、引数を送らないようにドキュメント化されているので、シグナル処理を <code class="docutils literal notranslate"><span class="pre">my_callback(sender)</span></code> と書きたくなるかもしれません。</p>
+<p>これは間違いです。実際、そうすると Django はエラーを返します。というのも、シグナルに引数が追加される可能性があり、レシーバはその新しい引数を扱えなければならないからです。</p>
+<p>レシーバーは同じシグネチャーを持ち、<code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">def</span></code> を使って宣言された非同期関数になることもできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">my_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Request finished!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>シグナルは同期でも非同期でも送ることができ、受信側は自動的に正しいコールスタイルに合わせられます。詳細は <a class="reference internal" href="#sending-signals"><span class="std std-ref">シグナルを送る</span></a> を参照してください。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>非同期レシーバのサポートが追加されました。</p>
+</div>
+</section>
+<section id="s-connecting-receiver-functions">
+<span id="s-id2"></span><span id="connecting-receiver-functions"></span><span id="id2"></span><h3>レシーバ関数に接続する<a class="headerlink" href="#connecting-receiver-functions" title="Link to this heading">¶</a></h3>
+<p>受信機を信号に接続する方法は2つあります。手動で接続する方法です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">request_finished</span>
+
+<span class="n">request_finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">my_callback</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>あるいは、 <a class="reference internal" href="#django.dispatch.receiver" title="django.dispatch.receiver"><code class="xref py py-func docutils literal notranslate"><span class="pre">receiver()</span></code></a> デコレータを使うこともできます:</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.dispatch.receiver">
+<span class="sig-name descname"><span class="pre">receiver</span></span>(<em class="sig-param"><span class="n"><span class="pre">signal</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/dispatch/dispatcher.py#L472"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.dispatch.receiver" title="Link to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">パラメータ<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> -- 関数を接続するシグナルまたはシグナルのリスト。</p></li>
+<li><p><strong>kwargs</strong> -- <a class="reference internal" href="#receiver-functions"><span class="std std-ref">関数</span></a> に渡すワイルドカードキーワード引数です。</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<p>下記がデコレーターとの繋げ方です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">request_finished</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">receiver</span>
+
+
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">request_finished</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Request finished!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>これで、リクエストが終了するたびに <code class="docutils literal notranslate"><span class="pre">my_callback</span></code> 関数が呼ばれるようになります。</p>
+<div class="admonition-where-should-this-code-live admonition">
+<p class="admonition-title">コードはどこに置くの？</p>
+<p>厳密には、シグナル処理と登録のコードは好きな場所に置くことができますが、コードのインポートによる副作用を最小限にするために、アプリケーションのルートモジュールと <code class="docutils literal notranslate"><span class="pre">models</span></code> モジュールの置くのは避けることを推奨します。</p>
+<p>実際には、シグナルハンドラは通常、関連するアプリケーションの <code class="docutils literal notranslate"><span class="pre">signals</span></code> サブモジュールで定義されます。シグナルレシーバーはアプリケーションの  <a class="reference internal" href="../ref/applications.html#configuring-applications-ref"><span class="std std-ref">configuration クラス</span></a> の <a class="reference internal" href="../ref/applications.html#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code></a> メソッドで接続されます。 <a class="reference internal" href="#django.dispatch.receiver" title="django.dispatch.receiver"><code class="xref py py-func docutils literal notranslate"><span class="pre">receiver()</span></code></a> デコレータを使っている場合は、 <a class="reference internal" href="../ref/applications.html#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code></a> の中にある <code class="docutils literal notranslate"><span class="pre">signals</span></code> サブモジュールをインポートしてください、これによりシグナルハンドラが暗黙的に接続されます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">AppConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.core.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">request_finished</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyAppConfig</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">):</span>
+    <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Implicitly connect signal handlers decorated with @receiver.</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">signals</span>
+
+        <span class="c1"># Explicitly connect a signal handler.</span>
+        <span class="n">request_finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">signals</span><span class="o">.</span><span class="n">my_callback</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>テスト中に <a class="reference internal" href="../ref/applications.html#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code></a> メソッドが複数回実行されることがあるため、特にテスト内でシグナルを送信する予定がある場合は、<a class="reference internal" href="#preventing-duplicate-signals"><span class="std std-ref">シグナルの重複を防ぐ</span></a> ためにシグナルを保護することを検討するとよいでしょう。</p>
+</div>
+</section>
+<section id="s-connecting-to-signals-sent-by-specific-senders">
+<span id="s-connecting-to-specific-signals"></span><span id="connecting-to-signals-sent-by-specific-senders"></span><span id="connecting-to-specific-signals"></span><h3>特定の送信者によって送られたシグナルに接続する<a class="headerlink" href="#connecting-to-signals-sent-by-specific-senders" title="Link to this heading">¶</a></h3>
+<p>シグナルの中には何度も送信されるものがありますが、そのようなシグナルの特定のサブセットだけを受信したいと思うかも知れません。例えば、モデルが保存される前に送られるシグナル <a class="reference internal" href="../ref/signals.html#django.db.models.signals.pre_save" title="django.db.models.signals.pre_save"><code class="xref py py-data docutils literal notranslate"><span class="pre">django.db.models.signals.pre_save</span></code></a> を考えてみましょう。ほとんどの場合、 <em>どの</em> モデルが保存されるかを知る必要はありません。ある <em>特定の</em> モデルが保存されたときだけ知る必要があります。</p>
+<p>このような場合、特定の送信者のみが送信するシグナルを受信するように登録できます。 <a class="reference internal" href="../ref/signals.html#django.db.models.signals.pre_save" title="django.db.models.signals.pre_save"><code class="xref py py-data docutils literal notranslate"><span class="pre">django.db.models.signals.pre_save</span></code></a> の場合、送信者は保存されるモデルクラスになるので、あるモデルから送信されるシグナルだけが欲しいことを示すことができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">pre_save</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.dispatch</span><span class="w"> </span><span class="kn">import</span> <span class="n">receiver</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">myapp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyModel</span>
+
+
+<span class="nd">@receiver</span><span class="p">(</span><span class="n">pre_save</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">MyModel</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_handler</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">my_handler</span></code> 関数は <code class="docutils literal notranslate"><span class="pre">MyModel</span></code> のインスタンスが保存されたときにだけ呼び出されます。</p>
+<p>異なるシグナルは異なるオブジェクトを送信元として使用します。それぞれのシグナルの詳細については <a class="reference internal" href="../ref/signals.html"><span class="doc">組み込みシグナルのドキュメント</span></a> を参照する必要があります。</p>
+</section>
+<section id="s-preventing-duplicate-signals">
+<span id="s-id3"></span><span id="preventing-duplicate-signals"></span><span id="id3"></span><h3>重複したシグナルを防止する<a class="headerlink" href="#preventing-duplicate-signals" title="Link to this heading">¶</a></h3>
+<p>状況によっては、レシーバーをシグナルに接続するコードが複数回実行されることがあります。そのため、レシーバ関数が複数回登録され、シグナルイベントに対して複数回呼び出される可能性があります。例えば、 <a class="reference internal" href="../ref/applications.html#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code></a> メソッドがテスト中に複数回実行されるかもしれません。より一般的には、シグナル登録はインポートされた回数だけ実行されるため、 シグナルを定義したモジュールをインポートしたプロジェクトではどこでも発生します。</p>
+<p>この動作が問題となる場合 (シグナルを使用してモデルが保存されるたびにメールを送信する場合など)、受信関数を識別するために <code class="docutils literal notranslate"><span class="pre">dispatch_uid</span></code> 引数に一意な識別子を渡します。この識別子は通常文字列ですが、ハッシュ可能なオブジェクトであれば何でもかまいません。この結果、受信関数は一意な <code class="docutils literal notranslate"><span class="pre">dispatch_uid</span></code> の値ごとに一度だけシグナルにバインドされることになります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">request_finished</span>
+
+<span class="n">request_finished</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">my_callback</span><span class="p">,</span> <span class="n">dispatch_uid</span><span class="o">=</span><span class="s2">&quot;my_unique_identifier&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-defining-and-sending-signals">
+<span id="s-id4"></span><span id="defining-and-sending-signals"></span><span id="id4"></span><h2>シグナルの定義と送信<a class="headerlink" href="#defining-and-sending-signals" title="Link to this heading">¶</a></h2>
+<p>アプリケーションは信号インフラを利用し、独自の信号を提供できます。</p>
+<div class="admonition-when-to-use-custom-signals admonition">
+<p class="admonition-title">カスタムシグナルを使うべきタイミング</p>
+<p>シグナルは暗黙の関数呼び出しなので、デバッグが難しくなります。カスタムシグナルの送信側と受信側の両方がプロジェクト内にある場合は、明示的な関数呼び出しを使ったほうがよいでしょう。</p>
+</div>
+<section id="s-defining-signals">
+<span id="defining-signals"></span><h3>シグナルを定義する<a class="headerlink" href="#defining-signals" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.dispatch.Signal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Signal</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/dispatch/dispatcher.py#L25"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.dispatch.Signal" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>すべてのシグナルは <a class="reference internal" href="#django.dispatch.Signal" title="django.dispatch.Signal"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.dispatch.Signal</span></code></a> インスタンスです。</p>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">django.dispatch</span>
+
+<span class="n">pizza_done</span> <span class="o">=</span> <span class="n">django</span><span class="o">.</span><span class="n">dispatch</span><span class="o">.</span><span class="n">Signal</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>このコードは、<code class="docutils literal notranslate"><span class="pre">pizza_done</span></code> シグナルを宣言しています。</p>
+</section>
+<section id="s-sending-signals">
+<span id="s-id5"></span><span id="sending-signals"></span><span id="id5"></span><h3>シグナルを送信する<a class="headerlink" href="#sending-signals" title="Link to this heading">¶</a></h3>
+<p>Django でシグナルを同期的に送信する方法は2つあります。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.dispatch.Signal.send">
+<span class="sig-prename descclassname"><span class="pre">Signal.</span></span><span class="sig-name descname"><span class="pre">send</span></span>(<em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/dispatch/dispatcher.py#L159"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.dispatch.Signal.send" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.dispatch.Signal.send_robust">
+<span class="sig-prename descclassname"><span class="pre">Signal.</span></span><span class="sig-name descname"><span class="pre">send_robust</span></span>(<em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/dispatch/dispatcher.py#L271"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.dispatch.Signal.send_robust" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>シグナルは非同期に送信することもできます。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.dispatch.Signal.asend">
+<span class="sig-prename descclassname"><span class="pre">Signal.</span></span><span class="sig-name descname"><span class="pre">asend</span></span>(<em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.dispatch.Signal.asend" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.dispatch.Signal.asend_robust">
+<span class="sig-prename descclassname"><span class="pre">Signal.</span></span><span class="sig-name descname"><span class="pre">asend_robust</span></span>(<em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.dispatch.Signal.asend_robust" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>シグナルを送信するには、<a class="reference internal" href="#django.dispatch.Signal.send" title="django.dispatch.Signal.send"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Signal.send()</span></code></a>、<a class="reference internal" href="#django.dispatch.Signal.send_robust" title="django.dispatch.Signal.send_robust"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Signal.send_robust()</span></code></a>、<a class="reference internal" href="#django.dispatch.Signal.asend" title="django.dispatch.Signal.asend"><code class="xref py py-meth docutils literal notranslate"><span class="pre">await</span> <span class="pre">Signal.asend()</span></code></a>、<a class="reference internal" href="#django.dispatch.Signal.asend_robust" title="django.dispatch.Signal.asend_robust"><code class="xref py py-meth docutils literal notranslate"><span class="pre">await</span> <span class="pre">Signal.asend_robust()</span></code></a> のどれかを呼び出します。引数として <code class="docutils literal notranslate"><span class="pre">sender</span></code> (ほとんどの場合クラス) を指定する必要があり、他のキーワード引数を好きなだけ指定できます。</p>
+<p>たとえば、<code class="docutils literal notranslate"><span class="pre">pizza_done</span></code> シグナルを送信するには、次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PizzaStore</span><span class="p">:</span>
+    <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">send_pizza</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toppings</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+        <span class="n">pizza_done</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">sender</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">toppings</span><span class="o">=</span><span class="n">toppings</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+        <span class="o">...</span>
+</pre></div>
+</div>
+<p>4つのメソッドはすべて、呼び出されたレシーバー関数とそのレスポンス値のリストを表すタプルのペア <code class="docutils literal notranslate"><span class="pre">[(receiver,</span> <span class="pre">response),</span> <span class="pre">...]</span></code> のリストを返します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">send()</span></code> は <code class="docutils literal notranslate"><span class="pre">send_robust()</span></code> と異なり、レシーバ関数が発生させた例外をどのようにハンド リングするかという点で異なります。 <code class="docutils literal notranslate"><span class="pre">send()</span></code> はレシーバが発生させた例外をキャッチしません。そのため、エラーが発生してもすべてのレシーバにシグナルが通知されるとは限りません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">send_robust()</span></code> は Python の <code class="docutils literal notranslate"><span class="pre">Exception</span></code> クラスに由来するすべてのエラーをキャッチし、すべてのレシーバにシグナルが通知されるようにします。エラーが発生した場合、エラーを発生させたレシーバのタプルのペアにエラーインスタンスが返されます。</p>
+<p>トレースバックは <code class="docutils literal notranslate"><span class="pre">send_robust()</span></code> を呼び出したときに返されるエラーの <code class="docutils literal notranslate"><span class="pre">__traceback__</span></code> 属性に存在します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">asend()</span></code> は <code class="docutils literal notranslate"><span class="pre">send()</span></code> と似ていますが、await しなければならないコルーチンです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">asend_pizza</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">toppings</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="k">await</span> <span class="n">pizza_done</span><span class="o">.</span><span class="n">asend</span><span class="p">(</span><span class="n">sender</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">toppings</span><span class="o">=</span><span class="n">toppings</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>同期であっても非同期であっても、レシーバは <code class="docutils literal notranslate"><span class="pre">send()</span></code> と <code class="docutils literal notranslate"><span class="pre">asend()</span></code> のどちらを使用しても正しく適応されます。<code class="docutils literal notranslate"><span class="pre">asend()</span></code> で呼び出された場合、同期レシーバは <a class="reference internal" href="async.html#asgiref.sync.sync_to_async" title="asgiref.sync.sync_to_async"><code class="xref py py-func docutils literal notranslate"><span class="pre">sync_to_async()</span></code></a> を使って呼び出されます。非同期レシーバは、<code class="docutils literal notranslate"><span class="pre">sync()</span></code> によって呼び出された場合、 <a class="reference internal" href="async.html#asgiref.sync.async_to_sync" title="asgiref.sync.async_to_sync"><code class="xref py py-func docutils literal notranslate"><span class="pre">async_to_sync()</span></code></a> を使って呼び出されます。<a class="reference internal" href="async.html#async-performance"><span class="std std-ref">ミドルウェア</span></a> のケースと同様に、この方法でレシーバを適合させることには、わずかなパフォーマンスコストがあります。<code class="docutils literal notranslate"><span class="pre">send()</span></code> または <code class="docutils literal notranslate"><span class="pre">asend()</span></code> 呼び出しの中で同期/非同期の呼び出しスタイルの切り替えの回数を減らすために、呼び出す前に非同期かどうかでレシーバをグループ化していることに注意してください。これは、同期レシーバの前に登録された非同期レシーバが、同期レシーバの後に実行される可能性があることを意味します。さらに、非同期レシーバは <code class="docutils literal notranslate"><span class="pre">asyncio.gather()</span></code> を使って同時に実行されます。</p>
+<p>非同期のリクエスト/レスポンス・サイクル以外のすべての組み込みシグナルは <a class="reference internal" href="#django.dispatch.Signal.send" title="django.dispatch.Signal.send"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Signal.send()</span></code></a> を使ってディスパッチされます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>非同期シグナルのサポートが追加されました。</p>
+</div>
+</section>
+</section>
+<section id="s-disconnecting-signals">
+<span id="disconnecting-signals"></span><h2>シグナルを切断する<a class="headerlink" href="#disconnecting-signals" title="Link to this heading">¶</a></h2>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.dispatch.Signal.disconnect">
+<span class="sig-prename descclassname"><span class="pre">Signal.</span></span><span class="sig-name descname"><span class="pre">disconnect</span></span>(<em class="sig-param"><span class="n"><span class="pre">receiver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sender</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dispatch_uid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/dispatch/dispatcher.py#L119"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.dispatch.Signal.disconnect" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>シグナルからレシーバーを切断するには <a class="reference internal" href="#django.dispatch.Signal.disconnect" title="django.dispatch.Signal.disconnect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Signal.disconnect()</span></code></a> を呼び出します。引数は <a class="reference internal" href="#django.dispatch.Signal.connect" title="django.dispatch.Signal.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Signal.connect()</span></code></a> の説明と同じです。このメソッドは、レシーバが切断された場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> を、切断されなかった場合は <code class="docutils literal notranslate"><span class="pre">False</span></code> を返します。<code class="docutils literal notranslate"><span class="pre">sender</span></code> が <code class="docutils literal notranslate"><span class="pre">&lt;app</span> <span class="pre">label&gt;.&lt;model&gt;</span></code> への遅延参照として渡された場合、このメソッドは常に <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します。</p>
+<p>引数 <code class="docutils literal notranslate"><span class="pre">receiver</span></code> は、切断する登録済みのレシーバを指定します。レシーバを識別するために <code class="docutils literal notranslate"><span class="pre">dispatch_uid</span></code> を使用する場合は <code class="docutils literal notranslate"><span class="pre">None</span></code> を指定します。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">シグナル</a><ul>
+<li><a class="reference internal" href="#listening-to-signals">シグナルを待ち受ける</a><ul>
+<li><a class="reference internal" href="#receiver-functions">レシーバ関数</a></li>
+<li><a class="reference internal" href="#connecting-receiver-functions">レシーバ関数に接続する</a></li>
+<li><a class="reference internal" href="#connecting-to-signals-sent-by-specific-senders">特定の送信者によって送られたシグナルに接続する</a></li>
+<li><a class="reference internal" href="#preventing-duplicate-signals">重複したシグナルを防止する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defining-and-sending-signals">シグナルの定義と送信</a><ul>
+<li><a class="reference internal" href="#defining-signals">シグナルを定義する</a></li>
+<li><a class="reference internal" href="#sending-signals">シグナルを送信する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#disconnecting-signals">シグナルを切断する</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="settings.html"
+                          title="前の章へ">Djangoの設定</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="checks.html"
+                          title="次の章へ">システムチェックフレームワーク</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topics/signals.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="settings.html" title="Djangoの設定">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="checks.html" title="システムチェックフレームワーク">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django のショートカット関数 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="ジェネリックビュー (汎用ビュー)" href="generic-views.html" />
+    <link rel="prev" title="ファイルのアップロード" href="file-uploads.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="file-uploads.html" title="ファイルのアップロード">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="generic-views.html" title="ジェネリックビュー (汎用ビュー)">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-http-shortcuts">
+            
+  <section id="s-module-django.shortcuts">
+<span id="s-django-shortcut-functions"></span><span id="module-django.shortcuts"></span><span id="django-shortcut-functions"></span><h1>Django のショートカット関数<a class="headerlink" href="#module-django.shortcuts" title="Link to this heading">¶</a></h1>
+<p id="index-0"><code class="docutils literal notranslate"><span class="pre">django.shortcuts</span></code> パッケージは、MVC の複数のレベルにまたがるヘルパー関数とクラスを集めたものです。言い換えれば、これらの関数やクラスは、便宜上、控えめな結合を取り入れます。</p>
+<section id="s-render">
+<span id="render"></span><h2><code class="docutils literal notranslate"><span class="pre">render()</span></code><a class="headerlink" href="#render" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.shortcuts.render">
+<span class="sig-name descname"><span class="pre">render</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/shortcuts.py#L18"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.shortcuts.render" title="Link to this definition">¶</a></dt>
+<dd><p>与えられたテンプレートとコンテキスト辞書を組み合わせてレンダリングされたテキストを持つ、 <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトを返します。</p>
+<p>Djangoは、 <a class="reference internal" href="../../ref/template-response.html#django.template.response.TemplateResponse" title="django.template.response.TemplateResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateResponse</span></code></a> を返すショートカット関数を提供していません。なぜなら、 <a class="reference internal" href="../../ref/template-response.html#django.template.response.TemplateResponse" title="django.template.response.TemplateResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateResponse</span></code></a> のコンストラクタは、 <a class="reference internal" href="#django.shortcuts.render" title="django.shortcuts.render"><code class="xref py py-func docutils literal notranslate"><span class="pre">render()</span></code></a> と同じくらい便利な機能を提供しているからです。</p>
+</dd></dl>
+
+<section id="s-required-arguments">
+<span id="required-arguments"></span><h3>必須の引数<a class="headerlink" href="#required-arguments" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">request</span></code></dt><dd><p>このレスポンスを生成するのに使用されるリクエスト オブジェクト。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">template_name</span></code></dt><dd><p>使用するテンプレートの完全な名前、または、テンプレート名のシーケンス。シーケンスが指定された場合、最初に存在するテンプレートが使用されます。テンプレートの検索方法については、<a class="reference internal" href="../templates.html#template-loading"><span class="std std-ref">テンプレートの読み込みドキュメント</span></a> を参照してください。</p>
+</dd>
+</dl>
+</section>
+<section id="s-optional-arguments">
+<span id="optional-arguments"></span><h3>オプションの引数<a class="headerlink" href="#optional-arguments" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">context</span></code></dt><dd><p>テンプレートコンテキストに追加する値の辞書です。デフォルトでは空の辞書です。辞書内の値が呼び出し可能な場合、ビューはテンプレートをレンダリングする直前にそれを呼び出します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">content_type</span></code></dt><dd><p>結果のドキュメントに適用するMIMEタイプ。デフォルトは <code class="docutils literal notranslate"><span class="pre">'text/html'</span></code> です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">status</span></code></dt><dd><p>レスポンスのステータスコード。デフォルトは <code class="docutils literal notranslate"><span class="pre">200</span></code> です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>テンプレートを読み込むために使用するテンプレートエンジンの <a class="reference internal" href="../../ref/settings.html#std-setting-TEMPLATES-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> を指定します。</p>
+</dd>
+</dl>
+</section>
+<section id="s-example">
+<span id="example"></span><h3>カスタマイズ例<a class="headerlink" href="#example" title="Link to this heading">¶</a></h3>
+<p>次の例では、テンプレート <code class="docutils literal notranslate"><span class="pre">myapp/index.html</span></code> をMIMEタイプ <code class="docutils literal notranslate"><span class="pre">application/xhtml+xml</span></code> でレンダリングしてみます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># View code here...</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span>
+        <span class="n">request</span><span class="p">,</span>
+        <span class="s2">&quot;myapp/index.html&quot;</span><span class="p">,</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;application/xhtml+xml&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>この例は次のコードと等価です。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">loader</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># View code here...</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;myapp/index.html&quot;</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">request</span><span class="p">),</span> <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;application/xhtml+xml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-redirect">
+<span id="redirect"></span><h2><code class="docutils literal notranslate"><span class="pre">redirect()</span></code><a class="headerlink" href="#redirect" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.shortcuts.redirect">
+<span class="sig-name descname"><span class="pre">redirect</span></span>(<em class="sig-param"><span class="n"><span class="pre">to</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">permanent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/shortcuts.py#L29"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.shortcuts.redirect" title="Link to this definition">¶</a></dt>
+<dd><p>渡された引数に対して、 適切な URLへの <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseRedirect</span></code></a> を返します。</p>
+<p>引数には以下が含まれます:</p>
+<ul class="simple">
+<li><p>モデル：モデルの <a class="reference internal" href="../../ref/models/instances.html#django.db.models.Model.get_absolute_url" title="django.db.models.Model.get_absolute_url"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_absolute_url()</span></code></a> 関数が呼び出されます。</p></li>
+<li><p>ビュー名（引数を渡せます）: <a class="reference internal" href="../../ref/urlresolvers.html#django.urls.reverse" title="django.urls.reverse"><code class="xref py py-func docutils literal notranslate"><span class="pre">reverse()</span></code></a> を使って名前を逆解決します。</p></li>
+<li><p>絶対URLまたは相対URL。これはそのままリダイレクト先になります。</p></li>
+</ul>
+<p>デフォルトでは一時的なリダイレクトを発行します。 <code class="docutils literal notranslate"><span class="pre">permanent=True</span></code> を渡すと恒久的なリダイレクトを発行します。</p>
+</dd></dl>
+
+<section id="s-examples">
+<span id="examples"></span><h3>例<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="#django.shortcuts.redirect" title="django.shortcuts.redirect"><code class="xref py py-func docutils literal notranslate"><span class="pre">redirect()</span></code></a> 関数の使い方はいくつかあります。</p>
+<ol class="arabic">
+<li><p>オブジェクトを渡すことで、そのオブジェクトの <a class="reference internal" href="../../ref/models/instances.html#django.db.models.Model.get_absolute_url" title="django.db.models.Model.get_absolute_url"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_absolute_url()</span></code></a> メソッドが呼び出され、リダイレクト URL を返します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">redirect</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>ビューの名前と、オプションで位置引数またはキーワード引数を渡すことで、 <a class="reference internal" href="../../ref/urlresolvers.html#django.urls.reverse" title="django.urls.reverse"><code class="xref py py-func docutils literal notranslate"><span class="pre">reverse()</span></code></a> メソッドを使って URL を逆引きできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;some-view-name&quot;</span><span class="p">,</span> <span class="n">foo</span><span class="o">=</span><span class="s2">&quot;bar&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p>リダイレクト先としてハードコーディングされたURLを渡せます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/some/url/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>これは完全なURLでも機能します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;https://example.com/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<p>デフォルトでは <a class="reference internal" href="#django.shortcuts.redirect" title="django.shortcuts.redirect"><code class="xref py py-func docutils literal notranslate"><span class="pre">redirect()</span></code></a> は一時的なリダイレクトを返します。上記のすべての形式で <code class="docutils literal notranslate"><span class="pre">permanent</span></code> 引数が使えます。 <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定された場合、恒久的なリダイレクトを返します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-get-object-or-404">
+<span id="get-object-or-404"></span><h2><code class="docutils literal notranslate"><span class="pre">get_object_or_404()</span></code><a class="headerlink" href="#get-object-or-404" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.shortcuts.get_object_or_404">
+<span class="sig-name descname"><span class="pre">get_object_or_404</span></span>(<em class="sig-param"><span class="n"><span class="pre">klass</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/shortcuts.py#L65"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.shortcuts.get_object_or_404" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.shortcuts.aget_object_or_404">
+<span class="sig-name descname"><span class="pre">aget_object_or_404</span></span>(<em class="sig-param"><span class="n"><span class="pre">klass</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.shortcuts.aget_object_or_404" title="Link to this definition">¶</a></dt>
+<dd><p><em>非同期バージョン</em>: <code class="docutils literal notranslate"><span class="pre">aget_object_or_404()</span></code></p>
+<p>与えられたモデルマネージャに対して <a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet.get" title="django.db.models.query.QuerySet.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a> を呼び出しますが、モデルの <a class="reference internal" href="../../ref/models/class.html#django.db.models.Model.DoesNotExist" title="django.db.models.Model.DoesNotExist"><code class="xref py py-class docutils literal notranslate"><span class="pre">DoesNotExist</span></code></a> 例外の代わりに <a class="reference internal" href="views.html#django.http.Http404" title="django.http.Http404"><code class="xref py py-class docutils literal notranslate"><span class="pre">Http404</span></code></a> 例外を発生させます。</p>
+</dd></dl>
+
+<section id="s-arguments">
+<span id="arguments"></span><h3>引数<a class="headerlink" href="#arguments" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">klass</span></code></dt><dd><p>オブジェクトを取得するための <a class="reference internal" href="../../ref/models/instances.html#django.db.models.Model" title="django.db.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> クラス、 <a class="reference internal" href="../db/managers.html#django.db.models.Manager" title="django.db.models.Manager"><code class="xref py py-class docutils literal notranslate"><span class="pre">Manager</span></code></a> または <a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet" title="django.db.models.query.QuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></a> インスタンスです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">*args</span></code></dt><dd><p><a class="reference internal" href="../../ref/models/querysets.html#django.db.models.Q" title="django.db.models.Q"><code class="xref py py-class docutils literal notranslate"><span class="pre">Q</span> <span class="pre">オブジェクト</span></code></a> 。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">**kwargs</span></code></dt><dd><p>ルックアップパラメータ。 <code class="docutils literal notranslate"><span class="pre">get()</span></code> および <code class="docutils literal notranslate"><span class="pre">filter()</span></code> が受入可能なフォーマットにします。</p>
+</dd>
+</dl>
+</section>
+<section id="s-id1">
+<span id="id1"></span><h3>カスタマイズ例<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>以下の例では <code class="docutils literal notranslate"><span class="pre">MyModel</span></code> からプライマリキーが 1 のオブジェクトを取得しています:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">MyModel</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この例は次のコードと等価です。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Http404</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">MyModel</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;No MyModel matches the given query.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>最もよくある使用例は、上記のように <a class="reference internal" href="../../ref/models/instances.html#django.db.models.Model" title="django.db.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a> を渡すものです。しかし、 <a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet" title="django.db.models.query.QuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></a> インスタンスを渡すこともできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">queryset</span> <span class="o">=</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">title__startswith</span><span class="o">=</span><span class="s2">&quot;M&quot;</span><span class="p">)</span>
+<span class="n">get_object_or_404</span><span class="p">(</span><span class="n">queryset</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>上の例は下記と等価なので、少し不自然ではあります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Book</span><span class="p">,</span> <span class="n">title__startswith</span><span class="o">=</span><span class="s2">&quot;M&quot;</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>しかし、他の場所から <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> 変数を渡された場合には便利です。</p>
+<p>最後に、 <a class="reference internal" href="../db/managers.html#django.db.models.Manager" title="django.db.models.Manager"><code class="xref py py-class docutils literal notranslate"><span class="pre">Manager</span></code></a> を使うこともできます。これは例えば <a class="reference internal" href="../db/managers.html#custom-managers"><span class="std std-ref">カスタムマネージャ</span></a> がある場合に便利です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Book</span><span class="o">.</span><span class="n">dahl_objects</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Matilda&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../ref/models/relations.html#django.db.models.fields.related.RelatedManager" title="django.db.models.fields.related.RelatedManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">関係マネージャ</span></code></a> を使うこともできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">author</span> <span class="o">=</span> <span class="n">Author</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Roald Dahl&quot;</span><span class="p">)</span>
+<span class="n">get_object_or_404</span><span class="p">(</span><span class="n">author</span><span class="o">.</span><span class="n">book_set</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Matilda&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>注意: <code class="docutils literal notranslate"><span class="pre">get()</span></code> と同様に、複数のオブジェクトが見つかった場合は <a class="reference internal" href="../../ref/exceptions.html#django.core.exceptions.MultipleObjectsReturned" title="django.core.exceptions.MultipleObjectsReturned"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a> 例外が発生します。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p><code class="docutils literal notranslate"><span class="pre">aget_object_or_404()</span></code> 関数が追加されました。</p>
+</div>
+</section>
+</section>
+<section id="s-get-list-or-404">
+<span id="get-list-or-404"></span><h2><code class="docutils literal notranslate"><span class="pre">get_list_or_404()</span></code><a class="headerlink" href="#get-list-or-404" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.shortcuts.get_list_or_404">
+<span class="sig-name descname"><span class="pre">get_list_or_404</span></span>(<em class="sig-param"><span class="n"><span class="pre">klass</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/shortcuts.py#L110"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.shortcuts.get_list_or_404" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.shortcuts.aget_list_or_404">
+<span class="sig-name descname"><span class="pre">aget_list_or_404</span></span>(<em class="sig-param"><span class="n"><span class="pre">klass</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.shortcuts.aget_list_or_404" title="Link to this definition">¶</a></dt>
+<dd><p><em>非同期バージョン</em>: <code class="docutils literal notranslate"><span class="pre">aget_list_or_404()</span></code></p>
+<p>与えられたモデルマネージャの <a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet.filter" title="django.db.models.query.QuerySet.filter"><code class="xref py py-meth docutils literal notranslate"><span class="pre">filter()</span></code></a> の結果をリストにキャストして返します。結果のリストが空の場合は、 <a class="reference internal" href="views.html#django.http.Http404" title="django.http.Http404"><code class="xref py py-class docutils literal notranslate"><span class="pre">Http404</span></code></a> を発生させます。</p>
+</dd></dl>
+
+<section id="s-id2">
+<span id="id2"></span><h3>引数<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">klass</span></code></dt><dd><p>リストを取得するための <a class="reference internal" href="../../ref/models/instances.html#django.db.models.Model" title="django.db.models.Model"><code class="xref py py-class docutils literal notranslate"><span class="pre">Model</span></code></a>, <a class="reference internal" href="../db/managers.html#django.db.models.Manager" title="django.db.models.Manager"><code class="xref py py-class docutils literal notranslate"><span class="pre">Manager</span></code></a> または <a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet" title="django.db.models.query.QuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></a> インスタンスです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">*args</span></code></dt><dd><p><a class="reference internal" href="../../ref/models/querysets.html#django.db.models.Q" title="django.db.models.Q"><code class="xref py py-class docutils literal notranslate"><span class="pre">Q</span> <span class="pre">オブジェクト</span></code></a> 。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">**kwargs</span></code></dt><dd><p>ルックアップパラメータ。 <code class="docutils literal notranslate"><span class="pre">get()</span></code> および <code class="docutils literal notranslate"><span class="pre">filter()</span></code> が受入可能なフォーマットにします。</p>
+</dd>
+</dl>
+</section>
+<section id="s-id3">
+<span id="id3"></span><h3>カスタマイズ例<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<p>以下の例では <code class="docutils literal notranslate"><span class="pre">MyModel</span></code> から全ての公開されたオブジェクトを取得しています:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_list_or_404</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">my_objects</span> <span class="o">=</span> <span class="n">get_list_or_404</span><span class="p">(</span><span class="n">MyModel</span><span class="p">,</span> <span class="n">published</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この例は次のコードと等価です。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Http404</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">my_objects</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">MyModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">published</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">my_objects</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;No MyModel matches the given query.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p><code class="docutils literal notranslate"><span class="pre">aget_list_or_404()</span></code> 関数が追加されました。</p>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Django のショートカット関数</a><ul>
+<li><a class="reference internal" href="#render"><code class="docutils literal notranslate"><span class="pre">render()</span></code></a><ul>
+<li><a class="reference internal" href="#required-arguments">必須の引数</a></li>
+<li><a class="reference internal" href="#optional-arguments">オプションの引数</a></li>
+<li><a class="reference internal" href="#example">カスタマイズ例</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#redirect"><code class="docutils literal notranslate"><span class="pre">redirect()</span></code></a><ul>
+<li><a class="reference internal" href="#examples">例</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#get-object-or-404"><code class="docutils literal notranslate"><span class="pre">get_object_or_404()</span></code></a><ul>
+<li><a class="reference internal" href="#arguments">引数</a></li>
+<li><a class="reference internal" href="#id1">カスタマイズ例</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#get-list-or-404"><code class="docutils literal notranslate"><span class="pre">get_list_or_404()</span></code></a><ul>
+<li><a class="reference internal" href="#id2">引数</a></li>
+<li><a class="reference internal" href="#id3">カスタマイズ例</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="file-uploads.html"
+                          title="前の章へ">ファイルのアップロード</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="generic-views.html"
+                          title="次の章へ">ジェネリックビュー (汎用ビュー)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/http/shortcuts.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="file-uploads.html" title="ファイルのアップロード">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="generic-views.html" title="ジェネリックビュー (汎用ビュー)">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

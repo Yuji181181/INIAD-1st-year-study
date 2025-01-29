@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django ドキュメント &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="_static/default.css?v=bf4d74af" />
+    <script src="_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" />
+    <link rel="next" title="さぁ始めましょう" href="intro/index.html" />
+    <link rel="prev" title="Django ドキュメント目次" href="contents.html" />
+
+
+
+ 
+<script src="templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="">
+    <div id="hd">
+      <h1><a href="#">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="#">Home</a>  |
+        <a title="Table of contents" href="contents.html">Table of contents</a>  |
+        <a title="Global index" href="genindex.html">Index</a>  |
+        <a title="Module index" href="py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="contents.html" title="Django ドキュメント目次">previous</a>
+     |
+    <a title="Django 5.1.6.dev20250122212402 ドキュメント" href="#" accesskey="U">up</a>
+   |
+    <a href="intro/index.html" title="さぁ始めましょう">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="index">
+            
+  <section id="s-django-documentation">
+<span id="django-documentation"></span><h1>Django ドキュメント<a class="headerlink" href="#django-documentation" title="Link to this heading">¶</a></h1>
+<p class="rubric">Django を使いこなすための全てがここにあります。</p>
+<section id="s-first-steps">
+<span id="s-index-first-steps"></span><span id="first-steps"></span><span id="index-first-steps"></span><h2>最初のステップ<a class="headerlink" href="#first-steps" title="Link to this heading">¶</a></h2>
+<p>Django やプログラミングは初めてですか？ それなら、ここから始めましょう！</p>
+<ul class="simple">
+<li><p><strong>何もないところから始めるなら:</strong> <a class="reference internal" href="intro/overview.html"><span class="doc">概要</span></a> | <a class="reference internal" href="intro/install.html"><span class="doc">インストール</span></a></p></li>
+<li><p><strong>チュートリアルはこちら:</strong> <a class="reference internal" href="intro/tutorial01.html"><span class="doc">その 1: リクエストとレスポンス</span></a> | <a class="reference internal" href="intro/tutorial02.html"><span class="doc">その 2: モデルと管理サイト</span></a> | <a class="reference internal" href="intro/tutorial03.html"><span class="doc">その 3: ビューとテンプレート</span></a> | <a class="reference internal" href="intro/tutorial04.html"><span class="doc">その 4: フォームと汎用ビュー</span></a> | <a class="reference internal" href="intro/tutorial05.html"><span class="doc">その 5: テスト</span></a> | <a class="reference internal" href="intro/tutorial06.html"><span class="doc">その 6: 静的ファイル</span></a> | <a class="reference internal" href="intro/tutorial07.html"><span class="doc">その 7: 管理サイトのカスタマイズ</span></a> | <a class="reference internal" href="intro/tutorial08.html"><span class="doc">その 8: サードパーティ製のパッケージを追加する</span></a></p></li>
+<li><p><strong>高度なチュートリアル:</strong> <a class="reference internal" href="intro/reusable-apps.html"><span class="doc">再利用可能なアプリを作成する</span></a> | <a class="reference internal" href="intro/contributing.html"><span class="doc">はじめてDjangoへ貢献する</span></a></p></li>
+</ul>
+</section>
+<section id="s-getting-help">
+<span id="getting-help"></span><h2>助けを求める<a class="headerlink" href="#getting-help" title="Link to this heading">¶</a></h2>
+<p>困り事ですか？手を貸しましょう！</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="faq/index.html"><span class="doc">FAQ</span></a> を探してみましょう。よくある質問への答えなら、ここで見つかります。</p></li>
+<li><p>特定のトピックに関する情報を探していますか？ それなら、 <a class="reference internal" href="genindex.html"><span class="std std-ref">索引</span></a> や <a class="reference internal" href="py-modindex.html"><span class="std std-ref">モジュール索引</span></a> 、そして <a class="reference internal" href="contents.html"><span class="doc">ドキュメントの詳しい目次</span></a> を見てください。</p></li>
+<li><p>何も見つかりませんか？ サポートを受けたりコミュニティへの質問に関する情報については、<a class="reference internal" href="faq/help.html"><span class="doc">FAQ: 助けを求める</span></a>  を確認してください。</p></li>
+<li><p>Django のバグを見つけたときは、 <a class="reference external" href="https://code.djangoproject.com/">チケットトラッカー</a> で報告してください。</p></li>
+</ul>
+</section>
+<section id="s-how-the-documentation-is-organized">
+<span id="how-the-documentation-is-organized"></span><h2>本ドキュメントの構成<a class="headerlink" href="#how-the-documentation-is-organized" title="Link to this heading">¶</a></h2>
+<p>Django にはドキュメントがたくさんあります。あらかじめドキュメントの構成の大まかな概要を知っておけば、特定のトピックを探すときに、どこを探せばいいかすぐに分かるようになるでしょう。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="intro/index.html"><span class="doc">チュートリアル</span></a> では、一連のステップを通して、実際に手を動かしながら Web アプリケーションを作ります。もし Django や Web アプリケーションの開発が初めてなら、ここから読み始めてください。「 <a class="reference internal" href="#index-first-steps"><span class="std std-ref">最初のステップ</span></a> 」のセクションも読んでみてください。</p></li>
+<li><p><a class="reference internal" href="topics/index.html"><span class="doc">トピックガイド</span></a> では、重要なトピックや概念について大まかに解説し、役に立つ背景情報や説明を行っています。</p></li>
+<li><p><a class="reference internal" href="ref/index.html"><span class="doc">リファレンスガイド</span></a> は、API や他の側面から見た Django の仕組みの技術的なリファレンスです。ここでは、Django の仕組みとその使い方について説明していますが、重要な概念については基本的に理解していることを前提に書かれています。</p></li>
+<li><p><a class="reference internal" href="howto/index.html"><span class="doc">How-to ガイド</span></a> はレシピ集です。よくある問題やユースケースに対して、どんなステップを踏んで解決すればいいかを説明しています。チュートリアルより発展的な内容で、Django の仕組みについてはある程度は理解していることを前提に書いてあります。</p></li>
+</ul>
+</section>
+<section id="s-the-model-layer">
+<span id="the-model-layer"></span><h2>モデル層<a class="headerlink" href="#the-model-layer" title="Link to this heading">¶</a></h2>
+<p>Django は、Web アプリケーションのデータ構造を定義、操作するための抽象レイヤ「モデル (models)」を提供しています。詳細は以下を参照してください:</p>
+<ul class="simple">
+<li><p><strong>モデル:</strong> <a class="reference internal" href="topics/db/models.html"><span class="doc">モデル 入門</span></a> | <a class="reference internal" href="ref/models/fields.html"><span class="doc">フィールド型</span></a> | <a class="reference internal" href="ref/models/indexes.html"><span class="doc">インデックス</span></a> | <a class="reference internal" href="ref/models/options.html"><span class="doc">Meta オプション</span></a> | <a class="reference internal" href="ref/models/class.html"><span class="doc">モデルクラス</span></a></p></li>
+<li><p><strong>QuerySets:</strong> <a class="reference internal" href="topics/db/queries.html"><span class="doc">クエリを作成する</span></a> | <a class="reference internal" href="ref/models/querysets.html"><span class="doc">QuerySetメソッドリファレンス</span></a> | <a class="reference internal" href="ref/models/lookups.html"><span class="doc">検索式</span></a></p></li>
+<li><p><strong>モデルインスタンス詳説:</strong> <a class="reference internal" href="ref/models/instances.html"><span class="doc">インスタンスメソッド解説</span></a> | <a class="reference internal" href="ref/models/relations.html"><span class="doc">リレーション先オブジェクトへのアクセス</span></a></p></li>
+<li><p><strong>マイグレーションとは:</strong> <a class="reference internal" href="topics/migrations.html"><span class="doc">マイグレーションの解説</span></a> | <a class="reference internal" href="ref/migration-operations.html"><span class="doc">操作方法リファレンス</span></a> | <a class="reference internal" href="ref/schema-editor.html"><span class="doc">スキーマエディタ</span></a> | <a class="reference internal" href="howto/writing-migrations.html"><span class="doc">マイグレーションを書くには</span></a></p></li>
+<li><p><strong>モデルの高度な話題:</strong> <a class="reference internal" href="topics/db/managers.html"><span class="doc">マネージャ (Manager)</span></a> | <a class="reference internal" href="topics/db/sql.html"><span class="doc">素の SQL を扱うには</span></a> | <a class="reference internal" href="topics/db/transactions.html"><span class="doc">トランザクション</span></a> | <a class="reference internal" href="topics/db/aggregation.html"><span class="doc">アグリゲーション (Aggregation)</span></a> | <a class="reference internal" href="topics/db/search.html"><span class="doc">検索</span></a> | <a class="reference internal" href="howto/custom-model-fields.html"><span class="doc">フィールド型を自作するには</span></a> | <a class="reference internal" href="topics/db/multi-db.html"><span class="doc">複数データベースを扱うには</span></a> | <a class="reference internal" href="howto/custom-lookups.html"><span class="doc">lookup フィルタを自作するには</span></a> | <a class="reference internal" href="ref/models/expressions.html"><span class="doc">クエリを書くには</span></a> | <a class="reference internal" href="ref/models/conditional-expressions.html"><span class="doc">条件分岐をするには</span></a> | <a class="reference internal" href="ref/models/database-functions.html"><span class="doc">データベース関数</span></a></p></li>
+<li><p><strong>その他:</strong> <a class="reference internal" href="ref/databases.html"><span class="doc">データベースのサポート状況</span></a> | <a class="reference internal" href="howto/legacy-databases.html"><span class="doc">レガシーなデータベースを扱う</span></a> | <a class="reference internal" href="howto/initial-data.html"><span class="doc">初期データを投入するには</span></a> | <a class="reference internal" href="topics/db/optimization.html"><span class="doc">データベースアクセスの最適化</span></a> | <a class="reference internal" href="ref/contrib/postgres/index.html"><span class="doc">PostgreSQLの特有の機能を扱うには</span></a></p></li>
+</ul>
+</section>
+<section id="s-the-view-layer">
+<span id="the-view-layer"></span><h2>ビュー層<a class="headerlink" href="#the-view-layer" title="Link to this heading">¶</a></h2>
+<p>Django には「ビュー (views)」と呼ばれる概念があります。ビューは、ユーザーリクエストを処理してレスポンスを返すロジックをカプセル化したものです。以下のリンクから、ビューの詳細を学びましょう。</p>
+<ul class="simple">
+<li><p><strong>基本事項:</strong> <a class="reference internal" href="topics/http/urls.html"><span class="doc">URLconfs</span></a> | <a class="reference internal" href="topics/http/views.html"><span class="doc">ビュー関数</span></a> | <a class="reference internal" href="topics/http/shortcuts.html"><span class="doc">ショートカット</span></a> | <a class="reference internal" href="topics/http/decorators.html"><span class="doc">デコレータ</span></a> | <a class="reference internal" href="topics/async.html"><span class="doc">非同期サポート</span></a></p></li>
+<li><p><strong>リファレンス:</strong> <a class="reference internal" href="ref/views.html"><span class="doc">組み込みのビュー</span></a> | <a class="reference internal" href="ref/request-response.html"><span class="doc">リクエスト/レスポンスオブジェクト</span></a> | <a class="reference internal" href="ref/template-response.html"><span class="doc">テンプレートレスポンスオブジェクト</span></a></p></li>
+<li><p><strong>ファイルアップロード:</strong> <a class="reference internal" href="topics/http/file-uploads.html"><span class="doc">概要</span></a> | <a class="reference internal" href="ref/files/file.html"><span class="doc">File オブジェクトリファレンス</span></a> | <a class="reference internal" href="ref/files/storage.html"><span class="doc">ストレージ API</span></a> | <a class="reference internal" href="topics/files.html"><span class="doc">ファイルの管理</span></a> | <a class="reference internal" href="howto/custom-file-storage.html"><span class="doc">ストレージを自作するには</span></a></p></li>
+<li><p><strong>クラスベースビュー:</strong> <a class="reference internal" href="topics/class-based-views/index.html"><span class="doc">概要</span></a> | <a class="reference internal" href="topics/class-based-views/generic-display.html"><span class="doc">ビルトインの表示用ビュー</span></a> | <a class="reference internal" href="topics/class-based-views/generic-editing.html"><span class="doc">ビルトインの編集用ビュー</span></a> | <a class="reference internal" href="topics/class-based-views/mixins.html"><span class="doc">Mixin を使うには</span></a> | <a class="reference internal" href="ref/class-based-views/index.html"><span class="doc">API リファレンス</span></a> | <a class="reference internal" href="ref/class-based-views/flattened-index.html"><span class="doc">索引</span></a></p></li>
+<li><p><strong>より高度なビューの話題:</strong> <a class="reference internal" href="howto/outputting-csv.html"><span class="doc">CSV を出力するには</span></a> | <a class="reference internal" href="howto/outputting-pdf.html"><span class="doc">PDF を出力するには</span></a></p></li>
+<li><p><strong>ミドルウェア:</strong> <a class="reference internal" href="topics/http/middleware.html"><span class="doc">ミドルウェアとは</span></a> | <a class="reference internal" href="ref/middleware.html"><span class="doc">ビルトインのミドルウェアクラス</span></a></p></li>
+</ul>
+</section>
+<section id="s-the-template-layer">
+<span id="the-template-layer"></span><h2>テンプレート層<a class="headerlink" href="#the-template-layer" title="Link to this heading">¶</a></h2>
+<p>テンプレート層は、ユーザに表示される情報をレンダリングするための、デザイナーにも書きやすい構文を提供します。デザイナーによるテンプレートの構文の使い方や、プログラマーが構文を拡張する方法について学びましょう。</p>
+<ul class="simple">
+<li><p><strong>基本:</strong> <a class="reference internal" href="topics/templates.html"><span class="doc">概要</span></a></p></li>
+<li><p><strong>デザイナー向けの情報:</strong> <a class="reference internal" href="ref/templates/language.html"><span class="doc">テンプレートの書き方概要</span></a> | <a class="reference internal" href="ref/templates/builtins.html"><span class="doc">ビルトインタグとフィルタ</span></a> | <a class="reference internal" href="ref/contrib/humanize.html"><span class="doc">人間にやさしい出力生成</span></a></p></li>
+<li><p><strong>プログラマー向けの情報:</strong> <a class="reference internal" href="ref/templates/api.html"><span class="doc">テンプレート API</span></a> | <a class="reference internal" href="howto/custom-template-tags.html"><span class="doc">タグやフィルタを自作するには</span></a> | <a class="reference internal" href="howto/custom-template-backend.html"><span class="doc">テンプレートのバックエンドを自作するには</span></a></p></li>
+</ul>
+</section>
+<section id="s-forms">
+<span id="forms"></span><h2>フォーム<a class="headerlink" href="#forms" title="Link to this heading">¶</a></h2>
+<p>Django には、フォームを簡単に作成したり、フォームに入力されたデータを簡単に操作できるようにしてくれる、多機能なフレームワークがあります。</p>
+<ul class="simple">
+<li><p><strong>フォームの基礎:</strong> <a class="reference internal" href="topics/forms/index.html"><span class="doc">概要</span></a> | <a class="reference internal" href="ref/forms/api.html"><span class="doc">フォーム API</span></a> | <a class="reference internal" href="ref/forms/fields.html"><span class="doc">ビルトインフォームフィールド</span></a> | <a class="reference internal" href="ref/forms/widgets.html"><span class="doc">ビルトインウィジェット</span></a></p></li>
+<li><p><strong>高度な話題:</strong> <a class="reference internal" href="topics/forms/modelforms.html"><span class="doc">モデルに対応したフォームを生成するには</span></a> | <a class="reference internal" href="topics/forms/media.html"><span class="doc">メディアファイルを組み込むには</span></a> | <a class="reference internal" href="topics/forms/formsets.html"><span class="doc">フォームセットを扱うには</span></a> | <a class="reference internal" href="ref/forms/validation.html"><span class="doc">バリデータを自作するには</span></a></p></li>
+</ul>
+</section>
+<section id="s-the-development-process">
+<span id="the-development-process"></span><h2>開発プロセス<a class="headerlink" href="#the-development-process" title="Link to this heading">¶</a></h2>
+<p>Django アプリケーションの開発とテストに役立つ、さまざまなコンポーネントとツールについて学ましょう。</p>
+<ul class="simple">
+<li><p><strong>設定:</strong> <a class="reference internal" href="topics/settings.html"><span class="doc">概要</span></a> | <a class="reference internal" href="ref/settings.html"><span class="doc">設定項目</span></a></p></li>
+<li><p><strong>アプリケーション:</strong> <a class="reference internal" href="ref/applications.html"><span class="doc">概要</span></a></p></li>
+<li><p><strong>例外:</strong> <a class="reference internal" href="ref/exceptions.html"><span class="doc">例外の概要</span></a></p></li>
+<li><p><strong>django-admin と manage.py:</strong> <a class="reference internal" href="ref/django-admin.html"><span class="doc">概要</span></a> | <a class="reference internal" href="howto/custom-management-commands.html"><span class="doc">自作の管理コマンドを追加するには</span></a></p></li>
+<li><p><strong>テスト:</strong> <a class="reference internal" href="topics/testing/index.html"><span class="doc">概要</span></a> | <a class="reference internal" href="topics/testing/overview.html"><span class="doc">テストの書き方と実行方法</span></a> | <a class="reference internal" href="topics/testing/tools.html"><span class="doc">テストのツール</span></a> | <a class="reference internal" href="topics/testing/advanced.html"><span class="doc">高度な話題</span></a></p></li>
+<li><p><strong>デプロイ:</strong> <a class="reference internal" href="howto/deployment/index.html"><span class="doc">概要</span></a> | <a class="reference internal" href="howto/deployment/wsgi/index.html"><span class="doc">WSGI サーバー</span></a> | <a class="reference internal" href="howto/deployment/asgi/index.html"><span class="doc">ASGI サーバー</span></a> | <a class="reference internal" href="howto/static-files/deployment.html"><span class="doc">静的なファイルをデプロイする</span></a> | <a class="reference internal" href="howto/error-reporting.html"><span class="doc">メールでコードのエラーを追跡する</span></a> | <a class="reference internal" href="howto/deployment/checklist.html"><span class="doc">デプロイのチェックリスト</span></a></p></li>
+</ul>
+</section>
+<section id="s-the-admin">
+<span id="the-admin"></span><h2>管理インタフェース<a class="headerlink" href="#the-admin" title="Link to this heading">¶</a></h2>
+<p>Django の目玉機能の一つである、自動生成の管理インタフェースのすべてを学びましょう。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="ref/contrib/admin/index.html"><span class="doc">管理サイト</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/admin/actions.html"><span class="doc">管理アクション</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/admin/admindocs.html"><span class="doc">管理サイトのドキュメント生成</span></a></p></li>
+</ul>
+</section>
+<section id="s-security">
+<span id="security"></span><h2>セキュリティ<a class="headerlink" href="#security" title="Link to this heading">¶</a></h2>
+<p>セキュリティは Web アプリケーションを開発する中でも最も重要なトピックです。Django は、複数のプロテクションのためのツールとメカニズムを提供しています:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="topics/security.html"><span class="doc">セキュリティの概要</span></a></p></li>
+<li><p><a class="reference internal" href="releases/security.html"><span class="doc">公表済みの Django のセキュリティ問題</span></a></p></li>
+<li><p><a class="reference internal" href="ref/clickjacking.html"><span class="doc">クリックジャッキング対策</span></a></p></li>
+<li><p><a class="reference internal" href="ref/csrf.html"><span class="doc">クロスサイトリクエストフォージェリ対策</span></a></p></li>
+<li><p><a class="reference internal" href="topics/signing.html"><span class="doc">暗号による署名</span></a></p></li>
+<li><p><a class="reference internal" href="ref/middleware.html#security-middleware"><span class="std std-ref">セキュリティ関連ミドルウェア</span></a></p></li>
+</ul>
+</section>
+<section id="s-internationalization-and-localization">
+<span id="internationalization-and-localization"></span><h2>国際化と地域化<a class="headerlink" href="#internationalization-and-localization" title="Link to this heading">¶</a></h2>
+<p>Django は堅牢な国際化、地域化フレームワークを提供しています。これらのフレームワークを使えば、多言語、世界の各地域に対応したアプリケーションが簡単に開発できます。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="topics/i18n/index.html"><span class="doc">概要</span></a> | <a class="reference internal" href="topics/i18n/translation.html"><span class="doc">国際化</span></a> | <a class="reference internal" href="topics/i18n/translation.html#how-to-create-language-files"><span class="std std-ref">ローカライズ</span></a> | <a class="reference internal" href="topics/i18n/formatting.html"><span class="doc">ローカライズされた Web UI フォーマットとフォームインプット</span></a></p></li>
+<li><p><a class="reference internal" href="topics/i18n/timezones.html"><span class="doc">タイムゾーン</span></a></p></li>
+</ul>
+</section>
+<section id="s-performance-and-optimization">
+<span id="performance-and-optimization"></span><h2>パフォーマンスと最適化<a class="headerlink" href="#performance-and-optimization" title="Link to this heading">¶</a></h2>
+<p>ソースコードをさらに効率的かつ高速に実行し、より少ないシステムリソースで動作するようにするのを助けてくれる、様々な技術とツールが存在します。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="topics/performance.html"><span class="doc">パフォーマンスと最適化の概要</span></a></p></li>
+</ul>
+</section>
+<section id="s-geographic-framework">
+<span id="geographic-framework"></span><h2>地理情報フレームワーク<a class="headerlink" href="#geographic-framework" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="ref/contrib/gis/index.html"><span class="doc">GeoDjango</span></a> は世界規模の地理情報 Web フレームワークを目指しています。 GeoDjango の目的は、地理情報システム (GIS) のWeb アプリケーションの開発をより簡単にし、空間データ (spatially enabled data) を活用することにあります。</p>
+</section>
+<section id="s-common-web-application-tools">
+<span id="common-web-application-tools"></span><h2>一般的な Web アプリケーションツール<a class="headerlink" href="#common-web-application-tools" title="Link to this heading">¶</a></h2>
+<p>Django は Web アプリケーションの開発でよく必要とされるツール群を提供しています。</p>
+<ul class="simple">
+<li><p><strong>認証:</strong> <a class="reference internal" href="topics/auth/index.html"><span class="doc">概要</span></a> | <a class="reference internal" href="topics/auth/default.html"><span class="doc">認証システムを使う</span></a> | <a class="reference internal" href="topics/auth/passwords.html"><span class="doc">パスワード管理</span></a> | <a class="reference internal" href="topics/auth/customizing.html"><span class="doc">認証の処理をカスタマイズする</span></a> | <a class="reference internal" href="ref/contrib/auth.html"><span class="doc">API リファレンス</span></a></p></li>
+<li><p><a class="reference internal" href="topics/cache.html"><span class="doc">キャッシュシステム</span></a></p></li>
+<li><p><a class="reference internal" href="topics/logging.html"><span class="doc">ログ出力</span></a></p></li>
+<li><p><a class="reference internal" href="topics/email.html"><span class="doc">メール送信</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/syndication.html"><span class="doc">配信フィード (RSS/Atom)</span></a></p></li>
+<li><p><a class="reference internal" href="topics/pagination.html"><span class="doc">ページ分割表示</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/messages.html"><span class="doc">メッセージフレームワーク</span></a></p></li>
+<li><p><a class="reference internal" href="topics/serialization.html"><span class="doc">データのシリアライズ</span></a></p></li>
+<li><p><a class="reference internal" href="topics/http/sessions.html"><span class="doc">セッション</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/sitemaps.html"><span class="doc">サイトマップ</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/staticfiles.html"><span class="doc">静的ファイル管理</span></a></p></li>
+<li><p><a class="reference internal" href="ref/validators.html"><span class="doc">データバリデーション</span></a></p></li>
+</ul>
+</section>
+<section id="s-other-core-functionalities">
+<span id="other-core-functionalities"></span><h2>その他の主要機能<a class="headerlink" href="#other-core-functionalities" title="Link to this heading">¶</a></h2>
+<p>Django フレームワークの、その他の主要機能について学びましょう。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="topics/conditional-view-processing.html"><span class="doc">条件付きコンテンツ処理</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/contenttypes.html"><span class="doc">コンテンツタイプと汎用リレーション</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/flatpages.html"><span class="doc">flatpages: フラットページコンテンツの管理</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/redirects.html"><span class="doc">リクエストのリダイレクト</span></a></p></li>
+<li><p><a class="reference internal" href="topics/signals.html"><span class="doc">イベントのシグナル</span></a></p></li>
+<li><p><a class="reference internal" href="topics/checks.html"><span class="doc">システムチェックフレームワーク</span></a></p></li>
+<li><p><a class="reference internal" href="ref/contrib/sites.html"><span class="doc">サイトフレームワーク</span></a></p></li>
+<li><p><a class="reference internal" href="ref/unicode.html"><span class="doc">Django での Unicode の扱い方</span></a></p></li>
+</ul>
+</section>
+<section id="s-the-django-open-source-project">
+<span id="the-django-open-source-project"></span><h2>オープンソースプロジェクトとしての Django<a class="headerlink" href="#the-django-open-source-project" title="Link to this heading">¶</a></h2>
+<p>Django プロジェクト自身の開発プロセスと、プロジェクトに貢献する方法について学びましょう。</p>
+<ul class="simple">
+<li><p><strong>コミュニティ:</strong> <a class="reference internal" href="internals/contributing/index.html"><span class="doc">Djangoに貢献する</span></a> | <a class="reference internal" href="internals/release-process.html"><span class="doc">リリースプロセス</span></a> | <a class="reference internal" href="internals/organization.html"><span class="doc">チームの組織</span></a> | <a class="reference internal" href="internals/git.html"><span class="doc">Djangoのソースコードリポジトリ</span></a> | <a class="reference internal" href="internals/security.html"><span class="doc">セキュリティポリシー</span></a> | <a class="reference internal" href="internals/mailing-lists.html"><span class="doc">メーリングリストとフォーラム</span></a></p></li>
+<li><p><strong>設計思想:</strong> <a class="reference internal" href="misc/design-philosophies.html"><span class="doc">概要</span></a></p></li>
+<li><p><strong>ドキュメンテーション:</strong> <a class="reference internal" href="internals/contributing/writing-documentation.html"><span class="doc">ドキュメントの仕組みと書き方</span></a></p></li>
+<li><p><strong>サードパーティが配布している Django:</strong> <a class="reference internal" href="misc/distributions.html"><span class="doc">概要</span></a></p></li>
+<li><p><strong>Django と長く付き合うために:</strong> <a class="reference internal" href="misc/api-stability.html"><span class="doc">API の安定性</span></a> | <a class="reference internal" href="releases/index.html"><span class="doc">リリースノート一覧とアップグレードの手順</span></a> | <a class="reference internal" href="internals/deprecation.html"><span class="doc">撤廃機能のスケジュール</span></a></p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="contents.html" title="Django ドキュメント目次">previous</a>
+     |
+    <a title="Django 5.1.6.dev20250122212402 ドキュメント" href="#" accesskey="U">up</a>
+   |
+    <a href="intro/index.html" title="さぁ始めましょう">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

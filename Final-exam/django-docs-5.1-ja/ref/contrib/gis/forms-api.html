@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GeoDjango フォーム API &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="GIS QuerySet API リファレンス" href="geoquerysets.html" />
+    <link rel="prev" title="GeoDjango データベース API" href="db-api.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="db-api.html" title="GeoDjango データベース API">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="geoquerysets.html" title="GIS QuerySet API リファレンス">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-gis-forms-api">
+            
+  <section id="s-module-django.contrib.gis.forms">
+<span id="s-geodjango-forms-api"></span><span id="module-django.contrib.gis.forms"></span><span id="geodjango-forms-api"></span><h1>GeoDjango フォーム API<a class="headerlink" href="#module-django.contrib.gis.forms" title="Link to this heading">¶</a></h1>
+<p>GeoDjango はジオローカライズされたデータを地図上に視覚的に表示・編集するために、いくつかの特殊なフォームフィールドとウィジェットを提供します。デフォルトでは、 <a class="reference external" href="https://www.earthdata.nasa.gov/">NASA</a> が提供する WMS レイヤーをベースとした <a class="reference external" href="https://openlayers.org/">OpenLayers</a> を利用した地図を使います。</p>
+<section id="s-field-arguments">
+<span id="field-arguments"></span><h2>フィールドの引数<a class="headerlink" href="#field-arguments" title="Link to this heading">¶</a></h2>
+<p>通常の <a class="reference internal" href="../../forms/fields.html#core-field-arguments"><span class="std std-ref">フォームフィールドの引数</span></a> に加えて、 GeoDjango のフォームフィールドは以下のオプションの引数を取ります。</p>
+<section id="s-srid">
+<span id="srid"></span><h3><code class="docutils literal notranslate"><span class="pre">srid</span></code><a class="headerlink" href="#srid" title="Link to this heading">¶</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.Field.srid">
+<span class="sig-prename descclassname"><span class="pre">Field.</span></span><span class="sig-name descname"><span class="pre">srid</span></span><a class="headerlink" href="#django.contrib.gis.forms.Field.srid" title="Link to this definition">¶</a></dt>
+<dd><p>これはフィールドの値を変換するSRIDコードです。例えば、マップウィジェットのSRIDがアプリケーションやデータベースで一般的に使われるSRIDと異なる場合、フィールドは入力値を自動的にそのSRIDに変換します。</p>
+</dd></dl>
+
+</section>
+<section id="s-geom-type">
+<span id="geom-type"></span><h3><code class="docutils literal notranslate"><span class="pre">geom_type</span></code><a class="headerlink" href="#geom-type" title="Link to this heading">¶</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.Field.geom_type">
+<span class="sig-prename descclassname"><span class="pre">Field.</span></span><span class="sig-name descname"><span class="pre">geom_type</span></span><a class="headerlink" href="#django.contrib.gis.forms.Field.geom_type" title="Link to this definition">¶</a></dt>
+<dd><p>通常、その属性を設定または変更する必要はありません。この属性はフィールドクラスに応じて設定されるべきです。これはOpenGIS標準のジオメトリ名に一致します。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-form-field-classes">
+<span id="form-field-classes"></span><h2>フォームフィールド クラス<a class="headerlink" href="#form-field-classes" title="Link to this heading">¶</a></h2>
+<section id="s-geometryfield">
+<span id="geometryfield"></span><h3><code class="docutils literal notranslate"><span class="pre">GeometryField</span></code><a class="headerlink" href="#geometryfield" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.GeometryField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GeometryField</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/fields.py#L10"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.GeometryField" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="s-pointfield">
+<span id="pointfield"></span><h3><code class="docutils literal notranslate"><span class="pre">PointField</span></code><a class="headerlink" href="#pointfield" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.PointField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PointField</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/fields.py#L123"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.PointField" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="s-linestringfield">
+<span id="linestringfield"></span><h3><code class="docutils literal notranslate"><span class="pre">LineStringField</span></code><a class="headerlink" href="#linestringfield" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.LineStringField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LineStringField</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/fields.py#L131"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.LineStringField" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="s-polygonfield">
+<span id="polygonfield"></span><h3><code class="docutils literal notranslate"><span class="pre">PolygonField</span></code><a class="headerlink" href="#polygonfield" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.PolygonField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PolygonField</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/fields.py#L139"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.PolygonField" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="s-multipointfield">
+<span id="multipointfield"></span><h3><code class="docutils literal notranslate"><span class="pre">MultiPointField</span></code><a class="headerlink" href="#multipointfield" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.MultiPointField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultiPointField</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/fields.py#L127"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.MultiPointField" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="s-multilinestringfield">
+<span id="multilinestringfield"></span><h3><code class="docutils literal notranslate"><span class="pre">MultiLineStringField</span></code><a class="headerlink" href="#multilinestringfield" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.MultiLineStringField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultiLineStringField</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/fields.py#L135"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.MultiLineStringField" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="s-multipolygonfield">
+<span id="multipolygonfield"></span><h3><code class="docutils literal notranslate"><span class="pre">MultiPolygonField</span></code><a class="headerlink" href="#multipolygonfield" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.MultiPolygonField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultiPolygonField</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/fields.py#L143"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.MultiPolygonField" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="s-geometrycollectionfield">
+<span id="geometrycollectionfield"></span><h3><code class="docutils literal notranslate"><span class="pre">GeometryCollectionField</span></code><a class="headerlink" href="#geometrycollectionfield" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.GeometryCollectionField">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GeometryCollectionField</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/fields.py#L119"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.GeometryCollectionField" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+</section>
+<section id="s-module-django.contrib.gis.forms.widgets">
+<span id="s-form-widgets"></span><span id="module-django.contrib.gis.forms.widgets"></span><span id="form-widgets"></span><h2>フォームウィジェット<a class="headerlink" href="#module-django.contrib.gis.forms.widgets" title="Link to this heading">¶</a></h2>
+<p>GeoDjango のフォームウィジェットを使うと、ビジュアルマップ上に地理情報を表示したり編集したりできます。現在利用可能なウィジェットはどれも 3D ジオメトリをサポートしていないので、 ジオメトリフィールドは <code class="docutils literal notranslate"><span class="pre">Textarea</span></code> ウィジェットを使ってフォールバックします。</p>
+<section id="s-widget-attributes">
+<span id="widget-attributes"></span><h3>ウィジェットの属性<a class="headerlink" href="#widget-attributes" title="Link to this heading">¶</a></h3>
+<p>GeoDjango ウィジェットはテンプレートベースなので、その属性のほとんどは他の Django ウィジェットの属性と異なります。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.BaseGeometryWidget.geom_type">
+<span class="sig-prename descclassname"><span class="pre">BaseGeometryWidget.</span></span><span class="sig-name descname"><span class="pre">geom_type</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.BaseGeometryWidget.geom_type" title="Link to this definition">¶</a></dt>
+<dd><p>OpenGIS ジオメトリタイプ。通常、フォームフィールドによって設定されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.BaseGeometryWidget.map_srid">
+<span class="sig-prename descclassname"><span class="pre">BaseGeometryWidget.</span></span><span class="sig-name descname"><span class="pre">map_srid</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.BaseGeometryWidget.map_srid" title="Link to this definition">¶</a></dt>
+<dd><p>地図で使用されるSRIDコード (デフォルトは4326)。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.BaseGeometryWidget.display_raw">
+<span class="sig-prename descclassname"><span class="pre">BaseGeometryWidget.</span></span><span class="sig-name descname"><span class="pre">display_raw</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.BaseGeometryWidget.display_raw" title="Link to this definition">¶</a></dt>
+<dd><p>主にデバッグのために、現在のジオメトリのシリアライズされた表現を示すテキストエリア入力を表示するかどうかを指定するブール値 (デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code>).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.BaseGeometryWidget.supports_3d">
+<span class="sig-prename descclassname"><span class="pre">BaseGeometryWidget.</span></span><span class="sig-name descname"><span class="pre">supports_3d</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.BaseGeometryWidget.supports_3d" title="Link to this definition">¶</a></dt>
+<dd><p>ウィジェットが3Dデータの編集をサポートしているかどうかを示します (デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です) 。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.BaseGeometryWidget.template_name">
+<span class="sig-prename descclassname"><span class="pre">BaseGeometryWidget.</span></span><span class="sig-name descname"><span class="pre">template_name</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.BaseGeometryWidget.template_name" title="Link to this definition">¶</a></dt>
+<dd><p>地図ウィジェットのレンダリングに使用されるテンプレート。</p>
+</dd></dl>
+
+<p>ウィジェットの属性は、他のDjangoウィジェットと同じように渡すことができます。例えば、次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis</span><span class="w"> </span><span class="kn">import</span> <span class="n">forms</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyGeoForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">Form</span><span class="p">):</span>
+    <span class="n">point</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">PointField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">forms</span><span class="o">.</span><span class="n">OSMWidget</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;display_raw&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}))</span>
+</pre></div>
+</div>
+</section>
+<section id="s-widget-classes">
+<span id="widget-classes"></span><h3>Widget クラス<a class="headerlink" href="#widget-classes" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">BaseGeometryWidget</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.BaseGeometryWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseGeometryWidget</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/widgets.py#L13"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.widgets.BaseGeometryWidget" title="Link to this definition">¶</a></dt>
+<dd><p>これは、サブクラスが必要とするロジックを含む抽象ベースウィジェットです。このウィジェットを直接ジオメトリフィールドに使うことはできません。GeoDjango ウィジェットのレンダリングは <a class="reference internal" href="#django.contrib.gis.forms.widgets.BaseGeometryWidget.template_name" title="django.contrib.gis.forms.widgets.BaseGeometryWidget.template_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">template_name</span></code></a> クラス属性で識別されるテンプレートに基づいていることに注意してください。</p>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">OpenLayersWidget</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.OpenLayersWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OpenLayersWidget</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/widgets.py#L83"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.widgets.OpenLayersWidget" title="Link to this definition">¶</a></dt>
+<dd><p>これはすべての GeoDjango フォームフィールドで使用されるデフォルトウィジェットです。<code class="docutils literal notranslate"><span class="pre">template_name</span></code> は <code class="docutils literal notranslate"><span class="pre">gis/openlayers.html</span></code> です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">OpenLayersWidget</span></code> と <a class="reference internal" href="#django.contrib.gis.forms.widgets.OSMWidget" title="django.contrib.gis.forms.widgets.OSMWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">OSMWidget</span></code></a> は <code class="docutils literal notranslate"><span class="pre">cdn.jsdelivr.net</span></code> のコンテンツ配信ネットワークでホストされている <code class="docutils literal notranslate"><span class="pre">ol.js</span></code> ファイルを使用します。これらのウィジェットをサブクラス化することで、内部の <code class="docutils literal notranslate"><span class="pre">Media</span></code> クラスの <code class="docutils literal notranslate"><span class="pre">js</span></code> プロパティに <code class="docutils literal notranslate"><span class="pre">ol.js</span></code> ファイルの独自のバージョンを指定できます (<a class="reference internal" href="../../../topics/forms/media.html#assets-as-a-static-definition"><span class="std std-ref">定数として定義されたアセット</span></a> を参照) 。</p>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">OSMWidget</span></code></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.OSMWidget">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OSMWidget</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/forms/widgets.py#L110"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.forms.widgets.OSMWidget" title="Link to this definition">¶</a></dt>
+<dd><p>このウィジェットは地理情報オブジェクトを表示するためにOpenStreetMapベースレイヤーを使用します。属性は以下の通りです:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.OSMWidget.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.OSMWidget.template_name" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">gis/openlayers-osm.html</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.OSMWidget.default_lat">
+<span class="sig-name descname"><span class="pre">default_lat</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.OSMWidget.default_lat" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.OSMWidget.default_lon">
+<span class="sig-name descname"><span class="pre">default_lon</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.OSMWidget.default_lon" title="Link to this definition">¶</a></dt>
+<dd><p>デフォルトの中心緯度と経度はそれぞれ <code class="docutils literal notranslate"><span class="pre">47</span></code> と <code class="docutils literal notranslate"><span class="pre">5</span></code> で、フランス東部の位置です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.gis.forms.widgets.OSMWidget.default_zoom">
+<span class="sig-name descname"><span class="pre">default_zoom</span></span><a class="headerlink" href="#django.contrib.gis.forms.widgets.OSMWidget.default_zoom" title="Link to this definition">¶</a></dt>
+<dd><p>デフォルトの地図の縮尺は <code class="docutils literal notranslate"><span class="pre">12</span></code> です。</p>
+</dd></dl>
+
+<p><a class="reference internal" href="#django.contrib.gis.forms.widgets.OpenLayersWidget" title="django.contrib.gis.forms.widgets.OpenLayersWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">OpenLayersWidget</span></code></a> の JavaScript ファイルのホスティングに関する注意はここにも適用されます。マップタイルへの <code class="docutils literal notranslate"><span class="pre">https</span></code> アクセスに関する <a class="reference external" href="https://help.openstreetmap.org/questions/10920/how-to-embed-a-map-in-my-https-site">FAQ answer</a> も参照してください。</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">GeoDjango フォーム API</a><ul>
+<li><a class="reference internal" href="#field-arguments">フィールドの引数</a><ul>
+<li><a class="reference internal" href="#srid"><code class="docutils literal notranslate"><span class="pre">srid</span></code></a></li>
+<li><a class="reference internal" href="#geom-type"><code class="docutils literal notranslate"><span class="pre">geom_type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#form-field-classes">フォームフィールド クラス</a><ul>
+<li><a class="reference internal" href="#geometryfield"><code class="docutils literal notranslate"><span class="pre">GeometryField</span></code></a></li>
+<li><a class="reference internal" href="#pointfield"><code class="docutils literal notranslate"><span class="pre">PointField</span></code></a></li>
+<li><a class="reference internal" href="#linestringfield"><code class="docutils literal notranslate"><span class="pre">LineStringField</span></code></a></li>
+<li><a class="reference internal" href="#polygonfield"><code class="docutils literal notranslate"><span class="pre">PolygonField</span></code></a></li>
+<li><a class="reference internal" href="#multipointfield"><code class="docutils literal notranslate"><span class="pre">MultiPointField</span></code></a></li>
+<li><a class="reference internal" href="#multilinestringfield"><code class="docutils literal notranslate"><span class="pre">MultiLineStringField</span></code></a></li>
+<li><a class="reference internal" href="#multipolygonfield"><code class="docutils literal notranslate"><span class="pre">MultiPolygonField</span></code></a></li>
+<li><a class="reference internal" href="#geometrycollectionfield"><code class="docutils literal notranslate"><span class="pre">GeometryCollectionField</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.contrib.gis.forms.widgets">フォームウィジェット</a><ul>
+<li><a class="reference internal" href="#widget-attributes">ウィジェットの属性</a></li>
+<li><a class="reference internal" href="#widget-classes">Widget クラス</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="db-api.html"
+                          title="前の章へ">GeoDjango データベース API</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="geoquerysets.html"
+                          title="次の章へ">GIS QuerySet API リファレンス</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/gis/forms-api.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="db-api.html" title="GeoDjango データベース API">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="geoquerysets.html" title="GIS QuerySet API リファレンス">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

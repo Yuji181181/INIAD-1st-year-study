@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GeoDjango アプリのテスト &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="GeoDjango のデプロイ" href="deployment.html" />
+    <link rel="prev" title="地理情報サイトマップ" href="sitemaps.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="sitemaps.html" title="地理情報サイトマップ">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="deployment.html" title="GeoDjango のデプロイ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-gis-testing">
+            
+  <section id="s-testing-geodjango-apps">
+<span id="testing-geodjango-apps"></span><h1>GeoDjango アプリのテスト<a class="headerlink" href="#testing-geodjango-apps" title="Link to this heading">¶</a></h1>
+<p>このドキュメントには、<a class="reference internal" href="#testing-postgis"><span class="std std-ref">PostGIS</span></a> ユーザのための追加の注意事項と設定が含まれています。</p>
+<section id="s-postgis">
+<span id="s-testing-postgis"></span><span id="postgis"></span><span id="testing-postgis"></span><h2>PostGIS<a class="headerlink" href="#postgis" title="Link to this heading">¶</a></h2>
+<section id="s-settings">
+<span id="settings"></span><h3>設定<a class="headerlink" href="#settings" title="Link to this heading">¶</a></h3>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>以下の設定には合理的なデフォルト値が設定されており、手動で設定する必要はありません。</p>
+</div>
+<section id="s-postgis-version">
+<span id="s-std-setting-POSTGIS_VERSION"></span><span id="postgis-version"></span><span id="std-setting-POSTGIS_VERSION"></span><h4><code class="docutils literal notranslate"><span class="pre">POSTGIS_VERSION</span></code><a class="headerlink" href="#postgis-version" title="Link to this heading">¶</a></h4>
+<p>GeoDjango の空間バックエンドが PostGIS 上で初期化されるとき、どの機能が利用可能かを調べるために、SQL クエリを実行してバージョンを調べる必要があります。この追加クエリを防ぎたい上級ユーザは、PostGIS のメジャー、マイナー、マイクロのバージョン番号を指定する整数の 3タプルを使って、バージョンを手動で設定できます。例えば、PostGIS X.Y.Z を設定するには次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">POSTGIS_VERSION</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-obtaining-sufficient-privileges">
+<span id="obtaining-sufficient-privileges"></span><h3>適切な権限の取得<a class="headerlink" href="#obtaining-sufficient-privileges" title="Link to this heading">¶</a></h3>
+<p>設定によりますが、このセクションで、PostgreSQL 上の GeoDjango アプリケーションのテストを実行するために必要な権限を持ったデータベースユーザを構成するための複数の方法が説明されています。もし、指示通りに <a class="reference internal" href="install/postgis.html#spatialdb-template"><span class="std std-ref">空間データベーステンプレート</span></a> が作成されている場合、テスト用のデータベースユーザはデータベースを作成する機能のみを持っていれば十分です。他の設定では、データベーススーパーユーザを使用する必要があるかもしれません。</p>
+<section id="s-create-database-user">
+<span id="create-database-user"></span><h4>データベースユーザーを作成する<a class="headerlink" href="#create-database-user" title="Link to this heading">¶</a></h4>
+<p>データベースを作成する権限を持つデータベースユーザーを作成するには、次のコマンドを使用します:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>createuser<span class="w"> </span>--createdb<span class="w"> </span>-R<span class="w"> </span>-S<span class="w"> </span>&lt;user_name&gt;
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">-R</span> <span class="pre">-S</span></code> フラグは、ユーザーに追加のユーザー (ロール) を作成させたり、スーパーユーザーになる権限を持たせたくないことを示しています。</p>
+<p>代わりに、既存のユーザーのロールをSQLシェルから変更することもできます (既存のスーパーユーザーアカウントから実行されているとして):</p>
+<div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="n">postgres</span><span class="o">#</span><span class="w"> </span><span class="k">ALTER</span><span class="w"> </span><span class="k">ROLE</span><span class="w"> </span><span class="o">&lt;</span><span class="n">user_name</span><span class="o">&gt;</span><span class="w"> </span><span class="n">CREATEDB</span><span class="w"> </span><span class="n">NOSUPERUSER</span><span class="w"> </span><span class="n">NOCREATEROLE</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+<section id="s-create-database-superuser">
+<span id="create-database-superuser"></span><h4>データベースのスーパーユーザーを作成する<a class="headerlink" href="#create-database-superuser" title="Link to this heading">¶</a></h4>
+<p>これは、たとえばユーザー作成時に行うことができます:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>createuser<span class="w"> </span>--superuser<span class="w"> </span>&lt;user_name&gt;
+</pre></div>
+</div>
+<p>あるいは、SQLシェルからユーザのロールを変更することもできます (既存のスーパーユーザアカウントから行われると仮定して):</p>
+<div class="highlight-psql notranslate"><div class="highlight"><pre><span></span><span class="n">postgres</span><span class="o">#</span><span class="w"> </span><span class="k">ALTER</span><span class="w"> </span><span class="k">ROLE</span><span class="w"> </span><span class="o">&lt;</span><span class="n">user_name</span><span class="o">&gt;</span><span class="w"> </span><span class="n">SUPERUSER</span><span class="p">;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-windows">
+<span id="windows"></span><h3>Windows<a class="headerlink" href="#windows" title="Link to this heading">¶</a></h3>
+<p>Windows プラットフォームでは、pgAdmin III ユーティリティを使用して、データベースユーザーにスーパーユーザー権限を追加できます。</p>
+<p>デフォルトでは、Windows 上の PostGIS インストーラには <code class="docutils literal notranslate"><span class="pre">template_postgis</span></code> というタイトルのテンプレート空間データベースが含まれています。</p>
+</section>
+</section>
+<section id="s-geodjango-tests">
+<span id="s-id1"></span><span id="geodjango-tests"></span><span id="id1"></span><h2>GeoDjangoのテスト<a class="headerlink" href="#geodjango-tests" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">runtests.py</span></code> を使用して <a class="reference internal" href="../../../internals/contributing/writing-code/unit-tests.html#running-unit-tests"><span class="std std-ref">Djangoテストスイートを実行する</span></a> 際に GeoDjango テストを実行するには、設定ファイル内のすべてのデータベースが <a class="reference internal" href="db-api.html#spatial-backends"><span class="std std-ref">空間データベースバックエンド</span></a> のいずれかを使用している必要があります。</p>
+<section id="s-example">
+<span id="example"></span><h3>カスタマイズ例<a class="headerlink" href="#example" title="Link to this heading">¶</a></h3>
+<p>次の内容は、Django テストスイート全体を実行するために使用できる、空っぽの設定ファイルの例です。この設定ファイルには、 <a class="reference internal" href="index.html#module-django.contrib.gis" title="django.contrib.gis: Geographic Information System (GIS) extensions for Django"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.gis</span></code></a> に含まれるテストも含まれています:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ENGINE&quot;</span><span class="p">:</span> <span class="s2">&quot;django.contrib.gis.db.backends.postgis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;geodjango&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;USER&quot;</span><span class="p">:</span> <span class="s2">&quot;geodjango&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;other&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ENGINE&quot;</span><span class="p">:</span> <span class="s2">&quot;django.contrib.gis.db.backends.postgis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;USER&quot;</span><span class="p">:</span> <span class="s2">&quot;geodjango&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s2">&quot;django_tests_secret_key&quot;</span>
+</pre></div>
+</div>
+<p>上記の設定が <code class="docutils literal notranslate"><span class="pre">runtests.py</span></code> と同じディレクトリにある <code class="docutils literal notranslate"><span class="pre">postgis.py</span></code> ファイルにあるとすると、コマンドを実行するときに、すべての Django と GeoDjango のテストが実行されます:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./runtests.py<span class="w"> </span>--settings<span class="o">=</span>postgis
+</pre></div>
+</div>
+<p>GeoDjango のテストスイートだけを実行するには、<code class="docutils literal notranslate"><span class="pre">gis_tests</span></code> を指定します:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./runtests.py<span class="w"> </span>--settings<span class="o">=</span>postgis<span class="w"> </span>gis_tests
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">GeoDjango アプリのテスト</a><ul>
+<li><a class="reference internal" href="#postgis">PostGIS</a><ul>
+<li><a class="reference internal" href="#settings">設定</a><ul>
+<li><a class="reference internal" href="#postgis-version"><code class="docutils literal notranslate"><span class="pre">POSTGIS_VERSION</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#obtaining-sufficient-privileges">適切な権限の取得</a><ul>
+<li><a class="reference internal" href="#create-database-user">データベースユーザーを作成する</a></li>
+<li><a class="reference internal" href="#create-database-superuser">データベースのスーパーユーザーを作成する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#geodjango-tests">GeoDjangoのテスト</a><ul>
+<li><a class="reference internal" href="#example">カスタマイズ例</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="sitemaps.html"
+                          title="前の章へ">地理情報サイトマップ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="deployment.html"
+                          title="次の章へ">GeoDjango のデプロイ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/gis/testing.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="sitemaps.html" title="地理情報サイトマップ">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="deployment.html" title="GeoDjango のデプロイ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

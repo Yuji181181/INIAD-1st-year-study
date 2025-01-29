@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PostgreSQL 固有のモデルインデックス &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="PostgreSQL 固有のルックアップ" href="lookups.html" />
+    <link rel="prev" title="PostgreSQL 固有のデータベース関数" href="functions.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="functions.html" title="PostgreSQL 固有のデータベース関数">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="lookups.html" title="PostgreSQL 固有のルックアップ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-postgres-indexes">
+            
+  <section id="s-module-django.contrib.postgres.indexes">
+<span id="s-postgresql-specific-model-indexes"></span><span id="module-django.contrib.postgres.indexes"></span><span id="postgresql-specific-model-indexes"></span><h1>PostgreSQL 固有のモデルインデックス<a class="headerlink" href="#module-django.contrib.postgres.indexes" title="Link to this heading">¶</a></h1>
+<p>以下はPostgreSQL固有の <code class="docutils literal notranslate"><span class="pre">django.contrib.postgres.indexes</span></code> モジュールから利用可能な <a class="reference internal" href="../../models/indexes.html"><span class="doc">インデックス</span></a> です。</p>
+<section id="s-bloomindex">
+<span id="bloomindex"></span><h2><code class="docutils literal notranslate"><span class="pre">BloomIndex</span></code><a class="headerlink" href="#bloomindex" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.indexes.BloomIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BloomIndex</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">expressions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/postgres/indexes.py#L45"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.postgres.indexes.BloomIndex" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://www.postgresql.org/docs/current/bloom.html">bloom</a> インデックスを作成します。</p>
+<p>このインデックスアクセスを使用するには、PostgreSQLで <a class="reference external" href="https://www.postgresql.org/docs/current/bloom.html">bloom</a> 拡張機能を有効にする必要があります。これは、 <a class="reference internal" href="operations.html#django.contrib.postgres.operations.BloomExtension" title="django.contrib.postgres.operations.BloomExtension"><code class="xref py py-class docutils literal notranslate"><span class="pre">BloomExtension</span></code></a> マイグレーションオペレーションを使用してインストールできます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">length</span></code> パラメータには、1 から 4096 の整数のビット数を指定して、各インデックスエントリの長さを指定してください。PostgreSQL のデフォルト値は 80 です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">columns</span></code> 引数は、1から4095までの整数ビットで、最大32個の値を持つタプルまたはリストを取ります。</p>
+</dd></dl>
+
+</section>
+<section id="s-brinindex">
+<span id="brinindex"></span><h2><code class="docutils literal notranslate"><span class="pre">BrinIndex</span></code><a class="headerlink" href="#brinindex" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.indexes.BrinIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BrinIndex</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">expressions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autosummarize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pages_per_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/postgres/indexes.py#L86"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.postgres.indexes.BrinIndex" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://www.postgresql.org/docs/current/brin.html">BRIN index</a> を作成します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">autosummarize</span></code> パラメータを <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定すると、autovacuum による <a class="reference external" href="https://www.postgresql.org/docs/current/brin.html#BRIN-OPERATION">automatic summarization</a> を有効にできます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">pages_per_range</span></code> 引数は正の整数を取ります。</p>
+</dd></dl>
+
+</section>
+<section id="s-btreeindex">
+<span id="btreeindex"></span><h2><code class="docutils literal notranslate"><span class="pre">BTreeIndex</span></code><a class="headerlink" href="#btreeindex" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.indexes.BTreeIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BTreeIndex</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">expressions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillfactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deduplicate_items</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/postgres/indexes.py#L117"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.postgres.indexes.BTreeIndex" title="Link to this definition">¶</a></dt>
+<dd><p>B-Tree インデックスを作成します。</p>
+<p><a class="reference external" href="https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS">fillfactor</a> パラメータには、インデックスページがどれだけ詰め込まれるかを調整するために、10 から 100 の整数値を指定してください。PostgreSQL のデフォルト値は 90 です。</p>
+<p><a class="reference external" href="https://www.postgresql.org/docs/current/btree-implementation.html#BTREE-DEDUPLICATION">deduplicate_items</a> パラメータに真偽値を指定して、重複排除が有効かどうかを制御します。PostgreSQLでは、重複排除はデフォルトで有効になっています。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.1:</span> <p><code class="docutils literal notranslate"><span class="pre">deduplicate_items</span></code> パラメータが追加されました。</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-ginindex">
+<span id="ginindex"></span><h2><code class="docutils literal notranslate"><span class="pre">GinIndex</span></code><a class="headerlink" href="#ginindex" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.indexes.GinIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GinIndex</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">expressions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fastupdate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gin_pending_list_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/postgres/indexes.py#L144"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.postgres.indexes.GinIndex" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://www.postgresql.org/docs/current/gin.html">gin インデックス</a> を作成します。</p>
+<p><a class="reference external" href="https://www.postgresql.org/docs/current/gin-builtin-opclasses.html">組み込みの演算子クラス</a> 以外のデータ型でこのインデックスを使用するには、 PostgreSQL で <a class="reference external" href="https://www.postgresql.org/docs/current/btree-gin.html">btree_gin 拡張</a> を有効にする必要があります。これをインストールするには <a class="reference internal" href="operations.html#django.contrib.postgres.operations.BtreeGinExtension" title="django.contrib.postgres.operations.BtreeGinExtension"><code class="xref py py-class docutils literal notranslate"><span class="pre">BtreeGinExtension</span></code></a> というマイグレーションオペレーションを使用します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">fastupdate</span></code> パラメータを <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定すると、PostgreSQL でデフォルトで有効になっている <a class="reference external" href="https://www.postgresql.org/docs/current/gin-implementation.html#GIN-FAST-UPDATE">GIN Fast Update Technique</a> を無効にできます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">fastupdate</span></code> が有効な場合に使用される GIN 保留リストの最大サイズを調整するには、 <a class="reference external" href="https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-GIN-PENDING-LIST-LIMIT">gin_pending_list_limit</a> パラメータに整数キロバイト数を指定します。</p>
+</dd></dl>
+
+</section>
+<section id="s-gistindex">
+<span id="gistindex"></span><h2><code class="docutils literal notranslate"><span class="pre">GistIndex</span></code><a class="headerlink" href="#gistindex" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.indexes.GistIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GistIndex</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">expressions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillfactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/postgres/indexes.py#L173"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.postgres.indexes.GistIndex" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://www.postgresql.org/docs/current/gist.html">GiSTインデックス</a> を作成します。これらのインデックスは、 <a class="reference internal" href="../gis/model-api.html#django.contrib.gis.db.models.BaseSpatialField.spatial_index" title="django.contrib.gis.db.models.BaseSpatialField.spatial_index"><code class="xref py py-attr docutils literal notranslate"><span class="pre">spatial_index=True</span></code></a> で指定された空間フィールドに自動的に作成されます。これらは、 <a class="reference internal" href="fields.html#django.contrib.postgres.fields.HStoreField" title="django.contrib.postgres.fields.HStoreField"><code class="xref py py-class docutils literal notranslate"><span class="pre">HStoreField</span></code></a> や <a class="reference internal" href="fields.html#range-fields"><span class="std std-ref">範囲フィールド</span></a> など他のタイプでも有用です。</p>
+<p>組み込みの <a class="reference external" href="https://www.postgresql.org/docs/current/gist-builtin-opclasses.html">gist 演算子クラス</a> 以外のデータ型でこのインデックスを使用するには、 PostgreSQL で <a class="reference external" href="https://www.postgresql.org/docs/current/btree-gist.html">btree_gist 拡張</a> を有効にする必要があります。これをインストールするには <a class="reference internal" href="operations.html#django.contrib.postgres.operations.BtreeGistExtension" title="django.contrib.postgres.operations.BtreeGistExtension"><code class="xref py py-class docutils literal notranslate"><span class="pre">BtreeGistExtension</span></code></a> というマイグレーションオペレーションを使用します。</p>
+<p>インデックスの <a class="reference external" href="https://www.postgresql.org/docs/current/gist-implementation.html#GIST-BUFFERING-BUILD">buffering build</a> を手動で有効または無効にするには、 <code class="docutils literal notranslate"><span class="pre">buffering</span></code> パラメータを <code class="docutils literal notranslate"><span class="pre">True</span></code> または <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定してください。</p>
+<p><a class="reference external" href="https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS">fillfactor</a> パラメータには、インデックスページがどれだけ詰め込まれるかを調整するために、10 から 100 の整数値を指定してください。PostgreSQL のデフォルト値は 90 です。</p>
+</dd></dl>
+
+</section>
+<section id="s-hashindex">
+<span id="hashindex"></span><h2><code class="docutils literal notranslate"><span class="pre">HashIndex</span></code><a class="headerlink" href="#hashindex" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.indexes.HashIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HashIndex</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">expressions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillfactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/postgres/indexes.py#L198"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.postgres.indexes.HashIndex" title="Link to this definition">¶</a></dt>
+<dd><p>ハッシュインデックスを作成します。</p>
+<p><a class="reference external" href="https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS">fillfactor</a> パラメータには、インデックスページがどれだけ詰め込まれるかを調整するために、10 から 100 の整数値を指定してください。PostgreSQL のデフォルト値は 90 です。</p>
+</dd></dl>
+
+</section>
+<section id="s-spgistindex">
+<span id="spgistindex"></span><h2><code class="docutils literal notranslate"><span class="pre">SpGistIndex</span></code><a class="headerlink" href="#spgistindex" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.indexes.SpGistIndex">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SpGistIndex</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">expressions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fillfactor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/postgres/indexes.py#L218"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.postgres.indexes.SpGistIndex" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://www.postgresql.org/docs/current/spgist.html">SP-GiST インデックス</a> を作成します。</p>
+<p><a class="reference external" href="https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-STORAGE-PARAMETERS">fillfactor</a> パラメータには、インデックスページがどれだけ詰め込まれるかを調整するために、10 から 100 の整数値を指定してください。PostgreSQL のデフォルト値は 90 です。</p>
+</dd></dl>
+
+</section>
+<section id="s-opclass-expressions">
+<span id="opclass-expressions"></span><h2><code class="docutils literal notranslate"><span class="pre">OpClass()</span></code> 式<a class="headerlink" href="#opclass-expressions" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.indexes.OpClass">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OpClass</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/postgres/indexes.py#L245"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.postgres.indexes.OpClass" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">OpClass()</span></code> 式は、機能インデックス、機能ユニーク制約、または除外制約を定義するために使用できるカスタム <a class="reference external" href="https://www.postgresql.org/docs/current/indexes-opclass.html">operator class</a> と一緒に表す <code class="docutils literal notranslate"><span class="pre">expression</span></code> を表します。これを使用するには、 <a class="reference internal" href="../../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> に <code class="docutils literal notranslate"><span class="pre">'django.contrib.postgres'</span></code> を追加する必要があります。<code class="docutils literal notranslate"><span class="pre">name</span></code> パラメータを <a class="reference external" href="https://www.postgresql.org/docs/current/indexes-opclass.html">operator class</a> の名前に設定します。</p>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Index</span><span class="p">(</span>
+    <span class="n">OpClass</span><span class="p">(</span><span class="n">Lower</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;varchar_pattern_ops&quot;</span><span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;lower_username_idx&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">varchar_pattern_ops</span></code> を使用して <code class="docutils literal notranslate"><span class="pre">Lower('username')</span></code> にインデックスを作成します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">UniqueConstraint</span><span class="p">(</span>
+    <span class="n">OpClass</span><span class="p">(</span><span class="n">Upper</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;text_pattern_ops&quot;</span><span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;upper_description_unique&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Upper('description')</span></code> を使って <code class="docutils literal notranslate"><span class="pre">text_pattern_ops</span></code> を使用してユニーク制約を作成します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ExclusionConstraint</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;exclude_overlapping_ops&quot;</span><span class="p">,</span>
+    <span class="n">expressions</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="n">OpClass</span><span class="p">(</span><span class="s2">&quot;circle&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;circle_ops&quot;</span><span class="p">),</span> <span class="n">RangeOperators</span><span class="o">.</span><span class="n">OVERLAPS</span><span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>これは <code class="docutils literal notranslate"><span class="pre">circle_ops</span></code> を使用して <code class="docutils literal notranslate"><span class="pre">circle</span></code> 上に排他制約を作成します。</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">PostgreSQL 固有のモデルインデックス</a><ul>
+<li><a class="reference internal" href="#bloomindex"><code class="docutils literal notranslate"><span class="pre">BloomIndex</span></code></a></li>
+<li><a class="reference internal" href="#brinindex"><code class="docutils literal notranslate"><span class="pre">BrinIndex</span></code></a></li>
+<li><a class="reference internal" href="#btreeindex"><code class="docutils literal notranslate"><span class="pre">BTreeIndex</span></code></a></li>
+<li><a class="reference internal" href="#ginindex"><code class="docutils literal notranslate"><span class="pre">GinIndex</span></code></a></li>
+<li><a class="reference internal" href="#gistindex"><code class="docutils literal notranslate"><span class="pre">GistIndex</span></code></a></li>
+<li><a class="reference internal" href="#hashindex"><code class="docutils literal notranslate"><span class="pre">HashIndex</span></code></a></li>
+<li><a class="reference internal" href="#spgistindex"><code class="docutils literal notranslate"><span class="pre">SpGistIndex</span></code></a></li>
+<li><a class="reference internal" href="#opclass-expressions"><code class="docutils literal notranslate"><span class="pre">OpClass()</span></code> 式</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="functions.html"
+                          title="前の章へ">PostgreSQL 固有のデータベース関数</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="lookups.html"
+                          title="次の章へ">PostgreSQL 固有のルックアップ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/postgres/indexes.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="functions.html" title="PostgreSQL 固有のデータベース関数">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="lookups.html" title="PostgreSQL 固有のルックアップ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

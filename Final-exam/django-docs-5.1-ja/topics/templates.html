@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>テンプレート &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="クラスベースビュー" href="class-based-views/index.html" />
+    <link rel="prev" title="フォームアセット (Media クラス)" href="forms/media.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);(function($) {
+    $(document).ready(function() {
+        $(".c-tab-unix").on("click", function() {
+            $("section.c-content-unix").show();
+            $("section.c-content-win").hide();
+            $(".c-tab-unix").prop("checked", true);
+        });
+        $(".c-tab-win").on("click", function() {
+            $("section.c-content-win").show();
+            $("section.c-content-unix").hide();
+            $(".c-tab-win").prop("checked", true);
+        });
+    });
+})(jQuery);</script>
+<link rel="stylesheet" href="../_static/console-tabs.css">
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="forms/media.html" title="フォームアセット (&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;Media&lt;/span&gt;&lt;/code&gt; クラス)">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="class-based-views/index.html" title="クラスベースビュー">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-templates">
+            
+  <section id="s-module-django.template">
+<span id="s-templates"></span><span id="module-django.template"></span><span id="templates"></span><h1>テンプレート<a class="headerlink" href="#module-django.template" title="Link to this heading">¶</a></h1>
+<p>Django はウェブフレームワークなので、HTML を動的に生成する便利な手段が必要でした。最も一般的なアプローチは、テンプレートに頼ることです。テンプレートには、出力したい HTML を書いた静的な部分と、動的なコンテンツを挿入する方法を書いた特別な構文の部分からなります。テンプレートを使って HTML ページを作るハンズオンの例については、<a class="reference internal" href="../intro/tutorial03.html"><span class="doc">チュートリアル 3</span></a> を見てください。</p>
+<p>Django プロジェクトは、1つまたは複数のテンプレートエンジンで構成できます (テンプレートを使わなければ、ゼロでも構いません)。Django は、Django テンプレート言語 (DTL) と呼ばれる独自のテンプレートシステムや、人気のある代替テンプレートである <a class="reference external" href="https://jinja.palletsprojects.com/">Jinja2</a> 用のバックエンドをビルトインで同梱しています。他のテンプレート言語用のバックエンドはサードパーティから入手できるかもしれません。 <a class="reference internal" href="../howto/custom-template-backend.html"><span class="doc">カスタムテンプレートバックエンド</span></a> を参照してください。</p>
+<p>Django は、バックエンドにかかわらず使用できる、テンプレートの読み込みとレンダリングのための標準の API を定義しています。読み込みのパートでは、指定された名前からテンプレートを探し、テンプレートを前処理し、通常はメモリ上のデータに変換します。レンダリングのパートでは、テンプレートの中にコンテキストデータを埋め込み、最終的な文字列を返します。</p>
+<p><a class="reference internal" href="../ref/templates/language.html"><span class="doc">Django テンプレート言語 (DTL)</span></a> はDjango 用のテンプレートシステムです。Django 1.8 までは、ビルトインのオプションしか選択できませんでした。小さな癖もありますが、とても良いテンプレートライブラリです。他のバックエンドを無理して選択しなければならない特別な理由がない限り、DTL を使用することをおすすめします。アプリケーションを書いてテンプレートを配布しようと考えている場合は、特にそうです。たとえば、Django のテンプレートを含んでいる <a class="reference internal" href="../ref/contrib/admin/index.html"><span class="doc">django.contrib.admin</span></a> のような contrib アプリは、DTL を使用しています。</p>
+<p>歴史的な理由により、テンプレートエンジンの一般的なサポートと Django テンプレート言語の実装は、両方とも <code class="docutils literal notranslate"><span class="pre">django.template</span></code> 名前空間に定義されています。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>テンプレートシステムは、信頼できないテンプレートの作者に対しては安全ではありません。たとえば、サイトではユーザー自身がテンプレートを送信できるようにしてはなりません。テンプレートの作者は XSS 攻撃と同様のことが可能になり、テンプレート変数の属性にアクセスして、秘密にしなければならない情報にアクセスできてしまう可能性があるからです。</p>
+</div>
+<section id="s-the-django-template-language">
+<span id="s-template-language-intro"></span><span id="the-django-template-language"></span><span id="template-language-intro"></span><h2>Django テンプレート言語<a class="headerlink" href="#the-django-template-language" title="Link to this heading">¶</a></h2>
+<section id="s-syntax">
+<span id="syntax"></span><h3>構文<a class="headerlink" href="#syntax" title="Link to this heading">¶</a></h3>
+<div class="admonition-about-this-section admonition">
+<p class="admonition-title">このセクションについて</p>
+<p>このセクションで紹介するのは、Django テンプレート言語の構文の概要です。詳細については、 <a class="reference internal" href="../ref/templates/language.html"><span class="doc">言語構文のリファレンス</span></a> を参照してください。</p>
+</div>
+<p>Django テンプレートは、 Django テンプレート言語を使ってマークアップされたテキスト文書や Python 文字列です。いくつかの構文はテンプレートエンジンによって認識され、解釈されます。主なものは変数とタグです。</p>
+<p>テンプレートは、コンテキストともにレンダリングされます。レンダリングでは、変数が見つかると、コンテキスト内に記録された変数の値に置換され、タグが実行されます。それ以外の文字列は、そのまま出力されます。</p>
+<p>Django テンプレート言語の構文は、4つの構成要素に分類できます。</p>
+<section id="s-variables">
+<span id="variables"></span><h4>変数<a class="headerlink" href="#variables" title="Link to this heading">¶</a></h4>
+<p>変数は、コンテキストから値を出力します。コンテキストは、キーと値をマッピングする辞書のようなオブジェクトです。</p>
+<p>変数はこのように <code class="docutils literal notranslate"><span class="pre">{{</span></code> と <code class="docutils literal notranslate"><span class="pre">}}</span></code> で囲まれます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>My first name is <span class="cp">{{</span> <span class="nv">first_name</span> <span class="cp">}}</span>. My last name is <span class="cp">{{</span> <span class="nv">last_name</span> <span class="cp">}}</span>.
+</pre></div>
+</div>
+<p>コンテキストが <code class="docutils literal notranslate"><span class="pre">{'first_name':</span> <span class="pre">'John',</span> <span class="pre">'last_name':</span> <span class="pre">'Doe'}</span></code> の場合、このテンプレートは次のようにレンダリングされます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>My first name is John. My last name is Doe.
+</pre></div>
+</div>
+<p>辞書ルックアップ、属性ルックアップ、リストインデックスルックアップはドット記法で実装されています:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">my_dict.key</span> <span class="cp">}}</span>
+<span class="cp">{{</span> <span class="nv">my_object.attribute</span> <span class="cp">}}</span>
+<span class="cp">{{</span> <span class="nv">my_list.0</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>変数が呼び出し可能オブジェクトに解決される場合、テンプレート・システムは引数なしで呼び出し、呼び出し可能オブジェクトの代わりにその結果を使用します。</p>
+</section>
+<section id="s-tags">
+<span id="tags"></span><h4>タグ<a class="headerlink" href="#tags" title="Link to this heading">¶</a></h4>
+<p>タグはレンダリングプロセスにおいて任意のロジックを提供します。</p>
+<p>この定義は意図的に曖昧にしてあります。たとえば、タグはコンテンツを出力したり、 &quot;if&quot; 文や &quot;for&quot; ループなどの制御構造として提供したり、データベースからコンテンツを取得したり、あるいは他のテンプレートタグへのアクセスを可能にしたりすることができます。</p>
+<p>タグはこのように <code class="docutils literal notranslate"><span class="pre">{%</span></code> と <code class="docutils literal notranslate"><span class="pre">%}</span></code> で囲まれます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">csrf_token</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>ほとんどのタグは引数を受け付けます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">cycle</span> <span class="s1">&#39;odd&#39;</span> <span class="s1">&#39;even&#39;</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>タグによっては開始タグと終了タグが必要です:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">user.is_authenticated</span> <span class="cp">%}</span>Hello, <span class="cp">{{</span> <span class="nv">user.username</span> <span class="cp">}}</span>.<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>関連項目: <a class="reference internal" href="../ref/templates/builtins.html#ref-templates-builtins-tags"><span class="std std-ref">組み込みタグのリファレンス</span></a> 、 <a class="reference internal" href="../howto/custom-template-tags.html#howto-writing-custom-template-tags"><span class="std std-ref">独自のテンプレートタグの書き方</span></a></p>
+</section>
+<section id="s-filters">
+<span id="filters"></span><h4>フィルタ<a class="headerlink" href="#filters" title="Link to this heading">¶</a></h4>
+<p>フィルタは変数やタグの引数の値を変換します。</p>
+<p>たとえばこのようなものです:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">django</span><span class="o">|</span><span class="nf">title</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>コンテキストを <code class="docutils literal notranslate"><span class="pre">{'django':</span> <span class="pre">'the</span> <span class="pre">web</span> <span class="pre">framework</span> <span class="pre">for</span> <span class="pre">perfectionists</span> <span class="pre">with</span> <span class="pre">deadlines'}</span></code> とすると、このテンプレートは次のようにレンダリングされます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>The Web Framework For Perfectionists With Deadlines
+</pre></div>
+</div>
+<p>引数を必要とするフィルタもあります:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">my_date</span><span class="o">|</span><span class="nf">date</span><span class="s2">:&quot;Y-m-d&quot;</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>関連項目: <a class="reference internal" href="../ref/templates/builtins.html#ref-templates-builtins-filters"><span class="std std-ref">組み込みフィルタのリファレンス</span></a> 、 <a class="reference internal" href="../howto/custom-template-tags.html#howto-writing-custom-template-filters"><span class="std std-ref">独自のテンプレートフィルタの書き方</span></a></p>
+</section>
+<section id="s-comments">
+<span id="comments"></span><h4>Comments<a class="headerlink" href="#comments" title="Link to this heading">¶</a></h4>
+<p>コメントはこのように書きます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="c">{# this won&#39;t be rendered #}</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-comment"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code></a> タグで複数行のコメントを書けます。</p>
+</section>
+</section>
+<section id="s-components">
+<span id="components"></span><h3>コンポーネント<a class="headerlink" href="#components" title="Link to this heading">¶</a></h3>
+<div class="admonition-about-this-section admonition">
+<p class="admonition-title">このセクションについて</p>
+<p>このセクションで紹介するのは、Django テンプレート言語の API の概要です。詳細については、<a class="reference internal" href="../ref/templates/api.html"><span class="doc">API リファレンス</span></a> をご覧ください。</p>
+</div>
+<section id="s-engine">
+<span id="engine"></span><h4>エンジン<a class="headerlink" href="#engine" title="Link to this heading">¶</a></h4>
+<p><a class="reference internal" href="../ref/templates/api.html#django.template.Engine" title="django.template.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.Engine</span></code></a> は Django テンプレートシステムのインスタンスをカプセル化します。 <a class="reference internal" href="../ref/templates/api.html#django.template.Engine" title="django.template.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">Engine</span></code></a> を直接インスタンス化する主な理由は、 Django プロジェクトの外で Django テンプレート言語を使うためです。</p>
+<p><a class="reference internal" href="#django.template.backends.django.DjangoTemplates" title="django.template.backends.django.DjangoTemplates"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.backends.django.DjangoTemplates</span></code></a> は、 <a class="reference internal" href="../ref/templates/api.html#django.template.Engine" title="django.template.Engine"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.Engine</span></code></a> を Django のテンプレートバックエンド API に適応させる薄いラッパーです。</p>
+</section>
+<section id="s-template">
+<span id="template"></span><h4>テンプレート<a class="headerlink" href="#template" title="Link to this heading">¶</a></h4>
+<p><a class="reference internal" href="../ref/templates/api.html#django.template.Template" title="django.template.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.Template</span></code></a> はコンパイルされたテンプレートを表します。テンプレートは <a class="reference internal" href="../ref/templates/api.html#django.template.Engine.get_template" title="django.template.Engine.get_template"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Engine.get_template()</span></code></a> または <a class="reference internal" href="../ref/templates/api.html#django.template.Engine.from_string" title="django.template.Engine.from_string"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Engine.from_string()</span></code></a> で取得できます。</p>
+<p>同様に <code class="docutils literal notranslate"><span class="pre">django.template.backends.django.Template</span></code> は <a class="reference internal" href="../ref/templates/api.html#django.template.Template" title="django.template.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.Template</span></code></a> を一般的なテンプレート API に適応させるための薄いラッパーです。</p>
+</section>
+<section id="s-context">
+<span id="context"></span><h4>コンテキスト<a class="headerlink" href="#context" title="Link to this heading">¶</a></h4>
+<p><a class="reference internal" href="../ref/templates/api.html#django.template.Context" title="django.template.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.Context</span></code></a> はコンテキストデータの他にいくつかのメタデータを保持します。これはテンプレートをレンダリングするために <a class="reference internal" href="../ref/templates/api.html#django.template.Template.render" title="django.template.Template.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Template.render()</span></code></a> に渡されます。</p>
+<p><a class="reference internal" href="../ref/templates/api.html#django.template.RequestContext" title="django.template.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.RequestContext</span></code></a> は <a class="reference internal" href="../ref/templates/api.html#django.template.Context" title="django.template.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> のサブクラスで、現在の <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> を保存し、テンプレートコンテキストプロセッサを実行します。</p>
+<p>共通 API には等価な概念がありません。コンテキストデータはプレーンな <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> で渡され、現在の <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> は必要に応じて別途渡されます。</p>
+</section>
+<section id="s-loaders">
+<span id="loaders"></span><h4>ローダー<a class="headerlink" href="#loaders" title="Link to this heading">¶</a></h4>
+<p>テンプレートローダーが責任を持つのは、テンプレートの検索、テンプレートの読み込み、<a class="reference internal" href="../ref/templates/api.html#django.template.Template" title="django.template.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">Template</span></code></a> オブジェクトを返すことです。</p>
+<p>Django はいくつかの <a class="reference internal" href="../ref/templates/api.html#template-loaders"><span class="std std-ref">ビルトインのテンプレートローダー</span></a> を提供していて、 <a class="reference internal" href="../ref/templates/api.html#custom-template-loaders"><span class="std std-ref">カスタム テンプレートローダー</span></a> をサポートしています。</p>
+</section>
+<section id="s-context-processors">
+<span id="context-processors"></span><h4>コンテキストプロセッサ<a class="headerlink" href="#context-processors" title="Link to this heading">¶</a></h4>
+<p>コンテキストプロセッサは、現在の <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> を引数としておけとり、データの <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> をレンダリングコンテキストに追加して返します。</p>
+<p>主な用途は、すべてのビューでコードを繰り返すことなく、すべてのテンプレートで共有される共通のデータをコンテキストに追加することです。</p>
+<p>Django は多くの <a class="reference internal" href="../ref/templates/api.html#context-processors"><span class="std std-ref">組み込みのコンテキストプロセッサ</span></a> を提供し、独自のコンテキストプロセッサを追加実装することもできます。</p>
+</section>
+</section>
+</section>
+<section id="s-support-for-template-engines">
+<span id="s-template-engines"></span><span id="support-for-template-engines"></span><span id="template-engines"></span><h2>テンプレートエンジンのサポート<a class="headerlink" href="#support-for-template-engines" title="Link to this heading">¶</a></h2>
+<section id="s-configuration">
+<span id="configuration"></span><h3>設定<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h3>
+<p>テンプレートエンジンは、<a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> で設定できます。ここには、各エンジンに対する設定のリストを設定します。デフォルト値は空リストです。<a class="reference internal" href="../ref/django-admin.html#django-admin-startproject"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">startproject</span></code></a> コマンドで生成された <code class="docutils literal notranslate"><span class="pre">settings.py</span></code> には、以下のように便利な値がいくつか設定されます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s2">&quot;django.template.backends.django.DjangoTemplates&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DIRS&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="s2">&quot;APP_DIRS&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;OPTIONS&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1"># ... some options here ...</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-BACKEND"><code class="xref std std-setting docutils literal notranslate"><span class="pre">BACKEND</span></code></a> は、Django テンプレートバックエンド API を実装したテンプレートエンジンのクラスへの、ドット区切りの Python path です。ビルトインのバックエンドは、<a class="reference internal" href="#django.template.backends.django.DjangoTemplates" title="django.template.backends.django.DjangoTemplates"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.backends.django.DjangoTemplates</span></code></a> と <a class="reference internal" href="#django.template.backends.jinja2.Jinja2" title="django.template.backends.jinja2.Jinja2"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.backends.jinja2.Jinja2</span></code></a> です。</p>
+<p>ほとんどのエンジンはファイルからテンプレートを読み込むため、各エンジンのトップレベルの設定には次の2つの設定があります。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DIRS</span></code></a> には、エンジンがテンプレートのソースファイルを検索するディレクトリのリストを、検索順に定義します。</p></li>
+<li><p><a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-APP_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APP_DIRS</span></code></a> には、エンジンがインストールしたアプリケーション内のテンプレートを検索するべきかどうかを指定します。各バックエンドは、アプリケーション内でテンプレートを保存するべきサブディレクトリ名として、慣習的な名前を定義しています。</p></li>
+</ul>
+<p>めったにないことですが、同じバックエンドの複数のインスタンスを、オプションだけ変えて設定することも可能です。その場合、各エンジンに対して、<a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> にユニークな名前を設定しなければなりません。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-OPTIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">OPTIONS</span></code></a> には、バックエンド特有の設定を書きます。</p>
+</section>
+<section id="s-module-django.template.loader">
+<span id="s-usage"></span><span id="s-template-loading"></span><span id="module-django.template.loader"></span><span id="usage"></span><span id="template-loading"></span><h3>使い方<a class="headerlink" href="#module-django.template.loader" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">django.template.loader</span></code> モジュールは、テンプレートを読み込むための2つの関数を定義しています。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.template.loader.get_template">
+<span class="sig-name descname"><span class="pre">get_template</span></span>(<em class="sig-param"><span class="n"><span class="pre">template_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/template/loader.py#L5"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.template.loader.get_template" title="Link to this definition">¶</a></dt>
+<dd><p>この関数は、指定した名前のテンプレートを読み込み、<code class="docutils literal notranslate"><span class="pre">Template</span></code> オブジェクトを返します。</p>
+<p>戻り値の正確な型はテンプレートを読み込んだバックエンドに依存します。それぞれのバックエンドは独自の <code class="docutils literal notranslate"><span class="pre">Template</span></code> クラスを持っています。</p>
+<p><code class="docutils literal notranslate"><span class="pre">get_template()</span></code> は各テンプレートエンジンを見つけるまで順番に試します。テンプレートが見つからない場合、 <a class="reference internal" href="#django.template.TemplateDoesNotExist" title="django.template.TemplateDoesNotExist"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TemplateDoesNotExist</span></code></a> を発生します。テンプレートが見つかったが無効な構文を含んでいる場合、 <a class="reference internal" href="#django.template.TemplateSyntaxError" title="django.template.TemplateSyntaxError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TemplateSyntaxError</span></code></a> を発生します。</p>
+<p>テンプレートがどのように検索され読み込まれるかは、各エンジンのバックエンドと設定によって異なります。</p>
+<p>検索を特定のテンプレートエンジンに限定したい場合は、 <code class="docutils literal notranslate"><span class="pre">using</span></code> 引数にそのエンジンの <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> を渡します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.template.loader.select_template">
+<span class="sig-name descname"><span class="pre">select_template</span></span>(<em class="sig-param"><span class="n"><span class="pre">template_name_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/template/loader.py#L22"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.template.loader.select_template" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">select_template()</span></code> は <code class="docutils literal notranslate"><span class="pre">get_template()</span></code> に似ていますが、1つのテンプレート名の代わりにテンプレート名のリストを取ります。各名前のテンプレートを順番に探し、最初に見つかったテンプレートを返します。</p>
+</dd></dl>
+
+<p>テンプレートの読み込みに失敗した場合、 <code class="docutils literal notranslate"><span class="pre">django.template</span></code> で定義されている以下の2つの例外が発生する可能性があります:</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.template.TemplateDoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TemplateDoesNotExist</span></span>(<em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tried</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/template/exceptions.py#L9"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.template.TemplateDoesNotExist" title="Link to this definition">¶</a></dt>
+<dd><p>この例外はテンプレートが見つからない場合に発生します。デバッグページの <a class="reference internal" href="../howto/custom-template-backend.html#template-postmortem"><span class="std std-ref">template postmortem</span></a> に入力するために、以下のオプション引数を受け付けます:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">backend</span></code></dt><dd><p>例外が発生したテンプレートバックエンドのインスタンス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">tried</span></code></dt><dd><p>テンプレートを見つける際に試されたソースのリスト。フォーマットは <code class="docutils literal notranslate"><span class="pre">(origin,</span> <span class="pre">status)</span></code> を含むタプルのリストです。ここで <code class="docutils literal notranslate"><span class="pre">origin</span></code> は <a class="reference internal" href="../howto/custom-template-backend.html#template-origin-api"><span class="std std-ref">origin-like</span></a> オブジェクトで、<code class="docutils literal notranslate"><span class="pre">status</span></code> はテンプレートが見つからなかった理由を表す文字列です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">chain</span></code></dt><dd><p>テンプレートを読み込もうとしたときに発生した例外 <a class="reference internal" href="#django.template.TemplateDoesNotExist" title="django.template.TemplateDoesNotExist"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TemplateDoesNotExist</span></code></a> の中間値のリストです。これは <a class="reference internal" href="#django.template.loader.get_template" title="django.template.loader.get_template"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_template()</span></code></a> のような、与えられたテンプレートを複数のエンジンから読み込もうとする関数で使用されます。</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.template.TemplateSyntaxError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TemplateSyntaxError</span></span>(<em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/template/exceptions.py#L39"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.template.TemplateSyntaxError" title="Link to this definition">¶</a></dt>
+<dd><p>この例外は、テンプレートが見つかったが、エラーを含んでいる場合に発生します。</p>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">get_template()</span></code> と <code class="docutils literal notranslate"><span class="pre">select_template()</span></code> が返す <code class="docutils literal notranslate"><span class="pre">Template</span></code> オブジェクトは以下のシグネチャを持つ <code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドを提供しなければなりません:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.template.backends.base.Template.render">
+<span class="sig-prename descclassname"><span class="pre">Template.</span></span><span class="sig-name descname"><span class="pre">render</span></span>(<em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.template.backends.base.Template.render" title="Link to this definition">¶</a></dt>
+<dd><p>与えられたコンテキストを用いて、このテンプレートをレンダリングします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">context</span></code> を指定する場合は、<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> でなければなりません。もし指定しなければ、エンジンは空のコンテキストでレンダリングします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">request</span></code> を指定する場合は、<a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> でなければなりません。テンプレートエンジンは、テンプレート内では、このインスタンスと CSRF トークンを使用できるようにする必要があります。そのための実装はバックエンドに依存します。</p>
+</dd></dl>
+
+<p>以下に、検索アルゴリズムの例を示します。この例の場合、<a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> 設定は次のようになっています。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">TEMPLATES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s2">&quot;django.template.backends.django.DjangoTemplates&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DIRS&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;/home/html/example.com&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/home/html/default&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;BACKEND&quot;</span><span class="p">:</span> <span class="s2">&quot;django.template.backends.jinja2.Jinja2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DIRS&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;/home/html/jinja2&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">},</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">get_template('story_detail.html')</span></code> を呼び出した場合、Django は次の順番にファイルを探します。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/example.com/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'django'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/default/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'django'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/jinja2/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'jinja2'</span></code> エンジン)</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">select_template(['story_253_detail.html',</span> <span class="pre">'story_detail.html'])</span></code> を呼び出した場合、Djangoは以下の順番にファイルを探します。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/example.com/story_253_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'django'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/default/story_253_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'django'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/jinja2/story_253_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'jinja2'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/example.com/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'django'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/default/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'django'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/jinja2/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'jinja2'</span></code> エンジン)</p></li>
+</ul>
+<p>Django がテンプレートを発見したら、その時点で探索は停止します。</p>
+<div class="admonition-use-django-template-loader-select-template-for-more-flexibility admonition">
+<p class="admonition-title">より柔軟性を求める場合は <code class="docutils literal notranslate"><span class="pre">django.template.loader.select_template()</span></code> を使ってください。</p>
+<p><a class="reference internal" href="#django.template.loader.select_template" title="django.template.loader.select_template"><code class="xref py py-func docutils literal notranslate"><span class="pre">select_template()</span></code></a> を使うと、柔軟にテンプレートを読み込むことができます。たとえば、ニュース記事を書いていて、いくつかの記事にカスタムテンプレートを持たせたい場合、 <code class="docutils literal notranslate"><span class="pre">select_template(['story_%s_detail.html'</span> <span class="pre">%</span> <span class="pre">story.id,</span> <span class="pre">'story_detail.html'])</span></code> のように使います。これにより、個々のストーリーにカスタムテンプレートを使用することができ、カスタムテンプレートを持たないストーリーにはフォールバックテンプレートを使用できます。</p>
+</div>
+<p>テンプレートを含む各ディレクトリの中のサブディレクトリにテンプレートを整理することは可能であり、望ましいことです。慣習としては、Django アプリごとにサブディレクトリを作り、必要に応じてその中にサブディレクトリを作ります。</p>
+<p>正気を保つためにも、そうしてください。すべてのテンプレートを1つのディレクトリのルートレベルに保存すると、面倒なことになります。</p>
+<p>サブディレクトリ内のテンプレートを読み込むには、次のようにスラッシュを使います:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;news/story_detail.html&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>上記と同じ <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> オプションを使用すると、以下のテンプレートを読み込もうとします:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/example.com/news/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'django'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/default/news/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'django'</span></code> エンジン)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/home/html/jinja2/news/story_detail.html</span></code> (<code class="docutils literal notranslate"><span class="pre">'jinja2'</span></code> エンジン)</p></li>
+</ul>
+<p>さらに、テンプレートの読み込みやレンダリングの繰り返しを減らすために、Django は処理を自動化するショートカット関数を提供しています。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.template.loader.render_to_string">
+<span class="sig-name descname"><span class="pre">render_to_string</span></span>(<em class="sig-param"><span class="n"><span class="pre">template_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/template/loader.py#L52"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.template.loader.render_to_string" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">render_to_string()</span></code> は <a class="reference internal" href="#django.template.loader.get_template" title="django.template.loader.get_template"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_template()</span></code></a> のようにテンプレートを読み込んで、すぐに <code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドを呼び出します。以下の引数を取ります。</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">template_name</span></code></dt><dd><p>読み込んでレンダリングするテンプレートの名前です。テンプレート名のリストの場合、 Django はテンプレートを見つけるのに <a class="reference internal" href="#django.template.loader.get_template" title="django.template.loader.get_template"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_template()</span></code></a> の代わりに <a class="reference internal" href="#django.template.loader.select_template" title="django.template.loader.select_template"><code class="xref py py-func docutils literal notranslate"><span class="pre">select_template()</span></code></a> を使います。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">context</span></code></dt><dd><p>レンダリングのためにテンプレートのコンテキストとして使用される <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">request</span></code></dt><dd><p>オプション <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> で、テンプレートのレンダリング処理中に利用できます。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>オプションのテンプレートエンジン <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> です。テンプレートの検索はそのエンジンに制限されます。</p>
+</dd>
+</dl>
+<p>使用例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.template.loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_to_string</span>
+
+<span class="n">rendered</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span><span class="s2">&quot;my_template.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p><a class="reference internal" href="http/shortcuts.html#django.shortcuts.render" title="django.shortcuts.render"><code class="xref py py-func docutils literal notranslate"><span class="pre">render()</span></code></a> ショートカットも参照してください。このショートカットは <a class="reference internal" href="#django.template.loader.render_to_string" title="django.template.loader.render_to_string"><code class="xref py py-func docutils literal notranslate"><span class="pre">render_to_string()</span></code></a> を呼び出して、その結果をビューから返すのに適した <a class="reference internal" href="../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> に出力します。</p>
+<p>最後に、設定されたエンジンを直接使用することもできます:</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.template.loader.engines">
+<span class="sig-name descname"><span class="pre">engines</span></span><a class="headerlink" href="#django.template.loader.engines" title="Link to this definition">¶</a></dt>
+<dd><p>テンプレートエンジンは <code class="docutils literal notranslate"><span class="pre">django.template.engines</span></code> で利用できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">engines</span>
+
+<span class="n">django_engine</span> <span class="o">=</span> <span class="n">engines</span><span class="p">[</span><span class="s2">&quot;django&quot;</span><span class="p">]</span>
+<span class="n">template</span> <span class="o">=</span> <span class="n">django_engine</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;Hello {{ name }}!&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ルックアップのキー (この例では <code class="docutils literal notranslate"><span class="pre">'django'</span></code>) はエンジンの <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> です。</p>
+</dd></dl>
+
+</section>
+<section id="s-module-django.template.backends.django">
+<span id="s-built-in-backends"></span><span id="s-module-django.template.backends"></span><span id="module-django.template.backends.django"></span><span id="built-in-backends"></span><span id="module-django.template.backends"></span><h3>組み込みのバックエンド<a class="headerlink" href="#module-django.template.backends.django" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.template.backends.django.DjangoTemplates">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DjangoTemplates</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/template/backends/django.py#L16"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.template.backends.django.DjangoTemplates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Django テンプレートエンジンを設定するには、 <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-BACKEND"><code class="xref std std-setting docutils literal notranslate"><span class="pre">BACKEND</span></code></a> を <code class="docutils literal notranslate"><span class="pre">'django.template.backends.django.DjangoTemplates'</span></code> にセットします。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-APP_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APP_DIRS</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、 <code class="docutils literal notranslate"><span class="pre">DjangoTemplates</span></code> エンジンはインストールされたアプリケーションの <code class="docutils literal notranslate"><span class="pre">templates</span></code> サブディレクトリにあるテンプレートを探します。この一般名は後方互換性のために残されています。</p>
+<p><code class="docutils literal notranslate"><span class="pre">DjangoTemplates</span></code> エンジンは以下の <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-OPTIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">OPTIONS</span></code></a> を受け付けます:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'autoescape'</span></code>: HTMLのオートエスケープを有効にするかどうかをコントロールする真偽値です。</p>
+<p>デフォルトは <code class="docutils literal notranslate"><span class="pre">True</span></code> です。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>HTML以外のテンプレートをレンダリングする場合のみ <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定してください！</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'context_processors'</span></code>: リクエストでテンプレートがレンダリングされるときにコンテキストを生成するために使用される呼び出し可能オブジェクトへの Python のドット区切りパスのリストです。これらの呼び出し可能オブジェクトはリクエストオブジェクトを引数として取り、コンテキストにマージされるアイテムの <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> を返します。</p>
+<p>デフォルトは空のリストです。</p>
+<p>詳しくは <a class="reference internal" href="../ref/templates/api.html#django.template.RequestContext" title="django.template.RequestContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestContext</span></code></a> を参照してください。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'debug'</span></code>: テンプレートのデバッグモードのオン/オフを切り替える真偽値です。もし <code class="docutils literal notranslate"><span class="pre">True</span></code> なら、テンプレートのレンダリング中に例外が発生した場合、fancy エラーページに詳細なレポートが表示されます。このレポートには、該当する行がハイライトされたテンプレートのスニペットが含まれます。</p>
+<p>デフォルトは <a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> 設定の値です。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'loaders'</span></code>: テンプレートローダクラスへの Python のドット区切りパスのリストです。各 <code class="docutils literal notranslate"><span class="pre">Loader</span></code> クラスは特定のソースからテンプレートをインポートする方法を知っています。任意で、文字列の代わりにタプルを使うこともできます。タプルの最初の項目は <code class="docutils literal notranslate"><span class="pre">Loader</span></code> クラス名で、それ以降の項目は初期化時に <code class="docutils literal notranslate"><span class="pre">Loader</span></code> に渡されます。</p>
+<p>デフォルトは <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DIRS</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-APP_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APP_DIRS</span></code></a> の値に依存します。</p>
+<p>詳しくは <a class="reference internal" href="../ref/templates/api.html#template-loaders"><span class="std std-ref">ローダーの種類</span></a> を参照してください。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'string_if_invalid'</span></code>: 無効な(例えばスペルミスのある)変数に対してテンプレートシステムが使用する文字列です。</p>
+<p>デフォルトは空文字列です。</p>
+<p>詳しくは <a class="reference internal" href="../ref/templates/api.html#invalid-template-variables"><span class="std std-ref">無効な変数の扱い</span></a> を参照してください。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'file_charset'</span></code>: ディスク上のテンプレートファイルを読み込む際に使用する文字セットです。</p>
+<p>デフォルトは <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code> です。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'libraries'</span></code>: テンプレートエンジンに登録するテンプレートタグモジュールのラベルとドット区切りPythonパスの辞書。これは新しいライブラリを追加したり、既存のライブラリの代替ラベルを提供するために使用できます。たとえば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;libraries&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;myapp_tags&quot;</span><span class="p">:</span> <span class="s2">&quot;path.to.myapp.tags&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;admin.urls&quot;</span><span class="p">:</span> <span class="s2">&quot;django.contrib.admin.templatetags.admin_urls&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">%}</span></code></a> タグに対応する辞書のキーを渡すことでライブラリをロードできます。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'builtins'</span></code>: <a class="reference internal" href="../ref/templates/builtins.html"><span class="doc">ビルトイン</span></a> に追加するテンプレートタグモジュールのドット区切りPythonパスのリストです。たとえば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">OPTIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;builtins&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;myapp.builtins&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">%}</span></code></a> タグを呼び出さなくても、組み込みライブラリのタグやフィルタを使うことができます。</p>
+</li>
+</ul>
+<dl class="py class" id="module-django.template.backends.jinja2">
+<dt class="sig sig-object py" id="django.template.backends.jinja2.Jinja2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jinja2</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/template/backends/jinja2.py#L14"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.template.backends.jinja2.Jinja2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference external" href="https://jinja.palletsprojects.com/">Jinja2</a> がインストールされている必要があります:</p>
+<div class="console-block" id="console-block-0">
+<input class="c-tab-unix" id="c-tab-0-unix" type="radio" name="console-0" checked>
+<label for="c-tab-0-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-0-win" type="radio" name="console-0">
+<label for="c-tab-0-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-0-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>Jinja2
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-0-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py -m pip install Jinja2
+</pre></div>
+</section>
+</div>
+<p><a class="reference external" href="https://jinja.palletsprojects.com/">Jinja2</a> エンジンを指定するには <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-BACKEND"><code class="xref std std-setting docutils literal notranslate"><span class="pre">BACKEND</span></code></a> に <code class="docutils literal notranslate"><span class="pre">'django.template.backends.jinja2.Jinja2'</span></code> を設定します。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-APP_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APP_DIRS</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、 <code class="docutils literal notranslate"><span class="pre">Jinja2</span></code> エンジンはインストールされているアプリケーションの <code class="docutils literal notranslate"><span class="pre">jinja2</span></code> サブディレクトリにあるテンプレートを探します。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-OPTIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">OPTIONS</span></code></a> の中で最も重要なエントリは <code class="docutils literal notranslate"><span class="pre">'environment'</span></code> です。これはJinja2の環境を返す呼び出し可能オブジェクトへのPythonのドット区切りパスです。デフォルトは <code class="docutils literal notranslate"><span class="pre">'jinja2.Environment'</span></code> です。Django はその呼び出し可能オブジェクトを起動し、他のオプションをキーワード引数として渡します。さらに、 Django はいくつかのオプションに Jinja2 とは異なるデフォルトを追加します:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'autoescape'</span></code>: <code class="docutils literal notranslate"><span class="pre">True</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'loader'</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DIRS</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-APP_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APP_DIRS</span></code></a> に設定されたローダー。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'auto_reload'</span></code>: <code class="docutils literal notranslate"><span class="pre">settings.DEBUG</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'undefined'</span></code>: <code class="docutils literal notranslate"><span class="pre">DebugUndefined</span> <span class="pre">if</span> <span class="pre">settings.DEBUG</span> <span class="pre">else</span> <span class="pre">Undefined</span></code></p></li>
+</ul>
+<p>また、 <code class="docutils literal notranslate"><span class="pre">Jinja2</span></code> エンジンは以下の <a class="reference internal" href="../ref/settings.html#std-setting-TEMPLATES-OPTIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">OPTIONS</span></code></a> も受け付けます:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">'context_processors'</span></code>: リクエストでテンプレートがレンダリングされるときにコンテキストを生成するために使用される呼び出し可能オブジェクトへの Python のドット区切りパスのリストです。これらの呼び出し可能オブジェクトはリクエストオブジェクトを引数として取り、コンテキストにマージされるアイテムの <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> を返します。</p>
+<p>デフォルトは空のリストです。</p>
+<div class="admonition-using-context-processors-with-jinja2-templates-is-discouraged admonition">
+<p class="admonition-title">Jinja2テンプレートでコンテキストプロセッサを使用することは推奨されません。</p>
+<p>Django テンプレートは引数付き関数の呼び出しをサポートしていないので、 コンテキストプロセッサは Django テンプレートで有用です。Jinja2 にはその制限がないので、コンテキストプロセッサとして使う関数を <code class="docutils literal notranslate"><span class="pre">jinja2.Environment</span></code> を使ってテンプレートのグローバル変数に置くことをお勧めします。そうすれば、テンプレートの中でその関数を呼び出すことができます:</p>
+<div class="highlight-jinja notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">function</span><span class="o">(</span><span class="nv">request</span><span class="o">)</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>いくつかの Django テンプレートコンテキストプロセッサは固定値を返します。Jinja2 テンプレートでは、 <code class="docutils literal notranslate"><span class="pre">jinja2.Environment</span></code> で直接定数を追加できるので、このような間接的なレイヤーは不要です。</p>
+<p>Jinja2用のコンテキストプロセッサを追加する当初のユースケースは、次のようなものでした:</p>
+<ul class="simple">
+<li><p>リクエストに依存する高コストな計算。</p></li>
+<li><p>すべてのテンプレートで結果が必要な場合。</p></li>
+<li><p>各テンプレートで結果を複数回使用する場合。</p></li>
+</ul>
+<p>これらの条件がすべて満たされない限り、テンプレートに関数を渡す方が Jinja2 の設計に合っています。</p>
+</div>
+</li>
+</ul>
+<p>デフォルトの設定は意図的に最小限に抑えられています。テンプレートがリクエストと共にレンダリングされる場合 (例えば <a class="reference internal" href="http/shortcuts.html#django.shortcuts.render" title="django.shortcuts.render"><code class="xref py py-func docutils literal notranslate"><span class="pre">render()</span></code></a> を使用する場合)、 <code class="docutils literal notranslate"><span class="pre">Jinja2</span></code> バックエンドは <code class="docutils literal notranslate"><span class="pre">request</span></code> 、 <code class="docutils literal notranslate"><span class="pre">csrf_input</span></code> および <code class="docutils literal notranslate"><span class="pre">csrf_token</span></code> というグローバルをコンテキストに追加します。それ以外は、このバックエンドは Django フレーバーの環境を作りません。Django のフィルタやタグについては知りません。Django 固有の API を使うには、環境に設定する必要があります。</p>
+<p>たとえば、下記のような内容の <code class="docutils literal notranslate"><span class="pre">myproject/jinja2.py</span></code> を作成することができ、:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.templatetags.static</span><span class="w"> </span><span class="kn">import</span> <span class="n">static</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">jinja2</span><span class="w"> </span><span class="kn">import</span> <span class="n">Environment</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">environment</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">):</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">Environment</span><span class="p">(</span><span class="o">**</span><span class="n">options</span><span class="p">)</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">globals</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="n">static</span><span class="p">,</span>
+            <span class="s2">&quot;url&quot;</span><span class="p">:</span> <span class="n">reverse</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">env</span>
+</pre></div>
+</div>
+<p>これで <code class="docutils literal notranslate"><span class="pre">'environment'</span></code> オプションを <code class="docutils literal notranslate"><span class="pre">'myproject.jinja2.environment'</span></code> に設定できます。</p>
+<p>そして、Jinja2 テンプレートで以下の構文を使用できるようになります:</p>
+<div class="highlight-html+jinja notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">static</span><span class="o">(</span><span class="s1">&#39;path/to/company-logo.png&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Company Logo&quot;</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">url</span><span class="o">(</span><span class="s1">&#39;admin:index&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span>Administration<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>タグとフィルタの概念は Django テンプレート言語にも Jinja2 にもありますが、使い方が異なります。Jinja2 はテンプレートの呼び出し可能オブジェクトに引数を渡すことをサポートしているので、 Django テンプレートでテンプレートタグやフィルタを必要とする多くの機能は、上の例のように Jinja2 テンプレートで関数を呼び出すことで実現できます。Jinja2 のグローバル名前空間はテンプレートコンテキストプロセッサの必要性をなくします。Django テンプレート言語には Jinja2 のテストに等価なものはありません。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">テンプレート</a><ul>
+<li><a class="reference internal" href="#the-django-template-language">Django テンプレート言語</a><ul>
+<li><a class="reference internal" href="#syntax">構文</a><ul>
+<li><a class="reference internal" href="#variables">変数</a></li>
+<li><a class="reference internal" href="#tags">タグ</a></li>
+<li><a class="reference internal" href="#filters">フィルタ</a></li>
+<li><a class="reference internal" href="#comments">Comments</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#components">コンポーネント</a><ul>
+<li><a class="reference internal" href="#engine">エンジン</a></li>
+<li><a class="reference internal" href="#template">テンプレート</a></li>
+<li><a class="reference internal" href="#context">コンテキスト</a></li>
+<li><a class="reference internal" href="#loaders">ローダー</a></li>
+<li><a class="reference internal" href="#context-processors">コンテキストプロセッサ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#support-for-template-engines">テンプレートエンジンのサポート</a><ul>
+<li><a class="reference internal" href="#configuration">設定</a></li>
+<li><a class="reference internal" href="#module-django.template.loader">使い方</a></li>
+<li><a class="reference internal" href="#module-django.template.backends.django">組み込みのバックエンド</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="forms/media.html"
+                          title="前の章へ">フォームアセット (<code class="docutils literal notranslate"><span class="pre">Media</span></code> クラス)</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="class-based-views/index.html"
+                          title="次の章へ">クラスベースビュー</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topics/templates.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="forms/media.html" title="フォームアセット (&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;Media&lt;/span&gt;&lt;/code&gt; クラス)">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="class-based-views/index.html" title="クラスベースビュー">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

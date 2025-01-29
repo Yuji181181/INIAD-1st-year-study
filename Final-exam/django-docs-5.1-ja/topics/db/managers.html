@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>マネージャ &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="素の SQL 文の実行" href="sql.html" />
+    <link rel="prev" title="検索" href="search.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="search.html" title="検索">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="sql.html" title="素の SQL 文の実行">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-db-managers">
+            
+  <section id="s-managers">
+<span id="managers"></span><h1>マネージャ<a class="headerlink" href="#managers" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.db.models.Manager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Manager</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/models/manager.py#L176"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.models.Manager" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">マネージャ</span> <span class="pre">(Manager)</span></code> とは、Django のモデルに対するデータベースクエリの操作を提供するインターフェイスです。Django アプリケーション内の1つのモデルに対して、<code class="docutils literal notranslate"><span class="pre">Manager</span></code> は最低でも1つは存在します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Manager</span></code> クラスの詳細については、<a class="reference internal" href="queries.html"><span class="doc">クエリを作成する</span></a> に書かれています。ここでは、特に、<code class="docutils literal notranslate"><span class="pre">Manager</span></code> の動作をカスタマイズするモデルのオプションについて説明しています。</p>
+<section id="s-manager-names">
+<span id="s-id1"></span><span id="manager-names"></span><span id="id1"></span><h2>マネージャの名前<a class="headerlink" href="#manager-names" title="Link to this heading">¶</a></h2>
+<p>デフォルトでは、Django は <code class="docutils literal notranslate"><span class="pre">objects</span></code> という名前の <code class="docutils literal notranslate"><span class="pre">Manager</span></code> を各 Django モデルクラスに対して追加します。しかし、もし <code class="docutils literal notranslate"><span class="pre">objects</span></code> をフィールド名として使いたい場合や、あるいは、<code class="docutils literal notranslate"><span class="pre">Manager</span></code> に対して <code class="docutils literal notranslate"><span class="pre">objects</span></code> 以外の名前を使いたい場合には、各モデル単位で好きな名前を付けることができます。あるクラスの <code class="docutils literal notranslate"><span class="pre">Manager</span></code> の名前を変えるには、そのクラスの上で <code class="docutils literal notranslate"><span class="pre">models.Manager()</span></code> と書いて、クラス変数を定義します。たとえば、次のように書きます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="n">people</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>このモデル例を使うと、<code class="docutils literal notranslate"><span class="pre">Person.objects</span></code> は <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> 例外を起こしますが、<code class="docutils literal notranslate"><span class="pre">Person.people.all()</span></code> と書けば、すべての <code class="docutils literal notranslate"><span class="pre">Person</span></code> オブジェクトのリストが得られます。</p>
+</section>
+<section id="s-custom-managers">
+<span id="s-id2"></span><span id="custom-managers"></span><span id="id2"></span><h2>マネージャのカスタマイズ<a class="headerlink" href="#custom-managers" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Manager</span></code> ベースクラスを拡張し、カスタマイズした <code class="docutils literal notranslate"><span class="pre">Manager</span></code> をモデル内でインスタンス化すれば、特定のモデル用にカスタマイズした <code class="docutils literal notranslate"><span class="pre">Manager</span></code> を使うことができます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Manager</span></code> をカスタマイズしたくなるシチュエーションとしては、たとえば次の2つのような場合が考えられます。1つ目は、<code class="docutils literal notranslate"><span class="pre">Manager</span></code> に新しいメソッドを追加したい場合、もう1つは、<code class="docutils literal notranslate"><span class="pre">Manager</span></code> が最初に返す <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を修正したい場合です。</p>
+<section id="s-adding-extra-manager-methods">
+<span id="adding-extra-manager-methods"></span><h3>マネージャに新しいメソッドを追加する<a class="headerlink" href="#adding-extra-manager-methods" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Manager</span></code> に新しいメソッドを追加するのがふさわしいのは、モデルに対する「テーブルレベル」での操作を追加したい場合です。(「低レベル」の機能、たとえば、あるモデルオブジェクトの1つのインスタンスに作用するような関数の場合には、<code class="docutils literal notranslate"><span class="pre">Manager</span></code> をカスタマイズするのではなく、<a class="reference internal" href="models.html#model-methods"><span class="std std-ref">モデルメソッド</span></a> を使ってください。</p>
+<p>たとえば、このカスタム <code class="docutils literal notranslate"><span class="pre">Manager</span></code> は <code class="docutils literal notranslate"><span class="pre">with_counts()</span></code> メソッドを追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Coalesce</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PollManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_counts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">num_responses</span><span class="o">=</span><span class="n">Coalesce</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Count</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">OpinionPoll</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">question</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">PollManager</span><span class="p">()</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Response</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">poll</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">OpinionPoll</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>この例では、 <code class="docutils literal notranslate"><span class="pre">OpinionPoll.objects.with_counts()</span></code> を使うことで、 <code class="docutils literal notranslate"><span class="pre">num_responses</span></code> 属性が付加された <code class="docutils literal notranslate"><span class="pre">OpinionPoll</span></code> オブジェクトの <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を得ることができます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Manager</span></code> のカスタマイズメソッドは、どんなオブジェクトを返しても構いませんが、<code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> だけは返してはいけません。</p>
+<p>注目すべきもう1つの点は、 <code class="docutils literal notranslate"><span class="pre">Manager</span></code> 内のメソッドではself.modelとすることで、 <code class="docutils literal notranslate"><span class="pre">Manager</span></code> に紐づいているモデルクラスを取得できることです。</p>
+</section>
+<section id="s-modifying-a-manager-s-initial-queryset">
+<span id="modifying-a-manager-s-initial-queryset"></span><h3>マネージャが初めに返す <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を修正する<a class="headerlink" href="#modifying-a-manager-s-initial-queryset" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">Manager</span></code> のベース <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> は、すべてのオブジェクトを返します。 たとえば、このモデルの例では...:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Book</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Book.objects.all()</span></code> は、データベース内の全ての本を返します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Manager.get_queryset()</span></code> メソッドをオーバーライドすることで、 <code class="docutils literal notranslate"><span class="pre">Manager</span></code> のベース <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を上書きできます。 <code class="docutils literal notranslate"><span class="pre">get_queryset()</span></code> は、必要な属性を含む <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を返す必要があります。</p>
+<p>例えば、次のモデルには <em>2つ</em> の <code class="docutils literal notranslate"><span class="pre">Manager</span></code> があります。片方はすべてのオブジェクトを返し、もう片方はRoald Dahlの本のみを返します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># First, define the Manager subclass.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DahlBookManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="s2">&quot;Roald Dahl&quot;</span><span class="p">)</span>
+
+
+<span class="c1"># Then hook it into the Book model explicitly.</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Book</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">author</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>  <span class="c1"># The default manager.</span>
+    <span class="n">dahl_objects</span> <span class="o">=</span> <span class="n">DahlBookManager</span><span class="p">()</span>  <span class="c1"># The Dahl-specific manager.</span>
+</pre></div>
+</div>
+<p>このモデルの例では、 <code class="docutils literal notranslate"><span class="pre">Book.objects.all()</span></code> はデータベース上の本を全て返 しますが、 <code class="docutils literal notranslate"><span class="pre">Book.dahl_objects.all()</span></code> は Roald Dahl の書いた本だけを返しま す。</p>
+<p><code class="docutils literal notranslate"><span class="pre">get_queryset()</span></code> は <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> オブジェクトを返すので、 <code class="docutils literal notranslate"><span class="pre">filter()</span></code> 、 <code class="docutils literal notranslate"><span class="pre">exclude()</span></code> 、その他の <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> オブジェクトのメソッドを全て使えます。したがって、以下のような文も実行できます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Book</span><span class="o">.</span><span class="n">dahl_objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="n">Book</span><span class="o">.</span><span class="n">dahl_objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Matilda&quot;</span><span class="p">)</span>
+<span class="n">Book</span><span class="o">.</span><span class="n">dahl_objects</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>この例では、同じモデルで複数のマネージャを使用するという、追加の面白いテクニックも紹介しました。一つのモデルに対して、好きなだけ <code class="docutils literal notranslate"><span class="pre">Manager()</span></code> インスタンスを割り当てることができます。これは、何度も同じコードを書かずにモデルに共通の &quot;フィルタ&quot; を定義するための方法です。</p>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">AuthorManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">EditorManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;E&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Author&quot;</span><span class="p">),</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Editor&quot;</span><span class="p">)})</span>
+    <span class="n">people</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">AuthorManager</span><span class="p">()</span>
+    <span class="n">editors</span> <span class="o">=</span> <span class="n">EditorManager</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>この例では、<code class="docutils literal notranslate"><span class="pre">Person.authors.all()</span></code>、<code class="docutils literal notranslate"><span class="pre">Person.editors.all()</span></code>、<code class="docutils literal notranslate"><span class="pre">Person.people.all()</span></code> を指定でき、期待通りの結果が得られます。</p>
+</section>
+<section id="s-default-managers">
+<span id="s-id3"></span><span id="default-managers"></span><span id="id3"></span><h3>デフォルトマネージャ<a class="headerlink" href="#default-managers" title="Link to this heading">¶</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Model._default_manager">
+<span class="sig-prename descclassname"><span class="pre">Model.</span></span><span class="sig-name descname"><span class="pre">_default_manager</span></span><a class="headerlink" href="#django.db.models.Model._default_manager" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>カスタムの <code class="docutils literal notranslate"><span class="pre">Manager</span></code> オブジェクトを使う場合、 Django が (モデル内で定義された順番で) 最初に見つけた <code class="docutils literal notranslate"><span class="pre">Manager</span></code> には特別なステータスがあることに注意してください。Django はクラスで定義された最初の <code class="docutils literal notranslate"><span class="pre">Manager</span></code> を「デフォルト」の <code class="docutils literal notranslate"><span class="pre">Manager</span></code> と解釈し、Django の一部の機能 (<a class="reference internal" href="../../ref/django-admin.html#django-admin-dumpdata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">dumpdata</span></code></a> を含む) はそのモデル専用にその <code class="docutils literal notranslate"><span class="pre">Manager</span></code> を使用します。その結果、<code class="docutils literal notranslate"><span class="pre">get_queryset()</span></code> をオーバーライドした結果、利用したいオブジェクトを取得できなくなるという事態を避けるために、デフォルトマネージャの選択には注意した方が良いでしょう。</p>
+<p>カスタムのデフォルトマネージャは <a class="reference internal" href="../../ref/models/options.html#django.db.models.Options.default_manager_name" title="django.db.models.Options.default_manager_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Meta.default_manager_name</span></code></a> で指定できます。</p>
+<p>たとえば、ジェネリックビューを実装しているサードパーティのアプリで、未知のモデルを扱わなければならないコードを書いている場合、モデルが <code class="docutils literal notranslate"><span class="pre">objects</span></code> マネージャを持っていると仮定するのではなく、このマネージャ (または <a class="reference internal" href="#django.db.models.Model._base_manager" title="django.db.models.Model._base_manager"><code class="xref py py-attr docutils literal notranslate"><span class="pre">_base_manager</span></code></a>) を使用してください。</p>
+</section>
+<section id="s-base-managers">
+<span id="base-managers"></span><h3>ベースマネージャ<a class="headerlink" href="#base-managers" title="Link to this heading">¶</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Model._base_manager">
+<span class="sig-prename descclassname"><span class="pre">Model.</span></span><span class="sig-name descname"><span class="pre">_base_manager</span></span><a class="headerlink" href="#django.db.models.Model._base_manager" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<section id="s-using-managers-for-related-object-access">
+<span id="s-managers-for-related-objects"></span><span id="using-managers-for-related-object-access"></span><span id="managers-for-related-objects"></span><h4>マネージャによるリレーション先オブジェクトへのアクセス<a class="headerlink" href="#using-managers-for-related-object-access" title="Link to this heading">¶</a></h4>
+<p>デフォルトでは、Django はリレーション先オブジェクト (例えば <code class="docutils literal notranslate"><span class="pre">choice.question</span></code>) にアクセスする際に、リレーション先オブジェクトの <code class="docutils literal notranslate"><span class="pre">_default_manager</span></code> ではなく、 <code class="docutils literal notranslate"><span class="pre">Model._base_manager</span></code> マネージャクラスのインスタンスを使います。これは Django がリレーション先オブジェクトを取得できるようにする必要があるためで、そうしないとデフォルトマネージャでフィルタリングされてしまう (つまりアクセスできない) からです。</p>
+<p>通常のベースマネージャクラス (<a class="reference internal" href="#django.db.models.Manager" title="django.db.models.Manager"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.db.models.Manager</span></code></a>) があなたの環境に合わない場合、 <a class="reference internal" href="../../ref/models/options.html#django.db.models.Options.base_manager_name" title="django.db.models.Options.base_manager_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Meta.base_manager_name</span></code></a> を設定することで、 Django にどのクラスを使うかを指示できます。</p>
+<p>ベースマネージャはリレーション先モデルのクエリや、<a class="reference internal" href="queries.html#backwards-related-objects"><span class="std std-ref">1対多や多対多のリレーションシップ</span></a> にアクセスする場合には使用されません。たとえば、 <a class="reference internal" href="../../intro/tutorial02.html#creating-models"><span class="std std-ref">チュートリアルの</span></a> <code class="docutils literal notranslate"><span class="pre">Question</span></code> モデルに <code class="docutils literal notranslate"><span class="pre">deleted</span></code> フィールドがあり、 <code class="docutils literal notranslate"><span class="pre">deleted=True</span></code> のインスタンスをフィルタリングするベースマネージャがあった場合、<code class="docutils literal notranslate"><span class="pre">Choice.objects.filter(question__name__startswith='What')</span></code> のようなクエリセットには削除された質問に関連する選択肢が含まれます。</p>
+</section>
+<section id="s-don-t-filter-away-any-results-in-this-type-of-manager-subclass">
+<span id="don-t-filter-away-any-results-in-this-type-of-manager-subclass"></span><h4>このタイプのマネージャのサブクラスでは、結果をフィルタリングしないでください。<a class="headerlink" href="#don-t-filter-away-any-results-in-this-type-of-manager-subclass" title="Link to this heading">¶</a></h4>
+<p>このマネージャは、他のモデルからリレーション先オブジェクトにアクセスするために 使用されます。このような状況では、 Django は、参照されるオブジェクトを <em>すべて</em> 取得できるように、取得するモデルのすべてのオブジェクトを見ることができなければなりません。</p>
+<p>したがって、 <code class="docutils literal notranslate"><span class="pre">get_queryset()</span></code> をオーバーライドして行をフィルタリングしてはいけません。もしそうすれば、 Django は不完全な結果を返します。</p>
+</section>
+</section>
+<section id="s-calling-custom-queryset-methods-from-the-manager">
+<span id="s-calling-custom-queryset-methods-from-manager"></span><span id="calling-custom-queryset-methods-from-the-manager"></span><span id="calling-custom-queryset-methods-from-manager"></span><h3>カスタマイズした <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> のメソッド をマネージャから呼び出す<a class="headerlink" href="#calling-custom-queryset-methods-from-the-manager" title="Link to this heading">¶</a></h3>
+<p>標準の <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> のほとんどのメソッドは <code class="docutils literal notranslate"><span class="pre">Manager</span></code> から直接アクセスできますが、カスタムの <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> で定義したメソッドは <code class="docutils literal notranslate"><span class="pre">Manager</span></code> でも実装する必要があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PersonQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">authors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">editors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">role</span><span class="o">=</span><span class="s2">&quot;E&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PersonManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">PersonQuerySet</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">using</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_db</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">authors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">authors</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">editors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">()</span><span class="o">.</span><span class="n">editors</span><span class="p">()</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">first_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">last_name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">role</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;A&quot;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Author&quot;</span><span class="p">),</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Editor&quot;</span><span class="p">)})</span>
+    <span class="n">people</span> <span class="o">=</span> <span class="n">PersonManager</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>この例では <code class="docutils literal notranslate"><span class="pre">authors()</span></code> と <code class="docutils literal notranslate"><span class="pre">editors()</span></code> の両方をマネージャ <code class="docutils literal notranslate"><span class="pre">Person.people</span></code> から直接呼び出すことができます。</p>
+</section>
+<section id="s-creating-a-manager-with-queryset-methods">
+<span id="s-create-manager-with-queryset-methods"></span><span id="creating-a-manager-with-queryset-methods"></span><span id="create-manager-with-queryset-methods"></span><h3><code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> のメソッドで、マネージャを生成する<a class="headerlink" href="#creating-a-manager-with-queryset-methods" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> と <code class="docutils literal notranslate"><span class="pre">Manager</span></code> の両方でメソッドを複製する必要がある上記の方法の代わりに、 <a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet.as_manager" title="django.db.models.query.QuerySet.as_manager"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QuerySet.as_manager()</span></code></a> を使用すると、カスタムした <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> のメソッドをコピーした <code class="docutils literal notranslate"><span class="pre">Manager</span></code> のインスタンスを作成できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="n">people</span> <span class="o">=</span> <span class="n">PersonQuerySet</span><span class="o">.</span><span class="n">as_manager</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet.as_manager" title="django.db.models.query.QuerySet.as_manager"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QuerySet.as_manager()</span></code></a> によって生成される <code class="docutils literal notranslate"><span class="pre">Manager</span></code> インスタンスは、前の例の <code class="docutils literal notranslate"><span class="pre">PersonManager</span></code> とほぼ同じになります。</p>
+<p>すべての <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> メソッドが <code class="docutils literal notranslate"><span class="pre">Manager</span></code> レベルで意味を持つわけではありません。例えば、 <a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet.delete" title="django.db.models.query.QuerySet.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QuerySet.delete()</span></code></a> メソッドが <code class="docutils literal notranslate"><span class="pre">Manager</span></code> クラスにコピーされることは意図的に防いであります。</p>
+<p>メソッドは以下の規則に従ってコピーされます:</p>
+<ul class="simple">
+<li><p>パブリックメソッドはデフォルトでコピーされます。</p></li>
+<li><p>プライベートメソッド (アンダースコアで始まるメソッド) は、デフォルトではコピーされません。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">queryset_only</span></code> 属性が <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定されているメソッドは常にコピーされます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">queryset_only</span></code> 属性が <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定されているメソッドはコピーされません。</p></li>
+</ul>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CustomQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+    <span class="c1"># Available on both Manager and QuerySet.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">public_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Available only on QuerySet.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_private_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="c1"># Available only on QuerySet.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">opted_out_public_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="n">opted_out_public_method</span><span class="o">.</span><span class="n">queryset_only</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Available on both Manager and QuerySet.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_opted_in_private_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+
+    <span class="n">_opted_in_private_method</span><span class="o">.</span><span class="n">queryset_only</span> <span class="o">=</span> <span class="kc">False</span>
+</pre></div>
+</div>
+<section id="s-from-queryset">
+<span id="from-queryset"></span><h4><code class="docutils literal notranslate"><span class="pre">from_queryset()</span></code><a class="headerlink" href="#from-queryset" title="Link to this heading">¶</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.from_queryset">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_queryset</span></span>(<em class="sig-param"><span class="n"><span class="pre">queryset_class</span></span></em>)<a class="headerlink" href="#django.db.models.from_queryset" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>高度な使い方をする場合には、カスタムの <code class="docutils literal notranslate"><span class="pre">Manager</span></code> とカスタムの <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> の両方が必要になるかもしれません。この場合、 <code class="docutils literal notranslate"><span class="pre">Manager.from_queryset()</span></code> を呼び出すことで、カスタム <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> メソッドをコピーしたベース <code class="docutils literal notranslate"><span class="pre">Manager</span></code> の <em>サブクラス</em> を返すことができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CustomManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">manager_only_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomQuerySet</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">QuerySet</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">manager_and_queryset_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">CustomManager</span><span class="o">.</span><span class="n">from_queryset</span><span class="p">(</span><span class="n">CustomQuerySet</span><span class="p">)()</span>
+</pre></div>
+</div>
+<p>生成されたクラスを変数に格納することもできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MyManager</span> <span class="o">=</span> <span class="n">CustomManager</span><span class="o">.</span><span class="n">from_queryset</span><span class="p">(</span><span class="n">CustomQuerySet</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">MyManager</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-custom-managers-and-model-inheritance">
+<span id="s-custom-managers-and-inheritance"></span><span id="custom-managers-and-model-inheritance"></span><span id="custom-managers-and-inheritance"></span><h3>カスタムマネージャとモデルの継承<a class="headerlink" href="#custom-managers-and-model-inheritance" title="Link to this heading">¶</a></h3>
+<p>Django がカスタムマネージャと <a class="reference internal" href="models.html#model-inheritance"><span class="std std-ref">モデルの継承</span></a> をどのように扱うかを以下に示します:</p>
+<ol class="arabic simple">
+<li><p>Python の通常の名前解決順序を使って (子クラスの名前は他を全て上書きし、次に最初の親クラスの名前、 というように) 、基底クラスのマネージャは常に子クラスに継承されます。</p></li>
+<li><p>モデルやその親クラスでマネージャが宣言されていない場合、Django は自動的に <code class="docutils literal notranslate"><span class="pre">objects</span></code> マネージャを作成します。</p></li>
+<li><p>クラスのデフォルトマネージャは <a class="reference internal" href="../../ref/models/options.html#django.db.models.Options.default_manager_name" title="django.db.models.Options.default_manager_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Meta.default_manager_name</span></code></a> で選択されたマネージャか、モデル上で最初に宣言されたマネージャか、最初の親モデルのデフォルトマネージャです。</p></li>
+</ol>
+<p>これらのルールは、抽象的な基底クラスを経由して、カスタムマネージャのコレクションをモデルのグループにインストールしたい場合でも、デフォルトのマネージャをカスタマイズするために必要な柔軟性を提供します。たとえば、次のような基底クラスがあるとします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">AbstractBase</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="n">objects</span> <span class="o">=</span> <span class="n">CustomManager</span><span class="p">()</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+</pre></div>
+</div>
+<p>これを子クラスで直接使用した場合、子クラスでマネージャを宣言していなければ <code class="docutils literal notranslate"><span class="pre">objects</span></code> がデフォルトのマネージャになります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ChildA</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="c1"># This class has CustomManager as the default manager.</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>もし <code class="docutils literal notranslate"><span class="pre">AbstractBase</span></code> を継承して別のデフォルトマネージャを指定したい場合は、子クラスにそのデフォルトマネージャを指定できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ChildB</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="c1"># An explicit default manager.</span>
+    <span class="n">default_manager</span> <span class="o">=</span> <span class="n">OtherManager</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>上記では <code class="docutils literal notranslate"><span class="pre">default_manager</span></code> がデフォルトです。 <code class="docutils literal notranslate"><span class="pre">objects</span></code> マネージャは継承されているのでまだ使用可能ですが、デフォルトでは使用されません。</p>
+<p>最後に、この例では <code class="docutils literal notranslate"><span class="pre">AbstractBase</span></code> のデフォルトを使用しつつ、子クラスに追加のマネージャを追加したいとします。 新しいマネージャを子クラスに直接追加することはできません。デフォルトをオーバーライドすることになり、抽象基底クラスのすべてのマネージャを明示的にインクルードする必要があるからです。解決策としては、追加のマネージャを別の基底クラスに置き、それをデフォルトクラスの <em>後の</em> 継承階層に含めることです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">ExtraManager</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">extra_manager</span> <span class="o">=</span> <span class="n">OtherManager</span><span class="p">()</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">abstract</span> <span class="o">=</span> <span class="kc">True</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ChildC</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">,</span> <span class="n">ExtraManager</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="c1"># Default manager is CustomManager, but OtherManager is</span>
+    <span class="c1"># also available via the &quot;extra_manager&quot; attribute.</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p>抽象モデル上でカスタムマネージャを <em>定義</em> することはできますが、抽象モデルを使ってメソッドを <em>呼び出す</em> ことはできないことに注意してください。 つまり:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ClassA</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>上記は有効なコードですが、:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AbstractBase</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">do_something</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>上記では例外が発生します。 これはマネージャがオブジェクトのコレクションを管理するためのロジックをカプセル化することを想定しているためです。抽象オブジェクトのコレクションを持つことはできないので、それらを管理することは意味がありません。抽象モデルに適用される機能がある場合、その機能は抽象モデルの staticmethod か classmethod に置くべきです。</p>
+</section>
+<section id="s-implementation-concerns">
+<span id="implementation-concerns"></span><h3>実装する際の注意<a class="headerlink" href="#implementation-concerns" title="Link to this heading">¶</a></h3>
+<p>カスタムマネージャにどのような機能を追加するにしても、マネージャインスタンスの浅いコピーを作成できることが必須です:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">manager</span> <span class="o">=</span> <span class="n">MyManager</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">manager</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Django は特定のクエリ中にマネージャオブジェクトの浅いコピーを作成します。マネージャがコピーできない場合、これらのクエリは失敗します。</p>
+<p>ほとんどのカスタムマネージャでは問題にならないでしょう。単純なメソッドを <code class="docutils literal notranslate"><span class="pre">Manager</span></code> に追加するだけであれば、 <code class="docutils literal notranslate"><span class="pre">Manager</span></code> のインスタンスをコピー不可能にすることはまずありません。しかし、オブジェクトの状態をコントロールする <code class="docutils literal notranslate"><span class="pre">Manager</span></code> オブジェクトの <code class="docutils literal notranslate"><span class="pre">__getattr__</span></code> やその他のプライベートメソッドをオーバーライドする場合は、 <code class="docutils literal notranslate"><span class="pre">Manager</span></code> のコピー機能に影響を与えないようにする必要があります。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">マネージャ</a><ul>
+<li><a class="reference internal" href="#manager-names">マネージャの名前</a></li>
+<li><a class="reference internal" href="#custom-managers">マネージャのカスタマイズ</a><ul>
+<li><a class="reference internal" href="#adding-extra-manager-methods">マネージャに新しいメソッドを追加する</a></li>
+<li><a class="reference internal" href="#modifying-a-manager-s-initial-queryset">マネージャが初めに返す <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を修正する</a></li>
+<li><a class="reference internal" href="#default-managers">デフォルトマネージャ</a></li>
+<li><a class="reference internal" href="#base-managers">ベースマネージャ</a><ul>
+<li><a class="reference internal" href="#using-managers-for-related-object-access">マネージャによるリレーション先オブジェクトへのアクセス</a></li>
+<li><a class="reference internal" href="#don-t-filter-away-any-results-in-this-type-of-manager-subclass">このタイプのマネージャのサブクラスでは、結果をフィルタリングしないでください。</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#calling-custom-queryset-methods-from-the-manager">カスタマイズした <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> のメソッド をマネージャから呼び出す</a></li>
+<li><a class="reference internal" href="#creating-a-manager-with-queryset-methods"><code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> のメソッドで、マネージャを生成する</a><ul>
+<li><a class="reference internal" href="#from-queryset"><code class="docutils literal notranslate"><span class="pre">from_queryset()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#custom-managers-and-model-inheritance">カスタムマネージャとモデルの継承</a></li>
+<li><a class="reference internal" href="#implementation-concerns">実装する際の注意</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="search.html"
+                          title="前の章へ">検索</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="sql.html"
+                          title="次の章へ">素の SQL 文の実行</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/db/managers.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="search.html" title="検索">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="sql.html" title="素の SQL 文の実行">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

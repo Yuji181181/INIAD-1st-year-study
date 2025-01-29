@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ミドルウェア (Middleware) &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="セッションの使いかた" href="sessions.html" />
+    <link rel="prev" title="ジェネリックビュー (汎用ビュー)" href="generic-views.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="generic-views.html" title="ジェネリックビュー (汎用ビュー)">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="sessions.html" title="セッションの使いかた">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-http-middleware">
+            
+  <section id="s-middleware">
+<span id="middleware"></span><h1>ミドルウェア (Middleware)<a class="headerlink" href="#middleware" title="Link to this heading">¶</a></h1>
+<p>ミドルウェアは、Django のリクエスト/レスポンス処理にフックを加えるためのフレームワークです。これは、Django の入力あるいは出力をグローバルに置き換えるための、軽量で低レベルの「プラグイン」システムです。</p>
+<p>各ミドルウェアのコンポーネントは、それぞれある特定の機能を実行する役目を持っています。たとえば、Django には <a class="reference internal" href="../../ref/middleware.html#django.contrib.auth.middleware.AuthenticationMiddleware" title="django.contrib.auth.middleware.AuthenticationMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationMiddleware</span></code></a> というミドルウェアコンポーネントがあります。このミドルウェアは、セッションを利用して、リクエストとユーザーとを関連付けます。</p>
+<p>このドキュメントでは、ミドルウェアが機能するしくみ、ミドルウェアを有効にする方法、そして、自分でミドルウェアを書く方法について説明します。Django には組み込みのミドルウェアがいくつか用意されているので、自分で書かなくてもすぐに使い始めることができます。これらの組み込みのミドルウェアについては、<a class="reference internal" href="../../ref/middleware.html"><span class="doc">組み込みミドルウェアリファレンス</span></a> にドキュメントされているので参照してください。</p>
+<section id="s-writing-your-own-middleware">
+<span id="writing-your-own-middleware"></span><h2>自分でミドルウェアを書く<a class="headerlink" href="#writing-your-own-middleware" title="Link to this heading">¶</a></h2>
+<p>ミドルウェアファクトリは、ミドルウェアを返す <code class="docutils literal notranslate"><span class="pre">get_response</span></code> を取る呼び出し可能なオブジェクトです。ミドルウェアは (ビューと同じように) リクエストを受け取ってレスポンスを返す呼び出し可能なオブジェクトです。</p>
+<p>ミドルウェアは、以下のように関数として書くことができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">simple_middleware</span><span class="p">(</span><span class="n">get_response</span><span class="p">):</span>
+    <span class="c1"># One-time configuration and initialization.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">middleware</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+        <span class="c1"># Code to be executed for each request before</span>
+        <span class="c1"># the view (and later middleware) are called.</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># Code to be executed for each request/response after</span>
+        <span class="c1"># the view is called.</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">return</span> <span class="n">middleware</span>
+</pre></div>
+</div>
+<p>もしくは、インスタンスを呼び出し可能なクラスとして書くこともできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">SimpleMiddleware</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_response</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span> <span class="o">=</span> <span class="n">get_response</span>
+        <span class="c1"># One-time configuration and initialization.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="c1"># Code to be executed for each request before</span>
+        <span class="c1"># the view (and later middleware) are called.</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># Code to be executed for each request/response after</span>
+        <span class="c1"># the view is called.</span>
+
+        <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p>Django によって渡される <code class="docutils literal notranslate"><span class="pre">get_response</span></code> 呼び出し可能オブジェクトは、実際の (これがミドルウェアの最後にリストアップされている場合) ビューか、チェーン内の次のミドルウェアの可能性があります。現在のミドルウェアはこれが何かを知る必要も気にする必要もなく、ただ次に来るものを表します。</p>
+<p>上記は、わずかに単純化したものです -- チェーン内の際にリストアップされたミドルウェアに対する <code class="docutils literal notranslate"><span class="pre">get_response</span></code> は実際のビューではなく <a class="reference internal" href="#view-middleware"><span class="std std-ref">ビューミドルウェア</span></a> を適用する処理を行うハンドラからのラッパーメソッドです。これは適切な URL 属性でビューを呼び出し、<a class="reference internal" href="#template-response-middleware"><span class="std std-ref">テンプレートレスポンス</span></a> と <a class="reference internal" href="#exception-middleware"><span class="std std-ref">例外</span></a> を適用します。</p>
+<p>ミドルウェアは同期 Python のみ(デフォルト)、非同期 Python のみ、または両方をサポートできます。どのようなリクエストをサポートするのか、またどのようなリクエストを受け取るのかについての詳細は <a class="reference internal" href="#async-middleware"><span class="std std-ref">非同期サポート</span></a> を参照してください。</p>
+<p>ミドルウェアは、あなたの Ptyhon パスのどこでも使うことができます。</p>
+<section id="s-init-get-response">
+<span id="init-get-response"></span><h3><code class="docutils literal notranslate"><span class="pre">__init__(get_response)</span></code><a class="headerlink" href="#init-get-response" title="Link to this heading">¶</a></h3>
+<p>ミドルウェアファクトリは <code class="docutils literal notranslate"><span class="pre">get_response</span></code> 引数を受け取る必要があります。ミドルウェアに対してグローバルな宣言を初期化することもできます。いくつかの注意事項があります:</p>
+<ul class="simple">
+<li><p>Django は <code class="docutils literal notranslate"><span class="pre">get_response</span></code> 引数でミドルウェアを初期化するため、<code class="docutils literal notranslate"><span class="pre">__init__()</span></code> で他の引数を必須にすることはできません。</p></li>
+<li><p>リクエストごとに 1 回呼ばれる <code class="docutils literal notranslate"><span class="pre">__call__()</span></code> メソッドとは異なり、<code class="docutils literal notranslate"><span class="pre">__init__()</span></code> はウェブサーバが起動したときに <em>1回だけ</em> 呼ばれます。</p></li>
+</ul>
+</section>
+<section id="s-marking-middleware-as-unused">
+<span id="marking-middleware-as-unused"></span><h3>ミドルウェアを不使用としてマークする<a class="headerlink" href="#marking-middleware-as-unused" title="Link to this heading">¶</a></h3>
+<p>起動時にミドルウェアを使うかどうかを決めることは、ときに有用です。この場合、ミドルウェアの <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> メソッドが <a class="reference internal" href="../../ref/exceptions.html#django.core.exceptions.MiddlewareNotUsed" title="django.core.exceptions.MiddlewareNotUsed"><code class="xref py py-exc docutils literal notranslate"><span class="pre">MiddlewareNotUsed</span></code></a> を投げる可能性があります。Django はミドルウェアプロセスからこのミドルウェアを削除し、<a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> のときはデバッグメッセージを <a class="reference internal" href="../../ref/logging.html#django-request-logger"><span class="std std-ref">django.request</span></a> ロガーに記録します。</p>
+</section>
+</section>
+<section id="s-activating-middleware">
+<span id="activating-middleware"></span><h2>ミドルウェアを有効にする<a class="headerlink" href="#activating-middleware" title="Link to this heading">¶</a></h2>
+<p>ミドルウェア要素をアクティブ化するには、Django の設定内の <a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> リストに追加してください。</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> では、各ミドルウェア要素は文字列で表されます: ミドルウェアファクトリのクラスや関数名に対する完全な Python パスです。 例えば、以下は <a class="reference internal" href="../../ref/django-admin.html#django-admin-startproject"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">django-admin</span> <span class="pre">startproject</span></code></a> で生成されるデフォルト値です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MIDDLEWARE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;django.middleware.security.SecurityMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.sessions.middleware.SessionMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.middleware.common.CommonMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.middleware.csrf.CsrfViewMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.auth.middleware.AuthenticationMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.messages.middleware.MessageMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.middleware.clickjacking.XFrameOptionsMiddleware&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>Django の導入では、ミドルウェアは必須ではありません — お望みならば <a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> は空でも構いません — しかし、最低でも <a class="reference internal" href="../../ref/middleware.html#django.middleware.common.CommonMiddleware" title="django.middleware.common.CommonMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonMiddleware</span></code></a> を使うことを強くお勧めします。</p>
+<p>ミドルウェアは他のミドルウェアに依存するため、<a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> の順番は重要です。<a class="reference internal" href="../../ref/middleware.html#django.contrib.auth.middleware.AuthenticationMiddleware" title="django.contrib.auth.middleware.AuthenticationMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationMiddleware</span></code></a> はセッション内に認証済みユーザを保持します。したがって、<a class="reference internal" href="../../ref/middleware.html#django.contrib.sessions.middleware.SessionMiddleware" title="django.contrib.sessions.middleware.SessionMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionMiddleware</span></code></a> の後に起動する必要があります。Django のミドルウェアクラスの順番については、<a class="reference internal" href="../../ref/middleware.html#middleware-ordering"><span class="std std-ref">Middleware の順序</span></a> を参照してください。</p>
+</section>
+<section id="s-middleware-order-and-layering">
+<span id="middleware-order-and-layering"></span><h2>ミドルウェアの順番とレイヤ<a class="headerlink" href="#middleware-order-and-layering" title="Link to this heading">¶</a></h2>
+<p>ビューを呼び出す前、リクエストの段階で、Django は <a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> 内で定義された順番で上から下に向かってミドルウェアを適用します。</p>
+<p>これはタマネギのように考えることができます: 各ミドルウェアクラスは、タマネギの中心にあるビューをラップする &quot;レイヤ&quot; です。リクエストがタマネギのすべてのレイヤ (つまり中心にあるビューにいたる全ての道) を通過すると (各レイヤーは <code class="docutils literal notranslate"><span class="pre">get_response</span></code> を呼び出してリクエストを次のレイヤに渡します)、レスポンスは各レイヤーを (逆順で) 通過して戻ります。</p>
+<p>いずれかのレイヤが短絡し、<code class="docutils literal notranslate"><span class="pre">get_response</span></code> を呼び出さずにレスポンスを返すことを決定した場合、そのレイヤの内側にあるタマネギの (ビューを含む) レイヤはリクエストおよびレスポンスを受け取りません。 レスポンスは、リクエストが通過したのと同じレイヤーを介してのみ返されます。</p>
+</section>
+<section id="s-other-middleware-hooks">
+<span id="other-middleware-hooks"></span><h2>他のミドルウェアのフック<a class="headerlink" href="#other-middleware-hooks" title="Link to this heading">¶</a></h2>
+<p>上述した基本的なリクエストやレスポンスのミドルウェアパターンのほかに、3 つの特殊なメソッドをクラスベースのミドルウェアに追加できます:</p>
+<section id="s-process-view">
+<span id="s-view-middleware"></span><span id="process-view"></span><span id="view-middleware"></span><h3><code class="docutils literal notranslate"><span class="pre">process_view()</span></code><a class="headerlink" href="#process-view" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="process_view">
+<span class="sig-name descname"><span class="pre">process_view</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_func</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">view_kwargs</span></span></em>)<a class="headerlink" href="#process_view" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">request</span></code> は <a class="reference internal" href="../../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> クラスのオブジェクトです。<code class="docutils literal notranslate"><span class="pre">view_func</span></code> は、直後に Django が使用する Python の関数です (関数の名前の文字列ではなく、実際の関数オブジェクトです)。<code class="docutils literal notranslate"><span class="pre">view_args</span></code> はビューに渡される位置引数のリスト、<code class="docutils literal notranslate"><span class="pre">view_kwargs</span></code> はビューに渡されるキーワード引数のディクショナリです。<code class="docutils literal notranslate"><span class="pre">view_args</span></code> も <code class="docutils literal notranslate"><span class="pre">view_kwargs</span></code> も、第一引数 (<code class="docutils literal notranslate"><span class="pre">request</span></code>) を含んでいません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">process_view()</span></code> は、Django がビューを呼び出す直前に呼び出されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">None</span></code> もしくは <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトを返す必要があります。<code class="docutils literal notranslate"><span class="pre">None</span></code> を返す場合、Django はこのリクエストの処理を続け、他のすべての <code class="docutils literal notranslate"><span class="pre">process_view()</span></code> ミドルウェアを実行し、さらに適切なビューを実行します。<a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトを返す場合、Django はわざわざ適切なビューを呼び出すことはしません; レスポンスミドルウェアを <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> に適用し、結果を返します。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>ビューが実行される、ミドルウェアの内側もしくは <code class="docutils literal notranslate"><span class="pre">process_view()</span></code> 内の <a class="reference internal" href="../../ref/request-response.html#django.http.HttpRequest.POST" title="django.http.HttpRequest.POST"><code class="xref py py-attr docutils literal notranslate"><span class="pre">request.POST</span></code></a> にアクセスすると、ミドルウェアの後に実行される全てのビューが <a class="reference internal" href="file-uploads.html#modifying-upload-handlers-on-the-fly"><span class="std std-ref">リクエストに対するアップロードハンドラを修正する</span></a> ことができなくなるため、通常は避けられるべきです。</p>
+<p><a class="reference internal" href="../../ref/middleware.html#django.middleware.csrf.CsrfViewMiddleware" title="django.middleware.csrf.CsrfViewMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code></a> クラスだけは例外と考えていいでしょう。というのも、このミドルウェアには、<a class="reference internal" href="../../ref/csrf.html#django.views.decorators.csrf.csrf_exempt" title="django.views.decorators.csrf.csrf_exempt"><code class="xref py py-func docutils literal notranslate"><span class="pre">csrf_exempt()</span></code></a> と <a class="reference internal" href="../../ref/csrf.html#django.views.decorators.csrf.csrf_protect" title="django.views.decorators.csrf.csrf_protect"><code class="xref py py-func docutils literal notranslate"><span class="pre">csrf_protect()</span></code></a> というデコレータが用意されていて、このデコレータを使えば、CSRF の検証が必要になったどの時点でも、明示的にビューを制御できるからです。</p>
+</div>
+</section>
+<section id="s-process-exception">
+<span id="s-exception-middleware"></span><span id="process-exception"></span><span id="exception-middleware"></span><h3><code class="docutils literal notranslate"><span class="pre">process_exception()</span></code><a class="headerlink" href="#process-exception" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="process_exception">
+<span class="sig-name descname"><span class="pre">process_exception</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exception</span></span></em>)<a class="headerlink" href="#process_exception" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">request</span></code> は <a class="reference internal" href="../../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> オブジェクトです。<code class="docutils literal notranslate"><span class="pre">exception</span></code> は、ビュー関数から投げられた <code class="docutils literal notranslate"><span class="pre">Exception</span></code> オブジェクトです。</p>
+<p>Django は、ビューが例外を起こした時に <code class="docutils literal notranslate"><span class="pre">process_exception()</span></code> を呼び出します。<code class="docutils literal notranslate"><span class="pre">process_exception()</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> あるいは <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトを返さなければなりません。 <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトを返した場合、テンプレートレスポンスミドルウェアおよびレスポンスミドルウェアが適用され、その結果得られたレスポンスがブラウザに返されます。そうでなければ、 <a class="reference internal" href="../../ref/views.html#error-views"><span class="std std-ref">デフォルトの例外のハンドリング</span></a> が行われます。</p>
+<p>繰り返しますが、ミドルウェアは <code class="docutils literal notranslate"><span class="pre">process_exception</span></code> を含むレスポンスフェーズで逆順に実行されます。例外ミドルウェアがレスポンスを返した場合、そのミドルウェアの上のミドルウェアクラスの <code class="docutils literal notranslate"><span class="pre">process_exception</span></code> メソッドは全く呼び出されません。</p>
+</section>
+<section id="s-process-template-response">
+<span id="s-template-response-middleware"></span><span id="process-template-response"></span><span id="template-response-middleware"></span><h3><code class="docutils literal notranslate"><span class="pre">process_template_response()</span></code><a class="headerlink" href="#process-template-response" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="process_template_response">
+<span class="sig-name descname"><span class="pre">process_template_response</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>)<a class="headerlink" href="#process_template_response" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">request</span></code> は <a class="reference internal" href="../../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> クラスのオブジェクトです。<code class="docutils literal notranslate"><span class="pre">response</span></code> は、Django のビューまたはミドルウェアから返される、<a class="reference internal" href="../../ref/template-response.html#django.template.response.TemplateResponse" title="django.template.response.TemplateResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateResponse</span></code></a> クラスのオブジェクト (あるいはそれと同等なもの) です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">process_template_response()</span></code> は、レスポンスオブジェクトが <code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドを持っている場合、つまり、<a class="reference internal" href="../../ref/template-response.html#django.template.response.TemplateResponse" title="django.template.response.TemplateResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateResponse</span></code></a> クラスのオブジェクトあるいはそれと同等のものである場合に、ビューの実行の直後に呼ばれます。</p>
+<p>このメソッドは、<code class="docutils literal notranslate"><span class="pre">render</span></code> メソッドを実装したレスポンスオブジェクトでなければなりません。このメソッド内では、与えられた <code class="docutils literal notranslate"><span class="pre">response</span></code> に対して <code class="docutils literal notranslate"><span class="pre">response.template_name</span></code> や <code class="docutils literal notranslate"><span class="pre">response.context_data</span></code> を修正したり、あるいは、新規に <a class="reference internal" href="../../ref/template-response.html#django.template.response.TemplateResponse" title="django.template.response.TemplateResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateResponse</span></code></a> クラスのオブジェクト (あるいはそれと同等なもの) を作成したりすることができます。</p>
+<p>ただし、レスポンスを自分でレンダリング (render) する必要はありません。なぜなら、レスポンスオブジェクトは、すべてのテンプレートレスポンスミドルウェアが呼び出された後に、自動的にレンダリングされるからです。</p>
+<p>レスポンスフェーズでは、ミドルウェアは逆順に呼び出されます。これには、<code class="docutils literal notranslate"><span class="pre">process_template_response()</span></code> も含まれます。</p>
+</section>
+</section>
+<section id="s-dealing-with-streaming-responses">
+<span id="dealing-with-streaming-responses"></span><h2>ストリーミングレスポンス (streaming responses) を扱う<a class="headerlink" href="#dealing-with-streaming-responses" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> とは違い、<a class="reference internal" href="../../ref/request-response.html#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> は <code class="docutils literal notranslate"><span class="pre">content</span></code> 属性を持ちません。そのため、ミドルウェアはもはや、すべてのレスポンスが <code class="docutils literal notranslate"><span class="pre">content</span></code> 属性を持っていることを前提にすることができなくなります。したがって、content にアクセスする必要がある場合には、レスポンスオブジェクトがストリーミングレスポンスオブジェクトかどうかをチェックし、その結果によって処理を場合分けしなければなりません。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">streaming</span><span class="p">:</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">streaming_content</span> <span class="o">=</span> <span class="n">wrap_streaming_content</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">streaming_content</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">content</span> <span class="o">=</span> <span class="n">alter_content</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">streaming_content</span></code> はメモリ上に置けないくらい大きいと想定しておくべきです。レスポンスミドルウェアでは、これを新しいジェネレータでラップできます。しかし、このジェネレータを処理することがあってはなりません。典型的なラップの方法は、次のようになります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">wrap_streaming_content</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="n">alter_content</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><a class="reference internal" href="../../ref/request-response.html#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> は同期イテレータと非同期イテレータの両方を受け付けます。ラッピング関数は一致する必要があります。ミドルウェアがこの種のイテレータをサポートする必要がある場合には、<a class="reference internal" href="../../ref/request-response.html#django.http.StreamingHttpResponse.is_async" title="django.http.StreamingHttpResponse.is_async"><code class="xref py py-attr docutils literal notranslate"><span class="pre">StreamingHttpResponse.is_async</span></code></a> 確認してください。</p>
+</section>
+<section id="s-exception-handling">
+<span id="exception-handling"></span><h2>例外のハンドリング<a class="headerlink" href="#exception-handling" title="Link to this heading">¶</a></h2>
+<p>Django はビューまたはミドルウェアによって起こされた例外を、エラーステータスコードを持つ適切な HTTP レスポンスに自動的に変換します。<a class="reference internal" href="../../ref/views.html#error-views"><span class="std std-ref">特定の例外</span></a> は 4xx ステータスコードに変換されますが、未知の例外は 500 ステータスコードに変換されます。</p>
+<p>この変換は各ミドルウェアの前と後で行われます (玉ねぎの各層の間にある薄い皮のようなものとして考えられます)。そのため、すべてのミドルウェアは常に、呼び出し可能な <code class="docutils literal notranslate"><span class="pre">get_response</span></code> の呼び出しから返ってきたある種の HTTP レスポンスを取得することに依存しています。ミドルウェアは、<code class="docutils literal notranslate"><span class="pre">get_response</span></code> への呼び出しを <code class="docutils literal notranslate"><span class="pre">try/except</span></code> の中にラッピングしたり、後ろのミドルウェアまたはビューから発生する可能性のある例外を心配したり必要はありません。たとえ呼び出しチェーンのすぐ次のミドルウェアがたとえば <a class="reference internal" href="views.html#django.http.Http404" title="django.http.Http404"><code class="xref py py-class docutils literal notranslate"><span class="pre">Http404</span></code></a> 例外を発生させたとしても、ミドルウェアがその例外を見ることはなく、代わりに得るのは 404 の <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse.status_code" title="django.http.HttpResponse.status_code"><code class="xref py py-attr docutils literal notranslate"><span class="pre">status_code</span></code></a> を持つ <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトです。</p>
+<p>この変換をスキップして例外を上に伝搬するには、<a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG_PROPAGATE_EXCEPTIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG_PROPAGATE_EXCEPTIONS</span></code></a> を <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定できます。</p>
+</section>
+<section id="s-asynchronous-support">
+<span id="s-async-middleware"></span><span id="asynchronous-support"></span><span id="async-middleware"></span><h2>非同期サポート<a class="headerlink" href="#asynchronous-support" title="Link to this heading">¶</a></h2>
+<p>ミドルウェアは同期リクエストと非同期リクエストのどのような組み合わせでもサポートできます。ミドルウェアが両方をサポートできない場合、Django はリクエストをミドルウェアの要求に合うように適応させますが、パフォーマンス上は不利になります。</p>
+<p>デフォルトでは、Django はミドルウェアが同期リクエストのみを処理できると想定します。この前提を変更するには、ミドルウェア ファクトリ関数またはクラスに次の属性を設定します。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">sync_capable</span></code> は、ミドルウェアが同期リクエストを処理できるかどうかを表すブール値です。デフォルトは <code class="docutils literal notranslate"><span class="pre">True</span></code>。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">async_capable</span></code> は、ミドルウェアが非同期リクエストを処理できるかどうかを表すブール値です。デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code>。</p></li>
+</ul>
+<p>ミドルウェアが <code class="docutils literal notranslate"><span class="pre">sync_capable</span> <span class="pre">=</span> <span class="pre">True</span></code> と <code class="docutils literal notranslate"><span class="pre">async_capable</span> <span class="pre">=</span> <span class="pre">True</span></code> の両方を持っている場合、Django はそれを変換せずにリクエストに渡します。この場合、ミドルウェアが非同期リクエストを受け取ったかどうかは、渡された <code class="docutils literal notranslate"><span class="pre">get_response</span></code> オブジェクトがコルーチン関数かどうかを <code class="docutils literal notranslate"><span class="pre">asgiref.sync.iscoroutinefunction</span></code> で確認できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">django.utils.decorators</span></code> モジュールには、ミドルウェアのファクトリ関数にこれらのフラグを設定できる <a class="reference internal" href="../../ref/utils.html#django.utils.decorators.sync_only_middleware" title="django.utils.decorators.sync_only_middleware"><code class="xref py py-func docutils literal notranslate"><span class="pre">sync_only_middleware()</span></code></a>、<a class="reference internal" href="../../ref/utils.html#django.utils.decorators.async_only_middleware" title="django.utils.decorators.async_only_middleware"><code class="xref py py-func docutils literal notranslate"><span class="pre">async_only_middleware()</span></code></a>、<a class="reference internal" href="../../ref/utils.html#django.utils.decorators.sync_and_async_middleware" title="django.utils.decorators.sync_and_async_middleware"><code class="xref py py-func docutils literal notranslate"><span class="pre">sync_and_async_middleware()</span></code></a> デコレータが含まれています。</p>
+<p>返された callable は、<code class="docutils literal notranslate"><span class="pre">get_response</span></code> メソッドの同期または非同期の性質と一致していなければなりません。非同期の <code class="docutils literal notranslate"><span class="pre">get_response</span></code> がある場合、コルーチン関数 (<code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">def</span></code>) を返さなければなりません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">process_view</span></code>、<code class="docutils literal notranslate"><span class="pre">process_template_response</span></code>、<code class="docutils literal notranslate"><span class="pre">process_exception</span></code> メソッドは、もし提供された場合、同期/非同期モードにも一致するように適応する必要があります。ただし、適応させなかった場合でも Django は必要に応じてそれらを個別に調整させますが、パフォーマンスがさらに低下します。</p>
+<p>以下は、両方をサポートするミドルウェア関数の作成方法の例です。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">asgiref.sync</span><span class="w"> </span><span class="kn">import</span> <span class="n">iscoroutinefunction</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">sync_and_async_middleware</span>
+
+
+<span class="nd">@sync_and_async_middleware</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">simple_middleware</span><span class="p">(</span><span class="n">get_response</span><span class="p">):</span>
+    <span class="c1"># One-time configuration and initialization goes here.</span>
+    <span class="k">if</span> <span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">get_response</span><span class="p">):</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">middleware</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+            <span class="c1"># Do something here!</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">else</span><span class="p">:</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">middleware</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+            <span class="c1"># Do something here!</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span>
+
+    <span class="k">return</span> <span class="n">middleware</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>同期呼び出しと非同期呼び出しの両方をサポートするハイブリッド ミドルウェアを宣言する場合、得られる呼び出しの種類が基になるビューと一致しなくなる可能性があります。Django は同期/非同期の遷移ができる限り少なくなるように、ミドルウェアのコールスタックを最適化します。</p>
+<p>よって、たとえ非同期ビューをラップしている場合でも、ビューとの間に他の同期ミドルウェアが存在する場合、同期モードで呼び出される可能性があります。</p>
+</div>
+<p>非同期のクラスベースのミドルウェアを使用する場合は、次のようにしてインスタンスが正しくコルーチン関数としてマークされていることを確認する必要があります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">asgiref.sync</span><span class="w"> </span><span class="kn">import</span> <span class="n">iscoroutinefunction</span><span class="p">,</span> <span class="n">markcoroutinefunction</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncMiddleware</span><span class="p">:</span>
+    <span class="n">async_capable</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">sync_capable</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_response</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span> <span class="o">=</span> <span class="n">get_response</span>
+        <span class="k">if</span> <span class="n">iscoroutinefunction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">):</span>
+            <span class="n">markcoroutinefunction</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="c1"># Some logic ...</span>
+        <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+</section>
+<section id="s-upgrading-pre-django-1-10-style-middleware">
+<span id="s-upgrading-middleware"></span><span id="upgrading-pre-django-1-10-style-middleware"></span><span id="upgrading-middleware"></span><h2>Django 1.10 以前のスタイルのミドルウェアをアップグレードする<a class="headerlink" href="#upgrading-pre-django-1-10-style-middleware" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.deprecation.MiddlewareMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.utils.deprecation.</span></span><span class="sig-name descname"><span class="pre">MiddlewareMixin</span></span><a class="headerlink" href="#django.utils.deprecation.MiddlewareMixin" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Django は <code class="docutils literal notranslate"><span class="pre">django.utils.deprecation.MiddlewareMixin</span></code> を提供しています。これを使うと、<a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> と古い <code class="docutils literal notranslate"><span class="pre">MIDDLEWARE_CLASSES</span></code> 両方に互換性があり、同期リクエストと非同期リクエストの両方をサポートするミドルウェアクラスの作成が簡単になります。Django に含まれるすべてのミドルウェアクラスは、両方の設定と互換性があります。</p>
+<p>mixin は <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> メソッドを提供しています。これは、必須の <code class="docutils literal notranslate"><span class="pre">get_response</span></code> 引数を受け取って <code class="docutils literal notranslate"><span class="pre">self.get_response</span></code> に保持します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">__call__()</span></code> メソッド:</p>
+<ol class="arabic simple">
+<li><p>(定義されている場合) <code class="docutils literal notranslate"><span class="pre">self.process_request(request)</span></code> を呼び出します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">self.get_response(request)</span></code> を呼び出し、後のミドルウェアとビューからレスポンスを得ます。</p></li>
+<li><p>(定義されている場合) <code class="docutils literal notranslate"><span class="pre">self.process_response(request,</span> <span class="pre">response)</span></code> を呼び出します。</p></li>
+<li><p>レスポンスを返します。</p></li>
+</ol>
+<p><code class="docutils literal notranslate"><span class="pre">MIDDLEWARE_CLASSES</span></code> で使われている場合は、<code class="docutils literal notranslate"><span class="pre">__call__()</span></code> メソッドは決して使われません; Django は <code class="docutils literal notranslate"><span class="pre">process_request()</span></code> と <code class="docutils literal notranslate"><span class="pre">process_response()</span></code> を直接呼び出します。</p>
+<p>ほとんどの場合、この mixin を継承することで、旧式のミドルウェアと十分な下位互換性を持つ新しいシステムと互換性を持たせることができます。 新しい短絡セマンティクスは無害であり、既存のミドルウェアにとっても有益です。 いくつかのケースでは、ミドルウェアクラスは新しいセマンティクスに調整するためにいくつかの変更を必要とすることがあります。</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> と <code class="docutils literal notranslate"><span class="pre">MIDDLEWARE_CLASSES</span></code> の動作には以下のような違いがあります。</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">MIDDLEWARE_CLASSES</span></code> のもとでは、全てのミドルウェアは常にその <code class="docutils literal notranslate"><span class="pre">process_response</span></code> メソッドが呼び出されます。たとえその前のミドルウェアが <code class="docutils literal notranslate"><span class="pre">process_request</span></code> メソッドからレスポンスを返してショート（短絡）した場合でもです。 <a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> のもとでは、ミドルウェアはオニオンのように動作します。レスポンスが外に出るときに通過するレイヤーは、リクエストが入るときに見たのと同じレイヤーです。ミドルウェアがショートした場合、そのミドルウェアとそれより前にある <a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> のミドルウェアのみがレスポンスを見ることになります。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MIDDLEWARE_CLASSES</span></code> のもとでは、ミドルウェアの <code class="docutils literal notranslate"><span class="pre">process_request</span></code> メソッドから発生した例外に <code class="docutils literal notranslate"><span class="pre">process_exception</span></code> が適用されます。 <a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> のもとでは、 <code class="docutils literal notranslate"><span class="pre">process_exception</span></code> はビュー（または <a class="reference internal" href="../../ref/template-response.html#django.template.response.TemplateResponse" title="django.template.response.TemplateResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateResponse</span></code></a> の <code class="docutils literal notranslate"><span class="pre">render</span></code> メソッド）から発生した例外にのみ適用されます。ミドルウェアから発生した例外は適切な HTTP レスポンスに変換され、次のミドルウェアに渡されます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">MIDDLEWARE_CLASSES</span></code> のもとでは、もし <code class="docutils literal notranslate"><span class="pre">process_response</span></code> メソッドが例外を発生させた場合、それ以前の全てのミドルウェアの <code class="docutils literal notranslate"><span class="pre">process_response</span></code> メソッドはスキップされ、常に <code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code> HTTP レスポンスが返されます（たとえ発生した例外がたとえば <a class="reference internal" href="views.html#django.http.Http404" title="django.http.Http404"><code class="xref py py-class docutils literal notranslate"><span class="pre">Http404</span></code></a> だったとしてもです）。 <a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> のもとでは、ミドルウェアから例外が発生した場合、直ちに適切な HTTP レスポンスに変換され、次のミドルウェアがそのレスポンスを見ることになります。ミドルウェアが例外を発生させたことを理由にミドルウェアがスキップされることはありません。</p></li>
+</ol>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ミドルウェア (Middleware)</a><ul>
+<li><a class="reference internal" href="#writing-your-own-middleware">自分でミドルウェアを書く</a><ul>
+<li><a class="reference internal" href="#init-get-response"><code class="docutils literal notranslate"><span class="pre">__init__(get_response)</span></code></a></li>
+<li><a class="reference internal" href="#marking-middleware-as-unused">ミドルウェアを不使用としてマークする</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#activating-middleware">ミドルウェアを有効にする</a></li>
+<li><a class="reference internal" href="#middleware-order-and-layering">ミドルウェアの順番とレイヤ</a></li>
+<li><a class="reference internal" href="#other-middleware-hooks">他のミドルウェアのフック</a><ul>
+<li><a class="reference internal" href="#process-view"><code class="docutils literal notranslate"><span class="pre">process_view()</span></code></a></li>
+<li><a class="reference internal" href="#process-exception"><code class="docutils literal notranslate"><span class="pre">process_exception()</span></code></a></li>
+<li><a class="reference internal" href="#process-template-response"><code class="docutils literal notranslate"><span class="pre">process_template_response()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#dealing-with-streaming-responses">ストリーミングレスポンス (streaming responses) を扱う</a></li>
+<li><a class="reference internal" href="#exception-handling">例外のハンドリング</a></li>
+<li><a class="reference internal" href="#asynchronous-support">非同期サポート</a></li>
+<li><a class="reference internal" href="#upgrading-pre-django-1-10-style-middleware">Django 1.10 以前のスタイルのミドルウェアをアップグレードする</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="generic-views.html"
+                          title="前の章へ">ジェネリックビュー (汎用ビュー)</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="sessions.html"
+                          title="次の章へ">セッションの使いかた</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/http/middleware.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="generic-views.html" title="ジェネリックビュー (汎用ビュー)">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="sessions.html" title="セッションの使いかた">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

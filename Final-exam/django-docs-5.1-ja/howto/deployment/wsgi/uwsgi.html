@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django を uWSGI とともに使うには？ &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="Django を Apache と mod_wsgi とともに使うには？" href="modwsgi.html" />
+    <link rel="prev" title="Django を Gunicorn とともに使う" href="gunicorn.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="gunicorn.html" title="Django を Gunicorn とともに使う">previous</a>
+     |
+    <a href="../../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="modwsgi.html" title="Django を Apache と &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;mod_wsgi&lt;/span&gt;&lt;/code&gt; とともに使うには？">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-deployment-wsgi-uwsgi">
+            
+  <section id="s-how-to-use-django-with-uwsgi">
+<span id="how-to-use-django-with-uwsgi"></span><h1>Django を uWSGI とともに使うには？<a class="headerlink" href="#how-to-use-django-with-uwsgi" title="Link to this heading">¶</a></h1>
+<p><a class="reference external" href="https://uwsgi-docs.readthedocs.io/">uWSGI</a> は高速かつ自己回復的、開発者やシステム管理者にとって使いやすいアプリケーションコンテナサーバーで、純粋な C 言語で記述されています。</p>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>uWSGI のドキュメントは、Django、nginx および uWSGI をカバーした <a class="reference external" href="https://uwsgi.readthedocs.io/en/latest/tutorials/Django_and_nginx.html">tutorial</a> を提供しています (たくさんあるセットアップ方法の一例です)。以下のドキュメントは、Django を uWSGI と統合する方法に焦点を当てています。</p>
+</div>
+<section id="s-prerequisite-uwsgi">
+<span id="prerequisite-uwsgi"></span><h2>前提条件: uWSGI<a class="headerlink" href="#prerequisite-uwsgi" title="Link to this heading">¶</a></h2>
+<p>uWSGI の wiki には、いくつかの <a class="reference external" href="https://uwsgi-docs.readthedocs.io/en/latest/Install.html">installation procedures</a> が記載されています。Python のパッケージマネージャーであるpipを使って、あらゆるバージョンの uWSGI を一つのコマンドでインストールすることができます。たとえば:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp"># </span>Install<span class="w"> </span>current<span class="w"> </span>stable<span class="w"> </span>version.
+<span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>uwsgi
+
+<span class="gp"># </span>Or<span class="w"> </span>install<span class="w"> </span>LTS<span class="w"> </span><span class="o">(</span>long<span class="w"> </span>term<span class="w"> </span>support<span class="o">)</span>.
+<span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>https://projects.unbit.it/downloads/uwsgi-lts.tar.gz
+</pre></div>
+</div>
+<section id="s-uwsgi-model">
+<span id="uwsgi-model"></span><h3>uWSGI モデル<a class="headerlink" href="#uwsgi-model" title="Link to this heading">¶</a></h3>
+<p>uWSGI はクライアントサーバモデルで動作します。Web サーバー (nginx や Apache など) は <code class="docutils literal notranslate"><span class="pre">djangoo-uwsgi</span></code> &quot;worker&quot; プロセスと通信し、動的なコンテンツを提供します。</p>
+</section>
+<section id="s-configuring-and-starting-the-uwsgi-server-for-django">
+<span id="configuring-and-starting-the-uwsgi-server-for-django"></span><h3>Django に対して uWSGI サーバーを設定、開始する<a class="headerlink" href="#configuring-and-starting-the-uwsgi-server-for-django" title="Link to this heading">¶</a></h3>
+<p>uWSGI では、プロセスを設定する方法が複数提供されています。uWSGI's <a class="reference external" href="https://uwsgi.readthedocs.io/en/latest/Configuration.html">configuration documentation</a> を参照してください。</p>
+<p>以下はuWSGIサーバーを起動するコマンドの例です:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uwsgi<span class="w"> </span>--chdir<span class="o">=</span>/path/to/your/project<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--module<span class="o">=</span>mysite.wsgi:application<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--env<span class="w"> </span><span class="nv">DJANGO_SETTINGS_MODULE</span><span class="o">=</span>mysite.settings<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--master<span class="w"> </span>--pidfile<span class="o">=</span>/tmp/project-master.pid<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--socket<span class="o">=</span><span class="m">127</span>.0.0.1:49152<span class="w"> </span><span class="se">\ </span><span class="w">     </span><span class="c1"># can also be a file</span>
+<span class="w">    </span>--processes<span class="o">=</span><span class="m">5</span><span class="w"> </span><span class="se">\ </span><span class="w">                </span><span class="c1"># number of worker processes</span>
+<span class="w">    </span>--uid<span class="o">=</span><span class="m">1000</span><span class="w"> </span>--gid<span class="o">=</span><span class="m">2000</span><span class="w"> </span><span class="se">\ </span><span class="w">        </span><span class="c1"># if root, uwsgi can drop privileges</span>
+<span class="w">    </span>--harakiri<span class="o">=</span><span class="m">20</span><span class="w"> </span><span class="se">\ </span><span class="w">                </span><span class="c1"># respawn processes taking more than 20 seconds</span>
+<span class="w">    </span>--max-requests<span class="o">=</span><span class="m">5000</span><span class="w"> </span><span class="se">\ </span><span class="w">          </span><span class="c1"># respawn processes after serving 5000 requests</span>
+<span class="w">    </span>--vacuum<span class="w"> </span><span class="se">\ </span><span class="w">                     </span><span class="c1"># clear environment on exit</span>
+<span class="w">    </span>--home<span class="o">=</span>/path/to/virtual/env<span class="w"> </span><span class="se">\ </span><span class="w">  </span><span class="c1"># optional path to a virtual environment</span>
+<span class="w">    </span>--daemonize<span class="o">=</span>/var/log/uwsgi/yourproject.log<span class="w">      </span><span class="c1"># background the process</span>
+</pre></div>
+</div>
+<p>この例では、<code class="docutils literal notranslate"><span class="pre">mysite</span></code> と名付けられたトップレベルのプロジェクトパッケージがあり、またその中に <code class="file docutils literal notranslate"><span class="pre">mysite/wsgi.py</span></code> という WSGI <code class="docutils literal notranslate"><span class="pre">application</span></code> オブジェクトを含むモジュールがあると仮定しています。これは、最近のバージョンの Django で <code class="docutils literal notranslate"><span class="pre">django-admin</span> <span class="pre">startproject</span> <span class="pre">mysite</span></code> (<code class="docutils literal notranslate"><span class="pre">mysite</span></code> には自分のプロジェクト名が入ります) を実行した場合、自動生成されるファイル構成です。もしこのファイルが存在しない場合、自分自身で作る必要があります。このファイルに記述すべきデフォルトの内容と、自分で追加できる部分に関しては、<a class="reference internal" href="index.html"><span class="doc">WSGI とともにデプロイするには</span></a> ドキュメントを参照してください。</p>
+<p>Django 特有のオプションは以下の通りです:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">chdir</span></code>: Python のインポートパス上で必要になるディレクトリへのパス -- つまり <code class="docutils literal notranslate"><span class="pre">mysite</span></code> パッケージを含むディレクトリです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">module</span></code>: 使われる WSGI モジュール -- 通常は <a class="reference internal" href="../../../ref/django-admin.html#django-admin-startproject"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">startproject</span></code></a> によって生成される <code class="docutils literal notranslate"><span class="pre">mysite.wsgi</span></code> モジュールです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">env</span></code>: 少なくとも <span class="target" id="index-2"></span><a class="reference internal" href="../../../topics/settings.html#envvar-DJANGO_SETTINGS_MODULE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_SETTINGS_MODULE</span></code></a> を含む必要があります。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">home</span></code>: プロジェクトの仮想環境へのパスを指定します。</p></li>
+</ul>
+<p>ini 設定ファイルの例:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="k">[uwsgi]</span>
+<span class="na">chdir</span><span class="o">=</span><span class="s">/path/to/your/project</span>
+<span class="na">module</span><span class="o">=</span><span class="s">mysite.wsgi:application</span>
+<span class="na">master</span><span class="o">=</span><span class="s">True</span>
+<span class="na">pidfile</span><span class="o">=</span><span class="s">/tmp/project-master.pid</span>
+<span class="na">vacuum</span><span class="o">=</span><span class="s">True</span>
+<span class="na">max-requests</span><span class="o">=</span><span class="s">5000</span>
+<span class="na">daemonize</span><span class="o">=</span><span class="s">/var/log/uwsgi/yourproject.log</span>
+</pre></div>
+</div>
+<p>ini 設定ファイルを使用する例:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>uwsgi<span class="w"> </span>--ini<span class="w"> </span>uwsgi.ini
+</pre></div>
+</div>
+<div class="admonition-fixing-unicodeencodeerror-for-file-uploads admonition">
+<p class="admonition-title">ファイルアップロード時の <code class="docutils literal notranslate"><span class="pre">UnicodeEncodeError</span></code> を修正する</p>
+<p>非 ASCII 文字を含むファイル名でファイルをアップロードするときに <code class="docutils literal notranslate"><span class="pre">UnicodeEncodeError</span></code> が発生する場合は、 <code class="docutils literal notranslate"><span class="pre">uwsgi.ini</span></code> に以下の設定を追加して、uWSGI が非 ASCII ファイル名を受け付けるようにしてください:</p>
+<div class="highlight-ini notranslate"><div class="highlight"><pre><span></span><span class="na">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">LANG=en_US.UTF-8</span>
+</pre></div>
+</div>
+<p>詳細については、Unicode リファレンスガイドの <a class="reference internal" href="../../../ref/unicode.html#unicode-files"><span class="std std-ref">ファイル</span></a> セクションを参照してください。</p>
+</div>
+<p>uWSGI worker の開始、停止およびリロードに関する情報は、uWSGI ドキュメントの <a class="reference external" href="https://uwsgi-docs.readthedocs.io/en/latest/Management.html">managing the uWSGI process</a> を参照してください。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Django を uWSGI とともに使うには？</a><ul>
+<li><a class="reference internal" href="#prerequisite-uwsgi">前提条件: uWSGI</a><ul>
+<li><a class="reference internal" href="#uwsgi-model">uWSGI モデル</a></li>
+<li><a class="reference internal" href="#configuring-and-starting-the-uwsgi-server-for-django">Django に対して uWSGI サーバーを設定、開始する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="gunicorn.html"
+                          title="前の章へ">Django を Gunicorn とともに使う</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="modwsgi.html"
+                          title="次の章へ">Django を Apache と <code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code> とともに使うには？</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/howto/deployment/wsgi/uwsgi.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="gunicorn.html" title="Django を Gunicorn とともに使う">previous</a>
+     |
+    <a href="../../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="modwsgi.html" title="Django を Apache と &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;mod_wsgi&lt;/span&gt;&lt;/code&gt; とともに使うには？">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

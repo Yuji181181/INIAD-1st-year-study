@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django の例外 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="ファイルの取り扱い" href="files/index.html" />
+    <link rel="prev" title="django-admin と manage.py" href="django-admin.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="django-admin.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django-admin&lt;/span&gt;&lt;/code&gt; と &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;manage.py&lt;/span&gt;&lt;/code&gt;">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="files/index.html" title="ファイルの取り扱い">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-exceptions">
+            
+  <section id="s-django-exceptions">
+<span id="django-exceptions"></span><h1>Django の例外<a class="headerlink" href="#django-exceptions" title="Link to this heading">¶</a></h1>
+<p>Django は普通の Python の例外の他に、いくつか独自の例外も起こします。</p>
+<section id="s-module-django.core.exceptions">
+<span id="s-django-core-exceptions"></span><span id="module-django.core.exceptions"></span><span id="django-core-exceptions"></span><h2>Django Core 例外<a class="headerlink" href="#module-django.core.exceptions" title="Link to this heading">¶</a></h2>
+<p>Django core 例外クラスは <code class="docutils literal notranslate"><span class="pre">django.core.exceptions</span></code> で定義されています。</p>
+<section id="s-appregistrynotready">
+<span id="appregistrynotready"></span><h3><code class="docutils literal notranslate"><span class="pre">AppRegistryNotReady</span></code><a class="headerlink" href="#appregistrynotready" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.AppRegistryNotReady">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AppRegistryNotReady</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L16"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.AppRegistryNotReady" title="Link to this definition">¶</a></dt>
+<dd><p>この例外は、ORM を初期化する <a class="reference internal" href="applications.html#app-loading-process"><span class="std std-ref">アプリケーション読み込みプロセス</span></a> が完了する前にモデルを使用しようとしたときに発生します。</p>
+</dd></dl>
+
+</section>
+<section id="s-objectdoesnotexist">
+<span id="objectdoesnotexist"></span><h3><code class="docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code><a class="headerlink" href="#objectdoesnotexist" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.ObjectDoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ObjectDoesNotExist</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L22"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.ObjectDoesNotExist" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="models/class.html#django.db.models.Model.DoesNotExist" title="django.db.models.Model.DoesNotExist"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Model.DoesNotExist</span></code></a> 例外の基底クラスです。<code class="docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code> のための <code class="docutils literal notranslate"><span class="pre">try/except</span></code> は、すべてのモデルの <a class="reference internal" href="models/class.html#django.db.models.Model.DoesNotExist" title="django.db.models.Model.DoesNotExist"><code class="xref py py-exc docutils literal notranslate"><span class="pre">DoesNotExist</span></code></a> 例外をキャッチします。</p>
+<p><a class="reference internal" href="models/querysets.html#django.db.models.query.QuerySet.get" title="django.db.models.query.QuerySet.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a> を参照してください。</p>
+</dd></dl>
+
+</section>
+<section id="s-emptyresultset">
+<span id="emptyresultset"></span><h3><code class="docutils literal notranslate"><span class="pre">EmptyResultSet</span></code><a class="headerlink" href="#emptyresultset" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.EmptyResultSet">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EmptyResultSet</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L240"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.EmptyResultSet" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">EmptyResultSet</span></code> は、クエリが何も結果を返さない場合に、クエリ生成時に発生する可能性があります。ほとんどの Django プロジェクトでは、この例外に遭遇することはないでしょうが、カスタムルックアップや式を実装する際に役立つかもしれません。</p>
+</dd></dl>
+
+</section>
+<section id="s-fullresultset">
+<span id="fullresultset"></span><h3><code class="docutils literal notranslate"><span class="pre">FullResultSet</span></code><a class="headerlink" href="#fullresultset" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.FullResultSet">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FullResultSet</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L246"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.FullResultSet" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">FullResultSet</span></code> は、クエリが全てに一致する場合に、クエリ生成中に発生する可能性があります。ほとんどの Django プロジェクトではこの例外に遭遇することはありませんが、カスタムルックアップや式を実装する際に役立つかもしれません。</p>
+</dd></dl>
+
+</section>
+<section id="s-fielddoesnotexist">
+<span id="fielddoesnotexist"></span><h3><code class="docutils literal notranslate"><span class="pre">FieldDoesNotExist</span></code><a class="headerlink" href="#fielddoesnotexist" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.FieldDoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FieldDoesNotExist</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L10"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.FieldDoesNotExist" title="Link to this definition">¶</a></dt>
+<dd><p>モデルの <code class="docutils literal notranslate"><span class="pre">_meta.get_field()</span></code> メソッドによって、リクエストされたフィールドがモデルまたはモデルの親に存在しない場合、 <code class="docutils literal notranslate"><span class="pre">FieldDoesNotExist</span></code> 例外が発生します。</p>
+</dd></dl>
+
+</section>
+<section id="s-multipleobjectsreturned">
+<span id="multipleobjectsreturned"></span><h3><code class="docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code><a class="headerlink" href="#multipleobjectsreturned" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.MultipleObjectsReturned">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L28"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.MultipleObjectsReturned" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="models/class.html#django.db.models.Model.MultipleObjectsReturned" title="django.db.models.Model.MultipleObjectsReturned"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Model.MultipleObjectsReturned</span></code></a> 例外の基底クラスです。<code class="docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code> の <code class="docutils literal notranslate"><span class="pre">try/except</span></code> は、すべてのモデルの <a class="reference internal" href="models/class.html#django.db.models.Model.MultipleObjectsReturned" title="django.db.models.Model.MultipleObjectsReturned"><code class="xref py py-exc docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a> 例外をキャッチします。</p>
+<p><a class="reference internal" href="models/querysets.html#django.db.models.query.QuerySet.get" title="django.db.models.query.QuerySet.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a> を参照してください。</p>
+</dd></dl>
+
+</section>
+<section id="s-suspiciousoperation">
+<span id="suspiciousoperation"></span><h3><code class="docutils literal notranslate"><span class="pre">SuspiciousOperation</span></code><a class="headerlink" href="#suspiciousoperation" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.SuspiciousOperation">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SuspiciousOperation</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L34"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.SuspiciousOperation" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.SuspiciousOperation" title="django.core.exceptions.SuspiciousOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SuspiciousOperation</span></code></a> 例外は、セッションクッキーの改ざんなど、セキュリティの観点から疑わしいとみなされる操作をユーザーが行った場合に発生します。 <code class="docutils literal notranslate"><span class="pre">SuspiciousOperation</span></code> のサブクラスには以下が含まれます:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DisallowedHost</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DisallowedModelAdminLookup</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DisallowedModelAdminToField</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">DisallowedRedirect</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">InvalidSessionKey</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">RequestDataTooBig</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SuspiciousFileOperation</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SuspiciousMultipartForm</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SuspiciousSession</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TooManyFieldsSent</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TooManyFilesSent</span></code></p></li>
+</ul>
+<p>もし <code class="docutils literal notranslate"><span class="pre">SuspiciousOperation</span></code> 例外が ASGI/WSGI ハンドラレベルに達した場合、<code class="docutils literal notranslate"><span class="pre">Error</span></code> レベルでログ記録され、 <a class="reference internal" href="request-response.html#django.http.HttpResponseBadRequest" title="django.http.HttpResponseBadRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseBadRequest</span></code></a> が結果として返されます。 詳細については、<a class="reference internal" href="../topics/logging.html"><span class="doc">ロギングのドキュメント</span></a> を参照してください。</p>
+</dd></dl>
+
+</section>
+<section id="s-permissiondenied">
+<span id="permissiondenied"></span><h3><code class="docutils literal notranslate"><span class="pre">PermissionDenied</span></code><a class="headerlink" href="#permissiondenied" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.PermissionDenied">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PermissionDenied</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L101"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.PermissionDenied" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.PermissionDenied" title="django.core.exceptions.PermissionDenied"><code class="xref py py-exc docutils literal notranslate"><span class="pre">PermissionDenied</span></code></a> 例外は、ユーザーにリクエストされたアクションを実行する権限がない場合に発生します。</p>
+</dd></dl>
+
+</section>
+<section id="s-viewdoesnotexist">
+<span id="viewdoesnotexist"></span><h3><code class="docutils literal notranslate"><span class="pre">ViewDoesNotExist</span></code><a class="headerlink" href="#viewdoesnotexist" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.ViewDoesNotExist">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ViewDoesNotExist</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L107"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.ViewDoesNotExist" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.ViewDoesNotExist" title="django.core.exceptions.ViewDoesNotExist"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ViewDoesNotExist</span></code></a> 例外は、リクエストされたビューが存在しないい場合に、<a class="reference internal" href="urlresolvers.html#module-django.urls" title="django.urls"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.urls</span></code></a> によって発生します。</p>
+</dd></dl>
+
+</section>
+<section id="s-middlewarenotused">
+<span id="middlewarenotused"></span><h3><code class="docutils literal notranslate"><span class="pre">MiddlewareNotUsed</span></code><a class="headerlink" href="#middlewarenotused" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.MiddlewareNotUsed">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MiddlewareNotUsed</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L113"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.MiddlewareNotUsed" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.MiddlewareNotUsed" title="django.core.exceptions.MiddlewareNotUsed"><code class="xref py py-exc docutils literal notranslate"><span class="pre">MiddlewareNotUsed</span></code></a> 例外は、サーバーの設定の中でミドルウェアが使用されなかった時に発生します。</p>
+</dd></dl>
+
+</section>
+<section id="s-improperlyconfigured">
+<span id="improperlyconfigured"></span><h3><code class="docutils literal notranslate"><span class="pre">ImproperlyConfigured</span></code><a class="headerlink" href="#improperlyconfigured" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.ImproperlyConfigured">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ImproperlyConfigured</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L119"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.ImproperlyConfigured" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.ImproperlyConfigured" title="django.core.exceptions.ImproperlyConfigured"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ImproperlyConfigured</span></code></a> 例外は、Django が何らかの点で不適切に設定されている場合に発生します。たとえば、<code class="docutils literal notranslate"><span class="pre">settings.py</span></code> に含まれる値が不正であったり、パースできないような場合が考えられます。</p>
+</dd></dl>
+
+</section>
+<section id="s-fielderror">
+<span id="fielderror"></span><h3><code class="docutils literal notranslate"><span class="pre">FieldError</span></code><a class="headerlink" href="#fielderror" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.FieldError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FieldError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L125"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.FieldError" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.FieldError" title="django.core.exceptions.FieldError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FieldError</span></code></a> 例外は、モデルのフィールドに問題がある時に発生します。発生理由としては、次のようないくつかの理由が考えられます。</p>
+<ul class="simple">
+<li><p>モデル内のフィールドが、抽象基底クラスからの同名のフィールドと衝突しています</p></li>
+<li><p>ソートによって無限ループが起こります</p></li>
+<li><p>フィルタパラメータからキーワードを解析できません</p></li>
+<li><p>クエリパラメータのキーワードからは、フィールドを特定できません</p></li>
+<li><p>指定されたフィールドに対する結合は許可されていません</p></li>
+<li><p>フィールド名が無効です</p></li>
+<li><p>クエリに無効な order_by 引数が含まれています</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="s-validationerror">
+<span id="validationerror"></span><h3><code class="docutils literal notranslate"><span class="pre">ValidationError</span></code><a class="headerlink" href="#validationerror" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.ValidationError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ValidationError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L134"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.ValidationError" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.ValidationError" title="django.core.exceptions.ValidationError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValidationError</span></code></a> 例外は、データがフォームまたはモデルのフィールド検証に失敗すると発生します。検証 (validation) のより詳しい情報については、<a class="reference internal" href="forms/validation.html"><span class="doc">フォームとフィールドのバリデーション</span></a> や <a class="reference internal" href="models/instances.html#validating-objects"><span class="std std-ref">モデルフィールドのバリデーション</span></a>、<a class="reference internal" href="validators.html"><span class="doc">バリデータのリファレンス</span></a> を参照してください。</p>
+</dd></dl>
+
+<section id="s-non-field-errors">
+<span id="non-field-errors"></span><h4><code class="docutils literal notranslate"><span class="pre">NON_FIELD_ERRORS</span></code><a class="headerlink" href="#non-field-errors" title="Link to this heading">¶</a></h4>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.core.exceptions.NON_FIELD_ERRORS">
+<span class="sig-name descname"><span class="pre">NON_FIELD_ERRORS</span></span><a class="headerlink" href="#django.core.exceptions.NON_FIELD_ERRORS" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">ValidationError</span></code> でフォームやモデルの特定のフィールドに属さないものは、 <code class="docutils literal notranslate"><span class="pre">NON_FIELD_ERRORS</span></code> として分類されます。この定数は、他のフィールドをそれぞれのエラーリストにマッピングする辞書でキーとして使用されます。</p>
+</section>
+</section>
+<section id="s-badrequest">
+<span id="badrequest"></span><h3><code class="docutils literal notranslate"><span class="pre">BadRequest</span></code><a class="headerlink" href="#badrequest" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.BadRequest">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BadRequest</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L95"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.BadRequest" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.BadRequest" title="django.core.exceptions.BadRequest"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BadRequest</span></code></a> 例外は、クライアントエラーによりリクエストを処理できない場合に発生します。 <code class="docutils literal notranslate"><span class="pre">BadRequest</span></code> 例外が ASGI/WSGI ハンドラレベルに到達すると、 <a class="reference internal" href="request-response.html#django.http.HttpResponseBadRequest" title="django.http.HttpResponseBadRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseBadRequest</span></code></a> が結果として返されます。</p>
+</dd></dl>
+
+</section>
+<section id="s-requestaborted">
+<span id="requestaborted"></span><h3><code class="docutils literal notranslate"><span class="pre">RequestAborted</span></code><a class="headerlink" href="#requestaborted" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.RequestAborted">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RequestAborted</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L89"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.RequestAborted" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.RequestAborted" title="django.core.exceptions.RequestAborted"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RequestAborted</span></code></a> 例外は、ハンドラによって読み込まれた HTTP ボディが途中で切断され、クライアント接続が閉じられるか、またはクライアントがデータを送信せず、サーバーが接続を閉じるタイムアウトに達したときに発生します。</p>
+<p>これはHTTPハンドラーモジュール内部のもので、他の場所で見ることはまずありません。HTTP処理コードを変更している場合、ソケットがクリーンに閉じられるように、中断されたリクエストに遭遇した際にはこれを発生させるべきです。</p>
+</dd></dl>
+
+</section>
+<section id="s-synchronousonlyoperation">
+<span id="synchronousonlyoperation"></span><h3><code class="docutils literal notranslate"><span class="pre">SynchronousOnlyOperation</span></code><a class="headerlink" href="#synchronousonlyoperation" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.exceptions.SynchronousOnlyOperation">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SynchronousOnlyOperation</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/exceptions.py#L252"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.exceptions.SynchronousOnlyOperation" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.exceptions.SynchronousOnlyOperation" title="django.core.exceptions.SynchronousOnlyOperation"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SynchronousOnlyOperation</span></code></a> 例外は、同期的な Python コードでのみ許可されているコードが、実行中の非同期イベントループを持つスレッドから非同期コンテキストで呼び出されたときに発生します。Django のこれらの部分は、一般に機能するためにスレッドセーフに大きく依存しており、同じスレッドを共有するコルーチンの下では正しく動作しません。</p>
+<p>非同期スレッドから同期専用のコードを呼び出そうとしている場合は、同期スレッドを作成し、その中で呼び出してください。これは、 <a class="reference internal" href="../topics/async.html#asgiref.sync.sync_to_async" title="asgiref.sync.sync_to_async"><code class="xref py py-func docutils literal notranslate"><span class="pre">asgiref.sync.sync_to_async()</span></code></a> を使用して実現できます。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-url-resolver-exceptions">
+<span id="url-resolver-exceptions"></span><h2>URL Resolver の例外<a class="headerlink" href="#url-resolver-exceptions" title="Link to this heading">¶</a></h2>
+<p>URL Resolver の例外は <code class="docutils literal notranslate"><span class="pre">django.urls</span></code> で定義されています。</p>
+<section id="s-resolver404">
+<span id="resolver404"></span><h3><code class="docutils literal notranslate"><span class="pre">Resolver404</span></code><a class="headerlink" href="#resolver404" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.urls.Resolver404">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Resolver404</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/urls/exceptions.py#L4"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.urls.Resolver404" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.urls.Resolver404" title="django.urls.Resolver404"><code class="xref py py-exc docutils literal notranslate"><span class="pre">Resolver404</span></code></a> 例外は、<code class="docutils literal notranslate"><span class="pre">resolve()</span></code> に渡されたパスがビューにマッピングされていない場合に、 <a class="reference internal" href="urlresolvers.html#django.urls.resolve" title="django.urls.resolve"><code class="xref py py-func docutils literal notranslate"><span class="pre">resolve()</span></code></a> によって発生します。これは <a class="reference internal" href="../topics/http/views.html#django.http.Http404" title="django.http.Http404"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.http.Http404</span></code></a> のサブクラスです。</p>
+</dd></dl>
+
+</section>
+<section id="s-noreversematch">
+<span id="noreversematch"></span><h3><code class="docutils literal notranslate"><span class="pre">NoReverseMatch</span></code><a class="headerlink" href="#noreversematch" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.urls.NoReverseMatch">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NoReverseMatch</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/urls/exceptions.py#L8"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.urls.NoReverseMatch" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.urls.NoReverseMatch" title="django.urls.NoReverseMatch"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NoReverseMatch</span></code></a> 例外は、提供されたパラメータに基づいてURLconf内の一致するURLを特定できない場合に、 <a class="reference internal" href="urlresolvers.html#module-django.urls" title="django.urls"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.urls</span></code></a> によって発生します。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-database-exceptions">
+<span id="database-exceptions"></span><h2>データベースの例外<a class="headerlink" href="#database-exceptions" title="Link to this heading">¶</a></h2>
+<p>データベースの例外は <code class="docutils literal notranslate"><span class="pre">django.db</span></code> からインポートできます。</p>
+<p>Django は標準のデータベース例外をラップしており、これによって Django コードにはこれらのクラスの共通の実装が保証されます。</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.Error">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Error</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L17"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.Error" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.InterfaceError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InterfaceError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L21"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.InterfaceError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.DatabaseError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DatabaseError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L25"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.DatabaseError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.DataError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DataError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L29"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.DataError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.OperationalError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">OperationalError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L33"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.OperationalError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.IntegrityError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IntegrityError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L37"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.IntegrityError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.InternalError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InternalError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L41"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.InternalError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.ProgrammingError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ProgrammingError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L45"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.ProgrammingError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.NotSupportedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NotSupportedError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/utils.py#L49"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.NotSupportedError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Djangoのデータベース例外のラッパーは、基になるデータベース例外と全く同じ動作をします。詳細については、 <span class="target" id="index-4"></span><a class="pep reference external" href="https://peps.python.org/pep-0249/"><strong>PEP 249</strong></a> 、Python Database API Specification v2.0 を参照してください。</p>
+<p><span class="target" id="index-5"></span><a class="pep reference external" href="https://peps.python.org/pep-3134/"><strong>PEP 3134</strong></a> に従って、 <code class="docutils literal notranslate"><span class="pre">__cause__</span></code> 属性が、追加情報へのアクセスを可能にする元の(ベースとなる)データベース例外とともに設定されます。</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.models.ProtectedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">ProtectedError</span></span><a class="headerlink" href="#django.db.models.ProtectedError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>参照されているオブジェクトの削除を防ぐために発生させられる <a class="reference internal" href="models/fields.html#django.db.models.PROTECT" title="django.db.models.PROTECT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">django.db.models.PROTECT</span></code></a> を使用しています。 <a class="reference internal" href="#django.db.models.ProtectedError" title="django.db.models.ProtectedError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">models.ProtectedError</span></code></a> は <a class="reference internal" href="#django.db.IntegrityError" title="django.db.IntegrityError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IntegrityError</span></code></a> のサブクラスです。</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.models.RestrictedError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">RestrictedError</span></span><a class="headerlink" href="#django.db.models.RestrictedError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="models/fields.html#django.db.models.RESTRICT" title="django.db.models.RESTRICT"><code class="xref py py-attr docutils literal notranslate"><span class="pre">django.db.models.RESTRICT</span></code></a> を使用して参照されているオブジェクトの削除を防ぐために発生します。 <a class="reference internal" href="#django.db.models.RestrictedError" title="django.db.models.RestrictedError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">models.RestrictedError</span></code></a> は <a class="reference internal" href="#django.db.IntegrityError" title="django.db.IntegrityError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">IntegrityError</span></code></a> のサブクラスです。</p>
+</section>
+<section id="s-http-exceptions">
+<span id="http-exceptions"></span><h2>HTTP 例外<a class="headerlink" href="#http-exceptions" title="Link to this heading">¶</a></h2>
+<p>HTTPの例外は <code class="docutils literal notranslate"><span class="pre">django.http</span></code> からインポートできます。</p>
+<section id="s-unreadableposterror">
+<span id="unreadableposterror"></span><h3><code class="docutils literal notranslate"><span class="pre">UnreadablePostError</span></code><a class="headerlink" href="#unreadableposterror" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.http.UnreadablePostError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UnreadablePostError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L38"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.UnreadablePostError" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.UnreadablePostError" title="django.http.UnreadablePostError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">UnreadablePostError</span></code></a> は、ユーザーがアップロードをキャンセルすると発生します。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-sessions-exceptions">
+<span id="sessions-exceptions"></span><h2>セッションの例外<a class="headerlink" href="#sessions-exceptions" title="Link to this heading">¶</a></h2>
+<p>セッションの例外は <code class="docutils literal notranslate"><span class="pre">django.contrib.sessions.exceptions</span></code> で定義されています。</p>
+<section id="s-sessioninterrupted">
+<span id="sessioninterrupted"></span><h3><code class="docutils literal notranslate"><span class="pre">SessionInterrupted</span></code><a class="headerlink" href="#sessioninterrupted" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.contrib.sessions.exceptions.SessionInterrupted">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SessionInterrupted</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sessions/exceptions.py#L16"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sessions.exceptions.SessionInterrupted" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.sessions.exceptions.SessionInterrupted" title="django.contrib.sessions.exceptions.SessionInterrupted"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SessionInterrupted</span></code></a> は、並行リクエストでセッションが破棄された場合に発生します。これは <a class="reference internal" href="#django.core.exceptions.BadRequest" title="django.core.exceptions.BadRequest"><code class="xref py py-exc docutils literal notranslate"><span class="pre">BadRequest</span></code></a> のサブクラスです。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-transaction-exceptions">
+<span id="transaction-exceptions"></span><h2>トランザクションの例外<a class="headerlink" href="#transaction-exceptions" title="Link to this heading">¶</a></h2>
+<p>トランザクションの例外は <code class="docutils literal notranslate"><span class="pre">django.db.transaction</span></code> で定義されています。</p>
+<section id="s-transactionmanagementerror">
+<span id="transactionmanagementerror"></span><h3><code class="docutils literal notranslate"><span class="pre">TransactionManagementError</span></code><a class="headerlink" href="#transactionmanagementerror" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.db.transaction.TransactionManagementError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TransactionManagementError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/transaction.py#L12"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.transaction.TransactionManagementError" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.db.transaction.TransactionManagementError" title="django.db.transaction.TransactionManagementError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TransactionManagementError</span></code></a> が発生するのは、データベースのトランザクションに関するあらゆる問題に対してです。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-testing-framework-exceptions">
+<span id="testing-framework-exceptions"></span><h2>テストフレームワークの例外<a class="headerlink" href="#testing-framework-exceptions" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">django.test</span></code> パッケージが提供する例外です。</p>
+<section id="s-redirectcycleerror">
+<span id="redirectcycleerror"></span><h3><code class="docutils literal notranslate"><span class="pre">RedirectCycleError</span></code><a class="headerlink" href="#redirectcycleerror" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.test.client.RedirectCycleError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">client.</span></span><span class="sig-name descname"><span class="pre">RedirectCycleError</span></span><a class="headerlink" href="#django.test.client.RedirectCycleError" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.test.client.RedirectCycleError" title="django.test.client.RedirectCycleError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RedirectCycleError</span></code></a> は、テストクライアントがループまたは過度に長いリダイレクトの連結を検出した時に発生します。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-python-exceptions">
+<span id="python-exceptions"></span><h2>Python の例外<a class="headerlink" href="#python-exceptions" title="Link to this heading">¶</a></h2>
+<p>Django は、十分適切な場合にはビルトインの Python の例外を起こします。詳しい情報については、Python のドキュメント <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#bltin-exceptions" title="(in Python v3.13)"><span>Built-in Exceptions</span></a> を読んでください。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Django の例外</a><ul>
+<li><a class="reference internal" href="#module-django.core.exceptions">Django Core 例外</a><ul>
+<li><a class="reference internal" href="#appregistrynotready"><code class="docutils literal notranslate"><span class="pre">AppRegistryNotReady</span></code></a></li>
+<li><a class="reference internal" href="#objectdoesnotexist"><code class="docutils literal notranslate"><span class="pre">ObjectDoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#emptyresultset"><code class="docutils literal notranslate"><span class="pre">EmptyResultSet</span></code></a></li>
+<li><a class="reference internal" href="#fullresultset"><code class="docutils literal notranslate"><span class="pre">FullResultSet</span></code></a></li>
+<li><a class="reference internal" href="#fielddoesnotexist"><code class="docutils literal notranslate"><span class="pre">FieldDoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#multipleobjectsreturned"><code class="docutils literal notranslate"><span class="pre">MultipleObjectsReturned</span></code></a></li>
+<li><a class="reference internal" href="#suspiciousoperation"><code class="docutils literal notranslate"><span class="pre">SuspiciousOperation</span></code></a></li>
+<li><a class="reference internal" href="#permissiondenied"><code class="docutils literal notranslate"><span class="pre">PermissionDenied</span></code></a></li>
+<li><a class="reference internal" href="#viewdoesnotexist"><code class="docutils literal notranslate"><span class="pre">ViewDoesNotExist</span></code></a></li>
+<li><a class="reference internal" href="#middlewarenotused"><code class="docutils literal notranslate"><span class="pre">MiddlewareNotUsed</span></code></a></li>
+<li><a class="reference internal" href="#improperlyconfigured"><code class="docutils literal notranslate"><span class="pre">ImproperlyConfigured</span></code></a></li>
+<li><a class="reference internal" href="#fielderror"><code class="docutils literal notranslate"><span class="pre">FieldError</span></code></a></li>
+<li><a class="reference internal" href="#validationerror"><code class="docutils literal notranslate"><span class="pre">ValidationError</span></code></a><ul>
+<li><a class="reference internal" href="#non-field-errors"><code class="docutils literal notranslate"><span class="pre">NON_FIELD_ERRORS</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#badrequest"><code class="docutils literal notranslate"><span class="pre">BadRequest</span></code></a></li>
+<li><a class="reference internal" href="#requestaborted"><code class="docutils literal notranslate"><span class="pre">RequestAborted</span></code></a></li>
+<li><a class="reference internal" href="#synchronousonlyoperation"><code class="docutils literal notranslate"><span class="pre">SynchronousOnlyOperation</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#url-resolver-exceptions">URL Resolver の例外</a><ul>
+<li><a class="reference internal" href="#resolver404"><code class="docutils literal notranslate"><span class="pre">Resolver404</span></code></a></li>
+<li><a class="reference internal" href="#noreversematch"><code class="docutils literal notranslate"><span class="pre">NoReverseMatch</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#database-exceptions">データベースの例外</a></li>
+<li><a class="reference internal" href="#http-exceptions">HTTP 例外</a><ul>
+<li><a class="reference internal" href="#unreadableposterror"><code class="docutils literal notranslate"><span class="pre">UnreadablePostError</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sessions-exceptions">セッションの例外</a><ul>
+<li><a class="reference internal" href="#sessioninterrupted"><code class="docutils literal notranslate"><span class="pre">SessionInterrupted</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#transaction-exceptions">トランザクションの例外</a><ul>
+<li><a class="reference internal" href="#transactionmanagementerror"><code class="docutils literal notranslate"><span class="pre">TransactionManagementError</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing-framework-exceptions">テストフレームワークの例外</a><ul>
+<li><a class="reference internal" href="#redirectcycleerror"><code class="docutils literal notranslate"><span class="pre">RedirectCycleError</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#python-exceptions">Python の例外</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="django-admin.html"
+                          title="前の章へ"><code class="docutils literal notranslate"><span class="pre">django-admin</span></code> と <code class="docutils literal notranslate"><span class="pre">manage.py</span></code></a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="files/index.html"
+                          title="次の章へ">ファイルの取り扱い</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/exceptions.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="django-admin.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django-admin&lt;/span&gt;&lt;/code&gt; と &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;manage.py&lt;/span&gt;&lt;/code&gt;">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="files/index.html" title="ファイルの取り扱い">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

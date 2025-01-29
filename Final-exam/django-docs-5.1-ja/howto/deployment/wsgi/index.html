@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>WSGI とともにデプロイするには &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="Django を Gunicorn とともに使う" href="gunicorn.html" />
+    <link rel="prev" title="Djangoをデプロイするには" href="../index.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../index.html" title="Djangoをデプロイするには">previous</a>
+     |
+    <a href="../../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="gunicorn.html" title="Django を Gunicorn とともに使う">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-deployment-wsgi-index">
+            
+  <section id="s-how-to-deploy-with-wsgi">
+<span id="how-to-deploy-with-wsgi"></span><h1>WSGI とともにデプロイするには<a class="headerlink" href="#how-to-deploy-with-wsgi" title="Link to this heading">¶</a></h1>
+<p>Django の主要なデプロイプラットフォームは、 Web サーバと Web アプリケーション に関して Python の標準である <a class="reference external" href="https://wsgi.readthedocs.io/en/latest/">WSGI</a> です。</p>
+<p>Django の <a class="reference internal" href="../../../ref/django-admin.html#django-admin-startproject"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">startproject</span></code></a> 管理コマンドは、最小限のデフォルト WSGI 設定をセットアップしてくれます 。このデフォルト WSGI 設定は、あなたのプロジェクトに合わせて調整でき、WSGI に準拠したアプリケーションサーバにその設定を使用させることができます。</p>
+<p>Django には以下の WSGI サーバのために、手引きとなるドキュメントが用意されています:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="gunicorn.html">Django を Gunicorn とともに使う</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uwsgi.html">Django を uWSGI とともに使うには？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modwsgi.html">Django を Apache と <code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code> とともに使うには？</a></li>
+<li class="toctree-l1"><a class="reference internal" href="apache-auth.html">Django のユーザーデータベースに対する Apache からの認証</a></li>
+</ul>
+</div>
+<section id="s-the-application-object">
+<span id="the-application-object"></span><h2><code class="docutils literal notranslate"><span class="pre">application</span></code> オブジェクト<a class="headerlink" href="#the-application-object" title="Link to this heading">¶</a></h2>
+<p>WSGI デプロイでキーとなる概念は、Web サーバがあなたのコードと通信するために使う <code class="docutils literal notranslate"><span class="pre">application</span></code> という呼び出し可能オブジェクトです。これは一般的に、サーバにアクセスできる Python モジュールの中で <code class="docutils literal notranslate"><span class="pre">application</span></code> という名前のオブジェクトとして提供されています。</p>
+<p><a class="reference internal" href="../../../ref/django-admin.html#django-admin-startproject"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">startproject</span></code></a> コマンドは、この <code class="docutils literal notranslate"><span class="pre">application</span></code> 呼び出し可能オブジェクトを含む <code class="file docutils literal notranslate"><span class="pre">&lt;project_name&gt;/wsgi.py</span></code> ファイルを生成します。</p>
+<p>これは、Django のデプロイサーバーによって、また WSGI デプロイプロダクションにおいて、これら両方で使われます。</p>
+<p>WSGI サーバーは <code class="docutils literal notranslate"><span class="pre">application</span></code> 呼び出し可能オブジェクトへのパスを、その設定から取得します。Django のビルトインサーバー (要するに <a class="reference internal" href="../../../ref/django-admin.html#django-admin-runserver"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">runserver</span></code></a> コマンド) は、<a class="reference internal" href="../../../ref/settings.html#std-setting-WSGI_APPLICATION"><code class="xref std std-setting docutils literal notranslate"><span class="pre">WSGI_APPLICATION</span></code></a> の設定からこれを読み出します。デフォルトでは、 <code class="file docutils literal notranslate"><span class="pre">&lt;project_name&gt;/wsgi.py</span></code> 内の <code class="docutils literal notranslate"><span class="pre">application</span></code> 呼び出し可能オブジェクトを指す <code class="docutils literal notranslate"><span class="pre">&lt;project_name&gt;.wsgi.application</span></code> がセットされています。</p>
+</section>
+<section id="s-configuring-the-settings-module">
+<span id="configuring-the-settings-module"></span><h2>Settings モジュールを設定する<a class="headerlink" href="#configuring-the-settings-module" title="Link to this heading">¶</a></h2>
+<p>WSGI サーバがあなたのアプリケーションを読み込むとき、Django は Settings モジュールをインポートする必要があります。そのモジュールは、あなたのアプリケーション全体が定義されている場所です。</p>
+<p>Django は適切な Settings モジュールを見つけるために、 <span class="target" id="index-4"></span><a class="reference internal" href="../../../topics/settings.html#envvar-DJANGO_SETTINGS_MODULE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_SETTINGS_MODULE</span></code></a> 環境変数を使用します。これは設定モジュールへのドット区切りのパスを含んでいなければなりません。開発時と実運用時で別々の値を使用することも可能です。どのように設定を組織するか次第です。</p>
+<p>この値が設定されていない場合、初期生成ファイルである <code class="file docutils literal notranslate"><span class="pre">wsgi.py</span></code> は、 <code class="docutils literal notranslate"><span class="pre">mysite.settings</span></code> をこの値として設定します。ここでの <code class="docutils literal notranslate"><span class="pre">mysite</span></code> はプロジェクトの名前です。このようにして初期設定ファイルを見つけるのが、 <a class="reference internal" href="../../../ref/django-admin.html#django-admin-runserver"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">runserver</span></code></a> にあらかじめ用意されている方法です。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>環境変数は、同一プロセス内においては同じ値が使われます。このため、単一プロセスで複数の Django サイトを運用する場合は、適切に機能しません。これは mod_wsgi を使用する場合に起こります。</p>
+<p>この問題を回避するためには、サイトごとに固有の daemon プロセスを mod_wsgi の daemon モードで運用するか、もしくは <code class="file docutils literal notranslate"><span class="pre">wsgi.py</span></code> ファイル内で <code class="docutils literal notranslate"><span class="pre">os.environ[&quot;DJANGO_SETTINGS_MODULE&quot;]</span> <span class="pre">=</span> <span class="pre">&quot;mysite.settings&quot;</span></code> を実行して環境変数の値を上書きします。</p>
+</div>
+</section>
+<section id="s-applying-wsgi-middleware">
+<span id="applying-wsgi-middleware"></span><h2>WSGIミドルウェアを適用する<a class="headerlink" href="#applying-wsgi-middleware" title="Link to this heading">¶</a></h2>
+<p><span class="target" id="index-5"></span><a class="pep reference external" href="https://peps.python.org/pep-3333/#middleware-components-that-play-both-sides"><strong>WSGI ミドルウェア</strong></a> を適用するには、アプリケーションオブジェクトをラップします。例えば、 <code class="file docutils literal notranslate"><span class="pre">wsgi.py</span></code> の一番下に以下の行を追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">helloworld.wsgi</span><span class="w"> </span><span class="kn">import</span> <span class="n">HelloWorldApplication</span>
+
+<span class="n">application</span> <span class="o">=</span> <span class="n">HelloWorldApplication</span><span class="p">(</span><span class="n">application</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>DjangoのWSGIアプリケーションをカスタムWSGIアプリケーションに置き換え、その後でDjangoのWSGIアプリケーションに委譲することもできます。これは、Djangoアプリケーションを他のフレームワークのWSGIアプリケーションと組み合わせたい場合に有効です。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">WSGI とともにデプロイするには</a><ul>
+<li><a class="reference internal" href="#the-application-object"><code class="docutils literal notranslate"><span class="pre">application</span></code> オブジェクト</a></li>
+<li><a class="reference internal" href="#configuring-the-settings-module">Settings モジュールを設定する</a></li>
+<li><a class="reference internal" href="#applying-wsgi-middleware">WSGIミドルウェアを適用する</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="../index.html"
+                          title="前の章へ">Djangoをデプロイするには</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="gunicorn.html"
+                          title="次の章へ">Django を Gunicorn とともに使う</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/howto/deployment/wsgi/index.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../index.html" title="Djangoをデプロイするには">previous</a>
+     |
+    <a href="../../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="gunicorn.html" title="Django を Gunicorn とともに使う">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

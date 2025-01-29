@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>GeoDjango &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="GeoDjango チュートリアル" href="tutorial.html" />
+    <link rel="prev" title="フラットページ (flatpages) アプリ" href="../flatpages.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../flatpages.html" title="フラットページ (flatpages) アプリ">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="tutorial.html" title="GeoDjango チュートリアル">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-gis-index">
+            
+  <section id="s-module-django.contrib.gis">
+<span id="s-geodjango"></span><span id="module-django.contrib.gis"></span><span id="geodjango"></span><h1>GeoDjango<a class="headerlink" href="#module-django.contrib.gis" title="Link to this heading">¶</a></h1>
+<p>GeoDjango は世界トップクラスの地理ウェブフレームワークを目指します。GeoDjango の目標は、GIS ウェブアプリケーションをできるだけ簡単に構築し、 空間的に有効なデータの力を活用できるようにすることです。</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">GeoDjango チュートリアル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#introduction">はじめに</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#setting-up">セットアップ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#geographic-data">地理データ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#geographic-models">地理情報モデル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#importing-spatial-data">空間データをインポートする</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#spatial-queries">空間クエリ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#putting-your-data-on-the-map">データを地図上に配置する</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install/index.html">GeoDjango のインストール</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install/index.html#overview">概要</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install/index.html#requirements">必要条件</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install/index.html#installation">インストール</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install/index.html#troubleshooting">トラブルシューティング</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install/index.html#platform-specific-instructions">プラットフォーム固有の手順</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model-api.html">GeoDjango モデル API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model-api.html#spatial-field-types">空間フィールドのタイプ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model-api.html#spatial-field-options">空間フィールドのオプション</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model-api.html#geometry-field-options">ジオメトリフィールドのオプション</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="db-api.html">GeoDjango データベース API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="db-api.html#module-django.contrib.gis.db.backends">空間バックエンド (Spatial Backend)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db-api.html#creating-and-saving-models-with-geometry-fields">モデルを作成し、ジオメトリフィールドを保存する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db-api.html#creating-and-saving-models-with-raster-fields">ラスターフィールドを持つモデルの作成と保存</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db-api.html#spatial-lookups">空間のルックアップ (Spatial Lookup)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db-api.html#distance-queries">距離クエリ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="db-api.html#compatibility-tables">互換表</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="forms-api.html">GeoDjango フォーム API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="forms-api.html#field-arguments">フィールドの引数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forms-api.html#form-field-classes">フォームフィールド クラス</a></li>
+<li class="toctree-l2"><a class="reference internal" href="forms-api.html#module-django.contrib.gis.forms.widgets">フォームウィジェット</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="geoquerysets.html">GIS QuerySet API リファレンス</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="geoquerysets.html#spatial-lookups">空間のルックアップ (Spatial Lookup)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geoquerysets.html#distance-lookups">距離ルックアップ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="functions.html">地理情報データベース関数</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#area"><code class="docutils literal notranslate"><span class="pre">Area</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#asgeojson"><code class="docutils literal notranslate"><span class="pre">AsGeoJSON</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#asgml"><code class="docutils literal notranslate"><span class="pre">AsGML</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#askml"><code class="docutils literal notranslate"><span class="pre">AsKML</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#assvg"><code class="docutils literal notranslate"><span class="pre">AsSVG</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#aswkb"><code class="docutils literal notranslate"><span class="pre">AsWKB</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#aswkt"><code class="docutils literal notranslate"><span class="pre">AsWKT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#azimuth"><code class="docutils literal notranslate"><span class="pre">Azimuth</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#boundingcircle"><code class="docutils literal notranslate"><span class="pre">BoundingCircle</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#centroid"><code class="docutils literal notranslate"><span class="pre">Centroid</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#closestpoint"><code class="docutils literal notranslate"><span class="pre">ClosestPoint</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#difference"><code class="docutils literal notranslate"><span class="pre">Difference</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#distance"><code class="docutils literal notranslate"><span class="pre">Distance</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#envelope"><code class="docutils literal notranslate"><span class="pre">Envelope</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#forcepolygoncw"><code class="docutils literal notranslate"><span class="pre">ForcePolygonCW</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#fromwkb"><code class="docutils literal notranslate"><span class="pre">FromWKB</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#fromwkt"><code class="docutils literal notranslate"><span class="pre">FromWKT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#geohash"><code class="docutils literal notranslate"><span class="pre">GeoHash</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#geometrydistance"><code class="docutils literal notranslate"><span class="pre">GeometryDistance</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#intersection"><code class="docutils literal notranslate"><span class="pre">Intersection</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#isempty"><code class="docutils literal notranslate"><span class="pre">IsEmpty</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#isvalid"><code class="docutils literal notranslate"><span class="pre">IsValid</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#length"><code class="docutils literal notranslate"><span class="pre">Length</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#linelocatepoint"><code class="docutils literal notranslate"><span class="pre">LineLocatePoint</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#makevalid"><code class="docutils literal notranslate"><span class="pre">MakeValid</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#memsize"><code class="docutils literal notranslate"><span class="pre">MemSize</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#numgeometries"><code class="docutils literal notranslate"><span class="pre">NumGeometries</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#numpoints"><code class="docutils literal notranslate"><span class="pre">NumPoints</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#perimeter"><code class="docutils literal notranslate"><span class="pre">Perimeter</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#pointonsurface"><code class="docutils literal notranslate"><span class="pre">PointOnSurface</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#reverse"><code class="docutils literal notranslate"><span class="pre">Reverse</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#scale"><code class="docutils literal notranslate"><span class="pre">Scale</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#snaptogrid"><code class="docutils literal notranslate"><span class="pre">SnapToGrid</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#symdifference"><code class="docutils literal notranslate"><span class="pre">SymDifference</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#transform"><code class="docutils literal notranslate"><span class="pre">Transform</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#translate"><code class="docutils literal notranslate"><span class="pre">Translate</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="functions.html#union"><code class="docutils literal notranslate"><span class="pre">Union</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="measure.html">測定オブジェクト</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="measure.html#example">カスタマイズ例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measure.html#supported-units">サポートされる単位</a></li>
+<li class="toctree-l2"><a class="reference internal" href="measure.html#measurement-api">測定API</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="geos.html">GEOS API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#background">背景</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#tutorial">チュートリアル</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#geometry-objects">ジオメトリ・オブジェクト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#geometry-collections">ジオメトリのコレクション</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#prepared-geometries">準備された (Prepared) ジオメトリ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#geometry-factories">ジオメトリ ファクトリ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#i-o-objects">I/O オブジェクト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#settings">設定</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geos.html#exceptions">例外</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="gdal.html">GDAL API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="gdal.html#overview">概要</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal.html#vector-data-source-objects">ベクトルデータソースオブジェクト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal.html#ogr-geometries">OGR ジオメトリ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal.html#coordinate-system-objects">座標系オブジェクト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal.html#raster-data-objects">ラスターデータオブジェクト</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal.html#settings">設定</a></li>
+<li class="toctree-l2"><a class="reference internal" href="gdal.html#exceptions">例外</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="geoip2.html">GeoIP2によるジオロケーション</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="geoip2.html#example">カスタマイズ例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geoip2.html#api-reference">API リファレンス</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geoip2.html#methods">メソッド</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geoip2.html#settings">設定</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geoip2.html#exceptions">例外</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">GeoDjango ユーティリティ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="layermapping.html"><code class="docutils literal notranslate"><span class="pre">LayerMapping</span></code> データインポートユーティリティ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ogrinspect.html">OGR のインスペクション</a></li>
+<li class="toctree-l2"><a class="reference internal" href="serializers.html"><code class="docutils literal notranslate"><span class="pre">GeoJSON</span></code> シリアライザ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="commands.html">GeoDjangoの管理コマンド</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#inspectdb"><code class="docutils literal notranslate"><span class="pre">inspectdb</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="commands.html#ogrinspect"><code class="docutils literal notranslate"><span class="pre">ogrinspect</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="admin.html">GeoDjango の admin サイト</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#gismodeladmin"><code class="docutils literal notranslate"><span class="pre">GISModelAdmin</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="feeds.html">地理情報フィード</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="feeds.html#example">カスタマイズ例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feeds.html#api-reference">API リファレンス</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="sitemaps.html">地理情報サイトマップ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sitemaps.html#example">カスタマイズ例</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sitemaps.html#reference">リファレンス</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="testing.html">GeoDjango アプリのテスト</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#postgis">PostGIS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="testing.html#geodjango-tests">GeoDjangoのテスト</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="deployment.html">GeoDjango のデプロイ</a></li>
+</ul>
+</div>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="../flatpages.html"
+                          title="前の章へ">フラットページ (flatpages) アプリ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="tutorial.html"
+                          title="次の章へ">GeoDjango チュートリアル</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/gis/index.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../flatpages.html" title="フラットページ (flatpages) アプリ">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="tutorial.html" title="GeoDjango チュートリアル">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

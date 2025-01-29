@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>地理空間ライブラリのインストール &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../../search.html" />
+    <link rel="next" title="PostGIS のインストール" href="postgis.html" />
+    <link rel="prev" title="GeoDjango のインストール" href="index.html" />
+
+
+
+ 
+<script src="../../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="GeoDjango のインストール">previous</a>
+     |
+    <a href="../../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="postgis.html" title="PostGIS のインストール">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-gis-install-geolibs">
+            
+  <section id="s-installing-geospatial-libraries">
+<span id="installing-geospatial-libraries"></span><h1>地理空間ライブラリのインストール<a class="headerlink" href="#installing-geospatial-libraries" title="Link to this heading">¶</a></h1>
+<p>GeoDjangoは、以下のオープンソースの地理空間ライブラリを使用し、またはそのインターフェースを提供します:</p>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>プログラム</p></th>
+<th class="head"><p>説明</p></th>
+<th class="head"><p>必須</p></th>
+<th class="head"><p>サポートされるバージョン</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="../geos.html"><span class="doc">GEOS</span></a></p></td>
+<td><p>Geometry Engine Open Source</p></td>
+<td><p>Yes</p></td>
+<td><p>3.12, 3.11, 3.10, 3.9, 3.8</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://proj.org/">PROJ</a></p></td>
+<td><p>Cartographic Projections library</p></td>
+<td><p>Yes (PostgreSQL and SQLite のみ)</p></td>
+<td><p>9.x, 8.x, 7.x, 6.x</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="../gdal.html"><span class="doc">GDAL</span></a></p></td>
+<td><p>Geospatial Data Abstraction Library</p></td>
+<td><p>Yes</p></td>
+<td><p>3.8, 3.7, 3.6, 3.5, 3.4, 3.3, 3.2, 3.1, 3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="../geoip2.html"><span class="doc">GeoIP</span></a></p></td>
+<td><p>IPベースのジオロケーション ライブラリ</p></td>
+<td><p>No</p></td>
+<td><p>2</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://postgis.net/">PostGIS</a></p></td>
+<td><p>PostgreSQL の空間拡張機能</p></td>
+<td><p>Yes (PostgreSQL のみ)</p></td>
+<td><p>3.4, 3.3, 3.2, 3.1, 3.0</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://www.gaia-gis.it/gaia-sins/">SpatiaLite</a></p></td>
+<td><p>SQLite の空間拡張機能</p></td>
+<td><p>Yes (SQLite のみ)</p></td>
+<td><p>5.1, 5.0, 4.3</p></td>
+</tr>
+</tbody>
+</table>
+<p>これらのライブラリの古いバージョンや新しいバージョンは GeoDjango でも全く問題なく動くかもしれません。あなたの感覚によって異なるかもしれません。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>GEOS、GDAL、GeoIP への GeoDjango インタフェースは、Django とは無関係に使うことができます。つまり、データベースや設定ファイルは必要ありません。 <a class="reference internal" href="../index.html#module-django.contrib.gis" title="django.contrib.gis: Geographic Information System (GIS) extensions for Django"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.gis</span></code></a> から通常通りインポートしてください。</p>
+</div>
+<p>Debian/Ubuntuでは、必要な地理空間ライブラリを直接または依存関係によってインストールする以下のパッケージをインストールすることをお勧めします:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>binutils<span class="w"> </span>libproj-dev<span class="w"> </span>gdal-bin
+</pre></div>
+</div>
+<p>また、 <a class="reference internal" href="index.html#macos"><span class="std std-ref">macOS</span></a> や <a class="reference internal" href="index.html#windows"><span class="std std-ref">Windows</span></a> を使用している場合は、プラットフォーム別の説明も参照してください。</p>
+<section id="s-building-from-source">
+<span id="s-build-from-source"></span><span id="building-from-source"></span><span id="build-from-source"></span><h2>ソースコードからビルドする<a class="headerlink" href="#building-from-source" title="Link to this heading">¶</a></h2>
+<p>UNIX や GNU/Linux システムでソースからインストールする場合は、インストール手順に注意して、指示された順番でライブラリをインストールしてください。MySQL や Oracle を空間データベースとして使用する場合、GEOS のみが必要です。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>Linuxプラットフォームでは、各ライブラリをインストールした後に <code class="docutils literal notranslate"><span class="pre">ldconfig</span></code> コマンドを実行する必要があるかもしれません。例えば:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>sudo<span class="w"> </span>make<span class="w"> </span>install
+$<span class="w"> </span>sudo<span class="w"> </span>ldconfig
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>macOSユーザーは、ソフトウェアをソースからコンパイルするために <a class="reference external" href="https://developer.apple.com/xcode/">Xcode</a> をインストールする必要があります。</p>
+</div>
+<section id="s-geos">
+<span id="s-geosbuild"></span><span id="geos"></span><span id="geosbuild"></span><h3>GEOS<a class="headerlink" href="#geos" title="Link to this heading">¶</a></h3>
+<p>GEOS はジオメトリ操作を行うための C++ ライブラリで、GeoDjango が使うデフォルトの内部ジオメトリ表現です (&quot;lazy&quot; ジオメトリの背後にあります) 。具体的には、 C API ライブラリは ctypes を使って Python から直接呼び出されます (<code class="docutils literal notranslate"><span class="pre">libgeos_c.so</span></code> など)。</p>
+<p>まず、GEOSのウェブサイトからGEOSをダウンロードし、ソースアーカイブを解凍します:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wget<span class="w"> </span>https://download.osgeo.org/geos/geos-X.Y.Z.tar.bz2
+$<span class="w"> </span>tar<span class="w"> </span>xjf<span class="w"> </span>geos-X.Y.Z.tar.bz2
+</pre></div>
+</div>
+<p>次に、GEOSディレクトリに移動し、 <code class="docutils literal notranslate"><span class="pre">build</span></code> フォルダを作成して、その中に移動してください:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>geos-X.Y.Z
+$<span class="w"> </span>mkdir<span class="w"> </span>build
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+</pre></div>
+</div>
+<p>次に、パッケージをビルドしてインストールします:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cmake<span class="w"> </span>-DCMAKE_BUILD_TYPE<span class="o">=</span>Release<span class="w"> </span>..
+$<span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>.
+$<span class="w"> </span>sudo<span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>.<span class="w"> </span>--target<span class="w"> </span>install
+</pre></div>
+</div>
+<section id="s-troubleshooting">
+<span id="troubleshooting"></span><h4>トラブルシューティング<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h4>
+<section id="s-can-t-find-geos-library">
+<span id="can-t-find-geos-library"></span><h5>GEOSライブラリが見つかりません<a class="headerlink" href="#can-t-find-geos-library" title="Link to this heading">¶</a></h5>
+<p>GeoDjango が GEOS を見つけられない場合、次のエラーが発生します:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>ImportError: Could not find the GEOS library (tried &quot;geos_c&quot;). Try setting GEOS_LIBRARY_PATH in your settings.
+</pre></div>
+</div>
+<p>最も一般的な解決策は、<a class="reference internal" href="index.html#libsettings"><span class="std std-ref">ライブラリの環境設定</span></a> を適切に設定するか、 <em>または</em> 設定で <a class="reference internal" href="#geoslibrarypath"><span class="std std-ref">GEOS_LIBRARY_PATH</span></a> を設定することです。</p>
+<p>GEOSのバイナリパッケージを使用する場合 (たとえばUbuntu上で) 、 <a class="reference internal" href="index.html#binutils"><span class="std std-ref">binutils をインストールする</span></a> が必要になる可能性があります。</p>
+</section>
+<section id="s-geos-library-path">
+<span id="s-geoslibrarypath"></span><span id="geos-library-path"></span><span id="geoslibrarypath"></span><h5><code class="docutils literal notranslate"><span class="pre">GEOS_LIBRARY_PATH</span></code><a class="headerlink" href="#geos-library-path" title="Link to this heading">¶</a></h5>
+<p>もしGEOSライブラリが標準以外の場所にあるか、システムのライブラリパスを変更したくない場合は、Djangoの設定ファイルに <a class="reference internal" href="../geos.html#std-setting-GEOS_LIBRARY_PATH"><code class="xref std std-setting docutils literal notranslate"><span class="pre">GEOS_LIBRARY_PATH</span></code></a> を追加できます。これにはGEOS Cライブラリへのフルパスを指定します。例えば、以下のように設定できます:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">GEOS_LIBRARY_PATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;/home/bob/local/lib/libgeos_c.so&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>設定は <strong>C</strong> 共有ライブラリの <em>フル</em> パスである必要があります。つまり、 <code class="docutils literal notranslate"><span class="pre">libgeos.so</span></code> ではなく <code class="docutils literal notranslate"><span class="pre">libgeos_c.so</span></code> を使用することが望まれます。</p>
+</div>
+<p>次も参照してください <a class="reference internal" href="../geos.html#geos-exceptions-in-logfile"><span class="std std-ref">ログがGEOS関連のエラーでいっぱいです</span></a> 。</p>
+</section>
+</section>
+</section>
+<section id="s-proj4">
+<span id="s-id3"></span><span id="proj4"></span><span id="id3"></span><h3>PROJ<a class="headerlink" href="#proj4" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="https://proj.org/">PROJ</a> は、地理空間データを異なる座標参照系に変換するためのライブラリです。</p>
+<p>まず、PROJのソースコードをダウンロードします:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wget<span class="w"> </span>https://download.osgeo.org/proj/proj-X.Y.Z.tar.gz
+</pre></div>
+</div>
+<p>... と座標変換 (datum shifting) ファイル (PROJ &lt; 7.x の場合は <code class="docutils literal notranslate"><span class="pre">proj-datumgrid-X.Y.tar.gz</span></code> をダウンロード) <a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wget<span class="w"> </span>https://download.osgeo.org/proj/proj-data-X.Y.tar.gz
+</pre></div>
+</div>
+<p>次に、ソースコードアーカイブを解凍し、<code class="docutils literal notranslate"><span class="pre">data</span></code> サブディレクトリ内にある座標変換ファイルを抽出します。これは設定を行う <em>前</em> に実行する必要があります。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>tar<span class="w"> </span>xzf<span class="w"> </span>proj-X.Y.Z.tar.gz
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>proj-X.Y.Z/data
+$<span class="w"> </span>tar<span class="w"> </span>xzf<span class="w"> </span>../../proj-data-X.Y.tar.gz
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>../..
+</pre></div>
+</div>
+<p>PROJ 9.x以降のリリースでは、<code class="docutils literal notranslate"><span class="pre">CMake</span></code> を使用したビルドのみがサポートされます (<a class="reference external" href="https://proj.org/community/rfc/rfc-7.html#rfc7">PROJ RFC-7</a> 参照) 。</p>
+<p><code class="docutils literal notranslate"><span class="pre">CMake</span></code> を使用してビルドするには、システムが <a class="reference external" href="https://proj.org/install.html#build-requirements">build requirements</a> を満たしていることを確認してください。その後、PROJディレクトリ内に <code class="docutils literal notranslate"><span class="pre">build</span></code> フォルダを作成し、そのフォルダに移動します。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>proj-X.Y.Z
+$<span class="w"> </span>mkdir<span class="w"> </span>build
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+</pre></div>
+</div>
+<p>最後に、PROJの設定、作成、およびインストールを行います:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cmake<span class="w"> </span>..
+$<span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>.
+$<span class="w"> </span>sudo<span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>.<span class="w"> </span>--target<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+<section id="s-gdal">
+<span id="s-gdalbuild"></span><span id="gdal"></span><span id="gdalbuild"></span><h3>GDAL<a class="headerlink" href="#gdal" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="https://gdal.org/">GDAL</a> は優れたオープンソースの地理空間ライブラリで、ほとんどのベクタやラスタの空間データフォーマットの読み込みをサポートしています。現在のところ、GeoDjango は <a class="reference internal" href="../gdal.html"><span class="doc">GDAL のベクトルデータ</span></a> の機能のみをサポートしています <a class="footnote-reference brackets" href="#id9" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> 。 <a class="reference internal" href="#geosbuild"><span class="std std-ref">GEOS</span></a> と <a class="reference internal" href="#proj4"><span class="std std-ref">PROJ</span></a> は GDAL をビルドする前にインストールする必要があります。</p>
+<p>まず、最新のGDALリリースバージョンをダウンロードし、アーカイブを解凍します:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>wget<span class="w"> </span>https://download.osgeo.org/gdal/X.Y.Z/gdal-X.Y.Z.tar.gz
+$<span class="w"> </span>tar<span class="w"> </span>xzf<span class="w"> </span>gdal-X.Y.Z.tar.gz
+</pre></div>
+</div>
+<p>GDAL 3.6.x 以降では、リリースは <code class="docutils literal notranslate"><span class="pre">CMake</span></code> を使用したビルドのみをサポートしています。 <code class="docutils literal notranslate"><span class="pre">CMake</span></code> を使ってビルドするには、GDAL ディレクトリに <code class="docutils literal notranslate"><span class="pre">build</span></code> フォルダを作成し、その中に移動してください:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>gdal-X.Y.Z
+$<span class="w"> </span>mkdir<span class="w"> </span>build
+$<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+</pre></div>
+</div>
+<p>最後に、GDAL の設定、ビルド、インストールを行います:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>cmake<span class="w"> </span>..
+$<span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>.
+$<span class="w"> </span>sudo<span class="w"> </span>cmake<span class="w"> </span>--build<span class="w"> </span>.<span class="w"> </span>--target<span class="w"> </span>install
+</pre></div>
+</div>
+<p>問題が発生した場合は、以下のトラブルシューティングのセクションを参照してください。</p>
+<section id="s-gdaltrouble">
+<span id="s-id7"></span><span id="gdaltrouble"></span><span id="id7"></span><h4>トラブルシューティング<a class="headerlink" href="#gdaltrouble" title="Link to this heading">¶</a></h4>
+<section id="s-can-t-find-gdal-library">
+<span id="can-t-find-gdal-library"></span><h5>GDAL ライブラリが見つかりません<a class="headerlink" href="#can-t-find-gdal-library" title="Link to this heading">¶</a></h5>
+<p>GeoDjango が GDAL ライブラリを見つけられない場合は、 <a class="reference internal" href="index.html#libsettings"><span class="std std-ref">ライブラリの環境設定</span></a> を設定するか、<em>もしくは</em> 設定で <a class="reference internal" href="#gdallibrarypath"><span class="std std-ref">GDAL_LIBRARY_PATH</span></a> を設定してください。</p>
+</section>
+<section id="s-gdal-library-path">
+<span id="s-gdallibrarypath"></span><span id="gdal-library-path"></span><span id="gdallibrarypath"></span><h5><code class="docutils literal notranslate"><span class="pre">GDAL_LIBRARY_PATH</span></code><a class="headerlink" href="#gdal-library-path" title="Link to this heading">¶</a></h5>
+<p>GDAL ライブラリが標準以外の場所にあったり、システムのライブラリパスを変更 したくない場合は、Django の設定ファイルに <a class="reference internal" href="../gdal.html#std-setting-GDAL_LIBRARY_PATH"><code class="xref std std-setting docutils literal notranslate"><span class="pre">GDAL_LIBRARY_PATH</span></code></a> 設定を追加して、GDAL ライブラリへのフルパスを記述してください。例えば:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nv">GDAL_LIBRARY_PATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;/home/sue/local/lib/libgdal.so&#39;</span>
+</pre></div>
+</div>
+<p class="rubric">脚注</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">1</a><span class="fn-bracket">]</span></span>
+<p>特定の投影法へデータの変換を行う、または特定の投影法から変換を行うためには、データムシフトファイルが必要です。たとえば、<a class="reference external" href="https://spatialreference.org/ref/epsg/3857/">Google projection (900913 または 3857)</a> の PROJ 文字列は、追加のデータムシフトファイルにのみ含まれる <code class="docutils literal notranslate"><span class="pre">null</span></code> グリッドファイルを必要とします。シフトファイルを今インストールする方が、後でそれが無いことによって起きる問題をデバッグするより簡単です。</p>
+</aside>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">2</a><span class="fn-bracket">]</span></span>
+<p>具体的には、GeoDjango は GDAL のコンポーネントである <a class="reference external" href="https://gdal.org/user/vector_data_model.html">OGR</a> ライブラリをサポートしています。</p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">地理空間ライブラリのインストール</a><ul>
+<li><a class="reference internal" href="#building-from-source">ソースコードからビルドする</a><ul>
+<li><a class="reference internal" href="#geos">GEOS</a><ul>
+<li><a class="reference internal" href="#troubleshooting">トラブルシューティング</a><ul>
+<li><a class="reference internal" href="#can-t-find-geos-library">GEOSライブラリが見つかりません</a></li>
+<li><a class="reference internal" href="#geos-library-path"><code class="docutils literal notranslate"><span class="pre">GEOS_LIBRARY_PATH</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#proj4">PROJ</a></li>
+<li><a class="reference internal" href="#gdal">GDAL</a><ul>
+<li><a class="reference internal" href="#gdaltrouble">トラブルシューティング</a><ul>
+<li><a class="reference internal" href="#can-t-find-gdal-library">GDAL ライブラリが見つかりません</a></li>
+<li><a class="reference internal" href="#gdal-library-path"><code class="docutils literal notranslate"><span class="pre">GDAL_LIBRARY_PATH</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="index.html"
+                          title="前の章へ">GeoDjango のインストール</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="postgis.html"
+                          title="次の章へ">PostGIS のインストール</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../../_sources/ref/contrib/gis/install/geolibs.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="GeoDjango のインストール">previous</a>
+     |
+    <a href="../../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="postgis.html" title="PostGIS のインストール">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

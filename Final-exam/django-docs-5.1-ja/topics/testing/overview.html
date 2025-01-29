@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>テストを書いて実行する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="テストツール" href="tools.html" />
+    <link rel="prev" title="Django におけるテスト" href="index.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="Django におけるテスト">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="tools.html" title="テストツール">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-testing-overview">
+            
+  <section id="s-module-django.test">
+<span id="s-writing-and-running-tests"></span><span id="module-django.test"></span><span id="writing-and-running-tests"></span><h1>テストを書いて実行する<a class="headerlink" href="#module-django.test" title="Link to this heading">¶</a></h1>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p><a class="reference internal" href="../../intro/tutorial05.html"><span class="doc">テストチュートリアル</span></a>、 <a class="reference internal" href="tools.html"><span class="doc">テストツールリファレンス</span></a>、 <a class="reference internal" href="advanced.html"><span class="doc">テストに関する応用的なトピック</span></a> も参照</p>
+</div>
+<p>ドキュメントは2つの大きなセクションに分けられます。前半のパートでは、Django でのテストの書き方を説明します。後半では、テストの実行の仕方について説明します。</p>
+<section id="s-writing-tests">
+<span id="writing-tests"></span><h2>テストを書く<a class="headerlink" href="#writing-tests" title="Link to this heading">¶</a></h2>
+<p>Django のユニットテストには、Python スタンダードライブラリのモジュール、<a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a> を使用します。このモジュールは、テストをクラスベースのアプローチで定義します。</p>
+<p>次の例では、 <a class="reference external" href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.TestCase</span></code></a> のサブクラスである <a class="reference internal" href="tools.html#django.test.TestCase" title="django.test.TestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.test.TestCase</span></code></a> から、テスト用の新しいサブクラスを作っています。各テストをトランザクションの内側で実行することで、独立性を実現しています。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">myapp.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Animal</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AnimalTestCase</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Animal</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;lion&quot;</span><span class="p">,</span> <span class="n">sound</span><span class="o">=</span><span class="s2">&quot;roar&quot;</span><span class="p">)</span>
+        <span class="n">Animal</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">,</span> <span class="n">sound</span><span class="o">=</span><span class="s2">&quot;meow&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_animals_can_speak</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Animals that can speak are correctly identified&quot;&quot;&quot;</span>
+        <span class="n">lion</span> <span class="o">=</span> <span class="n">Animal</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;lion&quot;</span><span class="p">)</span>
+        <span class="n">cat</span> <span class="o">=</span> <span class="n">Animal</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;cat&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lion</span><span class="o">.</span><span class="n">speak</span><span class="p">(),</span> <span class="s1">&#39;The lion says &quot;roar&quot;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">cat</span><span class="o">.</span><span class="n">speak</span><span class="p">(),</span> <span class="s1">&#39;The cat says &quot;meow&quot;&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#running-tests"><span class="std std-ref">テストを実行する</span></a> と、テストユーティリティのデフォルトの動作として、ファイル名が <code class="docutils literal notranslate"><span class="pre">test</span></code> で始まるファイル内のすべてのテストケースクラス (つまり <a class="reference external" href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.TestCase</span></code></a> のサブクラス) を見つけ、それらのテストケースクラスから自動的にテストスイートを構築し、そのテストスイートを実行します。</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a> の詳細については、Python のドキュメントを読んでください。</p>
+<div class="admonition-where-should-the-tests-live admonition">
+<p class="admonition-title">どこにテストを書くべき？</p>
+<p>デフォルトの <a class="reference internal" href="../../ref/django-admin.html#django-admin-startapp"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">startapp</span></code></a> テンプレートは、新しいアプリケーション内に <code class="docutils literal notranslate"><span class="pre">tests.py</span></code> ファイルを作成します。テストの数が少ないうちは、ここに書くのがいいかもしれません。しかし、テストスイートが大きくなってきたら、テストを複数のパッケージに再構成して、<code class="docutils literal notranslate"><span class="pre">test_models.py</span></code> 、 <code class="docutils literal notranslate"><span class="pre">test_views.py</span></code> 、 <code class="docutils literal notranslate"><span class="pre">test_forms.py</span></code> などの異なるサブモジュールに分離すると良いでしょう。ファイル名には、ちゃんと組織的な命名規則になっていれば、自由に好きな名前をつけて構いません。</p>
+<p><a class="reference internal" href="advanced.html#testing-reusable-applications"><span class="std std-ref">Django テストランナーを使って再利用可能なアプリケーションをテストする</span></a> も参照してください。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>作成したテストが、データの新規作成やモデルのクエリなどのデータベースアクセスを必要とするときは、<a class="reference external" href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.TestCase</span></code></a> ではなく、 <a class="reference internal" href="tools.html#django.test.TestCase" title="django.test.TestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.test.TestCase</span></code></a> のサブクラスを作るようにしてください。</p>
+<p><a class="reference external" href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.TestCase</span></code></a> を使えば、各テストでデータベースのトランザクションとフラッシュに必要な実行コストを避けることができます。しかし、データベースと相互作用するテストの場合、テストランナーがテストを実行する順番によっては、異なる動作をすることがあります。そのため、孤立した環境では成功するテストユニットでも、一連のテストスイートの中で実行した時には失敗してしまうという状況が発生することがあります。</p>
+</div>
+</section>
+<section id="s-running-tests">
+<span id="s-id1"></span><span id="running-tests"></span><span id="id1"></span><h2>テストの実行<a class="headerlink" href="#running-tests" title="Link to this heading">¶</a></h2>
+<p>テストが書けたら、プロジェクトの <code class="docutils literal notranslate"><span class="pre">manage.py</span></code> ユーティリティの <a class="reference internal" href="../../ref/django-admin.html#django-admin-test"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">test</span></code></a> コマンドでテストが実行できます。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span><span class="nb">test</span>
+</pre></div>
+</div>
+<p>テストの探索方法は、unittest モジュールの <a class="reference external" href="https://docs.python.org/3/library/unittest.html#unittest-test-discovery" title="(in Python v3.13)"><span class="xref std std-ref">ビルトインのテスト探索</span></a> にもとづきます。デフォルトでは、カレントディレクトリにある <code class="docutils literal notranslate"><span class="pre">test*.py</span></code> という名前の全てのファイルからテストを探し出します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">/manage.py</span> <span class="pre">test</span></code> に好きな数の「テストラベル」を与えることで、特定のテストを指定することもできます。各テストラベルには、パッケージ、モジュール、 <code class="docutils literal notranslate"><span class="pre">TestCase</span></code> サブクラス、テストメソッドへのドット区切りの Python パスを指定します。たとえば、以下のように指定します。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run all the tests in the animals.tests module</span>
+$<span class="w"> </span>./manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>animals.tests
+
+<span class="c1"># Run all the tests found within the &#39;animals&#39; package</span>
+$<span class="w"> </span>./manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>animals
+
+<span class="c1"># Run just one test case class</span>
+$<span class="w"> </span>./manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>animals.tests.AnimalTestCase
+
+<span class="c1"># Run just one test method</span>
+$<span class="w"> </span>./manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>animals.tests.AnimalTestCase.test_animals_can_speak
+</pre></div>
+</div>
+<p>ディレクトリ下に置かれたテストを探索するために、ディレクトリのパスを指定することもできます。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>animals/
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">-p</span></code> (または <code class="docutils literal notranslate"><span class="pre">--pattern</span></code>) オプションを使って、カスタムのファイル名のパターンマッチを指定すれば、テストファイルの名前が <code class="docutils literal notranslate"><span class="pre">test*.py</span></code> というパターンとは違っていても実行できます。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>./manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>--pattern<span class="o">=</span><span class="s2">&quot;tests_*.py&quot;</span>
+</pre></div>
+</div>
+<p>テストの実行中に <code class="docutils literal notranslate"><span class="pre">Ctrl-C</span></code> を押すと、テストランナーは現在実行中のテストが完了するのを待って、gracefully にテストを終了します。graceful な終了では、テストランナーは失敗したテストの詳細を出力し、実行したテストの数と、エラーおよび失敗したテストの数をレポートし、通常通りにテストデータベースを破棄します。そのため、 <code class="docutils literal notranslate"><span class="pre">Ctrl-C</span></code> を押すのは、たとえば、 <a class="reference internal" href="../../ref/django-admin.html#cmdoption-test-failfast"><code class="xref std std-option docutils literal notranslate"><span class="pre">--failfast</span></code></a> オプションを付けるのを忘れて、一部のテストが予期せず失敗して、すべてのテストが終わるのを待たずにすぐにその失敗の詳細を知りたいような場合に大変役に立ちます。</p>
+<p>現在実行中のテストの終了も待ちたくないときは、もう一度 <code class="docutils literal notranslate"><span class="pre">Ctrl-C</span></code> を押すことで、テストを graceful ではなく、すぐに強制終了できます。その場合、強制終了前に実行していたテストの詳細はリポートされず、実行中に作られたテストデータベースも破棄されません。</p>
+<div class="admonition-test-with-warnings-enabled admonition">
+<p class="admonition-title">警告を有効にしてテストする</p>
+<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-Wa</span> <span class="pre">manage.py</span> <span class="pre">test</span></code> というように、Python の警告表示を有効にしてテストを実行するのは良い考えです。<code class="docutils literal notranslate"><span class="pre">-Wa</span></code> フラグをセットすると、Python に deprecation 警告を表示するように伝えます。Django などの Python ライブラリは、機能の廃止を知らせるフラグとして、この警告を利用しています。また、この機能は、厳密には間違いではないがあまり良くないコードを知らせてくれることがあるので、実装を改善できることがあります。</p>
+</div>
+<section id="s-the-test-database">
+<span id="s-id2"></span><span id="the-test-database"></span><span id="id2"></span><h3>test データベース<a class="headerlink" href="#the-test-database" title="Link to this heading">¶</a></h3>
+<p>データベースを必要とするテスト (すなわち、モデルテスト) には、&quot;実際の&quot; (production) 環境のデータベースは使用しません。代わりに、テスト用の空のデータベースを用意します。</p>
+<p>テストが成功したかどうかにかかわらず、すべてのテストの実行が終わった時点で、テストデータベースは破棄されます。</p>
+<p><a class="reference internal" href="../../ref/django-admin.html#cmdoption-test-keepdb"><code class="xref std std-option docutils literal notranslate"><span class="pre">test</span> <span class="pre">--keepdb</span></code></a> オプションを指定すれば、テストデータベースの破棄を防ぐことができます。これにより、複数回テストを実行しても、テストデータベースを保存できます。データベースが存在しないときは、最初に新しく作成され、そしてデータベースが最新の状態になるように、マイグレーションが順番に実行されます。</p>
+<p>前のセクションで説明したように、テストの実行が強制的に中断された場合、テストデータベースが破棄されない可能性があります。次の実行では、データベースを再利用するか破棄するかを尋ねられるでしょう。<a class="reference internal" href="../../ref/django-admin.html#cmdoption-test-noinput"><code class="xref std std-option docutils literal notranslate"><span class="pre">test</span> <span class="pre">--noinput</span></code></a> オプションを使用すると、プロンプトを抑制し、データベースを自動的に破棄できます。このオプションは、たとえばタイムアウトでテスト中断される可能性がある継続的インテグレーションサーバー上でのテストの実行時などに役に立ちます。</p>
+<p>テストデータベースのデフォルトの名前は、 <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> 設定内の各 <a class="reference internal" href="../../ref/settings.html#std-setting-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> の値の前に <code class="docutils literal notranslate"><span class="pre">test_</span></code> を付けたものになります。SQLite を使っているときは、デフォルトでは、テストにはインメモリのデータベースを使います (つまり、データベースはメモリ内に作成されるため、ファイルシステムへのアクセスを完全になくすことができるのです！)。設定の <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> 内の <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASE-TEST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEST</span></code></a> ディクショナリには、テストデータベースに対するいろいろな設定を書くことができます。例えば、別のデータベース名を指定したければ、 <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASE-TEST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEST</span></code></a> ディクショナリの <a class="reference internal" href="../../ref/settings.html#std-setting-TEST_NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> に、 <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> の中から好きなデータベースを選んで指定できます。</p>
+<p>PostgreSQL では、 <a class="reference internal" href="../../ref/settings.html#std-setting-USER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USER</span></code></a> が、ビルトインの <code class="docutils literal notranslate"><span class="pre">postgres</span></code> データベースへの読み取りアクセス権も持っている必要があります。</p>
+<p>テストランナーの使うデータベースは、独立したデータベースだけでなく、設定ファイルで指定した通りのデータベースを使用させることもできます: <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASE-ENGINE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ENGINE</span></code></a>, <a class="reference internal" href="../../ref/settings.html#std-setting-USER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USER</span></code></a>, <a class="reference internal" href="../../ref/settings.html#std-setting-HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">HOST</span></code></a>, などです。テストデータベースは、<a class="reference internal" href="../../ref/settings.html#std-setting-USER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USER</span></code></a> で指定されたユーザによって作成されるため、そのユーザアカウントがシステム上で新しくデータベースを作成できる権限を持っている必要があります。</p>
+<p>テストデータベースの文字エンコーディングに対するきめ細かい対応をするために、<a class="reference internal" href="../../ref/settings.html#std-setting-TEST_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CHARSET</span></code></a> TEST オプションを使用してください。MySQL を使用している場合は、<a class="reference internal" href="../../ref/settings.html#std-setting-TEST_COLLATION"><code class="xref std std-setting docutils literal notranslate"><span class="pre">COLLATION</span></code></a> オプションを使用してテストデータベースが使用する特別な照合順序をコントロールできます。 これらおよびより進歩的な設定の詳細については、<a class="reference internal" href="../../ref/settings.html"><span class="doc">設定のドキュメント</span></a> を参照してください。</p>
+<p>SQLite で SQLite インメモリデータベースを使用する場合、 <a class="reference external" href="https://www.sqlite.org/sharedcache.html">共有キャッシュ</a> が有効になるため、スレッド間でデータベースを共有することが可能なテストを書くことができます。</p>
+<div class="admonition-finding-data-from-your-production-database-when-running-tests admonition">
+<p class="admonition-title">テストの実行中に本番データベースからデータを見つけるには？</p>
+<p>モジュールのコンパイル時にデータベースへのアクセスを試みると、 テスト用データベースがセットアップされる前にアクセスが発生し、予期しない結果になる可能性があります。例えば、モジュールレベルのコードにデータベースクエリがあり、実際のデータベースが存在する場合、実稼働データがテストを汚染する可能性があります。いかなる場合でも、 <em>コードにこのようなインポート時のデータベースクエリを含めるのは良くないことです</em> 。そのようなことをしないようにコードを書き直してください。</p>
+<p><a class="reference internal" href="../../ref/applications.html#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code></a> の実装をカスタマイズする場合にも同じことが言えます。</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p><a class="reference internal" href="advanced.html#topics-testing-advanced-multidb"><span class="std std-ref">応用的なマルチデータベースのテスト トピック</span></a> も参考にしてください。</p>
+</div>
+</section>
+<section id="s-order-in-which-tests-are-executed">
+<span id="s-order-of-tests"></span><span id="order-in-which-tests-are-executed"></span><span id="order-of-tests"></span><h3>テストの実行順序<a class="headerlink" href="#order-in-which-tests-are-executed" title="Link to this heading">¶</a></h3>
+<p>すべての <code class="docutils literal notranslate"><span class="pre">TestCase</span></code> コードがクリーンなデータベースで実行されることを保証するために、Django のテストランナーは次の方法でテストの実行順序を決定します。</p>
+<ul class="simple">
+<li><p>すべての <a class="reference internal" href="tools.html#django.test.TestCase" title="django.test.TestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></a> サブクラスが最初に実行されます。</p></li>
+<li><p>そして、他のすべての Django ベースのテスト (<a class="reference internal" href="tools.html#django.test.SimpleTestCase" title="django.test.SimpleTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleTestCase</span></code></a> をベースとしたテストケースクラス、 <a class="reference internal" href="tools.html#django.test.TransactionTestCase" title="django.test.TransactionTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransactionTestCase</span></code></a> を含む) が、特定の順序を保証も強制もしない状態で実行されます。</p></li>
+<li><p>最後に、その他の <a class="reference external" href="https://docs.python.org/3/library/unittest.html#unittest.TestCase" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">unittest.TestCase</span></code></a> テスト (doctests を含む) が実行されます。このテストの中には、データベースを変更し、そのまま元の状態に戻さないようなテストがあることもあります。</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>この新しいテスト順序は、テストケース順序の予期しない依存関係を明らかにするかもしれません。これは、<a class="reference internal" href="tools.html#django.test.TransactionTestCase" title="django.test.TransactionTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransactionTestCase</span></code></a> によってデータベース内に記述された宣言に依存する doctests のケースで、これらは独立的に実行できるように修正する必要があります。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>テストを読み込む際に検出された失敗は、上記のすべての前に配置され、迅速にフィードバックされます。これには、テストモジュールが見つからなかったり、構文エラーのために読み込めなかったりしたものが含まれます。</p>
+</div>
+<p><a class="reference internal" href="../../ref/django-admin.html#cmdoption-test-shuffle"><code class="xref std std-option docutils literal notranslate"><span class="pre">test</span> <span class="pre">--shuffle</span></code></a> と <a class="reference internal" href="../../ref/django-admin.html#cmdoption-test-reverse"><code class="xref std std-option docutils literal notranslate"><span class="pre">--reverse</span></code></a> オプションを使用すると、グループ内の実行順序をランダムにしたり逆にしたりすることができます。これは、テストが互いに独立していることを保証するのに役立ちます。</p>
+</section>
+<section id="s-rollback-emulation">
+<span id="s-test-case-serialized-rollback"></span><span id="rollback-emulation"></span><span id="test-case-serialized-rollback"></span><h3>ロールバックのエミュレーション<a class="headerlink" href="#rollback-emulation" title="Link to this heading">¶</a></h3>
+<p>マイグレーションで呼び出されるあらゆる初期データは、<code class="docutils literal notranslate"><span class="pre">TestCase</span></code> テスト内のみで有効で、 <code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> 内では無効です。加えて、トランザクションがサポートされるバックエンドのみで有効です (最も重要な例外は MyISAM です)。これは、<a class="reference internal" href="tools.html#django.test.LiveServerTestCase" title="django.test.LiveServerTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiveServerTestCase</span></code></a> や <a class="reference internal" href="../../ref/contrib/staticfiles.html#django.contrib.staticfiles.testing.StaticLiveServerTestCase" title="django.contrib.staticfiles.testing.StaticLiveServerTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">StaticLiveServerTestCase</span></code></a> といった <code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> に依存するテストに関しても同様です。</p>
+<p>Djangoは、 <code class="docutils literal notranslate"><span class="pre">TestCase</span></code> や <code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> の本文で <code class="docutils literal notranslate"><span class="pre">serialized_rollback</span></code> オプションを <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定することで、テストケースごとにデータを再読み込みできますが、これによりテストスイートの実行速度が約3倍遅くなることに注意してください。</p>
+<p>サードパーティのアプリや MyISAM に対して開発する場合は、通常この設定が必要です。しかし、独自のプロジェクトをトランザクションデータベースに対して開発する場合は、ほとんどのテストで <code class="docutils literal notranslate"><span class="pre">TestCase</span></code> を使用するはずです。したがって、この設定は不要です。</p>
+<p>初期シリアライズは通常、非常に高速ですが、このプロセスからいくつかのアプリを除外してテストの実行を少しでも高速にしたい場合は、それらのアプリを <a class="reference internal" href="../../ref/settings.html#std-setting-TEST_NON_SERIALIZED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEST_NON_SERIALIZED_APPS</span></code></a> に追加します。</p>
+<p>シリアライズされたデータが二度読み込まれるのを防ぐために、 <code class="docutils literal notranslate"><span class="pre">serialized_rollback=True</span></code> を設定すると、テストデータベースを flush するときに <a class="reference internal" href="../../ref/signals.html#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_migrate</span></code></a> シグナルを無効にします。</p>
+</section>
+<section id="s-other-test-conditions">
+<span id="other-test-conditions"></span><h3>その他のテストに関する条件<a class="headerlink" href="#other-test-conditions" title="Link to this heading">¶</a></h3>
+<p>設定ファイルで指定した <a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> の値にかかわらず、Django のテストは <a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a>=False を指定したものとして実行されます。これは、表示されるコードの出力が、実際の環境設定で見られるものと同じになるようにするためです。</p>
+<p>各テスト後にキャッシュはクリアされません。そのため、<code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">test</span> <span class="pre">fooapp</span></code> を実行すると、テストで挿入されたデータが実働環境のシステムのキャッシュに残り続ける可能性があります。データベースの場合と違い、別の「テスト用のキャッシュ」が使われないためです。ただし、この動作は将来 <a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/11505">変更される可能性があります</a> 。</p>
+</section>
+<section id="s-understanding-the-test-output">
+<span id="understanding-the-test-output"></span><h3>テストの出力を理解する<a class="headerlink" href="#understanding-the-test-output" title="Link to this heading">¶</a></h3>
+<p>テストを実行すると、テストランナーが用意したたくさんのメッセージが表示されます。表示するメッセージの詳細レベルは、コマンドラインで <code class="docutils literal notranslate"><span class="pre">verbosity</span></code> オプションを指定することで、自由にコントロールできます。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>Creating<span class="w"> </span><span class="nb">test</span><span class="w"> </span>database...
+Creating<span class="w"> </span>table<span class="w"> </span>myapp_animal
+Creating<span class="w"> </span>table<span class="w"> </span>myapp_mineral
+</pre></div>
+</div>
+<p>このメッセージは、テストランナーが前のセクションで説明したテスト用のデータベースを作成していることを表しています。</p>
+<p>テスト用データベースが作成されると、Django はテストを実行します。すべてのテストが成功すれば、次のようなメッセージが表示されるはずです。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>----------------------------------------------------------------------
+Ran<span class="w"> </span><span class="m">22</span><span class="w"> </span>tests<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.221s
+
+OK
+</pre></div>
+</div>
+<p>しかし、もしテストが失敗した場合には、失敗したテストとその詳細が表示されます。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="o">======================================================================</span>
+FAIL:<span class="w"> </span>test_was_published_recently_with_future_poll<span class="w"> </span><span class="o">(</span>polls.tests.PollMethodTests<span class="o">)</span>
+----------------------------------------------------------------------
+Traceback<span class="w"> </span><span class="o">(</span>most<span class="w"> </span>recent<span class="w"> </span>call<span class="w"> </span>last<span class="o">)</span>:
+<span class="w">  </span>File<span class="w"> </span><span class="s2">&quot;/dev/mysite/polls/tests.py&quot;</span>,<span class="w"> </span>line<span class="w"> </span><span class="m">16</span>,<span class="w"> </span><span class="k">in</span><span class="w"> </span>test_was_published_recently_with_future_poll
+<span class="w">    </span>self.assertIs<span class="o">(</span>future_poll.was_published_recently<span class="o">()</span>,<span class="w"> </span>False<span class="o">)</span>
+AssertionError:<span class="w"> </span>True<span class="w"> </span>is<span class="w"> </span>not<span class="w"> </span>False
+
+----------------------------------------------------------------------
+Ran<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="nb">test</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.003s
+
+FAILED<span class="w"> </span><span class="o">(</span><span class="nv">failures</span><span class="o">=</span><span class="m">1</span><span class="o">)</span>
+</pre></div>
+</div>
+<p>このエラー出力の詳しい説明は、このドキュメントの範囲外ですが、極めて直感的に理解できるものです。詳しく知りたければ、Python の <a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a> ライブラリのドキュメントを読んでみてください。</p>
+<p>失敗したテストの数に関わらず（失敗の原因がエラー、アサーションの失敗、予期しない成功のいずれであっても）、テストランナーのスクリプトから返ってくる終了コードは 1 であることに注意してください。すべてのテストが成功すれば、0 が返ります。この特徴は、別のシェルスクリプトの中でテストランナースクリプトを実行するときに、成功したかどうかの情報が必要な時に役に立ちます。</p>
+</section>
+<section id="s-speeding-up-the-tests">
+<span id="s-speeding-up-tests-auth-hashers"></span><span id="speeding-up-the-tests"></span><span id="speeding-up-tests-auth-hashers"></span><h3>テストのスピードアップ<a class="headerlink" href="#speeding-up-the-tests" title="Link to this heading">¶</a></h3>
+<section id="s-running-tests-in-parallel">
+<span id="running-tests-in-parallel"></span><h4>テストの並列実行<a class="headerlink" href="#running-tests-in-parallel" title="Link to this heading">¶</a></h4>
+<p>各テストが適切に独立性を保ったものであれば、マルチコアのハードウェア上でテストを並列実行することでスピートアップさせることができます。詳しくは <a class="reference internal" href="../../ref/django-admin.html#cmdoption-test-parallel"><code class="xref std std-option docutils literal notranslate"><span class="pre">test</span> <span class="pre">--parallel</span></code></a> を読んでください。</p>
+</section>
+<section id="s-password-hashing">
+<span id="password-hashing"></span><h4>パスワードのハッシュ生成<a class="headerlink" href="#password-hashing" title="Link to this heading">¶</a></h4>
+<p>デフォルトのパスワードのハッシュ生成器は、設計上、時間のかかるものになっています。テストの中で多数のユーザーを認証する必要がある場合、カスタムの設定ファイルを用意して、<a class="reference internal" href="../../ref/settings.html#std-setting-PASSWORD_HASHERS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">PASSWORD_HASHERS</span></code></a> 設定に、より高速なハッシュ生成アルゴリズムを設定すると良いでしょう。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">PASSWORD_HASHERS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;django.contrib.auth.hashers.MD5PasswordHasher&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-PASSWORD_HASHERS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">PASSWORD_HASHERS</span></code></a> には、必要なハッシュアルゴリズムが複数あっても、追加しておくことを忘れないようにしてください。</p>
+</section>
+<section id="s-preserving-the-test-database">
+<span id="preserving-the-test-database"></span><h4>テストデータベースを保存する<a class="headerlink" href="#preserving-the-test-database" title="Link to this heading">¶</a></h4>
+<p><a class="reference internal" href="../../ref/django-admin.html#cmdoption-test-keepdb"><code class="xref std std-option docutils literal notranslate"><span class="pre">test</span> <span class="pre">--keepdb</span></code></a> オプションで、テスト間でテストデータベースを保存できます。テスト実行の際、データベース作成および破棄にかかる時間を大幅に短縮できます。</p>
+</section>
+<section id="s-avoiding-disk-access-for-media-files">
+<span id="avoiding-disk-access-for-media-files"></span><h4>メディアファイルに対するディスクアクセスを回避する<a class="headerlink" href="#avoiding-disk-access-for-media-files" title="Link to this heading">¶</a></h4>
+<p><a class="reference internal" href="../../ref/files/storage.html#django.core.files.storage.InMemoryStorage" title="django.core.files.storage.InMemoryStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">InMemoryStorage</span></code></a> は、メディアファイルに対するディスクアクセスを避けるための便利な手段です。すべてのデータはメモリ内にとどまり、テスト実行の後に破棄されます。</p>
+</section>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">テストを書いて実行する</a><ul>
+<li><a class="reference internal" href="#writing-tests">テストを書く</a></li>
+<li><a class="reference internal" href="#running-tests">テストの実行</a><ul>
+<li><a class="reference internal" href="#the-test-database">test データベース</a></li>
+<li><a class="reference internal" href="#order-in-which-tests-are-executed">テストの実行順序</a></li>
+<li><a class="reference internal" href="#rollback-emulation">ロールバックのエミュレーション</a></li>
+<li><a class="reference internal" href="#other-test-conditions">その他のテストに関する条件</a></li>
+<li><a class="reference internal" href="#understanding-the-test-output">テストの出力を理解する</a></li>
+<li><a class="reference internal" href="#speeding-up-the-tests">テストのスピードアップ</a><ul>
+<li><a class="reference internal" href="#running-tests-in-parallel">テストの並列実行</a></li>
+<li><a class="reference internal" href="#password-hashing">パスワードのハッシュ生成</a></li>
+<li><a class="reference internal" href="#preserving-the-test-database">テストデータベースを保存する</a></li>
+<li><a class="reference internal" href="#avoiding-disk-access-for-media-files">メディアファイルに対するディスクアクセスを回避する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="index.html"
+                          title="前の章へ">Django におけるテスト</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="tools.html"
+                          title="次の章へ">テストツール</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/testing/overview.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="Django におけるテスト">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="tools.html" title="テストツール">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

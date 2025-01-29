@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>FAQ: インストール &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="FAQ: Django を使う" href="usage.html" />
+    <link rel="prev" title="FAQ: 一般的な質問" href="general.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="general.html" title="FAQ: 一般的な質問">previous</a>
+     |
+    <a href="index.html" title="Django FAQ よくある質問" accesskey="U">up</a>
+   |
+    <a href="usage.html" title="FAQ: Django を使う">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="faq-install">
+            
+  <section id="s-faq-installation">
+<span id="faq-installation"></span><h1>FAQ: インストール<a class="headerlink" href="#faq-installation" title="Link to this heading">¶</a></h1>
+<section id="s-how-do-i-get-started">
+<span id="how-do-i-get-started"></span><h2>まずは何をすればよいですか？<a class="headerlink" href="#how-do-i-get-started" title="Link to this heading">¶</a></h2>
+<ol class="arabic simple">
+<li><p>コードをダウンロード <a class="reference external" href="https://www.djangoproject.com/download/">Download the code</a> してください。</p></li>
+<li><p>Django をインストールしてください ( <a class="reference internal" href="../intro/install.html"><span class="doc">インストールガイド</span></a> を読みましょう)。</p></li>
+<li><p><a class="reference internal" href="../intro/tutorial01.html"><span class="doc">チュートリアル</span></a> を一通りやってみてください。</p></li>
+<li><p>他の  <a class="reference internal" href="../index.html"><span class="doc">ドキュメント</span></a> にも目を通して下さい。何か問題が起きたら、 質問 <a class="reference external" href="https://www.djangoproject.com/community/">ask questions</a> してみましょう。</p></li>
+</ol>
+</section>
+<section id="s-what-are-django-s-prerequisites">
+<span id="what-are-django-s-prerequisites"></span><h2>Django を動かすには何が必要ですか？<a class="headerlink" href="#what-are-django-s-prerequisites" title="Link to this heading">¶</a></h2>
+<p>DjangoにはPythonが必要です。 Djangoの各バージョンで動作するPythonのバージョンについては、次の質問の表を参照してください。 いくつかの用途では他のPythonライブラリが必要かもしれませんが、必要に応じてエラーが表示されます。</p>
+<p>あなたが Django を用いた実験をしたい場合、開発環境専用にウェブサーバーをインストールしたり、データベース・サーバーを用意する必要はありません。</p>
+<p>Django には <a class="reference internal" href="../ref/django-admin.html#django-admin-runserver"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">軽量な開発用サーバー</span></code></a> が付属しています。本番環境に対しては、Django は WSGI の仕様である <span class="target" id="index-2"></span><a class="pep reference external" href="https://peps.python.org/pep-3333/"><strong>PEP 3333</strong></a> に従っているため、様々なウェブサーバーで運用環境を構築できます。詳しくは、 <a class="reference internal" href="../howto/deployment/index.html"><span class="doc">Django をデプロイする</span></a> を参照してください。</p>
+<p>デフォルトでは、Django は Python のインストールに含まれている <a class="reference external" href="https://www.sqlite.org/">SQLite</a> を実行します。本番環境では <a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> をおすすめしていますが、 <a class="reference external" href="https://mariadb.org/">MariaDB</a> 、 <a class="reference external" href="https://www.mysql.com/">MySQL</a> 、 <a class="reference external" href="https://www.sqlite.org/">SQLite</a> 、 <a class="reference external" href="https://www.oracle.com/">Oracle</a> に対する公式サポートも提供しています。詳しくは、 <a class="reference internal" href="../ref/databases.html"><span class="doc">サポートするデータベース</span></a> を参照してください。</p>
+</section>
+<section id="s-what-python-version-can-i-use-with-django">
+<span id="s-faq-python-version-support"></span><span id="what-python-version-can-i-use-with-django"></span><span id="faq-python-version-support"></span><h2>どのバージョンの Python で Django が使えますか?<a class="headerlink" href="#what-python-version-can-i-use-with-django" title="Link to this heading">¶</a></h2>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>Django バージョン</p></th>
+<th class="head"><p>Python バージョン</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>3.2</p></td>
+<td><p>3.6、3.7、3.8、3.9、3.10（3.2.9で追加）</p></td>
+</tr>
+<tr class="row-odd"><td><p>4.0</p></td>
+<td><p>3.8, 3.9, 3.10</p></td>
+</tr>
+<tr class="row-even"><td><p>4.1</p></td>
+<td><p>3.8, 3.9, 3.10, 3.11 (4.1.3で追加)</p></td>
+</tr>
+<tr class="row-odd"><td><p>4.2</p></td>
+<td><p>3.8、3.9、3.10、3.11、3.12（4.2.8で追加）</p></td>
+</tr>
+<tr class="row-even"><td><p>5.0</p></td>
+<td><p>3.10、3.11、3.12</p></td>
+</tr>
+<tr class="row-odd"><td><p>5.1</p></td>
+<td><p>3.10, 3.11, 3.12, 3.13 (5.1.3 で追加)</p></td>
+</tr>
+</tbody>
+</table>
+<p>Pythonの各バージョンでは、最新のマイクロリリース (A.B.C) のみが正式にサポートされています。 <a class="reference external" href="https://www.python.org/downloads/">Pythonのダウンロードページ</a> で、各シリーズの最新のマイクロバージョンを見つけることができます。</p>
+<p>We will support a Python version up to and including the first Django LTS
+release whose security support ends after security support for that version of
+Python ends. For example, Python 3.9 security support ends in October 2025 and
+Django 4.2 LTS security support ends in April 2026. Therefore Django 4.2 is the
+last version to support Python 3.9.</p>
+</section>
+<section id="s-what-python-version-should-i-use-with-django">
+<span id="what-python-version-should-i-use-with-django"></span><h2>DjangoでどのPythonのバージョンを使用すべきですか？<a class="headerlink" href="#what-python-version-should-i-use-with-django" title="Link to this heading">¶</a></h2>
+<p>新しいバージョンの Python はより高速で、多くの機能があり、サポートされているので、 Python 3 の中でも最新バージョンを推奨します。</p>
+<p>古いリリースの Django を使うことで何も失うことはありませんが、新しい Python のリリースでの改良と最適化を活用できません。Django で使用するサードパーティ製アプリケーションは、独自のバージョン要件を自由に設定することができます。</p>
+</section>
+<section id="s-should-i-use-the-stable-version-or-development-version">
+<span id="should-i-use-the-stable-version-or-development-version"></span><h2>安定版と開発版のどちらを使うべきなのでしょうか？<a class="headerlink" href="#should-i-use-the-stable-version-or-development-version" title="Link to this heading">¶</a></h2>
+<p>一般的に、もしあなたがコードを本番で使っているのなら、安定版を使うべきでしょう。 Django はおよそ 8 ヶ月ごとに、バグフィックスを含めた安定版をリリースしています。これらの安定版は後方互換性を保証した API も提供していますので、もし次の新しい安定版では使用できないコードを書いていても、アップグレードにおいて問題はないはずです。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">FAQ: インストール</a><ul>
+<li><a class="reference internal" href="#how-do-i-get-started">まずは何をすればよいですか？</a></li>
+<li><a class="reference internal" href="#what-are-django-s-prerequisites">Django を動かすには何が必要ですか？</a></li>
+<li><a class="reference internal" href="#what-python-version-can-i-use-with-django">どのバージョンの Python で Django が使えますか?</a></li>
+<li><a class="reference internal" href="#what-python-version-should-i-use-with-django">DjangoでどのPythonのバージョンを使用すべきですか？</a></li>
+<li><a class="reference internal" href="#should-i-use-the-stable-version-or-development-version">安定版と開発版のどちらを使うべきなのでしょうか？</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="general.html"
+                          title="前の章へ">FAQ: 一般的な質問</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="usage.html"
+                          title="次の章へ">FAQ: Django を使う</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/faq/install.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="general.html" title="FAQ: 一般的な質問">previous</a>
+     |
+    <a href="index.html" title="Django FAQ よくある質問" accesskey="U">up</a>
+   |
+    <a href="usage.html" title="FAQ: Django を使う">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

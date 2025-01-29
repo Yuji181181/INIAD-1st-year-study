@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ロギング &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="ページ分割 (Pagination)" href="pagination.html" />
+    <link rel="prev" title="タイムゾーン" href="i18n/timezones.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="i18n/timezones.html" title="タイムゾーン">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="pagination.html" title="ページ分割 (Pagination)">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-logging">
+            
+  <section id="s-logging">
+<span id="s-logging-explanation"></span><span id="logging"></span><span id="logging-explanation"></span><h1>ロギング<a class="headerlink" href="#logging" title="Link to this heading">¶</a></h1>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../howto/logging.html#logging-how-to"><span class="std std-ref">ロギングの設定と利用</span></a></p></li>
+<li><p><a class="reference internal" href="../ref/logging.html#logging-ref"><span class="std std-ref">Django ロギング リファレンス</span></a></p></li>
+</ul>
+</div>
+<p>Python プログラマは、素早く便利なデバッグツールとして、コード内で <code class="docutils literal notranslate"><span class="pre">print()</span></code> をよく使います。ロギングフレームワークを使用するのはわずかな手間がかかるだけですが、それよりはるかにエレガントで柔軟です。デバッギングに便利であることに加えて、ロギングは、アプリケーションの状態と健全性に対して、よりよく構造化されたより多くの情報も提供してくれます。</p>
+<section id="s-overview">
+<span id="overview"></span><h2>概要<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>Django は、システムのロギングを実行するために、Python 組み込みの <a class="reference external" href="https://docs.python.org/3/library/logging.html#module-logging" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">logging</span></code></a> モジュールを使用・拡張しています。このモジュールは、Python 自体のドキュメントで詳細に解説されています。このセクションでは、簡単な概要を説明します。</p>
+<section id="s-the-cast-of-players">
+<span id="the-cast-of-players"></span><h3>登場人物<a class="headerlink" href="#the-cast-of-players" title="Link to this heading">¶</a></h3>
+<p>Pythonのロギングは4つの部分で構成されます。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#topic-logging-parts-loggers"><span class="std std-ref">ロガー</span></a></p></li>
+<li><p><a class="reference internal" href="#topic-logging-parts-handlers"><span class="std std-ref">ハンドラ</span></a></p></li>
+<li><p><a class="reference internal" href="#topic-logging-parts-filters"><span class="std std-ref">フィルタ</span></a></p></li>
+<li><p><a class="reference internal" href="#topic-logging-parts-formatters"><span class="std std-ref">フォーマッタ</span></a></p></li>
+</ul>
+<section id="s-loggers">
+<span id="s-topic-logging-parts-loggers"></span><span id="loggers"></span><span id="topic-logging-parts-loggers"></span><h4>ロガー<a class="headerlink" href="#loggers" title="Link to this heading">¶</a></h4>
+<p><em>ロガー</em> は、ロギングシステムのエントリーポイントです。各ロガーは処理が記述されたメッセージの名前付けされたバケットです。</p>
+<p>ロガーには <em>ログレベル</em> が設定されています。このログレベルはハンドリングされたログメッセージの深刻さを表しています。Pythonは下記のログレベルを定義しています。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>: デバッグのための低レベルシステム情報</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">INFO</span></code>: 一般的なシステム情報</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">WARNING</span></code>: 重要度の小さい問題が発生したことを示す情報</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ERROR</span></code>: 大きな問題が発生したことを示す情報</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code>: 重大な問題が発生したことを示す情報</p></li>
+</ul>
+<p>ロガーに記載された各メッセージは <em>ログレコード</em> です。各ログレコードは、特定のメッセージの重要性を表す <em>ログレベル</em> を持ちます。ログレコードには、記録されたイベントを説明するメタデータを含むことができます。これには、スタックトレースやエラーコードと言った詳細を含めることができます。</p>
+<p>ロガーにメッセージが渡されたとき、メッセージのログレベルはロガーのログレベルと比較されます。メッセージのログレベルがロガー自体のログレベルと同等以上の場合、メッセージは次の処理に進みます。それ以外の場合、メッセージは無視されます。</p>
+<p>ロガーによってメッセージの処理が必要だと判断された場合、メッセージは <em>ハンドラ</em> に渡されます。</p>
+</section>
+<section id="s-handlers">
+<span id="s-topic-logging-parts-handlers"></span><span id="handlers"></span><span id="topic-logging-parts-handlers"></span><h4>ハンドラ<a class="headerlink" href="#handlers" title="Link to this heading">¶</a></h4>
+<p><em>ハンドラ</em> は、ロガー上で書くメッセージに何をするかを決定するための原動力です。ここで、メッセージを表示する、ファイルに書き込む、ネットワークソケットに送信する、といった特定のロギング動作を記述します。</p>
+<p>ロガーと同様に、ハンドラもログレベルを持ちます。ログレコードのログレベルがハンドラのレベルに満たない場合、ハンドラはメッセージを無視します。</p>
+<p>ロガーには複数のハンドラを設定でき、また各ハンドラは異なるログレベルを持つことができます。この方法により、メッセージの重要性に応じて通知方法を変えることができます。たとえば、<code class="docutils literal notranslate"><span class="pre">ERROR</span></code> と <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code> メッセージを呼び出しサービスに転送するハンドラを設定する一方で、後で分析するために (<code class="docutils literal notranslate"><span class="pre">ERROR</span></code> や <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code> も含む) すべてのメッセージをファイルに記録する 2 つめのハンドラを設定できます。</p>
+</section>
+<section id="s-filters">
+<span id="s-topic-logging-parts-filters"></span><span id="filters"></span><span id="topic-logging-parts-filters"></span><h4>フィルタ<a class="headerlink" href="#filters" title="Link to this heading">¶</a></h4>
+<p><em>フィルタ</em> は、どのログレコードがロガーからハンドラへ渡されるかについて、追加的なコントロールを提供します。</p>
+<p>デフォルトでは、ログレベル要件を満たしたすべてのログメッセージが処理されます。しかし、フィルタを使用することで、ロギングのプロセスに追加的な要件を設定できます。たとえば、特定のソースからの <code class="docutils literal notranslate"><span class="pre">ERROR</span></code> のみを処理するようにフィルタを設定することができます。</p>
+<p>フィルタは、処理前にログレコードを修正するためにも使えます。たとえば、特定の条件を満たした場合に <code class="docutils literal notranslate"><span class="pre">ERROR</span></code> ログレコードを <code class="docutils literal notranslate"><span class="pre">WARNING</span></code> レコードに格下げさせるようなフィルタを設定できます。</p>
+<p>フィルタは、ロガーもしくはハンドラに対して設定できます; 複数のフィルタを使って複数のフィルタ動作を連鎖させることも可能です。</p>
+</section>
+<section id="s-formatters">
+<span id="s-topic-logging-parts-formatters"></span><span id="formatters"></span><span id="topic-logging-parts-formatters"></span><h4>フォーマッタ<a class="headerlink" href="#formatters" title="Link to this heading">¶</a></h4>
+<p>最終的には、ログレコードはテキストとして表現される必要があります。 <em>フォーマッタ</em> はこのテキストの書式を定義します。フォーマッタは、通常は Python の文字列フォーマットで、<a class="reference external" href="https://docs.python.org/3/library/logging.html#logrecord-attributes" title="(in Python v3.13)"><span class="xref std std-ref">LogRecord 属性</span></a> を含みます; しかし、特定の書式設定を行うような独自のフォーマッタを記述することもできます。</p>
+</section>
+</section>
+</section>
+<section id="s-security-implications">
+<span id="s-logging-security-implications"></span><span id="security-implications"></span><span id="logging-security-implications"></span><h2>セキュリティへの影響<a class="headerlink" href="#security-implications" title="Link to this heading">¶</a></h2>
+<p>ロギングシステムは潜在的にセンシティブな情報を取り扱うことになります。たとえば、ログレコードにはウェブリクエストやスタックトレースに関する情報が含まれることがありますが、ロガーで収集されたデータの一部にはセキュリティへの影響もあるかもしれません。あなたは次のことを理解しておく必要があります。</p>
+<ul class="simple">
+<li><p>どの情報を収集するか</p></li>
+<li><p>最終的にその情報はどこに保存されることになるか</p></li>
+<li><p>その情報の転送はどのように行われるか</p></li>
+<li><p>その情報にアクセスする可能性があるのは誰か</p></li>
+</ul>
+<p>センシティブな情報の収集をコントロールするために、特定のセンシティブな情報をエラーレポートからフィルタリングするように明示的に指定できます。その方法については <a class="reference internal" href="../howto/error-reporting.html#filtering-error-reports"><span class="std std-ref">エラーレポートをフィルタリングする</span></a> を参照してください。</p>
+<section id="s-adminemailhandler">
+<span id="adminemailhandler"></span><h3><code class="docutils literal notranslate"><span class="pre">AdminEmailHandler</span></code><a class="headerlink" href="#adminemailhandler" title="Link to this heading">¶</a></h3>
+<p>組み込みの <a class="reference internal" href="../ref/logging.html#django.utils.log.AdminEmailHandler" title="django.utils.log.AdminEmailHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdminEmailHandler</span></code></a> はセキュリティの文脈で言及に値します。もし <code class="docutils literal notranslate"><span class="pre">include_html</span></code> オプションが有効なら、送信するメールには、スタックの各レベルのローカル変数の名前と値、そして Django の設定値（言い換えれば、 <a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> のときに Web ページで公開されるのと同じレベルの詳細）が完全なトレースバックとして含まれます。</p>
+<p>通常、このような潜在的にセンシティブな情報を電子メールで送信するのは良くないとされています。その代わりに、詳細なログを送信できる多くのサードパーティ・サービスを利用することで、完全なトレースバックによる豊富な情報、通知先や情報へのアクセス権の明確な管理など、複数の利点が得られます。</p>
+</section>
+</section>
+<section id="s-configuring-logging">
+<span id="s-id1"></span><span id="configuring-logging"></span><span id="id1"></span><h2>ロギングを設定する<a class="headerlink" href="#configuring-logging" title="Link to this heading">¶</a></h2>
+<p>Python のロギングライブラリは、実用的なインターフェースから設定ファイルまで、ロギング設定のテクニックを提供しています。デフォルトでは、Django は <a class="reference external" href="https://docs.python.org/3/library/logging.config.html#logging-config-dictschema" title="(in Python v3.13)"><span class="xref std std-ref">dictConfig フォーマット</span></a> を使用します。</p>
+<p>ロギングを設定するためには、<a class="reference internal" href="../ref/settings.html#std-setting-LOGGING"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING</span></code></a> を使用してロギング設定の辞書を定義します。この設定には、ロギングセットアップで使いたいロガー、ハンドラ、フィルタ、フォーマッタを記述し、それらのコンポーネントで使用したいログレベルとその他のプロパティを記述します。</p>
+<p>デフォルトでは、<a class="reference internal" href="../ref/settings.html#std-setting-LOGGING"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING</span></code></a> 設定は、以下のスキームを使って <a class="reference internal" href="../ref/logging.html#default-logging-configuration"><span class="std std-ref">Django のデフォルトロギング設定</span></a> に統合されています。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-LOGGING"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING</span></code></a> の <code class="docutils literal notranslate"><span class="pre">disable_existing_loggers</span></code> キーの値を <code class="docutils literal notranslate"><span class="pre">True</span></code> にすると、全てのデフォルトの設定が無効になります（キーが存在しない場合は <code class="docutils literal notranslate"><span class="pre">dictConfig</span></code> のデフォルトになります）。このため、 <code class="docutils literal notranslate"><span class="pre">'disable_existing_loggers':</span> <span class="pre">True</span></code> を使う場合は注意してください。 <code class="docutils literal notranslate"><span class="pre">True</span></code> を設定する必要は殆どないでしょう。 <code class="docutils literal notranslate"><span class="pre">disable_existing_loggers</span></code> を <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定して、デフォルトのロガーの一部、または全てを定義しなおすこともできます。あるいは、 <a class="reference internal" href="../ref/settings.html#std-setting-LOGGING_CONFIG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING_CONFIG</span></code></a> を <code class="docutils literal notranslate"><span class="pre">None</span></code> に設定して、 <a class="reference internal" href="#disabling-logging-configuration"><span class="std std-ref">ロギングの設定を自分で行うこと</span></a> も出来ます。</p>
+<p>ロギングは、一般的な Django の <code class="docutils literal notranslate"><span class="pre">setup()</span></code> 関数の一部として設定されます。したがって、ロガーが常にプロジェクトコード内で使用準備ができていることが保証されています。</p>
+<section id="s-examples">
+<span id="examples"></span><h3>例<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="https://docs.python.org/3/library/logging.config.html#logging-config-dictschema" title="(in Python v3.13)"><span class="xref std std-ref">dictConfig フォーマット</span></a> に関する完全なドキュメントが、ロギング設定ディクショナリの最高の教材です。とはいえ、どんなことが可能なのか知ってもらうため、以下にいくつかの例を示します。</p>
+<p>最初に、全てのログメッセージをコンソールに出力するための最低限の設定がこちらです。</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">settings.py</span></code></span><a class="headerlink" href="#id3" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;disable_existing_loggers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;console&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.StreamHandler&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>この設定では、 <code class="docutils literal notranslate"><span class="pre">root</span></code> という名前の親のロガーがあり、 <code class="docutils literal notranslate"><span class="pre">WARNING</span></code> レベル以上のメッセージを受け取ったら、 console ハンドラに送るようになっています。 level を <code class="docutils literal notranslate"><span class="pre">INFO</span></code> または <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> にすると、より詳細なメッセージも表示されるようになります。この設定は開発中に役に立ちます。</p>
+<p>次に、より詳細なロギングを追加します。次の例は、ロギングシステムが <a class="reference internal" href="../ref/logging.html#django-logger"><span class="std std-ref">django</span></a> という名前のロガーからより多くのメッセージを出力するようにする方法を示しています。</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">settings.py</span></code></span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;disable_existing_loggers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;console&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.StreamHandler&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;django&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DJANGO_LOG_LEVEL&quot;</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;propagate&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>デフォルトでは、この設定は、<code class="docutils literal notranslate"><span class="pre">INFO</span></code> 以上のメッセージを <code class="docutils literal notranslate"><span class="pre">django</span></code> ロガーからコンソールに送信します。このレベルは、デフォルト設定ではログレコードを表示するのが <code class="docutils literal notranslate"><span class="pre">DEBUG=True</span></code> のときだけであること以外、Django のデフォルトのロギング設定と同じです。Django はそのような <code class="docutils literal notranslate"><span class="pre">INFO</span></code> レベルのログはそこまで多くログ出力しません。しかし、この設定では、環境変数 <code class="docutils literal notranslate"><span class="pre">DJANGO_LOG_LEVEL=DEBUG</span></code> を設定することで、Django のすべての debug ログを表示できます。これにはすべてのデータベースクエリが含まれるため、非常に冗長です。</p>
+<p>必ずしもコンソールに出力する必要はありません。<a class="reference internal" href="../ref/logging.html#django-logger"><span class="std std-ref">django</span></a> という名前のロガーをファイルに書き込むには、次のように設定します。</p>
+<div class="literal-block-wrapper docutils container" id="id5">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">settings.py</span></code></span><a class="headerlink" href="#id5" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;disable_existing_loggers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.FileHandler&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;/path/to/django/debug.log&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;django&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;propagate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>この例を使用するときは、<code class="docutils literal notranslate"><span class="pre">'filename'</span></code> のパスを Django アプリケーションを実行しているユーザーが書き込み可能な場所に変更してください。</p>
+<p>最後に、かなり複雑なロギングの設定の例です。</p>
+<div class="literal-block-wrapper docutils container" id="id6">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">settings.py</span></code></span><a class="headerlink" href="#id6" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;disable_existing_loggers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{levelname}</span><span class="s2"> </span><span class="si">{asctime}</span><span class="s2"> </span><span class="si">{module}</span><span class="s2"> </span><span class="si">{process:d}</span><span class="s2"> </span><span class="si">{thread:d}</span><span class="s2"> </span><span class="si">{message}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="s2">&quot;{&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;simple&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{levelname}</span><span class="s2"> </span><span class="si">{message}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="s2">&quot;{&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;special&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;()&quot;</span><span class="p">:</span> <span class="s2">&quot;project.logging.SpecialFilter&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;require_debug_true&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;()&quot;</span><span class="p">:</span> <span class="s2">&quot;django.utils.log.RequireDebugTrue&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;console&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;require_debug_true&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.StreamHandler&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;formatter&quot;</span><span class="p">:</span> <span class="s2">&quot;simple&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;mail_admins&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;django.utils.log.AdminEmailHandler&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;special&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;django&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;propagate&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;django.request&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mail_admins&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;propagate&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;myproject.custom&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;console&quot;</span><span class="p">,</span> <span class="s2">&quot;mail_admins&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;filters&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;special&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>このロギング設定は、以下のことを行います:</p>
+<ul>
+<li><p>設定が「dictConfig バージョン 1」形式であることを明示します。 現在、これが唯一の dictConfig 形式のバージョンです。</p></li>
+<li><p>2 つのフォーマッタを定義します:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">simple</span></code> は、ログレベル名 (例: <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>) とログメッセージを出力します。</p>
+<p>この <code class="docutils literal notranslate"><span class="pre">format</span></code> 文字列は標準の Python 文字列フォーマットで、各ログ行で出力される詳細を定義します。出力可能な詳細の全リストは <a class="reference external" href="https://docs.python.org/3/library/logging.html#formatter-objects" title="(in Python v3.13)"><span>Formatter Objects</span></a> で確認できます。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code> は、ログレベルの名称とログメッセージに加えて、時刻、プロセス、スレッド、ログメッセージを生成したモジュールを出力します。</p></li>
+</ul>
+</li>
+<li><p>2 つのフィルタを定義します:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">project.logging.SpecialFilter</span></code> は、エイリアス <code class="docutils literal notranslate"><span class="pre">special</span></code> を使っています。もしこのフィルタが追加の引数を必要とする場合、フィルタ設定の辞書に追加のキーとして提供できます。今回の場合、<code class="docutils literal notranslate"><span class="pre">SpecialFilter</span></code> をインスタンス化するときに、引数 <code class="docutils literal notranslate"><span class="pre">foo</span></code> に <code class="docutils literal notranslate"><span class="pre">bar</span></code> の値が与えられます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">django.utils.log.RequireDebugTrue</span></code> は、<a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> のときにレコードの処理を進めます。</p></li>
+</ul>
+</li>
+<li><p>2 つのハンドラを定義します:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">console</span></code> は、すべての <code class="docutils literal notranslate"><span class="pre">INFO</span></code> 以上のメッセージを <code class="docutils literal notranslate"><span class="pre">sys.stderr</span></code> に表示 (print) する <a class="reference external" href="https://docs.python.org/3/library/logging.handlers.html#logging.StreamHandler" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamHandler</span></code></a> クラスです。このハンドラは <code class="docutils literal notranslate"><span class="pre">simple</span></code> 出力フォーマットを使用します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">mail_admins</span></code> は、<code class="docutils literal notranslate"><span class="pre">ERROR</span></code> (またはそれより上) のすべてのメッセージをサイトの <a class="reference internal" href="../ref/settings.html#std-setting-ADMINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ADMINS</span></code></a> にメール送信する <a class="reference internal" href="../ref/logging.html#django.utils.log.AdminEmailHandler" title="django.utils.log.AdminEmailHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdminEmailHandler</span></code></a> クラスです。このハンドラは <code class="docutils literal notranslate"><span class="pre">special</span></code> フィルタを使用します。</p></li>
+</ul>
+</li>
+<li><p>3 つのロガーを設定します:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">django</span></code> は、すべてのメッセージを <code class="docutils literal notranslate"><span class="pre">console</span></code> ハンドラに渡します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">django.request</span></code> は、すべての <code class="docutils literal notranslate"><span class="pre">ERROR</span></code> メッセージを <code class="docutils literal notranslate"><span class="pre">mail_admins</span></code> ハンドラに渡します。加えて、このロガーはメッセージを親に <em>伝えない</em> よう設定されています。これは、<code class="docutils literal notranslate"><span class="pre">django.request</span></code> 内に記述されたログメッセージは <code class="docutils literal notranslate"><span class="pre">django</span></code> ロガーで処理されないことを意味します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">myproject.custom</span></code> は <code class="docutils literal notranslate"><span class="pre">INFO</span></code> もしくはそれ以上のすべてのメッセージを渡し、<code class="docutils literal notranslate"><span class="pre">special</span></code> フィルタを 2 つのハンドラに引き渡します -- <code class="docutils literal notranslate"><span class="pre">console</span></code> と <code class="docutils literal notranslate"><span class="pre">mail_admins</span></code> です。これは、<code class="docutils literal notranslate"><span class="pre">INFO</span></code> 以上のレベルのメッセージがコンソールで表示され、さらに <code class="docutils literal notranslate"><span class="pre">ERROR</span></code> と <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code> のメッセージはメールでも出力されることを意味します。</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="s-custom-logging-configuration">
+<span id="custom-logging-configuration"></span><h3>カスタムのロギング設定<a class="headerlink" href="#custom-logging-configuration" title="Link to this heading">¶</a></h3>
+<p>ロガーの設定に Python の dictConfig フォーマットを使用したくない場合は、あなた自身の設定スキームを定義できます。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-LOGGING_CONFIG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING_CONFIG</span></code></a> 設定は、Django のロガーを設定するために使われる呼び出し可能関数を定義します。デフォルトでは、Python の <a class="reference external" href="https://docs.python.org/3/library/logging.config.html#logging.config.dictConfig" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.config.dictConfig()</span></code></a> 関数を指します。しかし、異なる設定処理を使いたい場合は、他の引数を1つ取る任意の呼び出し可能関数を使用できます。<a class="reference internal" href="../ref/settings.html#std-setting-LOGGING"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING</span></code></a> のコンテンツは、ロギング設定時に引数の値として提供されます。</p>
+</section>
+<section id="s-disabling-logging-configuration">
+<span id="s-id2"></span><span id="disabling-logging-configuration"></span><span id="id2"></span><h3>ロギング設定を無効化する<a class="headerlink" href="#disabling-logging-configuration" title="Link to this heading">¶</a></h3>
+<p>ロギングを全く設定したくない (あるいは、自分のやり方でロギング手動で設定したい) なら、 <a class="reference internal" href="../ref/settings.html#std-setting-LOGGING_CONFIG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING_CONFIG</span></code></a> を <code class="docutils literal notranslate"><span class="pre">None</span></code> に設定することもできます。これにより、<a class="reference internal" href="../ref/logging.html#default-logging-configuration"><span class="std std-ref">Django のデフォルトのロギング設定</span></a> を無効化できます。</p>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-LOGGING_CONFIG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING_CONFIG</span></code></a> を <code class="docutils literal notranslate"><span class="pre">None</span></code> に設定すると、自動でロギングの設定が行われなくなるだけです。ロギング自体が使えなくなるわけではありません。自動でのロギング設定を無効化しても、Django はロギングのメソッドを呼び、もしログ設定がされていれば、そこに出力されます。</p>
+<p>Django の自動でのロギング設定を無効化し、手動で設定する場合はこのようにします。</p>
+<div class="literal-block-wrapper docutils container" id="id7">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">settings.py</span></code></span><a class="headerlink" href="#id7" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING_CONFIG</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging.config</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>デフォルトの設定処理は、設定が完全にロードされた後にのみ <a class="reference internal" href="../ref/settings.html#std-setting-LOGGING_CONFIG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING_CONFIG</span></code></a> を呼ばないことに注意してください。対照的に、設定ファイル内で手動で設定するロギングは、ロギング設定を直ちにロードします。そのため、ロギング設定は、必ずロギングが依存しているすべての設定の <em>後に</em> 書く必要があります。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ロギング</a><ul>
+<li><a class="reference internal" href="#overview">概要</a><ul>
+<li><a class="reference internal" href="#the-cast-of-players">登場人物</a><ul>
+<li><a class="reference internal" href="#loggers">ロガー</a></li>
+<li><a class="reference internal" href="#handlers">ハンドラ</a></li>
+<li><a class="reference internal" href="#filters">フィルタ</a></li>
+<li><a class="reference internal" href="#formatters">フォーマッタ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#security-implications">セキュリティへの影響</a><ul>
+<li><a class="reference internal" href="#adminemailhandler"><code class="docutils literal notranslate"><span class="pre">AdminEmailHandler</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuring-logging">ロギングを設定する</a><ul>
+<li><a class="reference internal" href="#examples">例</a></li>
+<li><a class="reference internal" href="#custom-logging-configuration">カスタムのロギング設定</a></li>
+<li><a class="reference internal" href="#disabling-logging-configuration">ロギング設定を無効化する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="i18n/timezones.html"
+                          title="前の章へ">タイムゾーン</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="pagination.html"
+                          title="次の章へ">ページ分割 (Pagination)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topics/logging.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="i18n/timezones.html" title="タイムゾーン">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="pagination.html" title="ページ分割 (Pagination)">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

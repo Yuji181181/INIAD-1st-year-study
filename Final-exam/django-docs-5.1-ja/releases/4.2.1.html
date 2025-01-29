@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django 4.2.1 リリースノート &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="Django 4.2 リリースノート" href="4.2.html" />
+    <link rel="prev" title="Django 4.2.2 リリースノート" href="4.2.2.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="4.2.2.html" title="Django 4.2.2 リリースノート">previous</a>
+     |
+    <a href="index.html" title="リリースノート" accesskey="U">up</a>
+   |
+    <a href="4.2.html" title="Django 4.2 リリースノート">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="releases-4.2.1">
+            
+  <section id="s-django-4-2-1-release-notes">
+<span id="django-4-2-1-release-notes"></span><h1>Django 4.2.1 リリースノート<a class="headerlink" href="#django-4-2-1-release-notes" title="Link to this heading">¶</a></h1>
+<p><em>2023年5月3日</em></p>
+<p>Django 4.2.1 は、4.2 の深刻度 &quot;low&quot; のセキュリティ問題を修正しました。</p>
+<section id="s-cve-2023-31047-potential-bypass-of-validation-when-uploading-multiple-files-using-one-form-field">
+<span id="cve-2023-31047-potential-bypass-of-validation-when-uploading-multiple-files-using-one-form-field"></span><h2>CVE-2023-31047: 1つのフォームフィールドを使用して複数のファイルをアップロードする際の検証のバイパスが可能な脆弱性<a class="headerlink" href="#cve-2023-31047-potential-bypass-of-validation-when-uploading-multiple-files-using-one-form-field" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../ref/forms/fields.html#django.forms.FileField" title="django.forms.FileField"><code class="xref py py-class docutils literal notranslate"><span class="pre">forms.FileField</span></code></a> や <a class="reference internal" href="../ref/forms/fields.html#django.forms.ImageField" title="django.forms.ImageField"><code class="xref py py-class docutils literal notranslate"><span class="pre">forms.ImageField</span></code></a> は、1つのフォームフィールドを使用して複数のファイルをアップロードすることをサポートしていないため、常に最後にアップロードされたファイルのみが検証されていました。残念ながら、<a class="reference internal" href="../topics/http/file-uploads.html#uploading-multiple-files"><span class="std std-ref">複数のファイルをアップロードする</span></a> トピックではそれとは違うことを示唆していました。</p>
+<p>脆弱性を回避するために、<a class="reference internal" href="../ref/forms/widgets.html#django.forms.ClearableFileInput" title="django.forms.ClearableFileInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClearableFileInput</span></code></a> と <a class="reference internal" href="../ref/forms/widgets.html#django.forms.FileInput" title="django.forms.FileInput"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileInput</span></code></a> フォームウィジェットは、<code class="docutils literal notranslate"><span class="pre">multiple</span></code> HTML 属性が設定されている場合に <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> を発生させるようになりました。例外を防ぎ、以前の動作を維持するには、 <code class="docutils literal notranslate"><span class="pre">allow_multiple_selected</span></code> を <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定してください。</p>
+<p>新しい属性の使用方法や、1つのフィールドを介して複数のファイルを処理する詳細については、<a class="reference internal" href="../topics/http/file-uploads.html#uploading-multiple-files"><span class="std std-ref">複数のファイルをアップロードする</span></a> を参照してください。</p>
+</section>
+<section id="s-bugfixes">
+<span id="bugfixes"></span><h2>バグ修正<a class="headerlink" href="#bugfixes" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>Django 4.2 で、属性名でフィールドを遅延読み込みするときに <code class="docutils literal notranslate"><span class="pre">QuerySet.defer()</span></code> がクラッシュするリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34458">#34458</a>)。</p></li>
+<li><p><a class="reference internal" href="../ref/contrib/postgres/search.html#django.contrib.postgres.search.SearchVector" title="django.contrib.postgres.search.SearchVector"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchVector</span></code></a> 関数が <code class="docutils literal notranslate"><span class="pre">%</span></code> 文字でクラッシュする Django 4.2 のリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34459">#34459</a>).</p></li>
+<li><p>Django 4.2 で、明示的なグループ化を使用するクエリに対する集計が間違った列に対してグループ化されるリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34464">#34464</a>)。</p></li>
+<li><p>Django 4.2 のリグレッションに従い、PostgreSQL の <a class="reference internal" href="../ref/settings.html#std-setting-OPTIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">OPTIONS</span></code></a> で <code class="docutils literal notranslate"><span class="pre">&quot;cursor_factory&quot;</span></code> オプションを設定することを許可しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34466">#34466</a>)。</p></li>
+<li><p>Django 4.2のリグレッション (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34470">#34470</a>) に対処し、PostgreSQL のクライアントエンコーディングを UTF-8 に強制しました。</p></li>
+<li><p>Django 4.2 で、 <code class="docutils literal notranslate"><span class="pre">i18n_patterns()</span></code> が <code class="docutils literal notranslate"><span class="pre">prefix_default_language</span></code> 引数にデフォルト言語のフォールバック言語を指定した場合に、 <code class="docutils literal notranslate"><span class="pre">prefix_default_language</span></code> を尊重していなかったリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34455">#34455</a>).</p></li>
+<li><p>Django 4.2 で、 <code class="docutils literal notranslate"><span class="pre">prefix_default_language</span></code> を <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定した <code class="docutils literal notranslate"><span class="pre">i18n_patterns()</span></code> からデフォルト言語の URL を翻訳すると、異なる言語のリクエストに対して 404 エラーが発生するリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34515`">#34515`</a>)。</p></li>
+<li><p>Django 4.2 で、<code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code>, <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> およびそのサブクラスのコピーやディープコピーの作成が正しく動作しない場合があるリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34482">#34482</a>, <a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34484">#34484</a>).</p></li>
+<li><p>Django 4.2 で、 <code class="docutils literal notranslate"><span class="pre">timesince</span></code> と <code class="docutils literal notranslate"><span class="pre">timeuntil</span></code> のテンプレートフィルタが、時差が 1 日未満の場合に、UTC 以外のタイムゾーンを持つ datetime に対して正しくない結果を返すというリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34483">#34483</a>)。</p></li>
+<li><p><a class="reference internal" href="../ref/contrib/postgres/search.html#django.contrib.postgres.search.SearchHeadline" title="django.contrib.postgres.search.SearchHeadline"><code class="xref py py-class docutils literal notranslate"><span class="pre">SearchHeadline</span></code></a> 関数が <code class="docutils literal notranslate"><span class="pre">psycopg</span></code> 3でクラッシュする Django 4.2 のリグレッション (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34486">#34486</a>) を修正しました。</p></li>
+<li><p>Django 4.2 で、admin 画面の <code class="docutils literal notranslate"><span class="pre">ClearableFileInput</span></code> のマージンが正しくないリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34506">#34506</a>)。</p></li>
+<li><p>Django 4.2 で、admin サイトのアプリインデックスビューにパンくずリストが表示されないリグレッションを修正しました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34512">#34512</a>).</p></li>
+<li><p>マイグレーションをスカッシュする際に、 <code class="docutils literal notranslate"><span class="pre">AddIndex</span></code>、<code class="docutils literal notranslate"><span class="pre">RemoveIndex</span></code>、<code class="docutils literal notranslate"><span class="pre">RenameIndex</span></code>、および <code class="docutils literal notranslate"><span class="pre">CreateModel</span></code> の操作を削減しました。これにより、履歴マイグレーションから非推奨の <code class="docutils literal notranslate"><span class="pre">Meta.index_together</span></code> オプションを削除し、代わりに <code class="docutils literal notranslate"><span class="pre">Meta.indexes</span></code> を使用できるようになりました (<a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/34525">#34525</a>)。</p></li>
+</ul>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Django 4.2.1 リリースノート</a><ul>
+<li><a class="reference internal" href="#cve-2023-31047-potential-bypass-of-validation-when-uploading-multiple-files-using-one-form-field">CVE-2023-31047: 1つのフォームフィールドを使用して複数のファイルをアップロードする際の検証のバイパスが可能な脆弱性</a></li>
+<li><a class="reference internal" href="#bugfixes">バグ修正</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="4.2.2.html"
+                          title="前の章へ">Django 4.2.2 リリースノート</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="4.2.html"
+                          title="次の章へ">Django 4.2 リリースノート</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/releases/4.2.1.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="4.2.2.html" title="Django 4.2.2 リリースノート">previous</a>
+     |
+    <a href="index.html" title="リリースノート" accesskey="U">up</a>
+   |
+    <a href="4.2.html" title="Django 4.2 リリースノート">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>エラーレポートの管理 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="Djangoアプリケーションを削除する" href="delete-app.html" />
+    <link rel="prev" title="ロギングの設定と利用" href="logging.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="logging.html" title="ロギングの設定と利用">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="delete-app.html" title="Djangoアプリケーションを削除する">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-error-reporting">
+            
+  <section id="s-how-to-manage-error-reporting">
+<span id="how-to-manage-error-reporting"></span><h1>エラーレポートの管理<a class="headerlink" href="#how-to-manage-error-reporting" title="Link to this heading">¶</a></h1>
+<p>サイトを公開している場合、<a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> 設定は常にオフにしておかなければなりません。これにより、サーバー動作は高速になり、エラーページによって明らかになるアプリケーションの詳細が悪意あるユーザーに漏れるのを防ぎます。</p>
+<p>しかし、 <a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> を <code class="docutils literal notranslate"><span class="pre">False</span></code> にセットして実行すると、サイトによって生成されるエラーが見られなくなります――表示されるのは万人向けのエラーページだけです。そこで、本番サイトで起きたエラーを追跡するために、Django ではこれらのエラーに関する詳細なレポートを作成するように設定できます。</p>
+<section id="s-email-reports">
+<span id="email-reports"></span><h2>E メールのレポート<a class="headerlink" href="#email-reports" title="Link to this heading">¶</a></h2>
+<section id="s-server-errors">
+<span id="server-errors"></span><h3>サーバーエラー<a class="headerlink" href="#server-errors" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">False</span></code> であるとき、コードがハンドリングされない例外を起こして内部サーバーエラーが起きると (厳密には、500 以上の HTTP ステータスコードを持つ全てのレスポンスが返ってくると)、Django は <a class="reference internal" href="../ref/settings.html#std-setting-ADMINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ADMINS</span></code></a> 設定のリストに含まれるユーザーにメールを送信します。これにより、管理者はすぐにエラーの通知を受け取ることができます。メールには、<a class="reference internal" href="../ref/settings.html#std-setting-ADMINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ADMINS</span></code></a> はエラーの説明、Python のトレースバック全体、エラーを引き起こした HTTP リクエストの詳細について書かれています。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>メールを送信するために、Django はメールサーバーへの接続方法をいくつか設定する必要があります。最低限 <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST</span></code></a> と、おそらく <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST_USER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST_USER</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST_PASSWORD"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST_PASSWORD</span></code></a> を指定する必要がありますが、メールサーバーの設定によっては他の設定も必要かもしれません。メール関連の設定の一覧は <a class="reference internal" href="../ref/settings.html"><span class="doc">Django の設定のドキュメント</span></a> を参照してください。</p>
+</div>
+<p>デフォルトでは、 Django は <a class="reference external" href="mailto:root&#37;&#52;&#48;localhost">root<span>&#64;</span>localhost</a> からメールを送信します。しかし、メールプロバイダによっては、このアドレスからのメールを全て拒否します。別の送信者アドレスを使うには、 <a class="reference internal" href="../ref/settings.html#std-setting-SERVER_EMAIL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SERVER_EMAIL</span></code></a> 設定を変更してください。</p>
+<p>この動作を有効にするには、受信者のメールアドレスを <a class="reference internal" href="../ref/settings.html#std-setting-ADMINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ADMINS</span></code></a> 設定に含めます。</p>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>サーバーエラーのメールはロギングフレームワークを使って送信されるので、 <a class="reference internal" href="../topics/logging.html"><span class="doc">ロギングの設定をカスタマイズする</span></a> ことで動作を変更できます。</p>
+</div>
+</section>
+<section id="s-errors">
+<span id="errors"></span><h3>404 エラー<a class="headerlink" href="#errors" title="Link to this heading">¶</a></h3>
+<p>Django は、リンク切れに関するエラー (404 &quot;page not found&quot; エラー) をメールで送信するように設定することもできます。Django は以下の場合に 404 エラーに関するメールを送ります:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">False</span></code> のとき;</p></li>
+<li><p><a class="reference internal" href="../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> 設定に <a class="reference internal" href="../ref/middleware.html#django.middleware.common.BrokenLinkEmailsMiddleware" title="django.middleware.common.BrokenLinkEmailsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.middleware.common.BrokenLinkEmailsMiddleware</span></code></a> が含まれているとき。</p></li>
+</ul>
+<p>これらの条件が満たされると、Django はあなたのコードが 404 を発生させ、そのリクエストがリファラを持っている場合、 <a class="reference internal" href="../ref/settings.html#std-setting-MANAGERS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MANAGERS</span></code></a> 設定にリストされているユーザにメールを送ります。リファラを持たない 404 にはわざわざメールを送りません。それは大抵、壊れた URL を入力したユーザか、壊れた Web ボットです。また、リファラがリクエストされた URL と同じ場合の 404 も無視します。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="../ref/middleware.html#django.middleware.common.BrokenLinkEmailsMiddleware" title="django.middleware.common.BrokenLinkEmailsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">BrokenLinkEmailsMiddleware</span></code></a> は、 <a class="reference internal" href="../ref/middleware.html#django.middleware.locale.LocaleMiddleware" title="django.middleware.locale.LocaleMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocaleMiddleware</span></code></a> や <a class="reference internal" href="../ref/contrib/flatpages.html#django.contrib.flatpages.middleware.FlatpageFallbackMiddleware" title="django.contrib.flatpages.middleware.FlatpageFallbackMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">FlatpageFallbackMiddleware</span></code></a> のような 404 エラーを検出する他のミドルウェアよりも前に表示する必要があります。これを <a class="reference internal" href="../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> 設定の一番上に置いてください。</p>
+</div>
+<p>特定の 404 を報告しないように Django に指示するには、 <a class="reference internal" href="../ref/settings.html#std-setting-IGNORABLE_404_URLS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">IGNORABLE_404_URLS</span></code></a> 設定をいじります。これはコンパイルされた正規表現オブジェクトのリストでなければなりません。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="n">IGNORABLE_404_URLS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\.(php|cgi)$&quot;</span><span class="p">),</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^/phpmyadmin/&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>この例では、 <code class="docutils literal notranslate"><span class="pre">.php</span></code> または <code class="docutils literal notranslate"><span class="pre">.cgi</span></code> で終わる URL への 404 は報告されません。また、 <code class="docutils literal notranslate"><span class="pre">/phpmyadmin/</span></code> で始まるURLも報告されません。</p>
+<p>以下は、ブラウザやクローラがよくリクエストする従来の URL を除外する方法の例です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="n">IGNORABLE_404_URLS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^/apple-touch-icon.*\.png$&quot;</span><span class="p">),</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^/favicon\.ico$&quot;</span><span class="p">),</span>
+    <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^/robots\.txt$&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>(これらは正規表現なので、ピリオドの前にバックスラッシュを入れてエスケープしていることに注意してください)</p>
+<p><a class="reference internal" href="../ref/middleware.html#django.middleware.common.BrokenLinkEmailsMiddleware" title="django.middleware.common.BrokenLinkEmailsMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.middleware.common.BrokenLinkEmailsMiddleware</span></code></a> の動作をさらにカスタマイズしたい場合(例えば、ウェブクローラからのリクエストを無視したい場合など)は、サブクラスを作成し、そのメソッドをオーバーライドしてください。</p>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>404エラーはロギングフレームワークを使って記録されます。デフォルトではこれらのログレコードは無視されますが、ハンドラを書いて <a class="reference internal" href="../topics/logging.html"><span class="doc">ロギングを適切に設定する</span></a> ことで、エラー報告に使うことができます。</p>
+</div>
+</section>
+</section>
+<section id="s-filtering-error-reports">
+<span id="s-id1"></span><span id="filtering-error-reports"></span><span id="id1"></span><h2>エラーレポートをフィルタリングする<a class="headerlink" href="#filtering-error-reports" title="Link to this heading">¶</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>機密データのフィルタリングは難しい問題であり、機密データがエラーレポートに漏れないことを保証することはほとんど不可能です。したがって、エラーレポートは信頼できるチームメンバーのみが利用できるようにし、インターネット上で暗号化されていないエラーレポートを送信することは避けるべきです（電子メールなど）。</p>
+</div>
+<section id="s-filtering-sensitive-information">
+<span id="filtering-sensitive-information"></span><h3>機密情報のフィルタリング<a class="headerlink" href="#filtering-sensitive-information" title="Link to this heading">¶</a></h3>
+<p>エラーレポートはエラーのデバッグにとても役立つので、通常は、エラーに関する関連情報をできるだけ多く記録しておくと便利です。例えば、デフォルトでは Django は発生した例外の <a class="reference external" href="https://en.wikipedia.org/wiki/Stack_trace">full traceback</a> や、各 <a class="reference external" href="https://en.wikipedia.org/wiki/Stack_frame">traceback frame</a> のローカル変数、 <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> の <a class="reference internal" href="../ref/request-response.html#httprequest-attributes"><span class="std std-ref">属性</span></a> を記録します。</p>
+<p>しかし、例えばユーザのパスワードやクレジットカード番号のように、ある種の情報は機密性が高すぎるため、記録するのが適切でない場合があります。そこで Django では、 <a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> ドキュメントで説明されているように、機密性が高そうな設定をフィルタリングすることに加えて、本番環境 (つまり、 <a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定されている場合) でエラーレポートからフィルタリングされる情報を制御するのに役立つ関数デコレータを提供しています。 <a class="reference internal" href="#django.views.decorators.debug.sensitive_variables" title="django.views.decorators.debug.sensitive_variables"><code class="xref py py-func docutils literal notranslate"><span class="pre">sensitive_variables()</span></code></a> と <a class="reference internal" href="#django.views.decorators.debug.sensitive_post_parameters" title="django.views.decorators.debug.sensitive_post_parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">sensitive_post_parameters()</span></code></a> です。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.decorators.debug.sensitive_variables">
+<span class="sig-name descname"><span class="pre">sensitive_variables</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">variables</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/decorators/debug.py#L11"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.decorators.debug.sensitive_variables" title="Link to this definition">¶</a></dt>
+<dd><p>コード内の関数（ビューまたは通常のコールバック）が機密情報を含む可能性のあるローカル変数を使用している場合、 <code class="docutils literal notranslate"><span class="pre">sensitive_variables</span></code> デコレータを使用することで、それらの変数の値がエラーレポートに含まれないようにすることができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">sensitive_variables</span>
+
+
+<span class="nd">@sensitive_variables</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;pw&quot;</span><span class="p">,</span> <span class="s2">&quot;cc&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_info</span><span class="p">(</span><span class="n">user</span><span class="p">):</span>
+    <span class="n">pw</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">pass_word</span>
+    <span class="n">cc</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">credit_card_number</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">name</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>上記の例では、 <code class="docutils literal notranslate"><span class="pre">user</span></code>、<code class="docutils literal notranslate"><span class="pre">pw</span></code>、<code class="docutils literal notranslate"><span class="pre">cc</span></code> の値は非表示になり、エラーレポートではアスタリスク (<code class="docutils literal notranslate"><span class="pre">*******</span></code>) に置き換えられますが、 <code class="docutils literal notranslate"><span class="pre">name</span></code> 変数の値は公開されます。</p>
+<p>関数のすべてのローカル変数をエラーログから徹底的に隠す場合は、引数なしで <code class="docutils literal notranslate"><span class="pre">sensitive_variables</span></code> デコレーターを使います:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@sensitive_variables</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_function</span><span class="p">():</span> <span class="o">...</span>
+</pre></div>
+</div>
+<div class="admonition-when-using-multiple-decorators admonition">
+<p class="admonition-title">複数のデコレータを使うとき</p>
+<p>非表示にしたい変数が関数の引数でもある場合 (例えば、次の例では '<code class="docutils literal notranslate"><span class="pre">user</span></code>') 、そしてデコレートされた関数に複数のデコレーターがある場合は、 <code class="docutils literal notranslate"><span class="pre">&#64;sensitive_variables</span></code> をデコレーターチェインの先頭に置くようにしてください。こうすることで、関数の引数が他のデコレータに渡される際に、その引数を隠すことができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@sensitive_variables</span><span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;pw&quot;</span><span class="p">,</span> <span class="s2">&quot;cc&quot;</span><span class="p">)</span>
+<span class="nd">@some_decorator</span>
+<span class="nd">@another_decorator</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">process_info</span><span class="p">(</span><span class="n">user</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p><code class="docutils literal notranslate"><span class="pre">async</span></code> 関数のラップをサポートしました。</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.decorators.debug.sensitive_post_parameters">
+<span class="sig-name descname"><span class="pre">sensitive_post_parameters</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">parameters</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/decorators/debug.py#L82"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.decorators.debug.sensitive_post_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>もしビューの 1 つが <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> オブジェクトを <a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.POST" title="django.http.HttpRequest.POST"><code class="xref py py-attr docutils literal notranslate"><span class="pre">POST</span> <span class="pre">parameters</span></code></a> で受け取った場合、機密情報が含まれている可能性があるので、 <code class="docutils literal notranslate"><span class="pre">sensitive_post_parameters</span></code> デコレータを使って、エラーレポートにそのパラメータの値が含まれないようにすることができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">sensitive_post_parameters</span>
+
+
+<span class="nd">@sensitive_post_parameters</span><span class="p">(</span><span class="s2">&quot;pass_word&quot;</span><span class="p">,</span> <span class="s2">&quot;credit_card_number&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">record_user_profile</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">UserProfile</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+        <span class="n">password</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s2">&quot;pass_word&quot;</span><span class="p">],</span>
+        <span class="n">credit_card</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s2">&quot;credit_card_number&quot;</span><span class="p">],</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>上の例では、 <code class="docutils literal notranslate"><span class="pre">pass_word</span></code> と <code class="docutils literal notranslate"><span class="pre">credit_card_number</span></code> のPOSTパラメータの値は隠され、エラーレポート内のリクエストの表現ではアスタリスク (<code class="docutils literal notranslate"><span class="pre">*******</span></code>) に置き換えられますが、 <code class="docutils literal notranslate"><span class="pre">name</span></code> パラメータの値は公開されます。</p>
+<p>エラーレポートでリクエストの全てのPOSTパラメータを徹底的に隠す場合は、 引数なしで <code class="docutils literal notranslate"><span class="pre">sensitive_post_parameters</span></code> デコレータを使います:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@sensitive_post_parameters</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>特定の <a class="reference internal" href="../topics/auth/default.html#module-django.contrib.auth.views" title="django.contrib.auth.views"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.auth.views</span></code></a> のビュー (<code class="docutils literal notranslate"><span class="pre">auth</span></code> admin 内の <code class="docutils literal notranslate"><span class="pre">login</span></code>, <code class="docutils literal notranslate"><span class="pre">password_reset_confirm</span></code>, <code class="docutils literal notranslate"><span class="pre">password_change</span></code>, <code class="docutils literal notranslate"><span class="pre">auth</span></code> admin の <code class="docutils literal notranslate"><span class="pre">add_view</span></code> と <code class="docutils literal notranslate"><span class="pre">user_change_password</span></code>) のエラーレポートから、すべての POST パラメータが徹底的にフィルタされ、ユーザパスワードのような機密情報の漏洩を防ぎます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p><code class="docutils literal notranslate"><span class="pre">async</span></code> 関数のラップをサポートしました。</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-custom-error-reports">
+<span id="s-id2"></span><span id="custom-error-reports"></span><span id="id2"></span><h3>カスタムエラーレポート<a class="headerlink" href="#custom-error-reports" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="#django.views.decorators.debug.sensitive_variables" title="django.views.decorators.debug.sensitive_variables"><code class="xref py py-func docutils literal notranslate"><span class="pre">sensitive_variables()</span></code></a> と <a class="reference internal" href="#django.views.decorators.debug.sensitive_post_parameters" title="django.views.decorators.debug.sensitive_post_parameters"><code class="xref py py-func docutils literal notranslate"><span class="pre">sensitive_post_parameters()</span></code></a> がすることは、それぞれ、装飾された関数にセンシティブな変数名をアノテートし、<code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> オブジェクトにセンシティブな POST パラメータ名をアノテートするだけです。実際のフィルタリングは Django のデフォルトのエラーレポートフィルタ ( <a class="reference internal" href="#django.views.debug.SafeExceptionReporterFilter" title="django.views.debug.SafeExceptionReporterFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.debug.SafeExceptionReporterFilter</span></code></a> ) で行われます。このフィルタはデコレータのアノテーションを使い、エラーレポートが生成される際に、対応する値をアスタリスク (<code class="docutils literal notranslate"><span class="pre">*******</span></code>) に置き換えます。このデフォルトの動作を上書きしたり、サイト全体でカスタマイズしたい場合は、独自のフィルタクラスを定義し、 <a class="reference internal" href="../ref/settings.html#std-setting-DEFAULT_EXCEPTION_REPORTER_FILTER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_EXCEPTION_REPORTER_FILTER</span></code></a> 設定でそれを使うように Django に指示する必要があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEFAULT_EXCEPTION_REPORTER_FILTER</span> <span class="o">=</span> <span class="s2">&quot;path.to.your.CustomExceptionReporterFilter&quot;</span>
+</pre></div>
+</div>
+<p>また、 <code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> の <code class="docutils literal notranslate"><span class="pre">exception_reporter_filter</span></code> 属性を指定することで、任意のビューで使用するフィルタをより細かく制御できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">exception_reporter_filter</span> <span class="o">=</span> <span class="n">CustomExceptionReporterFilter</span><span class="p">()</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>カスタムフィルタクラスは <a class="reference internal" href="#django.views.debug.SafeExceptionReporterFilter" title="django.views.debug.SafeExceptionReporterFilter"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.debug.SafeExceptionReporterFilter</span></code></a> を継承し、以下の属性とメソッドをオーバーライドする必要があります:</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.debug.SafeExceptionReporterFilter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SafeExceptionReporterFilter</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L108"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.SafeExceptionReporterFilter" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.debug.SafeExceptionReporterFilter.cleansed_substitute">
+<span class="sig-name descname"><span class="pre">cleansed_substitute</span></span><a class="headerlink" href="#django.views.debug.SafeExceptionReporterFilter.cleansed_substitute" title="Link to this definition">¶</a></dt>
+<dd><p>センシティブな値を置換する文字列値。デフォルトでは、センシティブな変数の値をアスタリスク (<code class="docutils literal notranslate"><span class="pre">*******</span></code>) で置き換えます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.debug.SafeExceptionReporterFilter.hidden_settings">
+<span class="sig-name descname"><span class="pre">hidden_settings</span></span><a class="headerlink" href="#django.views.debug.SafeExceptionReporterFilter.hidden_settings" title="Link to this definition">¶</a></dt>
+<dd><p>センシティブな設定や <code class="docutils literal notranslate"><span class="pre">request.META</span></code> にマッチする正規表現オブジェクト。デフォルトでは下記です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;API|TOKEN|KEY|SECRET|PASS|SIGNATURE|HTTP_COOKIE&quot;</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.debug.SafeExceptionReporterFilter.is_active">
+<span class="sig-name descname"><span class="pre">is_active</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L175"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.SafeExceptionReporterFilter.is_active" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.views.debug.SafeExceptionReporterFilter.get_post_parameters" title="django.views.debug.SafeExceptionReporterFilter.get_post_parameters"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_post_parameters()</span></code></a> と <a class="reference internal" href="#django.views.debug.SafeExceptionReporterFilter.get_traceback_frame_variables" title="django.views.debug.SafeExceptionReporterFilter.get_traceback_frame_variables"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_traceback_frame_variables()</span></code></a> のフィルタリングを有効にする場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> を返します。デフォルトでは <a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合に有効になります。 <a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> のドキュメントにあるように、センシティブな <code class="docutils literal notranslate"><span class="pre">request.META</span></code> の値は常に、センシティブな設定値とともにフィルタリングされることに注意してください。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.debug.SafeExceptionReporterFilter.get_post_parameters">
+<span class="sig-name descname"><span class="pre">get_post_parameters</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L198"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.SafeExceptionReporterFilter.get_post_parameters" title="Link to this definition">¶</a></dt>
+<dd><p>フィルタリングされた POST パラメータの辞書を返します。センシティブな値は <a class="reference internal" href="#django.views.debug.SafeExceptionReporterFilter.cleansed_substitute" title="django.views.debug.SafeExceptionReporterFilter.cleansed_substitute"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cleansed_substitute</span></code></a> で置換されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.debug.SafeExceptionReporterFilter.get_traceback_frame_variables">
+<span class="sig-name descname"><span class="pre">get_traceback_frame_variables</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tb_frame</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L239"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.SafeExceptionReporterFilter.get_traceback_frame_variables" title="Link to this definition">¶</a></dt>
+<dd><p>与えられたトレースバックフレームのローカル変数のフィルタリングされた辞書を返します。センシティブな値は <a class="reference internal" href="#django.views.debug.SafeExceptionReporterFilter.cleansed_substitute" title="django.views.debug.SafeExceptionReporterFilter.cleansed_substitute"><code class="xref py py-attr docutils literal notranslate"><span class="pre">cleansed_substitute</span></code></a> で置き換えられます。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>フィルタリングの他にエラーレポートをカスタマイズする必要がある場合は、 <a class="reference internal" href="../ref/settings.html#std-setting-DEFAULT_EXCEPTION_REPORTER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_EXCEPTION_REPORTER</span></code></a> 設定を定義することでカスタムエラーレポータークラスを指定できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DEFAULT_EXCEPTION_REPORTER</span> <span class="o">=</span> <span class="s2">&quot;path.to.your.CustomExceptionReporter&quot;</span>
+</pre></div>
+</div>
+<p>例外レポーターは例外レポートデータをコンパイルし、テキストまたはHTMLとして適切にフォーマットする責任があります。(例外報告レポーターは、例外レポートデータを作成する際に <a class="reference internal" href="../ref/settings.html#std-setting-DEFAULT_EXCEPTION_REPORTER_FILTER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_EXCEPTION_REPORTER_FILTER</span></code></a> を使用します)。</p>
+<p>カスタムレポータークラスは <a class="reference internal" href="#django.views.debug.ExceptionReporter" title="django.views.debug.ExceptionReporter"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.debug.ExceptionReporter</span></code></a> を継承する必要があります。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.debug.ExceptionReporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ExceptionReporter</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L310"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.ExceptionReporter" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.debug.ExceptionReporter.html_template_path">
+<span class="sig-name descname"><span class="pre">html_template_path</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L314"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.ExceptionReporter.html_template_path" title="Link to this definition">¶</a></dt>
+<dd><p>例外の HTML 表現をレンダリングするテンプレートへの絶対ファイルシステムパスを表す <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> を返すプロパティです。デフォルトは Django が提供するテンプレートです。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.debug.ExceptionReporter.text_template_path">
+<span class="sig-name descname"><span class="pre">text_template_path</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L318"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.ExceptionReporter.text_template_path" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">pathlib.Path</span></code></a> を返すプロパティで、例外のプレーンテキスト表現をレンダリングするテンプレー トへのファイルシステムの絶対パスを表します。デフォルトは Django が提供するテンプレートです。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.debug.ExceptionReporter.get_traceback_data">
+<span class="sig-name descname"><span class="pre">get_traceback_data</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L344"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.ExceptionReporter.get_traceback_data" title="Link to this definition">¶</a></dt>
+<dd><p>トレースバック情報を含む辞書を返します。</p>
+<p>これは、例えば例外レポートをカスタマイズするための主な拡張ポイントです。例えば下記のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.debug</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExceptionReporter</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomExceptionReporter</span><span class="p">(</span><span class="n">ExceptionReporter</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_traceback_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_traceback_data</span><span class="p">()</span>
+        <span class="c1"># ... remove/add something here ...</span>
+        <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.debug.ExceptionReporter.get_traceback_html">
+<span class="sig-name descname"><span class="pre">get_traceback_html</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L424"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.ExceptionReporter.get_traceback_html" title="Link to this definition">¶</a></dt>
+<dd><p>例外レポートの HTML 版を返します。</p>
+<p>デバッグ 500 HTTP エラー・ページの HTML 版に使用されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.debug.ExceptionReporter.get_traceback_text">
+<span class="sig-name descname"><span class="pre">get_traceback_text</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/debug.py#L431"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.debug.ExceptionReporter.get_traceback_text" title="Link to this definition">¶</a></dt>
+<dd><p>例外レポートのプレーンテキスト版を返します。</p>
+<p>デバッグ 500 HTTP エラーページおよび E メールレポートのプレーンテキスト版に使用されます。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>フィルタクラスと同様に、 <code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> の <code class="docutils literal notranslate"><span class="pre">exception_reporter_class</span></code> 属性を指定することで、任意のビューで使用する例外レポータークラスを制御できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">exception_reporter_class</span> <span class="o">=</span> <span class="n">CustomExceptionReporter</span><span class="p">()</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>また、独自の <a class="reference internal" href="../topics/http/middleware.html#exception-middleware"><span class="std std-ref">例外ミドルウェア</span></a> を書くことで、独自のエラーレポートを設定することもできます。もしカスタムエラー処理を書くのであれば、 Django の組み込みエラー処理を真似て、 <a class="reference internal" href="../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合のみエラーを報告/ログ出力するようにすると良いでしょう。</p>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">エラーレポートの管理</a><ul>
+<li><a class="reference internal" href="#email-reports">E メールのレポート</a><ul>
+<li><a class="reference internal" href="#server-errors">サーバーエラー</a></li>
+<li><a class="reference internal" href="#errors">404 エラー</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#filtering-error-reports">エラーレポートをフィルタリングする</a><ul>
+<li><a class="reference internal" href="#filtering-sensitive-information">機密情報のフィルタリング</a></li>
+<li><a class="reference internal" href="#custom-error-reports">カスタムエラーレポート</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="logging.html"
+                          title="前の章へ">ロギングの設定と利用</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="delete-app.html"
+                          title="次の章へ">Djangoアプリケーションを削除する</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/error-reporting.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="logging.html" title="ロギングの設定と利用">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="delete-app.html" title="Djangoアプリケーションを削除する">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

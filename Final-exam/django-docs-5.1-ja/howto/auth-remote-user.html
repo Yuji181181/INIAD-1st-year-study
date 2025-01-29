@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>REMOTE_USER で認証する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="Django の CSRF 保護を利用する" href="csrf.html" />
+    <link rel="prev" title="静的ファイルをデプロイする" href="static-files/deployment.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="static-files/deployment.html" title="静的ファイルをデプロイする">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="csrf.html" title="Django の CSRF 保護を利用する">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-auth-remote-user">
+            
+  <section id="s-how-to-authenticate-using-remote-user">
+<span id="how-to-authenticate-using-remote-user"></span><h1><code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> で認証する<a class="headerlink" href="#how-to-authenticate-using-remote-user" title="Link to this heading">¶</a></h1>
+<p>このドキュメントは、Djangoアプリケーションで外部認証ソース（Webサーバーが <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> 環境変数を設定する場合）を利用する方法について説明しています。このタイプの認証ソリューションは、通常、IIS＋統合Windows認証や、Apache＋ <a class="reference external" href="https://httpd.apache.org/docs/current/mod/mod_authnz_ldap.html">mod_authnz_ldap</a> 、 <a class="reference external" href="https://www.apereo.org/projects/cas">CAS</a> 、 <a class="reference external" href="https://uit.stanford.edu/service/authentication">WebAuth</a> 、 <a class="reference external" href="https://sourceforge.net/projects/mod-auth-sspi">mod_auth_sspi</a> などのシングルサインオンソリューションを備えたイントラネットサイトで見られます。</p>
+<p>Web サーバーが認証を行う際には、一般に下層のアプリケーションで使用される <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> 環境変数を設定します。Django では、<a class="reference internal" href="../ref/request-response.html#django.http.HttpRequest.META" title="django.http.HttpRequest.META"><code class="xref py py-attr docutils literal notranslate"><span class="pre">request.META</span></code></a> 属性から <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> が利用できます。Django は <code class="docutils literal notranslate"><span class="pre">RemoteUserMiddleware</span></code> または <code class="docutils literal notranslate"><span class="pre">PersistentRemoteUserMiddleware</span></code> 、そして <a class="reference internal" href="../topics/auth/index.html#module-django.contrib.auth" title="django.contrib.auth: Django's authentication framework."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.auth</span></code></a> に含まれる <a class="reference internal" href="../ref/contrib/auth.html#module-django.contrib.auth.backends" title="django.contrib.auth.backends: Django's built-in authentication backend classes."><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.backends</span></code></a> を使うことで <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> の値を利用できるように設定できます。</p>
+<section id="s-configuration">
+<span id="configuration"></span><h2>設定<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h2>
+<p>最初に次のように <a class="reference internal" href="../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> 設定に <a class="reference internal" href="../ref/middleware.html#django.contrib.auth.middleware.RemoteUserMiddleware" title="django.contrib.auth.middleware.RemoteUserMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.middleware.RemoteUserMiddleware</span></code></a> を加える必要があります。これは <a class="reference internal" href="../ref/middleware.html#django.contrib.auth.middleware.AuthenticationMiddleware" title="django.contrib.auth.middleware.AuthenticationMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.auth.middleware.AuthenticationMiddleware</span></code></a> の <strong>後に</strong> 追加してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MIDDLEWARE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.auth.middleware.AuthenticationMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.auth.middleware.RemoteUserMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>続いて、<a class="reference internal" href="../ref/settings.html#std-setting-AUTHENTICATION_BACKENDS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">AUTHENTICATION_BACKENDS</span></code></a> 設定の <a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.backends.ModelBackend" title="django.contrib.auth.backends.ModelBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelBackend</span></code></a> を <a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.backends.RemoteUserBackend" title="django.contrib.auth.backends.RemoteUserBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteUserBackend</span></code></a> に変更します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">AUTHENTICATION_BACKENDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;django.contrib.auth.backends.RemoteUserBackend&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>この設定を行うと <code class="docutils literal notranslate"><span class="pre">RemoteUserMiddleware</span></code> は <code class="docutils literal notranslate"><span class="pre">request.META['REMOTE_USER']</span></code> 内の username を検索し、 <a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.backends.RemoteUserBackend" title="django.contrib.auth.backends.RemoteUserBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteUserBackend</span></code></a> を使用したユーザーの認証と自動ログインを行います。</p>
+<p>この特定の設定は、デフォルトの <code class="docutils literal notranslate"><span class="pre">ModelBackend</span></code> による認証を無効にすることに注意してください。つまり、 <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> の値が設定されていなければ、Django の admin interface を使ったとしても、ユーザーはログインすることができないということです。 <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> が存在しない場合のフォールバックとして <code class="docutils literal notranslate"><span class="pre">AUTHENTICATION_BACKENDS</span></code> のリストに <code class="docutils literal notranslate"><span class="pre">'django.contrib.auth.backends.ModelBackend'</span></code>  を追加しておけば、この問題は解決できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">contrib.admin</span></code> 画面や <a class="reference internal" href="../ref/django-admin.html#django-admin-createsuperuser"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">createsuperuser</span></code></a> 管理コマンドなどの、Django のユーザ管理機能はリモートユーザを統合管理しません。これらのインタフェースは <code class="docutils literal notranslate"><span class="pre">AUTHENTICATION_BACKENDS</span></code> の設定にかかわらず、データベース中のユーザだけを管理します。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">RemoteUserBackend</span></code> を <code class="docutils literal notranslate"><span class="pre">ModelBackend</span></code> から継承した後も、<code class="docutils literal notranslate"><span class="pre">ModelBackend</span></code> によってチェックが行われ、すべてのパーミッションが維持されます。</p>
+<p><a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.models.User.is_active" title="django.contrib.auth.models.User.is_active"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_active=False</span></code></a> 属性を持つユーザは認証が許可されません。許可したい場合は、<a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.backends.AllowAllUsersRemoteUserBackend" title="django.contrib.auth.backends.AllowAllUsersRemoteUserBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">AllowAllUsersRemoteUserBackend</span></code></a> を使用してください。</p>
+</div>
+<p>認証メカニズムが <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> 以外のカスタム HTTP ヘッダを使っている場合には、以下の例のように <code class="docutils literal notranslate"><span class="pre">RemoteUserMiddleware</span></code> をサブクラス化して、クラスの <code class="docutils literal notranslate"><span class="pre">header</span></code> 属性を適切な <code class="docutils literal notranslate"><span class="pre">request.META</span></code> のキー名に設定してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">RemoteUserMiddleware</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomHeaderMiddleware</span><span class="p">(</span><span class="n">RemoteUserMiddleware</span><span class="p">):</span>
+    <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;HTTP_AUTHUSER&quot;</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>もし <code class="docutils literal notranslate"><span class="pre">RemoteUserMiddleware</span></code> のサブクラスをカスタム HTTP ヘッダーとともに使う場合は、十分に注意してください。フロントエンドのウェブサーバは、適切な認証のチェックに基づいて、必ずヘッダーを設定または削除するようにしなければなりまません。偽の (もしくは「スプーフィングされた」) ヘッダー値を送ってくるエンドユーザーを決して許可してはいけません。たとえば、HTTP ヘッダの <code class="docutils literal notranslate"><span class="pre">X-Auth-User</span></code> と <code class="docutils literal notranslate"><span class="pre">X-Auth_User</span></code> は、両方とも <code class="docutils literal notranslate"><span class="pre">request.META</span></code> の <code class="docutils literal notranslate"><span class="pre">HTTP_X_AUTH_USER</span></code> キーに正規化されてしまうため、ウェブサーバーがダッシュの代わりにアンダースコアを使用してスプーフィングされたヘッダーを許容しないことを必ず確認しなければなりません。</p>
+<p>この警告は、デフォルト設定の <code class="docutils literal notranslate"><span class="pre">header</span> <span class="pre">=</span> <span class="pre">'REMOTE_USER'</span></code> になっている <code class="docutils literal notranslate"><span class="pre">RemoteUserMiddleware</span></code> には適用されません。なぜなら、<code class="docutils literal notranslate"><span class="pre">request.META</span></code> 内の <code class="docutils literal notranslate"><span class="pre">HTTP_</span></code> で始まらないキーは WSGI サーバだけが設定でき、、HTTP リクエストヘッダーから直接設定されるわけではないためです。</p>
+</div>
+<p>認証メカニズムをより細かく制御したい場合は、 <a class="reference internal" href="../ref/contrib/auth.html#django.contrib.auth.backends.RemoteUserBackend" title="django.contrib.auth.backends.RemoteUserBackend"><code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteUserBackend</span></code></a> を継承する独自の認証バックエンドを作成し、属性やメソッドをいくつかオーバライドしてください。</p>
+</section>
+<section id="s-using-remote-user-on-login-pages-only">
+<span id="s-persistent-remote-user-middleware-howto"></span><span id="using-remote-user-on-login-pages-only"></span><span id="persistent-remote-user-middleware-howto"></span><h2>ログインページでのみ <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> を使用する<a class="headerlink" href="#using-remote-user-on-login-pages-only" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">RemoteUserMiddleware</span></code> 認証ミドルウェアは、 HTTP リクエストヘッダーの <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> が認証されたリクエストに存在していることを想定しています。これは、<code class="docutils literal notranslate"><span class="pre">htpasswd</span></code> や同様のメカニズムを備えた Basic 認証であれば妥当で実用的かもしれませんが、Negotiate (GSSAPI/Kerberos) や他のリソース中心的な認証メソッドでは、フロントエンド HTTP サーバ内の認証は、通常、1つまたは少数のログイン URL しか設置せず、認証の成功後にもアプリケーションが認証されたセッション自体を維持することが想定されています。</p>
+<p><a class="reference internal" href="../ref/middleware.html#django.contrib.auth.middleware.PersistentRemoteUserMiddleware" title="django.contrib.auth.middleware.PersistentRemoteUserMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersistentRemoteUserMiddleware</span></code></a> は、このようなユースケースへのサポートを提供します。このミドルウェアは、ユーザーが明示的にログアウトするまで、認証されたセッションを維持しようとします。このクラスは、上述のドキュメント内の <a class="reference internal" href="../ref/middleware.html#django.contrib.auth.middleware.RemoteUserMiddleware" title="django.contrib.auth.middleware.RemoteUserMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteUserMiddleware</span></code></a> とドロップインで交換できます。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> で認証する</a><ul>
+<li><a class="reference internal" href="#configuration">設定</a></li>
+<li><a class="reference internal" href="#using-remote-user-on-login-pages-only">ログインページでのみ <code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> を使用する</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="static-files/deployment.html"
+                          title="前の章へ">静的ファイルをデプロイする</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="csrf.html"
+                          title="次の章へ">Django の CSRF 保護を利用する</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/auth-remote-user.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="static-files/deployment.html" title="静的ファイルをデプロイする">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="csrf.html" title="Django の CSRF 保護を利用する">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

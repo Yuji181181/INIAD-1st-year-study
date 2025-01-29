@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django FAQ よくある質問 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="FAQ: 一般的な質問" href="general.html" />
+    <link rel="prev" title="カスタムのストレージクラスを書く" href="../howto/custom-file-storage.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../howto/custom-file-storage.html" title="カスタムのストレージクラスを書く">previous</a>
+     |
+    <a title="Django 5.1.6.dev20250122212402 ドキュメント" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="general.html" title="FAQ: 一般的な質問">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="faq-index">
+            
+  <section id="s-django-faq">
+<span id="django-faq"></span><h1>Django FAQ よくある質問<a class="headerlink" href="#django-faq" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="general.html">FAQ: 一般的な質問</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="general.html#why-does-this-project-exist">Django というプロジェクトが作られた経緯を教えてください。</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#what-does-django-mean-and-how-do-you-pronounce-it">「Django」とはどういう意味で、どのように発音するのですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#is-django-stable">Django は安定したプロジェクトですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#does-django-scale">Django はスケールしますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#who-s-behind-this">Django はどんな組織が支援しているのですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#how-is-django-licensed">Djangoはどのようにライセンスされていますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#why-does-django-include-python-s-license-file">DjangoにPythonのライセンスファイルが含まれているのはなぜですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#which-sites-use-django">Django を使っているサイトを教えてください。</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#django-appears-to-be-a-mvc-framework-but-you-call-the-controller-the-view-and-the-view-the-template-how-come-you-don-t-use-the-standard-names">Django は MVC フレームワークのように思えるのですが、コントローラ (Controller) を「ビュー  (view)」と呼び、ビュー (View) を「テンプレート (template)」と呼んでいます。なぜ標準的な呼び方をしないのですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#framework-x-does-feature-y-why-doesn-t-django">&lt;フレームワーク X&gt; には &lt;機能 Y&gt; がありますが、なぜ Django にはないのですか</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#why-did-you-write-all-of-django-from-scratch-instead-of-using-other-python-libraries">なぜ既存の Python ライブラリを使わずスクラッチで Django を作ったのですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#is-django-a-content-management-system-cms">Django はコンテンツ管理システム (CMS) なのでしょうか?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#how-can-i-download-the-django-documentation-to-read-it-offline">Django のドキュメントをダウンロードしてオフラインで読むにはどうすればいいですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="general.html#how-do-i-cite-django">Django の引用に関して</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">FAQ: インストール</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="install.html#how-do-i-get-started">まずは何をすればよいですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#what-are-django-s-prerequisites">Django を動かすには何が必要ですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#what-python-version-can-i-use-with-django">どのバージョンの Python で Django が使えますか?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#what-python-version-should-i-use-with-django">DjangoでどのPythonのバージョンを使用すべきですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="install.html#should-i-use-the-stable-version-or-development-version">安定版と開発版のどちらを使うべきなのでしょうか？</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">FAQ: Django を使う</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#why-do-i-get-an-error-about-importing-django-settings-module"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_SETTINGS_MODULE</span></code> のインポートにまつわるエラーが出るのですが、なぜですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#i-can-t-stand-your-template-language-do-i-have-to-use-it">テンプレート言語を好きになれません。どうしても使わないとだめですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#do-i-have-to-use-your-model-database-layer">付属のモデル／データベースレイヤを使わねばならないのですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#how-do-i-use-image-and-file-fields">画像やファイルのフィールドはどう使うのですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage.html#how-do-i-make-a-variable-available-to-all-my-templates">どうやったら、全てのテンプレートで使える変数を定義できますか？</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="help.html">FAQ: 助けを求める</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="help.html#how-do-i-do-x-why-doesn-t-y-work-where-can-i-go-to-get-help">X をするにはどうすればいいですか？どうして Y は動かないのでしょうか？助けはどこで得られますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html#why-hasn-t-my-message-appeared-on-django-users">私のメッセージが <em>django-users</em> に表示されないようです。なぜでしょうか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html#nobody-answered-my-question-what-should-i-do">誰も私の質問に答えてくれません！どうしたらいいですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html#i-think-i-ve-found-a-bug-what-should-i-do">バグを発見したみたいです！何をするべきですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="help.html#i-think-i-ve-found-a-security-problem-what-should-i-do">セキュリティ上の問題を発見したようです！何をするべきですか？</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">FAQ: データベースとモデル</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#how-can-i-see-the-raw-sql-queries-django-is-running">Django が実行している生の SQL クエリを見られますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#can-i-use-django-with-a-preexisting-database">既存のデータベースで Django を使えますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#if-i-make-changes-to-a-model-how-do-i-update-the-database">モデルを変更した時、どのようにデータベースを更新すればよいですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#do-django-models-support-multiple-column-primary-keys">Django のモデルは複合主キーをサポートしますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#does-django-support-nosql-databases">Django で NoSQL データベースは利用できますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#how-do-i-add-database-specific-options-to-my-create-table-statements-such-as-specifying-myisam-as-the-table-type">MyISAM ストレージエンジンを指定するといったような <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code> 文のデータベース固有のカスタマイズを追加するにはどうしたらよいでしょうか？</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="admin.html">FAQ: 管理インタフェース</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-just-brings-up-the-login-page-again-with-no-error-messages">ログインできません。正しいユーザ名とパスワードを入力したのに、再度ログインページが表示されます。エラーメッセージも出ません。</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#i-can-t-log-in-when-i-enter-a-valid-username-and-password-it-brings-up-the-login-page-again-with-a-please-enter-a-correct-username-and-password-error">ログインできません。正しいユーザ名とパスワードを入力したはずなのに、再度ログインページが開き、「正しいユーザ名とパスワードを入力してください」というエラーメッセージが表示されます。</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#how-do-i-automatically-set-a-field-s-value-to-the-user-who-last-edited-the-object-in-the-admin">管理サイト上で最後にオブジェクトを編集したユーザの情報をあるフィールドに自動的に設定する方法はありますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#how-do-i-limit-admin-access-so-that-objects-can-only-be-edited-by-the-users-who-created-them">管理サイト上で、オブジェクトを最初に作成したユーザだけがオブジェクトを編集できるようにアクセス権を制限するにはどうすればよいですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#my-admin-site-css-and-images-showed-up-fine-using-the-development-server-but-they-re-not-displaying-when-using-mod-wsgi">開発サーバでは管理サイトの CSS や画像がうまく表示されるのに、mod_wsgi を使った場合には表示されません。</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#my-list-filter-contains-a-manytomanyfield-but-the-filter-doesn-t-display">“list_filter” に ManyToManyField を入れたのに、フィルタが表示されません。</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#some-objects-aren-t-appearing-in-the-admin">管理サイトでいくつかのオブジェクトが表示されません。</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#how-can-i-customize-the-functionality-of-the-admin-interface">管理インターフェイスの機能をカスタマイズしたい場合にはどうすればいいですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#the-dynamically-generated-admin-site-is-ugly-how-can-i-change-it">動的に生成された管理サイトが見にくいのですが、どうすれば修正できますか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#what-browsers-are-supported-for-using-the-admin">管理サイトをサポートしているブラウザを教えてください。</a></li>
+<li class="toctree-l2"><a class="reference internal" href="admin.html#what-assistive-technologies-are-supported-for-using-the-admin">管理画面を使う上で、どのような支援技術がサポートされていますか？</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">FAQ: コードへの貢献</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#how-can-i-get-started-contributing-code-to-django">Django のコードに貢献し始めるにはどうすればいいですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#i-submitted-a-bug-fix-several-weeks-ago-why-are-you-ignoring-my-contribution">数週間前にバグ修正を提出したのですが、なぜ私の貢献は無視されているのでしょうか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#when-and-how-might-i-remind-the-team-of-a-change-i-care-about">反映してほしい変更があるときは、いつ、どうやってチームにリマインドするのがよいですか？</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#but-i-ve-reminded-you-several-times-and-you-keep-ignoring-my-contribution">でも、何度もリマインドしたのに、私の貢献は無視され続けています！</a></li>
+<li class="toctree-l2"><a class="reference internal" href="contributing.html#i-m-sure-my-ticket-is-absolutely-100-perfect-can-i-mark-it-as-ready-for-checkin-myself">私のチケットは完全に100％完璧だと確信しています、しかし自分で「チェックインの準備ができました」とマークすることはできますか？</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting.html">トラブルシューティング</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#problems-running-django-admin"><code class="docutils literal notranslate"><span class="pre">django-admin</span></code> 実行時の問題</a></li>
+<li class="toctree-l2"><a class="reference internal" href="troubleshooting.html#miscellaneous">その他</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="../howto/custom-file-storage.html"
+                          title="前の章へ">カスタムのストレージクラスを書く</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="general.html"
+                          title="次の章へ">FAQ: 一般的な質問</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/faq/index.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../howto/custom-file-storage.html" title="カスタムのストレージクラスを書く">previous</a>
+     |
+    <a title="Django 5.1.6.dev20250122212402 ドキュメント" href="../index.html" accesskey="U">up</a>
+   |
+    <a href="general.html" title="FAQ: 一般的な質問">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

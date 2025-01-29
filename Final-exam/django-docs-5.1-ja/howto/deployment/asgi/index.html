@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ASGI とともにデプロイするには &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="Django を Daphne とともに使う" href="daphne.html" />
+    <link rel="prev" title="Django のユーザーデータベースに対する Apache からの認証" href="../wsgi/apache-auth.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../wsgi/apache-auth.html" title="Django のユーザーデータベースに対する Apache からの認証">previous</a>
+     |
+    <a href="../../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="daphne.html" title="Django を Daphne とともに使う">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-deployment-asgi-index">
+            
+  <section id="s-how-to-deploy-with-asgi">
+<span id="how-to-deploy-with-asgi"></span><h1>ASGI とともにデプロイするには<a class="headerlink" href="#how-to-deploy-with-asgi" title="Link to this heading">¶</a></h1>
+<p>WSGI だけでなく、Django は非同期ウェブサーバやアプリケーションのための新しい Python 標準である <a class="reference external" href="https://asgi.readthedocs.io/en/latest/">ASGI</a> でのデプロイもサポートしています。</p>
+<p>Django の <a class="reference internal" href="../../../ref/django-admin.html#django-admin-startproject"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">startproject</span></code></a> 管理用コマンドは、デフォルトの ASGI 設定をセットアップします。必要に応じて、あなたのプロジェクトと ASGI 準拠の Web サーバに合わせて微調整することができます。</p>
+<p>Django には以下の ASGI サーバのために、手引きとなるドキュメントが用意されています。</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="daphne.html">Django を Daphne とともに使う</a></li>
+<li class="toctree-l1"><a class="reference internal" href="hypercorn.html">Django を Hypercorn とともに使う</a></li>
+<li class="toctree-l1"><a class="reference internal" href="uvicorn.html">Django を Uvicorn とともに使う</a></li>
+</ul>
+</div>
+<section id="s-the-application-object">
+<span id="the-application-object"></span><h2><code class="docutils literal notranslate"><span class="pre">application</span></code> オブジェクト<a class="headerlink" href="#the-application-object" title="Link to this heading">¶</a></h2>
+<p>WSGI と同様に、ASGI は <code class="docutils literal notranslate"><span class="pre">application</span></code> という呼び出し可能オブジェクトを提供しており、アプリケーション サーバはこれを使用してあなたのコードと通信します。これは一般的に、サーバにアクセスできる Python モジュールの中で <code class="docutils literal notranslate"><span class="pre">application</span></code> という名前のオブジェクトとして提供されています。</p>
+<p><a class="reference internal" href="../../../ref/django-admin.html#django-admin-startproject"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">startproject</span></code></a> コマンドは、この <code class="docutils literal notranslate"><span class="pre">application</span></code> 呼び出し可能オブジェクトを含む <code class="file docutils literal notranslate"><span class="pre">&lt;project_name&gt;/asgi.py</span></code> ファイルを生成します。</p>
+<p>開発サーバー (<code class="docutils literal notranslate"><span class="pre">runserver</span></code>) では使用されませんが、開発環境と本番環境のどちらでも、任意の ASGI サーバーからも使用できます。</p>
+<p>ASGI サーバーは通常、呼び出し可能オブジェクト application へのパスを文字列として取ります。たとえば、ほとんどの Django プロジェクトでは、<code class="docutils literal notranslate"><span class="pre">myproject.asgi:application</span></code> のような文字列になります。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>Django のデフォルトの ASGI ハンドラは全てのコードを同期スレッドで実行します が、独自の非同期ハンドラを実行する場合は、非同期安全性を意識する必要があります。</p>
+<p>非同期コードの中で、ブロッキングな同期関数やライブラリを呼び出さないでください。Django は、非同期安全でない Django の部分でこのようなことができないようにしていますが、サードパーティのアプリや Python ライブラリではそうとは限りません。</p>
+</div>
+</section>
+<section id="s-configuring-the-settings-module">
+<span id="configuring-the-settings-module"></span><h2>Settings モジュールを設定する<a class="headerlink" href="#configuring-the-settings-module" title="Link to this heading">¶</a></h2>
+<p>ASGI サーバがアプリケーションをロードするとき、Django は settings モジュールをインポートする必要があります――アプリケーション全体がここで定義されます。</p>
+<p>Django は適切な Settings モジュールを見つけるために、 <span class="target" id="index-2"></span><a class="reference internal" href="../../../topics/settings.html#envvar-DJANGO_SETTINGS_MODULE"><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DJANGO_SETTINGS_MODULE</span></code></a> 環境変数を使用します。これは設定モジュールへのドット区切りのパスを含んでいなければなりません。開発時と実運用時で別々の値を使用することも可能です。どのように設定を組織するか次第です。</p>
+<p>この変数が指定されていない場合、デフォルトの <code class="file docutils literal notranslate"><span class="pre">asgi.py</span></code> は <code class="docutils literal notranslate"><span class="pre">mysite.settings</span></code> を設定します。 <code class="docutils literal notranslate"><span class="pre">mysite</span></code> はプロジェクトの名前です。</p>
+</section>
+<section id="s-applying-asgi-middleware">
+<span id="applying-asgi-middleware"></span><h2>ASGI ミドルウェアの適用<a class="headerlink" href="#applying-asgi-middleware" title="Link to this heading">¶</a></h2>
+<p>ASGI ミドルウェアを適用したり、他の ASGI アプリケーションに Django を組み込むには、 Django の <code class="docutils literal notranslate"><span class="pre">application</span></code> オブジェクトを <code class="docutils literal notranslate"><span class="pre">asgi.py</span></code> ファイルでラップします。例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">some_asgi_library</span><span class="w"> </span><span class="kn">import</span> <span class="n">AmazingMiddleware</span>
+
+<span class="n">application</span> <span class="o">=</span> <span class="n">AmazingMiddleware</span><span class="p">(</span><span class="n">application</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ASGI とともにデプロイするには</a><ul>
+<li><a class="reference internal" href="#the-application-object"><code class="docutils literal notranslate"><span class="pre">application</span></code> オブジェクト</a></li>
+<li><a class="reference internal" href="#configuring-the-settings-module">Settings モジュールを設定する</a></li>
+<li><a class="reference internal" href="#applying-asgi-middleware">ASGI ミドルウェアの適用</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="../wsgi/apache-auth.html"
+                          title="前の章へ">Django のユーザーデータベースに対する Apache からの認証</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="daphne.html"
+                          title="次の章へ">Django を Daphne とともに使う</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/howto/deployment/asgi/index.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../wsgi/apache-auth.html" title="Django のユーザーデータベースに対する Apache からの認証">previous</a>
+     |
+    <a href="../../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="daphne.html" title="Django を Daphne とともに使う">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

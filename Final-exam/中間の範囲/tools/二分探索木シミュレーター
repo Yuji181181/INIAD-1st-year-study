@@ -1,0 +1,18 @@
+// Project クラスのコンストラクタ内で初期化
+function initializeCanvas() {
+    const canvas = document.getElementById('canvas');
+    const centerX = canvas.width / 2;
+    
+    this.cursor = {
+        X: centerX,  // キャンバスの中央に初期位置を設定
+        Y: this.cursor.Y
+    };
+}
+
+// クリックイベントハンドラーの修正
+function onClick(e) {
+    const rect = this.pjt.canvas.getBoundingClientRect();
+    const centerX = rect.width / 2;
+    this.pjt.cursor.X = centerX; 
+    this.pjt.cursor.Y = e.offsetY;
+}

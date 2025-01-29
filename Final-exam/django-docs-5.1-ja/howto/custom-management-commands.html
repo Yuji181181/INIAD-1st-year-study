@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>カスタム django-admin コマンドの作り方 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="カスタムのストレージクラスを書く" href="custom-file-storage.html" />
+    <link rel="prev" title="Django の CSRF 保護を利用する" href="csrf.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="csrf.html" title="Django の CSRF 保護を利用する">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="custom-file-storage.html" title="カスタムのストレージクラスを書く">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-custom-management-commands">
+            
+  <section id="s-module-django.core.management">
+<span id="s-how-to-create-custom-django-admin-commands"></span><span id="module-django.core.management"></span><span id="how-to-create-custom-django-admin-commands"></span><h1>カスタム <code class="docutils literal notranslate"><span class="pre">django-admin</span></code> コマンドの作り方<a class="headerlink" href="#module-django.core.management" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">manage.py</span></code> を用いることで独自のアクションを登録する事ができます。例として、あなたが配布している Django アプリケーションに <code class="docutils literal notranslate"><span class="pre">manage.py</span></code> アクションを追加したくなったとします。このドキュメントでは、<a class="reference internal" href="../intro/tutorial01.html"><span class="doc">このチュートリアル</span></a> で作成した <code class="docutils literal notranslate"><span class="pre">polls</span></code> アプリケーションに独自の <code class="docutils literal notranslate"><span class="pre">closepoll</span></code> コマンドを追加します。</p>
+<p>独自のコマンドを追加するためには、 <code class="docutils literal notranslate"><span class="pre">management/commands</span></code> ディレクトリをアプリケーションに追加してください。Djangoは、そのディレクトリ内のアンダーバーで始まらないPythonモジュールすべてを <code class="docutils literal notranslate"><span class="pre">manage.py</span></code> コマンドに登録します。例えば:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>polls/
+    __init__.py
+    models.py
+    management/
+        __init__.py
+        commands/
+            __init__.py
+            _private.py
+            closepoll.py
+    tests.py
+    views.py
+</pre></div>
+</div>
+<p>この例では、<code class="docutils literal notranslate"><span class="pre">closepoll</span></code> コマンドは <code class="docutils literal notranslate"><span class="pre">polls</span></code> アプリケーションを <a class="reference internal" href="../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> に含むプロジェクト全てで利用できるようになります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">_private.py</span></code> モジュールは管理コマンドとして利用できません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">closepoll.py</span></code> モジュールには一つだけ満たすべき要件があります。それは、 <a class="reference internal" href="#django.core.management.BaseCommand" title="django.core.management.BaseCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></a> クラスもしくはその <a class="reference internal" href="#ref-basecommand-subclasses"><span class="std std-ref">サブクラス</span></a> の一つを継承した <code class="docutils literal notranslate"><span class="pre">Command</span></code> クラスを定義することです。</p>
+<div class="admonition-standalone-scripts admonition">
+<p class="admonition-title">スタンドアロンのスクリプト</p>
+<p>カスタム管理コマンドはスタンドアロンのスクリプト、 UNIX の crontab や Windows のタスクスケジューラ管理パネルから定期的に実行されるスクリプトを処理する場合に特に有用です。</p>
+</div>
+<p>コマンドを実装するには、<code class="docutils literal notranslate"><span class="pre">polls/management/commands/closepoll.py</span></code> を以下のように編集してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.management.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCommand</span><span class="p">,</span> <span class="n">CommandError</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">polls.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Question</span> <span class="k">as</span> <span class="n">Poll</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="n">help</span> <span class="o">=</span> <span class="s2">&quot;Closes the specified poll for voting&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;poll_ids&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">poll_id</span> <span class="ow">in</span> <span class="n">options</span><span class="p">[</span><span class="s2">&quot;poll_ids&quot;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">poll</span> <span class="o">=</span> <span class="n">Poll</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">poll_id</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">Poll</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">CommandError</span><span class="p">(</span><span class="s1">&#39;Poll &quot;</span><span class="si">%s</span><span class="s1">&quot; does not exist&#39;</span> <span class="o">%</span> <span class="n">poll_id</span><span class="p">)</span>
+
+            <span class="n">poll</span><span class="o">.</span><span class="n">opened</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">poll</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">(</span><span class="s1">&#39;Successfully closed poll &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">poll_id</span><span class="p">)</span>
+            <span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note" id="management-commands-output">
+<p class="admonition-title">注釈</p>
+<p>管理コマンドを使用してコンソール出力を提供したい場合は、直接 <code class="docutils literal notranslate"><span class="pre">stdout</span></code> と <code class="docutils literal notranslate"><span class="pre">stderr</span></code> に出力するのではなく、<code class="docutils literal notranslate"><span class="pre">self.stdout</span></code> と <code class="docutils literal notranslate"><span class="pre">self.stderr</span></code> に書き込むべきです。これらのプロキシを使用することで、カスタムコマンドのテストがはるかに簡単になります。また、メッセージの終わりに改行文字を追加する必要はないことにも注意してください。<code class="docutils literal notranslate"><span class="pre">ending</span></code> パラメータを指定しない限り、改行文字は自動的に追加されます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Unterminated line&quot;</span><span class="p">,</span> <span class="n">ending</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>新たに作成したカスタムコマンドは <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">closepoll</span> <span class="pre">&lt;poll_ids&gt;</span></code> と実行する事で利用できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">handle()</span></code> メソッドは一つ以上の <code class="docutils literal notranslate"><span class="pre">poll_ids</span></code> を受け取り、それぞれに対応した <code class="docutils literal notranslate"><span class="pre">poll.opened</span></code> を <code class="docutils literal notranslate"><span class="pre">False</span></code> にセットします。もしコマンドの利用者が存在しない poll を指定した場合、<a class="reference internal" href="#django.core.management.CommandError" title="django.core.management.CommandError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CommandError</span></code></a> 例外が発生します。<code class="docutils literal notranslate"><span class="pre">poll.opened</span></code> 属性は元の <a class="reference internal" href="../intro/tutorial02.html"><span class="doc">チュートリアル</span></a> には存在しないので、この例では <code class="docutils literal notranslate"><span class="pre">polls.models.Question</span></code> モデルに追加しました。</p>
+<section id="s-accepting-optional-arguments">
+<span id="s-custom-commands-options"></span><span id="accepting-optional-arguments"></span><span id="custom-commands-options"></span><h2>省略可能な引数を受け入れる<a class="headerlink" href="#accepting-optional-arguments" title="Link to this heading">¶</a></h2>
+<p>上記の <code class="docutils literal notranslate"><span class="pre">closepoll</span></code> は、追加のコマンドラインオプションを受け入れることで、投票を閉じる代わりに削除するように簡単に変更できます。これらのカスタムオプションは、次のように <a class="reference internal" href="#django.core.management.BaseCommand.add_arguments" title="django.core.management.BaseCommand.add_arguments"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_arguments()</span></code></a> メソッドで追加できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="c1"># Positional arguments</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;poll_ids&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="c1"># Named (optional) arguments</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+            <span class="s2">&quot;--delete&quot;</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+            <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Delete poll instead of closing it&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span>
+        <span class="c1"># ...</span>
+        <span class="k">if</span> <span class="n">options</span><span class="p">[</span><span class="s2">&quot;delete&quot;</span><span class="p">]:</span>
+            <span class="n">poll</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="c1"># ...</span>
+</pre></div>
+</div>
+<p>オプション(例では <code class="docutils literal notranslate"><span class="pre">delete</span></code>)は handle メソッドで辞書型変数の引数として利用可能です。<code class="docutils literal notranslate"><span class="pre">add_argument</span></code> の利用についてより詳細な情報を得るには Python 公式ドキュメントの <a class="reference external" href="https://docs.python.org/3/library/argparse.html#module-argparse" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">argparse</span></code></a> を参照してください。</p>
+<p>独自のコマンドラインオプションを追加できるのに加え、<a class="reference internal" href="../ref/django-admin.html"><span class="doc">管理コマンド</span></a> に定義された <a class="reference internal" href="../ref/django-admin.html#cmdoption-verbosity"><code class="xref std std-option docutils literal notranslate"><span class="pre">--verbosity</span></code></a> や <a class="reference internal" href="../ref/django-admin.html#cmdoption-traceback"><code class="xref std std-option docutils literal notranslate"><span class="pre">--traceback</span></code></a> といったオプションも標準で利用できます。</p>
+</section>
+<section id="s-management-commands-and-locales">
+<span id="s-id1"></span><span id="management-commands-and-locales"></span><span id="id1"></span><h2>管理コマンドとロケール<a class="headerlink" href="#management-commands-and-locales" title="Link to this heading">¶</a></h2>
+<p>デフォルトでは、管理コマンドは現在アクティブなロケールで実行されます。</p>
+<p>何らかの理由でカスタム管理コマンドをアクティブなロケールなしで実行する必要がある (たとえば、翻訳されたコンテンツがデータベースに挿入されないようにしたい) 場合は、 <a class="reference internal" href="#django.core.management.BaseCommand.handle" title="django.core.management.BaseCommand.handle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle()</span></code></a> メソッドで <code class="docutils literal notranslate"><span class="pre">&#64;no_translations</span></code> デコレータを使用して翻訳を無効にします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.management.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseCommand</span><span class="p">,</span> <span class="n">no_translations</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="o">...</span>
+
+    <span class="nd">@no_translations</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">options</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>翻訳の非アクティブ化には構成設定へのアクセスが必要なので、構成設定なしで機能するコマンドにデコレータを使用することはできません。</p>
+</section>
+<section id="s-testing">
+<span id="testing"></span><h2>テスト<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h2>
+<p>カスタム管理コマンドのテストに関する情報は <a class="reference internal" href="../topics/testing/tools.html#topics-testing-management-commands"><span class="std std-ref">テストに関するページ</span></a> で得ることができます。</p>
+</section>
+<section id="s-overriding-commands">
+<span id="overriding-commands"></span><h2>コマンドのオーバーライド<a class="headerlink" href="#overriding-commands" title="Link to this heading">¶</a></h2>
+<p>Djangoは、ビルトインコマンドを読み込んだ後に <a class="reference internal" href="../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> を逆順に検索してコマンドを登録します。この検索の際に、すでに登録済みのコマンド名と重複したコマンド名が見つかった場合、新しく見つかったコマンドで最初に見つけたコマンドをオーバーライドします。</p>
+<p>別の言い方をすると、コマンドをオーバーライドするためには、新しいコマンドは、オーバーライドするコマンドと同じ名前でなければなりません。そして、そのアプリは、<a class="reference internal" href="../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> で、オーバーライドするコマンドのアプリよりも前にある必要があります。</p>
+<p>意図せずオーバーライドされたサードパーティアプリからの管理コマンドは、オーバーライドされたコマンドの <code class="docutils literal notranslate"><span class="pre">Command</span></code> をインポートするプロジェクトのアプリ（<a class="reference internal" href="../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> でサードパーティアプリの前に注文） の1つで新しいコマンドを作成することにより、新しい名前で使用可能にできます。</p>
+</section>
+<section id="s-command-objects">
+<span id="command-objects"></span><h2>Command オブジェクト<a class="headerlink" href="#command-objects" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseCommand</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/management/base.py#L184"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.management.BaseCommand" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>全ての管理コマンドの派生元となる基底クラス。</p>
+<p>コマンドライン引数を解析し、それに対してどのコードを呼び出すかを決定するすべてのメカニズムにアクセスしたい場合は、このクラスを使用してください。そのような動作を変更する必要がない場合は、 <a class="reference internal" href="#ref-basecommand-subclasses"><span class="std std-ref">サブクラス</span></a> のいずれかを使用することを検討してください。</p>
+<p><a class="reference internal" href="#django.core.management.BaseCommand" title="django.core.management.BaseCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></a> クラスのサブクラス化には <a class="reference internal" href="#django.core.management.BaseCommand.handle" title="django.core.management.BaseCommand.handle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle()</span></code></a> メソッドの実装が必要です。</p>
+<section id="s-attributes">
+<span id="attributes"></span><h3>属性<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h3>
+<p>全ての属性は派生クラスでセットでき、<a class="reference internal" href="#django.core.management.BaseCommand" title="django.core.management.BaseCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></a> クラスの <a class="reference internal" href="#ref-basecommand-subclasses"><span class="std std-ref">サブクラス</span></a> で利用可能です。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.help">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">help</span></span><a class="headerlink" href="#django.core.management.BaseCommand.help" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドに関する短い説明。ユーザーが <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">manage.py</span> <span class="pre">help</span> <span class="pre">&lt;command&gt;</span></code> を実行することでヘルプメッセージとして表示されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.missing_args_message">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">missing_args_message</span></span><a class="headerlink" href="#django.core.management.BaseCommand.missing_args_message" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドが必須の位置引数を定義している場合、引数が足りない場合に返されるエラーメッセージをカスタマイズできます。デフォルトは <a class="reference external" href="https://docs.python.org/3/library/argparse.html#module-argparse" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">argparse</span></code></a> によって出力されます (&quot;too few arguments&quot;)。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.output_transaction">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">output_transaction</span></span><a class="headerlink" href="#django.core.management.BaseCommand.output_transaction" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドが SQL 文を出力するかどうかを決めるブール値。<code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、出力文が自動的に <code class="docutils literal notranslate"><span class="pre">BEGIN;</span></code> と <code class="docutils literal notranslate"><span class="pre">COMMIT;</span></code> で囲まれます。デフォルトの値は <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.requires_migrations_checks">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">requires_migrations_checks</span></span><a class="headerlink" href="#django.core.management.BaseCommand.requires_migrations_checks" title="Link to this definition">¶</a></dt>
+<dd><p>Boolean。<code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、ディスク上に存在する一連のマイグレーション定義がデータベース上に保存されたマイグレーション定義とマッチしない場合に警告を出力します。この警告はコマンドの実行を停止させる物ではありません。デフォルトの値は <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.requires_system_checks">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">requires_system_checks</span></span><a class="headerlink" href="#django.core.management.BaseCommand.requires_system_checks" title="Link to this definition">¶</a></dt>
+<dd><p>例えば <code class="docutils literal notranslate"><span class="pre">[Tags.staticfiles,</span> <span class="pre">Tags.models]</span></code> のようなタグのリストやタプル。 <a class="reference internal" href="../topics/checks.html#registering-labeling-checks"><span class="std std-ref">指定したタグに登録された</span></a> システムチェックは、コマンドを実行する前にエラーがないかチェックされます。 <code class="docutils literal notranslate"><span class="pre">'__all__'</span></code> を使用することで、すべてのシステムチェックを実行するように指定することができます。デフォルトでは <code class="docutils literal notranslate"><span class="pre">'__all__'</span></code> に設定されています。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.style">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">style</span></span><a class="headerlink" href="#django.core.management.BaseCommand.style" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">stdout</span></code> や <code class="docutils literal notranslate"><span class="pre">stderr</span></code> を記述した際にカラー出力を補助するインスタンス変数です。以下の利用例を参照ください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">SUCCESS</span><span class="p">(</span><span class="s2">&quot;...&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>カラーパレットの調整と利用可能なスタイルについては <a class="reference internal" href="../ref/django-admin.html#syntax-coloring"><span class="std std-ref">シンタックスカラーリング</span></a> を参照してください (このセクションに記述されている &quot;roles&quot; のアルファベットを大文字にすると利用できます)。</p>
+<p><a class="reference internal" href="../ref/django-admin.html#cmdoption-no-color"><code class="xref std std-option docutils literal notranslate"><span class="pre">--no-color</span></code></a> オプションを渡してコマンドを実行した場合、全ての <code class="docutils literal notranslate"><span class="pre">self.style()</span></code> 呼び出しはオリジナルのカラー分けされていない出力を行います。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.suppressed_base_arguments">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">suppressed_base_arguments</span></span><a class="headerlink" href="#django.core.management.BaseCommand.suppressed_base_arguments" title="Link to this definition">¶</a></dt>
+<dd><p>ヘルプ出力で抑制するデフォルトのコマンドオプション。これは、オプション名のセットでなければなりません（例：'--verbosity'）。抑制されたオプションのデフォルト値はそのまま渡されます。</p>
+</dd></dl>
+
+</section>
+<section id="s-methods">
+<span id="methods"></span><h3>メソッド<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="#django.core.management.BaseCommand" title="django.core.management.BaseCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></a> には、いくつかのオーバーライド可能なメソッドが含まれています。しかし、<a class="reference internal" href="#django.core.management.BaseCommand.handle" title="django.core.management.BaseCommand.handle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle()</span></code></a> メソッドだけは、実装する必要があります。</p>
+<div class="admonition-implementing-a-constructor-in-a-subclass admonition">
+<p class="admonition-title">サブクラス内でのコンストラクタの実装</p>
+<p><a class="reference internal" href="#django.core.management.BaseCommand" title="django.core.management.BaseCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></a> を継承したサブクラス内で <code class="docutils literal notranslate"><span class="pre">__init__</span></code> を実装する場合、<a class="reference internal" href="#django.core.management.BaseCommand" title="django.core.management.BaseCommand"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCommand</span></code></a> の <code class="docutils literal notranslate"><span class="pre">__init__</span></code> を呼び出す必要があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Command</span><span class="p">(</span><span class="n">BaseCommand</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># ...</span>
+</pre></div>
+</div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.create_parser">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">create_parser</span></span>(<em class="sig-param"><span class="n"><span class="pre">prog_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcommand</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/management/base.py#L295"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.management.BaseCommand.create_parser" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">CommandParser</span></code> インスタンスを返します。これは <a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentParser</span></code></a> サブクラスで、Django用にいくつかカスタマイズされています。</p>
+<p>このメソッドをオーバーライドし、 <a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ArgumentParser</span></code></a> パラメータの <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> を使って <code class="docutils literal notranslate"><span class="pre">super()</span></code> を呼び出すことでインスタンスをカスタマイズできます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.add_arguments">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">add_arguments</span></span>(<em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/management/base.py#L371"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.management.BaseCommand.add_arguments" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドに渡されたコマンドライン引数を操作するパーサーを追加するためのエントリポイントです。カスタム管理コマンドが受け取る位置引数およびオプション引数を追加するためにはこのメソッドをオーバーライドする必要があります。直接 <code class="docutils literal notranslate"><span class="pre">BaseCommand</span></code> を継承している場合は <code class="docutils literal notranslate"><span class="pre">super()</span></code> の呼び出しは必要ありません。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.get_version">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">get_version</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/management/base.py#L287"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.management.BaseCommand.get_version" title="Link to this definition">¶</a></dt>
+<dd><p>Djangoのバージョンを返します。これはすべての組み込みDjangoコマンドに対して正しいはずです。 ユーザー指定のコマンドは、このメソッドをオーバーライドして独自のバージョンを返すことができます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.execute">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">execute</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/management/base.py#L432"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.management.BaseCommand.execute" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドを実行し、必要とされた場合(<a class="reference internal" href="#django.core.management.BaseCommand.requires_system_checks" title="django.core.management.BaseCommand.requires_system_checks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">requires_system_checks</span></code></a> 属性によって設定可能)システムチェックを行います。コマンドが <a class="reference internal" href="#django.core.management.CommandError" title="django.core.management.CommandError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CommandError</span></code></a> 例外を発生させた場合は、実行を中断して <code class="docutils literal notranslate"><span class="pre">stderr</span></code> に出力します。</p>
+</dd></dl>
+
+<div class="admonition-calling-a-management-command-in-your-code admonition">
+<p class="admonition-title">コード中での管理コマンドの呼び出し</p>
+<p>カスタム管理コマンドを実行するためにコード中から　<code class="docutils literal notranslate"><span class="pre">execute()</span></code> を直接呼び出す事は避けてください。代わりに <a class="reference internal" href="../ref/django-admin.html#django.core.management.call_command" title="django.core.management.call_command"><code class="xref py py-func docutils literal notranslate"><span class="pre">call_command()</span></code></a> を利用してください。</p>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.handle">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">handle</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/management/base.py#L606"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.management.BaseCommand.handle" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドにおける実際の処理内容。サブクラスはこのメソッドを実装しなければなりません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">stdout</span></code> に出力される文字列を返すことができます (<a class="reference internal" href="#django.core.management.BaseCommand.output_transaction" title="django.core.management.BaseCommand.output_transaction"><code class="xref py py-attr docutils literal notranslate"><span class="pre">output_transaction</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、文字列は <code class="docutils literal notranslate"><span class="pre">BEGIN;</span></code> と <code class="docutils literal notranslate"><span class="pre">COMMIT;</span></code> で挟まれて出力されます)。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.management.BaseCommand.check">
+<span class="sig-prename descclassname"><span class="pre">BaseCommand.</span></span><span class="sig-name descname"><span class="pre">check</span></span>(<em class="sig-param"><span class="n"><span class="pre">app_configs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">display_num_errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_deployment_checks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">checks.ERROR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">databases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/management/base.py#L471"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.management.BaseCommand.check" title="Link to this definition">¶</a></dt>
+<dd><p>潜在的な問題のために Django プロジェクト全体を検証するシステムチェックフレームワークを利用します。致命的な問題は <a class="reference internal" href="#django.core.management.CommandError" title="django.core.management.CommandError"><code class="xref py py-exc docutils literal notranslate"><span class="pre">CommandError</span></code></a> 例外を発生し、警告は <code class="docutils literal notranslate"><span class="pre">stderr</span></code> への出力、重要でない通知は <code class="docutils literal notranslate"><span class="pre">stdout</span></code> への出力となります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">app_configs</span></code> および <code class="docutils literal notranslate"><span class="pre">tags</span></code> が共に <code class="docutils literal notranslate"><span class="pre">None</span></code> であった場合、デプロイメントとデータベース関連のチェック以外の全てのシステムチェックが実行されます。<code class="docutils literal notranslate"><span class="pre">tags</span></code> はチェックタグ、例えば <code class="docutils literal notranslate"><span class="pre">compatibility</span></code> あるいは <code class="docutils literal notranslate"><span class="pre">models</span></code> 等、のリストとなります。</p>
+<p>また、<code class="docutils literal notranslate"><span class="pre">include_deployment_checks=True</span></code> を渡すとデプロイメントのチェックを行い、<code class="docutils literal notranslate"><span class="pre">databases</span></code> にデータベースエイリアスのリストを渡すとデータベース関連のチェックを行います。</p>
+</dd></dl>
+
+</section>
+<section id="s-basecommand-subclasses">
+<span id="s-ref-basecommand-subclasses"></span><span id="basecommand-subclasses"></span><span id="ref-basecommand-subclasses"></span><h3><code class="docutils literal notranslate"><span class="pre">BaseCommand</span></code> のサブクラス<a class="headerlink" href="#basecommand-subclasses" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.core.management.AppCommand">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AppCommand</span></span><a class="headerlink" href="#django.core.management.AppCommand" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>一つ以上のインストールされたアプリケーションラベルを引数として受け取り、それぞれに対して何らかの処理を行う管理コマンド。</p>
+<p><a class="reference internal" href="#django.core.management.BaseCommand.handle" title="django.core.management.BaseCommand.handle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle()</span></code></a> を実装する代わりに、サブクラスでは、アプリケーション毎に一度ずつだけ呼び出される <a class="reference internal" href="#django.core.management.AppCommand.handle_app_config" title="django.core.management.AppCommand.handle_app_config"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_app_config()</span></code></a> を実装する必要があります。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.management.AppCommand.handle_app_config">
+<span class="sig-prename descclassname"><span class="pre">AppCommand.</span></span><span class="sig-name descname"><span class="pre">handle_app_config</span></span>(<em class="sig-param"><span class="n"><span class="pre">app_config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="headerlink" href="#django.core.management.AppCommand.handle_app_config" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドラインで渡されたアプリケーションラベル個々に対応している <a class="reference internal" href="../ref/applications.html#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> のインスタンスである <code class="docutils literal notranslate"><span class="pre">app_config</span></code> に応じたコマンドの処理を行います。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.core.management.LabelCommand">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LabelCommand</span></span><a class="headerlink" href="#django.core.management.LabelCommand" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>コマンドラインで1つ以上の任意の引数（ラベル）を受け取り、それぞれに対して何かを行う管理コマンド。</p>
+<p>サブクラスは、<a class="reference internal" href="#django.core.management.BaseCommand.handle" title="django.core.management.BaseCommand.handle"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle()</span></code></a> を実装するのではなく、ラベルごとに1回呼び出される <a class="reference internal" href="#django.core.management.LabelCommand.handle_label" title="django.core.management.LabelCommand.handle_label"><code class="xref py py-meth docutils literal notranslate"><span class="pre">handle_label()</span></code></a> を実装する必要があります。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.core.management.LabelCommand.label">
+<span class="sig-prename descclassname"><span class="pre">LabelCommand.</span></span><span class="sig-name descname"><span class="pre">label</span></span><a class="headerlink" href="#django.core.management.LabelCommand.label" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドに渡される任意引数について記述した文字列。この文字列はコマンドの使用法やエラーメッセージに利用します。デフォルトは <code class="docutils literal notranslate"><span class="pre">'label'</span></code> です。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.management.LabelCommand.handle_label">
+<span class="sig-prename descclassname"><span class="pre">LabelCommand.</span></span><span class="sig-name descname"><span class="pre">handle_label</span></span>(<em class="sig-param"><span class="n"><span class="pre">label</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">options</span></span></em>)<a class="headerlink" href="#django.core.management.LabelCommand.handle_label" title="Link to this definition">¶</a></dt>
+<dd><p>コマンドラインに渡された文字列である <code class="docutils literal notranslate"><span class="pre">label</span></code> に対応したコマンドの処理を行います。</p>
+</dd></dl>
+
+</section>
+<section id="s-command-exceptions">
+<span id="command-exceptions"></span><h3>コマンドが発生させる例外<a class="headerlink" href="#command-exceptions" title="Link to this heading">¶</a></h3>
+<dl class="py exception">
+<dt class="sig sig-object py" id="django.core.management.CommandError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CommandError</span></span>(<em class="sig-param"><span class="n"><span class="pre">returncode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/management/base.py#L22"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.management.CommandError" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>管理コマンド実行中に発生した問題について示した例外クラス。</p>
+<p>この例外がコマンドラインコンソールからの管理コマンドの実行中に発生した場合、キャッチされて適切な出力ストリーム（つまり、<code class="docutils literal notranslate"><span class="pre">stderr</span></code>）に対して整形されたエラーメッセージに変換されます。そのため、コマンドの実行中に何かが間違っていることを示す場合は、この例外を（エラーの理にかなった説明とともに）発生させることを推奨します。任意で <code class="docutils literal notranslate"><span class="pre">returncode</span></code> 引数を受け入れて、<a class="reference external" href="https://docs.python.org/3/library/sys.html#sys.exit" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">sys.exit()</span></code></a> で管理コマンドが終了する際の終了ステータスをカスタマイズできます。</p>
+<p><a class="reference internal" href="../ref/django-admin.html#django.core.management.call_command" title="django.core.management.call_command"><code class="xref py py-func docutils literal notranslate"><span class="pre">call_command()</span></code></a> を介して管理コマンドが実行された場合は、例外の捕捉をするかどうかは実装に依存します。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">カスタム <code class="docutils literal notranslate"><span class="pre">django-admin</span></code> コマンドの作り方</a><ul>
+<li><a class="reference internal" href="#accepting-optional-arguments">省略可能な引数を受け入れる</a></li>
+<li><a class="reference internal" href="#management-commands-and-locales">管理コマンドとロケール</a></li>
+<li><a class="reference internal" href="#testing">テスト</a></li>
+<li><a class="reference internal" href="#overriding-commands">コマンドのオーバーライド</a></li>
+<li><a class="reference internal" href="#command-objects">Command オブジェクト</a><ul>
+<li><a class="reference internal" href="#attributes">属性</a></li>
+<li><a class="reference internal" href="#methods">メソッド</a></li>
+<li><a class="reference internal" href="#basecommand-subclasses"><code class="docutils literal notranslate"><span class="pre">BaseCommand</span></code> のサブクラス</a></li>
+<li><a class="reference internal" href="#command-exceptions">コマンドが発生させる例外</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="csrf.html"
+                          title="前の章へ">Django の CSRF 保護を利用する</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="custom-file-storage.html"
+                          title="次の章へ">カスタムのストレージクラスを書く</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/custom-management-commands.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="csrf.html" title="Django の CSRF 保護を利用する">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="custom-file-storage.html" title="カスタムのストレージクラスを書く">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

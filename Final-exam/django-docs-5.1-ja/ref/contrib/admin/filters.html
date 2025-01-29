@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ModelAdmin リストフィルタ &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="Django admin ドキュメントジェネレータ" href="admindocs.html" />
+    <link rel="prev" title="管理アクション" href="actions.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="actions.html" title="管理アクション">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="admindocs.html" title="Django admin ドキュメントジェネレータ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-admin-filters">
+            
+  <section id="s-modeladmin-list-filters">
+<span id="s-id1"></span><span id="modeladmin-list-filters"></span><span id="id1"></span><h1><code class="docutils literal notranslate"><span class="pre">ModelAdmin</span></code> リストフィルタ<a class="headerlink" href="#modeladmin-list-filters" title="Link to this heading">¶</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">ModelAdmin</span></code> クラスは、以下のスクリーンショットのように、admin アプリケーションの変更一覧ページの右サイドバーに表示されるリストフィルタを定義できます:</p>
+<img alt="../../../_images/list_filter.png" src="../../../_images/list_filter.png" />
+<p>フィールドごとのフィルタリングを有効にするには、<a class="reference internal" href="index.html#django.contrib.admin.ModelAdmin.list_filter" title="django.contrib.admin.ModelAdmin.list_filter"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ModelAdmin.list_filter</span></code></a> を要素のリストまたはタプルに設定し、各要素が以下のいずれかのタイプでなければなりません:</p>
+<ul class="simple">
+<li><p>フィールド名。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">django.contrib.admin.SimpleListFilter</span></code> のサブクラス。</p></li>
+<li><p>フィールド名と <code class="docutils literal notranslate"><span class="pre">django.contrib.admin.FieldListFilter</span></code> のサブクラスを含む 2値タプル。</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">list_filter</span></code> を定義するための各オプションについては、以下の例を参照してください。</p>
+<section id="s-using-a-field-name">
+<span id="using-a-field-name"></span><h2>フィールド名を使用する<a class="headerlink" href="#using-a-field-name" title="Link to this heading">¶</a></h2>
+<p>最も簡単なオプションは、モデルから必須のフィールド名を指定することです。</p>
+<p>指定するフィールドは <code class="docutils literal notranslate"><span class="pre">BooleanField</span></code>, <code class="docutils literal notranslate"><span class="pre">CharField</span></code>, <code class="docutils literal notranslate"><span class="pre">DateField</span></code>, <code class="docutils literal notranslate"><span class="pre">DateTimeField</span></code>, <code class="docutils literal notranslate"><span class="pre">IntegerField</span></code>, <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> または <code class="docutils literal notranslate"><span class="pre">ManyToManyField</span></code> のいずれかでなければなりません:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PersonAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;is_staff&quot;</span><span class="p">,</span> <span class="s2">&quot;company&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">list_filter</span></code> 内のフィールド名は <code class="docutils literal notranslate"><span class="pre">__</span></code> ルックアップを使って関係先を参照できます。たとえば、次のように参照できます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PersonAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">UserAdmin</span><span class="p">):</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;company__name&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="s-using-a-simplelistfilter">
+<span id="using-a-simplelistfilter"></span><h2><code class="docutils literal notranslate"><span class="pre">SimpleListFilter</span></code> を使用する<a class="headerlink" href="#using-a-simplelistfilter" title="Link to this heading">¶</a></h2>
+<p>フィルタリングをカスタマイズするには、 <code class="docutils literal notranslate"><span class="pre">django.contrib.admin.SimpleListFilter</span></code> をサブクラス化して独自のリストフィルタを定義します。 <code class="docutils literal notranslate"><span class="pre">title</span></code> と <code class="docutils literal notranslate"><span class="pre">parameter_name</span></code> 属性を指定し、 <code class="docutils literal notranslate"><span class="pre">lookups</span></code> と <code class="docutils literal notranslate"><span class="pre">queryset</span></code> メソッドをオーバーライドする必要があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">admin</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">gettext_lazy</span> <span class="k">as</span> <span class="n">_</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">DecadeBornListFilter</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">SimpleListFilter</span><span class="p">):</span>
+    <span class="c1"># Human-readable title which will be displayed in the</span>
+    <span class="c1"># right admin sidebar just above the filter options.</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;decade born&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Parameter for the filter that will be used in the URL query.</span>
+    <span class="n">parameter_name</span> <span class="o">=</span> <span class="s2">&quot;decade&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">lookups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">model_admin</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of tuples. The first element in each</span>
+<span class="sd">        tuple is the coded value for the option that will</span>
+<span class="sd">        appear in the URL query. The second element is the</span>
+<span class="sd">        human-readable name for the option that will appear</span>
+<span class="sd">        in the right sidebar.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;80s&quot;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;in the eighties&quot;</span><span class="p">)),</span>
+            <span class="p">(</span><span class="s2">&quot;90s&quot;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;in the nineties&quot;</span><span class="p">)),</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the filtered queryset based on the value</span>
+<span class="sd">        provided in the query string and retrievable via</span>
+<span class="sd">        `self.value()`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Compare the requested value (either &#39;80s&#39; or &#39;90s&#39;)</span>
+        <span class="c1"># to decide how to filter the queryset.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;80s&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">birthday__gte</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1980</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">birthday__lte</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1989</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;90s&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">queryset</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">birthday__gte</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="n">birthday__lte</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1999</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+            <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PersonAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">[</span><span class="n">DecadeBornListFilter</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>利便性のため、<code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> オブジェクトが <code class="docutils literal notranslate"><span class="pre">lookups</span></code> と <code class="docutils literal notranslate"><span class="pre">queryset</span></code> メソッドに渡されます。たとえば、次のようにします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">AuthDecadeBornListFilter</span><span class="p">(</span><span class="n">DecadeBornListFilter</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lookups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">model_admin</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">lookups</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">model_admin</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_superuser</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">queryset</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">queryset</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>たとえば利用可能なデータに基づくルックアップを行いたい場合などに便利なように、<code class="docutils literal notranslate"><span class="pre">ModelAdmin</span></code> オブジェクトは <code class="docutils literal notranslate"><span class="pre">lookups</span></code> メソッドに渡されます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">AdvancedDecadeBornListFilter</span><span class="p">(</span><span class="n">DecadeBornListFilter</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">lookups</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">model_admin</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Only show the lookups if there actually is</span>
+<span class="sd">        anyone born in the corresponding decades.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">model_admin</span><span class="o">.</span><span class="n">get_queryset</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">birthday__gte</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1980</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">birthday__lte</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1989</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="s2">&quot;80s&quot;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;in the eighties&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+            <span class="n">birthday__gte</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1990</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="n">birthday__lte</span><span class="o">=</span><span class="n">date</span><span class="p">(</span><span class="mi">1999</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">31</span><span class="p">),</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="s2">&quot;90s&quot;</span><span class="p">,</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;in the nineties&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="s-using-a-field-name-and-an-explicit-fieldlistfilter">
+<span id="using-a-field-name-and-an-explicit-fieldlistfilter"></span><h2>フィールド名と明示的な <code class="docutils literal notranslate"><span class="pre">FieldListFilter</span></code> を使用する<a class="headerlink" href="#using-a-field-name-and-an-explicit-fieldlistfilter" title="Link to this heading">¶</a></h2>
+<p>最後に、フィールドに使用する明示的なフィルタタイプを指定したい場合は、2値タプルとして <code class="docutils literal notranslate"><span class="pre">list_filter</span></code> 項目を指定できます。最初の要素はフィールド名で、2番目の要素は <code class="docutils literal notranslate"><span class="pre">django.contrib.admin.FieldListFilter</span></code> を継承したクラスです。例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">PersonAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;is_staff&quot;</span><span class="p">,</span> <span class="n">admin</span><span class="o">.</span><span class="n">BooleanFieldListFilter</span><span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p>ここでは <code class="docutils literal notranslate"><span class="pre">is_staff</span></code> フィールドは <code class="docutils literal notranslate"><span class="pre">BooleanFieldListFilter</span></code> を使用します。ほとんどの場合、フィールド名を指定するだけでフィールドは自動的に適切なフィルタを使用しますが、この形式では使用するフィルタを制御できます。</p>
+<p>以下の例は、使用するためにオプトインする必要がある利用可能なフィルタクラスを示します。</p>
+<p>リレーション先モデルの選択肢を、そのリレーションに含まれるオブジェクトに限定できます。これには <code class="docutils literal notranslate"><span class="pre">RelatedOnlyFieldListFilter</span></code> を使用します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BookAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;author&quot;</span><span class="p">,</span> <span class="n">admin</span><span class="o">.</span><span class="n">RelatedOnlyFieldListFilter</span><span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">author</span></code> が <code class="docutils literal notranslate"><span class="pre">User</span></code> モデルの <code class="docutils literal notranslate"><span class="pre">ForeignKey</span></code> であるとすると、これは <code class="docutils literal notranslate"><span class="pre">list_filter</span></code> の選択肢を、すべてのユーザーではなく、本を書いたユーザーに制限します。</p>
+<p>空の値は <code class="docutils literal notranslate"><span class="pre">EmptyFieldListFilter</span></code> を使ってフィルタリングできます。これは、フィールドが何を保存できるかに応じて、空の文字列と NULL の両方をフィルタリングできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">BookAdmin</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">ModelAdmin</span><span class="p">):</span>
+    <span class="n">list_filter</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="n">admin</span><span class="o">.</span><span class="n">EmptyFieldListFilter</span><span class="p">),</span>
+    <span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">__in</span></code> ルックアップを使用してフィルタを定義することで、任意の値のいずれかでフィルタリングできます。<code class="docutils literal notranslate"><span class="pre">expected_parameters</span></code> メソッドをオーバーライドし、適切なフィールド名を持つ <code class="docutils literal notranslate"><span class="pre">lookup_kwargs</span></code> 属性を指定する必要があります。クエリ文字列内の複数の値はデフォルトでカンマで区切られますが、これは <code class="docutils literal notranslate"><span class="pre">list_separator</span></code> 属性を介してカスタマイズできます。以下の例は、縦棒文字を区切り文字として使用するフィルタを示しています:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FilterWithCustomSeparator</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">FieldListFilter</span><span class="p">):</span>
+    <span class="c1"># custom list separator that should be used to separate values.</span>
+    <span class="n">list_separator</span> <span class="o">=</span> <span class="s2">&quot;|&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_admin</span><span class="p">,</span> <span class="n">field_path</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup_kwarg</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__in&quot;</span> <span class="o">%</span> <span class="n">field_path</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">field</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">model_admin</span><span class="p">,</span> <span class="n">field_path</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">expected_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">lookup_kwarg</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="../contenttypes.html#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> フィールドはサポートされていません。</p>
+</div>
+<p>リストフィルタは通常、フィルタに複数の選択肢がある場合にのみ表示されます。フィルタの <code class="docutils literal notranslate"><span class="pre">has_output()</span></code> メソッドは、フィルタが表示されるかどうかを制御します。</p>
+<p>リストフィルタのレンダリングにはカスタムテンプレートを指定できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FilterWithCustomTemplate</span><span class="p">(</span><span class="n">admin</span><span class="o">.</span><span class="n">SimpleListFilter</span><span class="p">):</span>
+    <span class="n">template</span> <span class="o">=</span> <span class="s2">&quot;custom_template.html&quot;</span>
+</pre></div>
+</div>
+<p>具体的な例については、Django により提供されるデフォルトのテンプレート (<code class="docutils literal notranslate"><span class="pre">admin/filter.html</span></code>) を参照してください。</p>
+</section>
+<section id="s-facets">
+<span id="s-facet-filters"></span><span id="facets"></span><span id="facet-filters"></span><h2>ファセット (Facet)<a class="headerlink" href="#facets" title="Link to this heading">¶</a></h2>
+<div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<p>デフォルトでは、ファセット (facet) と呼ばれる各フィルタのカウントは、admin UIからトグルで表示できます。これらのカウントは現在適用されているフィルタに応じて更新されます。詳細は <a class="reference internal" href="index.html#django.contrib.admin.ModelAdmin.show_facets" title="django.contrib.admin.ModelAdmin.show_facets"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ModelAdmin.show_facets</span></code></a> を参照してください。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">ModelAdmin</span></code> リストフィルタ</a><ul>
+<li><a class="reference internal" href="#using-a-field-name">フィールド名を使用する</a></li>
+<li><a class="reference internal" href="#using-a-simplelistfilter"><code class="docutils literal notranslate"><span class="pre">SimpleListFilter</span></code> を使用する</a></li>
+<li><a class="reference internal" href="#using-a-field-name-and-an-explicit-fieldlistfilter">フィールド名と明示的な <code class="docutils literal notranslate"><span class="pre">FieldListFilter</span></code> を使用する</a></li>
+<li><a class="reference internal" href="#facets">ファセット (Facet)</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="actions.html"
+                          title="前の章へ">管理アクション</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="admindocs.html"
+                          title="次の章へ">Django admin ドキュメントジェネレータ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/admin/filters.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="actions.html" title="管理アクション">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="admindocs.html" title="Django admin ドキュメントジェネレータ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

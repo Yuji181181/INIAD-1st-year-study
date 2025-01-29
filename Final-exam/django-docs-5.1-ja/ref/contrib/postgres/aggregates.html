@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>PostgreSQL 固有の集計関数 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="PostgreSQL 固有のデータベース制約" href="constraints.html" />
+    <link rel="prev" title="django.contrib.postgres" href="index.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.contrib.postgres&lt;/span&gt;&lt;/code&gt;">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="constraints.html" title="PostgreSQL 固有のデータベース制約">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-postgres-aggregates">
+            
+  <section id="s-module-django.contrib.postgres.aggregates">
+<span id="s-postgresql-specific-aggregation-functions"></span><span id="module-django.contrib.postgres.aggregates"></span><span id="postgresql-specific-aggregation-functions"></span><h1>PostgreSQL 固有の集計関数<a class="headerlink" href="#module-django.contrib.postgres.aggregates" title="Link to this heading">¶</a></h1>
+<p>これらの機能は、 <code class="docutils literal notranslate"><span class="pre">django.contrib.postgres.aggregates</span></code> モジュールから利用可能です。これらについての詳細は、 <a class="reference external" href="https://www.postgresql.org/docs/current/functions-aggregate.html">PostgreSQLドキュメント</a> に記載されています。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>すべての関数はデフォルトのエイリアスを持たないので、明示的にエイリアスを指定する必要があります。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">SomeModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">arr</span><span class="o">=</span><span class="n">ArrayAgg</span><span class="p">(</span><span class="s2">&quot;somefield&quot;</span><span class="p">))</span>
+<span class="go">{&#39;arr&#39;: [0, 1, 2]}</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition-common-aggregate-options admonition">
+<p class="admonition-title">一般的な集計オプション</p>
+<p>すべての集計関数は、 <a class="reference internal" href="../../models/querysets.html#aggregate-filter"><span class="std std-ref">filter</span></a> キーワード引数を持ち、ほとんどの集計関数は <a class="reference internal" href="../../models/querysets.html#aggregate-default"><span class="std std-ref">default</span></a> キーワード引数も持っています。</p>
+</div>
+<section id="s-general-purpose-aggregation-functions">
+<span id="general-purpose-aggregation-functions"></span><h2>汎用的な集計関数<a class="headerlink" href="#general-purpose-aggregation-functions" title="Link to this heading">¶</a></h2>
+<section id="s-arrayagg">
+<span id="arrayagg"></span><h3><code class="docutils literal notranslate"><span class="pre">ArrayAgg</span></code><a class="headerlink" href="#arrayagg" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.ArrayAgg">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ArrayAgg</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distinct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ordering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.ArrayAgg" title="Link to this definition">¶</a></dt>
+<dd><p>null を含む値のリストを配列に連結して返すか、値がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> を返す。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.ArrayAgg.distinct">
+<span class="sig-name descname"><span class="pre">distinct</span></span><a class="headerlink" href="#django.contrib.postgres.aggregates.ArrayAgg.distinct" title="Link to this definition">¶</a></dt>
+<dd><p>オプションの真偽値引数で、配列の値を区別するかどうかを指定する。デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.ArrayAgg.ordering">
+<span class="sig-name descname"><span class="pre">ordering</span></span><a class="headerlink" href="#django.contrib.postgres.aggregates.ArrayAgg.ordering" title="Link to this definition">¶</a></dt>
+<dd><p>結果リスト内の要素の並び順を指定する、省略可能なフィールド名の文字列 (降順を示すオプションの <code class="docutils literal notranslate"><span class="pre">&quot;&quot;-&quot;&quot;</span></code> 接頭辞を含む) または式 (もしくは文字列および/または式のタプルもしくはリスト)。</p>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;some_field&quot;</span>
+<span class="s2">&quot;-some_field&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">F</span>
+
+<span class="n">F</span><span class="p">(</span><span class="s2">&quot;some_field&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">desc</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>以前のバージョンでは、行がなく、<code class="docutils literal notranslate"><span class="pre">default</span></code> が指定されていない場合、<code class="docutils literal notranslate"><span class="pre">ArrayAgg</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> ではなく空のリストを返していました。必要な場合は、明示的に <code class="docutils literal notranslate"><span class="pre">default</span></code> を <code class="docutils literal notranslate"><span class="pre">Value([])</span></code> に設定してください。</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-bitand">
+<span id="bitand"></span><h3><code class="docutils literal notranslate"><span class="pre">BitAnd</span></code><a class="headerlink" href="#bitand" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.BitAnd">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BitAnd</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.BitAnd" title="Link to this definition">¶</a></dt>
+<dd><p>すべての非 null 入力値のビットごとの <code class="docutils literal notranslate"><span class="pre">AND</span></code> を返し、すべての値が null の場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> を返します。</p>
+</dd></dl>
+
+</section>
+<section id="s-bitor">
+<span id="bitor"></span><h3><code class="docutils literal notranslate"><span class="pre">BitOr</span></code><a class="headerlink" href="#bitor" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.BitOr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BitOr</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.BitOr" title="Link to this definition">¶</a></dt>
+<dd><p>すべての非 null 入力値のビットごとの <code class="docutils literal notranslate"><span class="pre">OR</span></code> の <code class="docutils literal notranslate"><span class="pre">int</span></code> を返します。すべての値が null の場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> を返します。</p>
+</dd></dl>
+
+</section>
+<section id="s-bitxor">
+<span id="bitxor"></span><h3><code class="docutils literal notranslate"><span class="pre">BitXor</span></code><a class="headerlink" href="#bitxor" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.BitXor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BitXor</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.BitXor" title="Link to this definition">¶</a></dt>
+<dd><p>すべての非 null 入力値のビットごとの <code class="docutils literal notranslate"><span class="pre">XOR</span></code> の <code class="docutils literal notranslate"><span class="pre">int</span></code> を返します。すべての値が null の場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> が返されます。PostgreSQL 14+ が必要です。</p>
+</dd></dl>
+
+</section>
+<section id="s-booland">
+<span id="booland"></span><h3><code class="docutils literal notranslate"><span class="pre">BoolAnd</span></code><a class="headerlink" href="#booland" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.BoolAnd">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BoolAnd</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.BoolAnd" title="Link to this definition">¶</a></dt>
+<dd><p>すべての入力値が true の場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> を、すべての値が null または値が存在しない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> を、それ以外の場合は <code class="docutils literal notranslate"><span class="pre">False</span></code> を返します。</p>
+<p>使用例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Comment</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">published</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">()</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.postgres.aggregates</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoolAnd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Comment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">booland</span><span class="o">=</span><span class="n">BoolAnd</span><span class="p">(</span><span class="s2">&quot;published&quot;</span><span class="p">))</span>
+<span class="go">{&#39;booland&#39;: False}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Comment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">booland</span><span class="o">=</span><span class="n">BoolAnd</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">rank__lt</span><span class="o">=</span><span class="mi">100</span><span class="p">)))</span>
+<span class="go">{&#39;booland&#39;: True}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-boolor">
+<span id="boolor"></span><h3><code class="docutils literal notranslate"><span class="pre">BoolOr</span></code><a class="headerlink" href="#boolor" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.BoolOr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BoolOr</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.BoolOr" title="Link to this definition">¶</a></dt>
+<dd><p>少なくとも1つの入力値が true の場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> を、すべての値が null または値がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> を、そうでない場合は <code class="docutils literal notranslate"><span class="pre">False</span></code> を返します。</p>
+<p>使用例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Comment</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">body</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">()</span>
+    <span class="n">published</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">()</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Q</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.postgres.aggregates</span><span class="w"> </span><span class="kn">import</span> <span class="n">BoolOr</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Comment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">boolor</span><span class="o">=</span><span class="n">BoolOr</span><span class="p">(</span><span class="s2">&quot;published&quot;</span><span class="p">))</span>
+<span class="go">{&#39;boolor&#39;: True}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Comment</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">boolor</span><span class="o">=</span><span class="n">BoolOr</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">rank__gt</span><span class="o">=</span><span class="mi">2</span><span class="p">)))</span>
+<span class="go">{&#39;boolor&#39;: False}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-jsonbagg">
+<span id="jsonbagg"></span><h3><code class="docutils literal notranslate"><span class="pre">JSONBAgg</span></code><a class="headerlink" href="#jsonbagg" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.JSONBAgg">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">JSONBAgg</span></span>(<em class="sig-param"><span class="n"><span class="pre">expressions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distinct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ordering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.JSONBAgg" title="Link to this definition">¶</a></dt>
+<dd><p>入力値を <code class="docutils literal notranslate"><span class="pre">JSON</span></code> 配列として返します。値がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> を返します。結果は <a class="reference internal" href="../../../topics/db/queries.html#std-fieldlookup-jsonfield.key"><code class="xref std std-lookup docutils literal notranslate"><span class="pre">キーとインデックスのルックアップ</span></code></a> を使ってクエリできます。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.JSONBAgg.distinct">
+<span class="sig-name descname"><span class="pre">distinct</span></span><a class="headerlink" href="#django.contrib.postgres.aggregates.JSONBAgg.distinct" title="Link to this definition">¶</a></dt>
+<dd><p>オプションの真偽値引数で、配列の値を区別するかどうかを指定する。デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.JSONBAgg.ordering">
+<span class="sig-name descname"><span class="pre">ordering</span></span><a class="headerlink" href="#django.contrib.postgres.aggregates.JSONBAgg.ordering" title="Link to this definition">¶</a></dt>
+<dd><p>結果リスト内の要素の並び順を指定する、省略可能なフィールド名の文字列 (降順を示すオプションの <code class="docutils literal notranslate"><span class="pre">&quot;&quot;-&quot;&quot;</span></code> 接頭辞を含む) または式 (もしくは文字列および/または式のタプルもしくはリスト)。</p>
+<p>例は、 <a class="reference internal" href="#django.contrib.postgres.aggregates.ArrayAgg.ordering" title="django.contrib.postgres.aggregates.ArrayAgg.ordering"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ArrayAgg.ordering</span></code></a> と同じです。</p>
+</dd></dl>
+
+<p>使用例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Room</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">number</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HotelReservation</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">room</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s2">&quot;Room&quot;</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">()</span>
+    <span class="n">requirements</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">JSONField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.postgres.aggregates</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONBAgg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Room</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">requirements</span><span class="o">=</span><span class="n">JSONBAgg</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="s2">&quot;hotelreservation__requirements&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">ordering</span><span class="o">=</span><span class="s2">&quot;-hotelreservation__start&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">requirements__0__sea_view</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;requirements&quot;</span><span class="p">)</span>
+<span class="go">&lt;QuerySet [{&#39;number&#39;: 102, &#39;requirements&#39;: [</span>
+<span class="go">    {&#39;parking&#39;: False, &#39;sea_view&#39;: True, &#39;double_bed&#39;: False},</span>
+<span class="go">    {&#39;parking&#39;: True, &#39;double_bed&#39;: True}</span>
+<span class="go">]}]&gt;</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>以前のバージョンでは、行がなく、かつ <code class="docutils literal notranslate"><span class="pre">default</span></code> が提供されていないとき、 <code class="docutils literal notranslate"><span class="pre">JSONBAgg</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> の代わりに空のリストが返されていました。必要な場合は、明示的に <code class="docutils literal notranslate"><span class="pre">default</span></code> を <code class="docutils literal notranslate"><span class="pre">Value([])</span></code> に設定してください。</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-stringagg">
+<span id="stringagg"></span><h3><code class="docutils literal notranslate"><span class="pre">StringAgg</span></code><a class="headerlink" href="#stringagg" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.StringAgg">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StringAgg</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distinct</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ordering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.StringAgg" title="Link to this definition">¶</a></dt>
+<dd><p>入力値を文字列に連結し、<code class="docutils literal notranslate"><span class="pre">delimiter</span></code> 文字列で区切って返します。値がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> を返します。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.StringAgg.delimiter">
+<span class="sig-name descname"><span class="pre">delimiter</span></span><a class="headerlink" href="#django.contrib.postgres.aggregates.StringAgg.delimiter" title="Link to this definition">¶</a></dt>
+<dd><p>必須引数。文字列である必要があります。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.StringAgg.distinct">
+<span class="sig-name descname"><span class="pre">distinct</span></span><a class="headerlink" href="#django.contrib.postgres.aggregates.StringAgg.distinct" title="Link to this definition">¶</a></dt>
+<dd><p>連結された値が重複するかどうかを決定するオプションの真偽値引数。デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.StringAgg.ordering">
+<span class="sig-name descname"><span class="pre">ordering</span></span><a class="headerlink" href="#django.contrib.postgres.aggregates.StringAgg.ordering" title="Link to this definition">¶</a></dt>
+<dd><p>フィールド名 (降順を示すオプションの接頭辞 <code class="docutils literal notranslate"><span class="pre">&quot;-&quot;</span></code> を持つ) 、または結果文字列の要素の順序を指定する式 (または文字列や式のタプルやリスト) のオプションの文字列。</p>
+<p>例は、 <a class="reference internal" href="#django.contrib.postgres.aggregates.ArrayAgg.ordering" title="django.contrib.postgres.aggregates.ArrayAgg.ordering"><code class="xref py py-attr docutils literal notranslate"><span class="pre">ArrayAgg.ordering</span></code></a> と同じです。</p>
+</dd></dl>
+
+<p>使用例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Publication</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Article</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">headline</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">publications</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Publication</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">article</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">headline</span><span class="o">=</span><span class="s2">&quot;NASA uses Python&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">article</span><span class="o">.</span><span class="n">publications</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;The Python Journal&quot;</span><span class="p">)</span>
+<span class="go">&lt;Publication: Publication object (1)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">article</span><span class="o">.</span><span class="n">publications</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s2">&quot;Science News&quot;</span><span class="p">)</span>
+<span class="go">&lt;Publication: Publication object (2)&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.postgres.aggregates</span><span class="w"> </span><span class="kn">import</span> <span class="n">StringAgg</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">publication_names</span><span class="o">=</span><span class="n">StringAgg</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="s2">&quot;publications__title&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;, &quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">ordering</span><span class="o">=</span><span class="s2">&quot;publications__title&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">(</span><span class="s2">&quot;headline&quot;</span><span class="p">,</span> <span class="s2">&quot;publication_names&quot;</span><span class="p">)</span>
+<span class="go">&lt;QuerySet [{</span>
+<span class="go">    &#39;headline&#39;: &#39;NASA uses Python&#39;, &#39;publication_names&#39;: &#39;Science News, The Python Journal&#39;</span>
+<span class="go">}]&gt;</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>以前のバージョンでは、行が存在せず <code class="docutils literal notranslate"><span class="pre">default</span></code> が指定されていない場合、<code class="docutils literal notranslate"><span class="pre">StringAgg</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> の代わりに空の文字列を返していました。必要な場合は、明示的に <code class="docutils literal notranslate"><span class="pre">default</span></code> を <code class="docutils literal notranslate"><span class="pre">Value(&quot;&quot;)</span></code> に設定してください。</p>
+</div>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-aggregate-functions-for-statistics">
+<span id="aggregate-functions-for-statistics"></span><h2>統計のための集計関数<a class="headerlink" href="#aggregate-functions-for-statistics" title="Link to this heading">¶</a></h2>
+<section id="s-y-and-x">
+<span id="y-and-x"></span><h3><code class="docutils literal notranslate"><span class="pre">y</span></code> および <code class="docutils literal notranslate"><span class="pre">x</span></code><a class="headerlink" href="#y-and-x" title="Link to this heading">¶</a></h3>
+<p>これらの関数の引数 <code class="docutils literal notranslate"><span class="pre">y</span></code> と <code class="docutils literal notranslate"><span class="pre">x</span></code> には、フィールド名または数値データを返す式を指定できます。どちらも必須です。</p>
+</section>
+<section id="s-corr">
+<span id="corr"></span><h3><code class="docutils literal notranslate"><span class="pre">Corr</span></code><a class="headerlink" href="#corr" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.Corr">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Corr</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.Corr" title="Link to this definition">¶</a></dt>
+<dd><p>相関係数を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返す。</p>
+</dd></dl>
+
+</section>
+<section id="s-covarpop">
+<span id="covarpop"></span><h3><code class="docutils literal notranslate"><span class="pre">CovarPop</span></code><a class="headerlink" href="#covarpop" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.CovarPop">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CovarPop</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.CovarPop" title="Link to this definition">¶</a></dt>
+<dd><p>母集団の共分散を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返す。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.CovarPop.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><a class="headerlink" href="#django.contrib.postgres.aggregates.CovarPop.sample" title="Link to this definition">¶</a></dt>
+<dd><p>オプション。デフォルトでは <code class="docutils literal notranslate"><span class="pre">CovarPop</span></code> は一般母集団の共分散を返す。ただし、 <code class="docutils literal notranslate"><span class="pre">sample=True</span></code> の場合、戻り値はサンプル母集団の共分散になる。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-regravgx">
+<span id="regravgx"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrAvgX</span></code><a class="headerlink" href="#regravgx" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrAvgX">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrAvgX</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrAvgX" title="Link to this definition">¶</a></dt>
+<dd><p>独立変数の平均値 (<code class="docutils literal notranslate"><span class="pre">sum(x)/N</span></code>) を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返す。</p>
+</dd></dl>
+
+</section>
+<section id="s-regravgy">
+<span id="regravgy"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrAvgY</span></code><a class="headerlink" href="#regravgy" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrAvgY">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrAvgY</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrAvgY" title="Link to this definition">¶</a></dt>
+<dd><p>従属変数の平均値 (<code class="docutils literal notranslate"><span class="pre">sum(y)/N</span></code>) を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返す。</p>
+</dd></dl>
+
+</section>
+<section id="s-regrcount">
+<span id="regrcount"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrCount</span></code><a class="headerlink" href="#regrcount" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrCount">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrCount</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrCount" title="Link to this definition">¶</a></dt>
+<dd><p>両方の式が NULL ではない入力行の数を <code class="docutils literal notranslate"><span class="pre">int</span></code> で返す。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">default</span></code> 引数はサポートされていません。</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-regrintercept">
+<span id="regrintercept"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrIntercept</span></code><a class="headerlink" href="#regrintercept" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrIntercept">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrIntercept</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrIntercept" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> のペアによって決定される最小二乗法にフィットした一次方程式の y 切片を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返します。マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> を返します。</p>
+</dd></dl>
+
+</section>
+<section id="s-regrr2">
+<span id="regrr2"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrR2</span></code><a class="headerlink" href="#regrr2" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrR2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrR2</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrR2" title="Link to this definition">¶</a></dt>
+<dd><p>相関係数の二乗を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返します。</p>
+</dd></dl>
+
+</section>
+<section id="s-regrslope">
+<span id="regrslope"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrSlope</span></code><a class="headerlink" href="#regrslope" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrSlope">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrSlope</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrSlope" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">(x,</span> <span class="pre">y)</span></code> のペアによって決定される最小二乗法の一次方程式の傾きを <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返す。</p>
+</dd></dl>
+
+</section>
+<section id="s-regrsxx">
+<span id="regrsxx"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrSXX</span></code><a class="headerlink" href="#regrsxx" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrSXX">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrSXX</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrSXX" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">sum(x^2)</span> <span class="pre">-</span> <span class="pre">sum(x)^2/N</span></code> (&quot;独立変数の二乗和&quot;) を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返す。</p>
+</dd></dl>
+
+</section>
+<section id="s-regrsxy">
+<span id="regrsxy"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrSXY</span></code><a class="headerlink" href="#regrsxy" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrSXY">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrSXY</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrSXY" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">sum(x*y)-sum(x)*sum(y)/N</span></code> (独立変数と従属変数の &quot;積和&quot;) を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返す。</p>
+</dd></dl>
+
+</section>
+<section id="s-regrsyy">
+<span id="regrsyy"></span><h3><code class="docutils literal notranslate"><span class="pre">RegrSYY</span></code><a class="headerlink" href="#regrsyy" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.postgres.aggregates.RegrSYY">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RegrSYY</span></span>(<em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.contrib.postgres.aggregates.RegrSYY" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">sum(y^2)</span> <span class="pre">-</span> <span class="pre">sum(y)^2/N</span></code> (従属変数の二乗和) を <code class="docutils literal notranslate"><span class="pre">float</span></code> で返すか、マッチする行がない場合は <code class="docutils literal notranslate"><span class="pre">default</span></code> で返す。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-usage-examples">
+<span id="usage-examples"></span><h2>使用例<a class="headerlink" href="#usage-examples" title="Link to this heading">¶</a></h2>
+<p>この例では以下のテーブルを使用します:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>| FIELD1 | FIELD2 | FIELD3 |
+|--------|--------|--------|
+|    foo |      1 |     13 |
+|    bar |      2 | (null) |
+|   test |      3 |     13 |
+</pre></div>
+</div>
+<p>汎用的な集計関数の例をいくつか紹介します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TestModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">StringAgg</span><span class="p">(</span><span class="s2">&quot;field1&quot;</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">))</span>
+<span class="go">{&#39;result&#39;: &#39;foo;bar;test&#39;}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TestModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">ArrayAgg</span><span class="p">(</span><span class="s2">&quot;field2&quot;</span><span class="p">))</span>
+<span class="go">{&#39;result&#39;: [1, 2, 3]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TestModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">result</span><span class="o">=</span><span class="n">ArrayAgg</span><span class="p">(</span><span class="s2">&quot;field1&quot;</span><span class="p">))</span>
+<span class="go">{&#39;result&#39;: [&#39;foo&#39;, &#39;bar&#39;, &#39;test&#39;]}</span>
+</pre></div>
+</div>
+<p>次の例では、統計的集計関数の使い方を示します。基礎となる数学については説明しません (たとえば、 <a class="reference external" href="https://ja.wikipedia.org/wiki/%E5%9B%9E%E5%B8%B0%E5%88%86%E6%9E%90">wikipedia</a> で読むことができます):</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">TestModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">count</span><span class="o">=</span><span class="n">RegrCount</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;field3&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;field2&quot;</span><span class="p">))</span>
+<span class="go">{&#39;count&#39;: 2}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TestModel</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">avgx</span><span class="o">=</span><span class="n">RegrAvgX</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;field3&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;field2&quot;</span><span class="p">),</span> <span class="n">avgy</span><span class="o">=</span><span class="n">RegrAvgY</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s2">&quot;field3&quot;</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s2">&quot;field2&quot;</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">{&#39;avgx&#39;: 2, &#39;avgy&#39;: 13}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">PostgreSQL 固有の集計関数</a><ul>
+<li><a class="reference internal" href="#general-purpose-aggregation-functions">汎用的な集計関数</a><ul>
+<li><a class="reference internal" href="#arrayagg"><code class="docutils literal notranslate"><span class="pre">ArrayAgg</span></code></a></li>
+<li><a class="reference internal" href="#bitand"><code class="docutils literal notranslate"><span class="pre">BitAnd</span></code></a></li>
+<li><a class="reference internal" href="#bitor"><code class="docutils literal notranslate"><span class="pre">BitOr</span></code></a></li>
+<li><a class="reference internal" href="#bitxor"><code class="docutils literal notranslate"><span class="pre">BitXor</span></code></a></li>
+<li><a class="reference internal" href="#booland"><code class="docutils literal notranslate"><span class="pre">BoolAnd</span></code></a></li>
+<li><a class="reference internal" href="#boolor"><code class="docutils literal notranslate"><span class="pre">BoolOr</span></code></a></li>
+<li><a class="reference internal" href="#jsonbagg"><code class="docutils literal notranslate"><span class="pre">JSONBAgg</span></code></a></li>
+<li><a class="reference internal" href="#stringagg"><code class="docutils literal notranslate"><span class="pre">StringAgg</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#aggregate-functions-for-statistics">統計のための集計関数</a><ul>
+<li><a class="reference internal" href="#y-and-x"><code class="docutils literal notranslate"><span class="pre">y</span></code> および <code class="docutils literal notranslate"><span class="pre">x</span></code></a></li>
+<li><a class="reference internal" href="#corr"><code class="docutils literal notranslate"><span class="pre">Corr</span></code></a></li>
+<li><a class="reference internal" href="#covarpop"><code class="docutils literal notranslate"><span class="pre">CovarPop</span></code></a></li>
+<li><a class="reference internal" href="#regravgx"><code class="docutils literal notranslate"><span class="pre">RegrAvgX</span></code></a></li>
+<li><a class="reference internal" href="#regravgy"><code class="docutils literal notranslate"><span class="pre">RegrAvgY</span></code></a></li>
+<li><a class="reference internal" href="#regrcount"><code class="docutils literal notranslate"><span class="pre">RegrCount</span></code></a></li>
+<li><a class="reference internal" href="#regrintercept"><code class="docutils literal notranslate"><span class="pre">RegrIntercept</span></code></a></li>
+<li><a class="reference internal" href="#regrr2"><code class="docutils literal notranslate"><span class="pre">RegrR2</span></code></a></li>
+<li><a class="reference internal" href="#regrslope"><code class="docutils literal notranslate"><span class="pre">RegrSlope</span></code></a></li>
+<li><a class="reference internal" href="#regrsxx"><code class="docutils literal notranslate"><span class="pre">RegrSXX</span></code></a></li>
+<li><a class="reference internal" href="#regrsxy"><code class="docutils literal notranslate"><span class="pre">RegrSXY</span></code></a></li>
+<li><a class="reference internal" href="#regrsyy"><code class="docutils literal notranslate"><span class="pre">RegrSYY</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#usage-examples">使用例</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="index.html"
+                          title="前の章へ"><code class="docutils literal notranslate"><span class="pre">django.contrib.postgres</span></code></a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="constraints.html"
+                          title="次の章へ">PostgreSQL 固有のデータベース制約</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/postgres/aggregates.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.contrib.postgres&lt;/span&gt;&lt;/code&gt;">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="constraints.html" title="PostgreSQL 固有のデータベース制約">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>タイムゾーン &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="ロギング" href="../logging.html" />
+    <link rel="prev" title="表示形式のローカライズ" href="formatting.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="formatting.html" title="表示形式のローカライズ">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="../logging.html" title="ロギング">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-i18n-timezones">
+            
+  <section id="s-time-zones">
+<span id="time-zones"></span><h1>タイムゾーン<a class="headerlink" href="#time-zones" title="Link to this heading">¶</a></h1>
+<section id="s-overview">
+<span id="s-time-zones-overview"></span><span id="overview"></span><span id="time-zones-overview"></span><h2>概要<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>タイムゾーンのサポートが有効のとき、Django は内部的にタイムゾーンを意識した (aware な) タイムゾーンオブジェクトを使用して、データベース内に UTC で日時の情報を保持します。そして、テンプレートやフォーム内でエンドユーザのタイムゾーンに変換します。</p>
+<p>この機能は、ユーザが複数のタイムゾーンを使用しており、またユーザに対して彼らの時計と同じ日時を表示したいときに有用です。</p>
+<p>あなたのウェブサイトが1つのタイムゾーンでしか利用できない場合でも、データベースにUTCでデータを保存するのはよいことです。主な理由はサマータイム（DST）です。多くの国では、春に時計を進め、秋に時計を戻すサマータイム制度を採用しています。現地時間で作業している場合、年に2回、この移行時にエラーが発生する可能性があります。あなたのブログには関係ないことかもしれませんが、毎年2回、顧客に1時間ずつ過大請求したり過小請求したりするのは問題です。この問題の解決策は、コード内でUTCを使用し、エンドユーザーとのやりとりの時だけローカルタイムを使用することです。</p>
+<p>タイムゾーンのサポートはデフォルトで有効になっています。無効にするには、設定ファイルで <a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">False</span></code></a> を設定してください。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>古いバージョンでは、タイムゾーンのサポートはデフォルトで無効になっていました。</p>
+</div>
+<p>タイムゾーンのサポートには <a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">zoneinfo</span></code></a> を使います。これは Python 3.9 から Python 標準ライブラリの一部となりました。</p>
+<p>特定の問題と格闘している場合は、<a class="reference internal" href="#time-zones-faq"><span class="std std-ref">タイムゾーンの FAQ</span></a> を参照してください。</p>
+</section>
+<section id="s-concepts">
+<span id="concepts"></span><h2>コンセプト<a class="headerlink" href="#concepts" title="Link to this heading">¶</a></h2>
+<section id="s-naive-and-aware-datetime-objects">
+<span id="s-naive-vs-aware-datetimes"></span><span id="naive-and-aware-datetime-objects"></span><span id="naive-vs-aware-datetimes"></span><h3>native と aware の日時オブジェクト<a class="headerlink" href="#naive-and-aware-datetime-objects" title="Link to this heading">¶</a></h3>
+<p>Python の <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a> のオブジェクトには、タイムゾーン情報を保持するために使える <code class="docutils literal notranslate"><span class="pre">tzinfo</span></code> 属性があり、これは <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.tzinfo</span></code></a> のサブクラスのインスタンスで表されます。 この属性がセットされオフセットを示すとき、datetime オブジェクトは <strong>aware</strong> (タイムゾーンを意識した日時) となります。それ以外の場合は <strong>naive</strong> (タイムゾーンを意識しない素朴な日時) となります。</p>
+<p><a class="reference internal" href="../../ref/utils.html#django.utils.timezone.is_aware" title="django.utils.timezone.is_aware"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_aware()</span></code></a>  <a class="reference internal" href="../../ref/utils.html#django.utils.timezone.is_naive" title="django.utils.timezone.is_naive"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_naive()</span></code></a> を使って、datatime を aware にするか native にするかを決めることもできます。</p>
+<p>タイムゾーンのサポートが無効になっている場合、 Django はローカル時間の naive な datetime オブジェクトを使います。多くの場合、これで十分です。このモードでは、現在時刻を取得するには、次のように書きます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+
+<span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>タイムゾーンサポートが有効化 (<a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ=True</span></code></a> ) されているときは、Django は タイムゾーンを認識する (awareな) datetime オブジェクトを使用します。コード内で datetime オブジェクトを作成した場合も、aware となります。このモードでは、上の例は以下のようになります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+<span class="n">now</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>認識された datetime オブジェクトを扱うことは、必ずしも直感的ではありません。例えば、標準の datetime コンストラクタの <code class="docutils literal notranslate"><span class="pre">tzinfo</span></code> 引数は、夏時間を含むタイムゾーンでは正しく動作しません。他のタイムゾーンを使用する場合は、 <a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">zoneinfo</span></code></a> のドキュメントをよく確認してください。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>Python の <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.time</span></code></a> オブジェクトは、<code class="docutils literal notranslate"><span class="pre">tzinfo</span></code> 属性を持ちます。また PostgreSQL には、これに相当する <code class="docutils literal notranslate"><span class="pre">time</span> <span class="pre">with</span> <span class="pre">time</span> <span class="pre">zone</span></code> タイプがあります。ただし、PostgreSQL のドキュメントにあるとおり、このタイプは &quot;不確かな有用性に導く特性を示しています&quot;。</p>
+<p>Django は naive な time オブジェクトのみをサポートしており、aware な time オブジェクトを保存しようとすると例外を投げます。これは、日付を伴わない時刻に対するタイムゾーンには意味がないからです。</p>
+</div>
+</section>
+<section id="s-interpretation-of-naive-datetime-objects">
+<span id="s-naive-datetime-objects"></span><span id="interpretation-of-naive-datetime-objects"></span><span id="naive-datetime-objects"></span><h3>native な datetime オブジェクトの変換<a class="headerlink" href="#interpretation-of-naive-datetime-objects" title="Link to this heading">¶</a></h3>
+<p>後方互換性を維持するため、 <a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> のときでも、Django は naive な datetime オブジェクトを受け入れます。データベースレイヤがそのようなオブジェクトを受け取ると、<a class="reference internal" href="#default-current-time-zone"><span class="std std-ref">デフォルトのタイムゾーン</span></a> として解釈して aware に変換しようと試み、警告を発します。</p>
+<p>残念ながら、夏時間（DST）の移行中には、存在しない日時や曖昧な日時があります。そのため、タイムゾーンサポートが有効な場合は常に aware な日時オブジェクトを作成するべきです。（DST移行中に日時に適用すべきオフセットを指定するために <code class="docutils literal notranslate"><span class="pre">fold</span></code> 属性を使用する例については、<a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#module-zoneinfo" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">zoneinfo</span> <span class="pre">ドキュメントの</span> <span class="pre">Using</span> <span class="pre">ZoneInfo</span> <span class="pre">セクション</span></code></a> を参照してください。）</p>
+<p>実際には、これはめったに問題になりません。Django はモデルやーフォームでは aware な datetime オブジェクトを渡し、ほとんどの場合、新しい datetime オブジェクトは <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code></a> 計算を通じて他の日時から作成されます。唯一アプリケーションのコード内でよく作成される datetime は現在の時刻で、<a class="reference internal" href="../../ref/utils.html#django.utils.timezone.now" title="django.utils.timezone.now"><code class="xref py py-func docutils literal notranslate"><span class="pre">timezone.now()</span></code></a> は自動的に適切な処理を行います。</p>
+</section>
+<section id="s-default-time-zone-and-current-time-zone">
+<span id="s-default-current-time-zone"></span><span id="default-time-zone-and-current-time-zone"></span><span id="default-current-time-zone"></span><h3>デフォルトタイムゾーンとカレントタイムゾーン<a class="headerlink" href="#default-time-zone-and-current-time-zone" title="Link to this heading">¶</a></h3>
+<p><strong>デフォルトタイムゾーン</strong> は、<a class="reference internal" href="../../ref/settings.html#std-setting-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TIME_ZONE</span></code></a> 設定によって定義されるタイムゾーンです。</p>
+<p><strong>カレントタイムゾーン</strong> は、レンダリングに使われるタイムゾーンです。</p>
+<p><a class="reference internal" href="../../ref/utils.html#django.utils.timezone.activate" title="django.utils.timezone.activate"><code class="xref py py-func docutils literal notranslate"><span class="pre">activate()</span></code></a> を使って、エンドユーザの実際のタイムゾーンに対するカレントタイムゾーンをセットする必要があります。 そうしないと、デフォルトタイムゾーンが使用されます。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TIME_ZONE</span></code></a> のドキュメントで説明されているとおり、Django は環境変数をセットし、プロセスがデフォルトタイムゾーンで動くようにします。 これは、<a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> やカレントタイムゾーンの値にかかわらず発生します。</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、ローカルタイムに依存しているアプリケーションとの後方互換性を保つために便利です。しかし、 <a class="reference internal" href="#naive-datetime-objects"><span class="std std-ref">上で説明したように</span></a> 、これは完全に信頼できるものではありません。自分のコードでは常にUTCで認識されたdatetimeを扱う必要があります。例えば、 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime.fromtimestamp" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">fromtimestamp()</span></code></a> を使用し、 <code class="docutils literal notranslate"><span class="pre">tz</span></code> パラメータに <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timezone.utc" title="(in Python v3.13)"><code class="xref py py-attr docutils literal notranslate"><span class="pre">utc</span></code></a> を指定します。</p>
+</div>
+</section>
+<section id="s-selecting-the-current-time-zone">
+<span id="selecting-the-current-time-zone"></span><h3>カレントタイムゾーンを選択する<a class="headerlink" href="#selecting-the-current-time-zone" title="Link to this heading">¶</a></h3>
+<p>カレントタイムゾーンは、翻訳に対する <a class="reference internal" href="index.html#term-locale-name"><span class="xref std std-term">locale</span></a> に相当します。ただし、Django がユーザのタイムゾーンを自動的に決めるために使える <code class="docutils literal notranslate"><span class="pre">Accept-Language</span></code> HTTP ヘッダに相当するものはありません。代わりに、Django は <a class="reference internal" href="../../ref/utils.html#time-zone-selection-functions"><span class="std std-ref">タイムゾーン選択関数</span></a> を提供しています。これらを使って、あなたにとって有用なタイムゾーン選択ロジックを組み立ててください。</p>
+<p>タイムゾーンを気にするほとんどのウェブサイトは、ユーザーにどのタイムゾーンに住んでいるかを尋ね、この情報をユーザーのプロフィールに保存します。匿名ユーザーの場合は、主な視聴者のタイムゾーンまたはUTCを使用します。 <a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#zoneinfo.available_timezones" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">zoneinfo.available_timezones()</span></code></a> は利用可能なタイムゾーンのセットを提供し、ロケーションからタイムゾーンへのマッピングを構築できます 。</p>
+<p>以下は、セッション内にカレントタイムゾーンを保持する例です。(シンプルにするため、全体的にエラー処理を省略しています。)</p>
+<p>以下のミドルウェアを <a class="reference internal" href="../../ref/settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> に追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">zoneinfo</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TimezoneMiddleware</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_response</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span> <span class="o">=</span> <span class="n">get_response</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+        <span class="n">tzname</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;django_timezone&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tzname</span><span class="p">:</span>
+            <span class="n">timezone</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="n">zoneinfo</span><span class="o">.</span><span class="n">ZoneInfo</span><span class="p">(</span><span class="n">tzname</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">timezone</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>カレントタイムゾーンをセットできるビューを作成します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render</span>
+
+<span class="c1"># Prepare a map of common locations to timezone choices you wish to offer.</span>
+<span class="n">common_timezones</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;London&quot;</span><span class="p">:</span> <span class="s2">&quot;Europe/London&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Paris&quot;</span><span class="p">:</span> <span class="s2">&quot;Europe/Paris&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;New York&quot;</span><span class="p">:</span> <span class="s2">&quot;America/New_York&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">set_timezone</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="p">[</span><span class="s2">&quot;django_timezone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">[</span><span class="s2">&quot;timezone&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;template.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;timezones&quot;</span><span class="p">:</span> <span class="n">common_timezones</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>このビューに <code class="docutils literal notranslate"><span class="pre">POST</span></code> するフォームを <code class="docutils literal notranslate"><span class="pre">template.html</span></code> に入れます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">tz</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">get_current_timezone</span> <span class="k">as</span> <span class="nv">TIME_ZONE</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">form</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{%</span> <span class="k">url</span> <span class="s1">&#39;set_timezone&#39;</span> <span class="cp">%}</span><span class="s">&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;POST&quot;</span><span class="p">&gt;</span>
+    <span class="cp">{%</span> <span class="k">csrf_token</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">label</span> <span class="na">for</span><span class="o">=</span><span class="s">&quot;timezone&quot;</span><span class="p">&gt;</span>Time zone:<span class="p">&lt;/</span><span class="nt">label</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">select</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;timezone&quot;</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">for</span> <span class="nv">city</span><span class="o">,</span> <span class="nv">tz</span> <span class="k">in</span> <span class="nv">timezones</span> <span class="cp">%}</span>
+        <span class="p">&lt;</span><span class="nt">option</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">tz</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">tz</span> <span class="o">==</span> <span class="nv">TIME_ZONE</span> <span class="cp">%}</span> <span class="na">selected</span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">city</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">option</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+    <span class="p">&lt;/</span><span class="nt">select</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Set&quot;</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-time-zone-aware-input-in-forms">
+<span id="s-time-zones-in-forms"></span><span id="time-zone-aware-input-in-forms"></span><span id="time-zones-in-forms"></span><h2>フォームでのタイムゾーン aware な入力<a class="headerlink" href="#time-zone-aware-input-in-forms" title="Link to this heading">¶</a></h2>
+<p>タイムゾーンサポートを有効にしたとき、Django はフォーム内に入力された日時を <a class="reference internal" href="#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> で変換し、<code class="docutils literal notranslate"><span class="pre">cleaned_data</span></code> 内で aware な datetime オブジェクトを返します。</p>
+<p>変換されたdatetimeが存在しないか、または夏時間の移行期間中であるためにあいまいな場合は、無効な値として報告されます。</p>
+</section>
+<section id="s-time-zone-aware-output-in-templates">
+<span id="s-time-zones-in-templates"></span><span id="time-zone-aware-output-in-templates"></span><span id="time-zones-in-templates"></span><h2>テンプレートでのタイムゾーン aware な出力<a class="headerlink" href="#time-zone-aware-output-in-templates" title="Link to this heading">¶</a></h2>
+<p>タイムゾーンサポートを有効にしているとき、Django はテンプレートでレンダリングする際に aware な datetime オブジェクトを <a class="reference internal" href="#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> に変換します。この動作は、 <a class="reference internal" href="formatting.html"><span class="doc">表示形式のローカライズ</span></a> と非常によく似ています。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>Django は naive な日時オブジェクトは変換しません。これは、曖昧であることと、タイムゾーンサポートが有効化されているときは naive な日時を生成すべきではないからです。ただし、後述するテンプレートフィルタを使えば強制的に変換させることもできます。</p>
+</div>
+<p>現地時刻への転換は、適切ではないことがあります -- 人手はなくコンピュータに対してアウトプットを生成するときなどです。以下のフィルタやタグ (<code class="docutils literal notranslate"><span class="pre">tz</span></code> テンプレートタグライブラリによって提供されています) で、タイムゾーンの転換をコントロールできます。</p>
+<section id="s-template-tags">
+<span id="template-tags"></span><h3>テンプレートタグ<a class="headerlink" href="#template-tags" title="Link to this heading">¶</a></h3>
+<section id="s-localtime">
+<span id="s-std-templatetag-localtime"></span><span id="localtime"></span><span id="std-templatetag-localtime"></span><h4><code class="docutils literal notranslate"><span class="pre">localtime</span></code><a class="headerlink" href="#localtime" title="Link to this heading">¶</a></h4>
+<p>ブロック内で、aware な datetime オブジェクトのカレントタイムゾーンへの転換を有効化または無効化します。</p>
+<p>このタグは、テンプレートエンジンに関する限り、<a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> 設定とまったく同じ効果を持ちます。これを使うと、より細かい粒度の転換をコントロールできます。</p>
+<p>テンプレートブロックの変換を有効または無効にするには、次のようにします:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">tz</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">localtime</span> <span class="nv">on</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">value</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endlocaltime</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">localtime</span> <span class="nv">off</span> <span class="cp">%}</span>
+    <span class="cp">{{</span> <span class="nv">value</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endlocaltime</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> の値は、<code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">localtime</span> <span class="pre">%}</span></code> ブロックの中では尊重されません。</p>
+</div>
+</section>
+<section id="s-timezone">
+<span id="s-std-templatetag-timezone"></span><span id="timezone"></span><span id="std-templatetag-timezone"></span><h4><code class="docutils literal notranslate"><span class="pre">timezone</span></code><a class="headerlink" href="#timezone" title="Link to this heading">¶</a></h4>
+<p>ブロック内でカレントタイムゾーンをセットまたは解除します。カレントタイムゾーンがセットされていないときは、デフォルトタイムゾーンが適用されます。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">tz</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">timezone</span> <span class="s2">&quot;Europe/Paris&quot;</span> <span class="cp">%}</span>
+    Paris time: <span class="cp">{{</span> <span class="nv">value</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endtimezone</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">timezone</span> <span class="kp">None</span> <span class="cp">%}</span>
+    Server time: <span class="cp">{{</span> <span class="nv">value</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">endtimezone</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+</section>
+<section id="s-get-current-timezone">
+<span id="s-std-templatetag-get_current_timezone"></span><span id="get-current-timezone"></span><span id="std-templatetag-get_current_timezone"></span><h4><code class="docutils literal notranslate"><span class="pre">get_current_timezone</span></code><a class="headerlink" href="#get-current-timezone" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">get_current_timezone</span></code> タグを使えば、カレントタイムゾーンの名前を取得できます:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">get_current_timezone</span> <span class="k">as</span> <span class="nv">TIME_ZONE</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>これ以外に、<a class="reference internal" href="../../ref/templates/api.html#django.template.context_processors.tz" title="django.template.context_processors.tz"><code class="xref py py-func docutils literal notranslate"><span class="pre">tz()</span></code></a> コンテキストプロセッサを有効化して <code class="docutils literal notranslate"><span class="pre">TIME_ZONE</span></code> コンテキスト変数を使うことができます。</p>
+</section>
+</section>
+<section id="s-template-filters">
+<span id="template-filters"></span><h3>テンプレートフィルタ<a class="headerlink" href="#template-filters" title="Link to this heading">¶</a></h3>
+<p>以下のフィルタは、aware と native の日時の両方を受け入れます。転換するために、これらは native な日時はデフォルトタイムゾーンにあると仮定します。これらは常に aware な日時を返します。</p>
+<section id="s-std-templatefilter-localtime">
+<span id="s-id1"></span><span id="std-templatefilter-localtime"></span><span id="id1"></span><h4><code class="docutils literal notranslate"><span class="pre">localtime</span></code><a class="headerlink" href="#std-templatefilter-localtime" title="Link to this heading">¶</a></h4>
+<p>単一の値からカレントタイムゾーンへの変換を強制します。</p>
+<p>例えば次のようにします:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">tz</span> <span class="cp">%}</span>
+
+<span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">localtime</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+</section>
+<section id="s-utc">
+<span id="s-std-templatefilter-utc"></span><span id="utc"></span><span id="std-templatefilter-utc"></span><h4><code class="docutils literal notranslate"><span class="pre">utc</span></code><a class="headerlink" href="#utc" title="Link to this heading">¶</a></h4>
+<p>単一の値から UTC への転換を強制します。</p>
+<p>例えば次のようにします:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">tz</span> <span class="cp">%}</span>
+
+<span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">utc</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+</section>
+<section id="s-std-templatefilter-timezone">
+<span id="s-id2"></span><span id="std-templatefilter-timezone"></span><span id="id2"></span><h4><code class="docutils literal notranslate"><span class="pre">timezone</span></code><a class="headerlink" href="#std-templatefilter-timezone" title="Link to this heading">¶</a></h4>
+<p>単一の値から指定したタイムゾーンへの転換を強制します。</p>
+<p>引数は <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> サブクラスのインスタンスか、タイムゾーンの名前である必要があります。</p>
+<p>例えば次のようにします:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">tz</span> <span class="cp">%}</span>
+
+<span class="cp">{{</span> <span class="nv">value</span><span class="o">|</span><span class="nf">timezone</span><span class="s2">:&quot;Europe/Paris&quot;</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="s-migration-guide">
+<span id="s-time-zones-migration-guide"></span><span id="migration-guide"></span><span id="time-zones-migration-guide"></span><h2>マイグレーションガイド<a class="headerlink" href="#migration-guide" title="Link to this heading">¶</a></h2>
+<p>以下は、Django がタイムゾーンをサポートする以前に開始したプロジェクトをマイグレーションする方法です。</p>
+<section id="s-database">
+<span id="database"></span><h3>データベース<a class="headerlink" href="#database" title="Link to this heading">¶</a></h3>
+<section id="s-postgresql">
+<span id="postgresql"></span><h4>PostgreSQL<a class="headerlink" href="#postgresql" title="Link to this heading">¶</a></h4>
+<p>PostgreSQL バックエンドは datetime を <code class="docutils literal notranslate"><span class="pre">timestamp</span> <span class="pre">with</span> <span class="pre">time</span> <span class="pre">zone</span></code> として保存します。実際には、これが意味するのは、datetime をコネクションのタイムゾーンからストレージ上では UTC に変換して、取得時には UTC からコネクションのタイムゾーンに変換するということです。</p>
+<p>結果として、PostgreSQL を使っている場合、 <code class="docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">False</span></code> と <code class="docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">True</span></code> を自由に切り替えることができます。データベース接続のタイムゾーンはそれぞれ <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASE-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASE-TIME_ZONE</span></code></a> か <code class="docutils literal notranslate"><span class="pre">UTC</span></code> に設定されるので、Django はどんな場合でも正しい日時を取得できます。データ変換を行う必要はありません。</p>
+<div class="admonition-time-zone-settings admonition">
+<p class="admonition-title">タイムゾーンの設定</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> 設定で接続に設定された <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASE-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">タイムゾーン</span></code></a> は、通常の <a class="reference internal" href="../../ref/settings.html#std-setting-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TIME_ZONE</span></code></a> 設定とは異なります。</p>
+</div>
+</section>
+<section id="s-other-databases">
+<span id="other-databases"></span><h4>他のデータベース<a class="headerlink" href="#other-databases" title="Link to this heading">¶</a></h4>
+<p>他のバックエンドは、タイムゾーン情報なしで日時を保持します。<code class="docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">False</span></code> から <code class="docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">True</span></code> に切り替えた場合、現地時刻から UTC に転換する必要があります -- あなたの現地時刻に DST がある場合、これは確実に 1 つに決まるわけではありません。</p>
+</section>
+</section>
+<section id="s-code">
+<span id="code"></span><h3>コード<a class="headerlink" href="#code" title="Link to this heading">¶</a></h3>
+<p>最初のステップは、設定ファイルに <a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">True</span></code></a> を追加することです。この時点では、だいたいのことがうまく動くはずです。コード内で naive な datetime オブジェクトを生成した場合、Django は必要に応じて aware にします。</p>
+<p>ただし、これらの変換ではDSTの移行が失敗する可能性があります。これは、まだ対ー無ゾーンサポートの利点が完全には得られていないことを意味します。 また、naive な日時と aware な日時を比較することは不可能なため、いくつかの問題に遭遇する可能性があります。 Django はaware な日時を提供するので、モデルやフォームから来た datetime と、コード内に作成した naive な datetime を比較すると例外が発生します。</p>
+<p>したがって、第2のステップは、datetime オブジェクトをインスタンス化している部分を aware に変更するため、コードをリファクタリングすることです。 これは段階的に行うことができます。<a class="reference internal" href="../../ref/utils.html#module-django.utils.timezone" title="django.utils.timezone: Timezone support."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.utils.timezone</span></code></a> は、互換性のための便利なヘルパーをいくつ定義しています <a class="reference internal" href="../../ref/utils.html#django.utils.timezone.now" title="django.utils.timezone.now"><code class="xref py py-func docutils literal notranslate"><span class="pre">now()</span></code></a>、<a class="reference internal" href="../../ref/utils.html#django.utils.timezone.is_aware" title="django.utils.timezone.is_aware"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_aware()</span></code></a>、<a class="reference internal" href="../../ref/utils.html#django.utils.timezone.is_naive" title="django.utils.timezone.is_naive"><code class="xref py py-func docutils literal notranslate"><span class="pre">is_naive()</span></code></a>、<a class="reference internal" href="../../ref/utils.html#django.utils.timezone.make_aware" title="django.utils.timezone.make_aware"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_aware()</span></code></a> そして <a class="reference internal" href="../../ref/utils.html#django.utils.timezone.make_naive" title="django.utils.timezone.make_naive"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_naive()</span></code></a> です。</p>
+<p>最後に、アップグレードが必要なコードを見つけやすくするために、Django は naive な datetime をデータベースに保存しようとすると警告を出します:</p>
+<div class="highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="x">RuntimeWarning: DateTimeField ModelName.field_name received a naive</span>
+<span class="x">datetime (2012-01-01 00:00:00) while time zone support is active.</span>
+</pre></div>
+</div>
+<p>開発中、以下を設定ファイルに追加することで、これらの警告を例外として発生するように変更し、トラックバックを得ることができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span>
+    <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s2">&quot;DateTimeField .* received a naive datetime&quot;</span><span class="p">,</span>
+    <span class="ne">RuntimeWarning</span><span class="p">,</span>
+    <span class="sa">r</span><span class="s2">&quot;django\.db\.models\.fields&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="s-fixtures">
+<span id="fixtures"></span><h3>フィクスチャ (fixture)<a class="headerlink" href="#fixtures" title="Link to this heading">¶</a></h3>
+<p>aware な日時をシリアライズするとき、以下のように UTC オフセットが含まれます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;2011-09-01T13:20:30+03:00&quot;</span>
+</pre></div>
+</div>
+<p>しかし、naive な日付の場合はそうではありません:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;2011-09-01T13:20:30&quot;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../ref/models/fields.html#django.db.models.DateTimeField" title="django.db.models.DateTimeField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTimeField</span></code></a> を使ったモデルに対しては、この違いにより、タイムゾーンサポートのありとなし両方に対して動作するフィクスチャを記述することができません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">False</span></code> もしくは Django 1.4 以前 で生成されたフィクスチャは、&quot;naive&quot; 形式を使用します。このようなフィクスチャがプロジェクトに含まれる場合、タイムゾーンサポートを有効化した後に、これらをロードする際に <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeWarning" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeWarning</span></code></a> を参照してください。警告を破棄するには、これらのフィクスチャを &quot;aware&quot; 形式に転換する必要があります。</p>
+<p><a class="reference internal" href="../../ref/django-admin.html#django-admin-loaddata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">loaddata</span></code></a> と <a class="reference internal" href="../../ref/django-admin.html#django-admin-dumpdata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">dumpdata</span></code></a> でフィクスチャを再生成できます。または、それらが十分に小さい場合、シリアライズされた各日時に <a class="reference internal" href="../../ref/settings.html#std-setting-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TIME_ZONE</span></code></a> に一致する UTC オフセットを追加するように編集できます。</p>
+</section>
+</section>
+<section id="s-faq">
+<span id="s-time-zones-faq"></span><span id="faq"></span><span id="time-zones-faq"></span><h2>FAQ<a class="headerlink" href="#faq" title="Link to this heading">¶</a></h2>
+<section id="s-setup">
+<span id="setup"></span><h3>セットアップ<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p><strong>複数のタイムゾーンを必要としません。タイムゾーンサポートを有効化するべきですか？</strong></p>
+<p>はい。タイムゾーンのサポートを有効にすると、 Django はより正確な現地時間のモデルを使います。これにより、夏時間 (DST) の遷移にまつわる微妙で再現不可能なバグを回避できます。</p>
+<p>タイムゾーンのサポートを有効にすると、Django の aware な datetime を期待しているところで naive な datetime を使っていることが原因のエラーが発生します。このようなエラーはテストを実行するときに現れます。無効な操作を避ける方法をすぐに知ることができるでしょう。</p>
+<p>一方、タイムゾーンのサポートがないために起こるバグは、予防、診断、修正が非常に困難です。スケジュールされたタスクや datetime 演算を含むものは、年に1度か2度しか発生しない微妙なバグの原因になります。</p>
+<p>このような理由から、新しいプロジェクトではタイムゾーンのサポートがデフォルトで有効になっています。</p>
+</li>
+<li><p><strong>タイムゾーンサポートを有効化しました。私は安全ですか？</strong></p>
+<p>おそらく。DST 関連のバグからは守られるようになりましたが、それでも不用意な変換 ( naive な日時を aware な日時に変更する、およびその逆）ことによって自ら墓穴を掘る可能性があります。</p>
+<p>アプリケーションが他のシステムに接続する場合、例えばウェブサービスにクエリする場合、datetime が適切に指定されていることを確認してください。datetime を安全に送信するには、その表現に UTC オフセットを含めるか、その値を UTC にする必要があります（あるいはその両方！）。</p>
+<p>最後に、私たちのカレンダーシステムには興味深いエッジケースがあります。例えば、ある日付から直接1年を引くことはできません:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span><span class="w"> </span><span class="nf">one_year_before</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>  <span class="c1"># Wrong example.</span>
+<span class="gp">... </span>    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="n">value</span><span class="o">.</span><span class="n">year</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">one_year_before</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="go">datetime.datetime(2011, 3, 1, 10, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">one_year_before</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>: <span class="n">day is out of range for month</span>
+</pre></div>
+</div>
+<p>このような関数を正しく実装するには、2012-02-29から1年を引いた値が2011-02-28なのか、2011-03-01なのかを決める必要があります。</p>
+</li>
+<li><p><strong>現地時刻で日時を保持しているデータベースと、どのようにやり取りすればいいですか？</strong></p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-DATABASE-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TIME_ZONE</span></code></a> オプションを、<a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> 設定内のデータベースに適したタイムゾーンにセットしてください。</p>
+<p>これは、 <a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> のときに、タイムゾーンをサポートしておらず、 Django が管理していないデータベースに接続するのに便利です。</p>
+</li>
+</ol>
+</section>
+<section id="s-troubleshooting">
+<span id="troubleshooting"></span><h3>トラブルシューティング<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p><strong>私のアプリケーションが</strong> <code class="docutils literal notranslate"><span class="pre">TypeError:</span> <span class="pre">can't</span> <span class="pre">compare</span> <span class="pre">offset-naive</span></code> <code class="docutils literal notranslate"><span class="pre">and</span> <span class="pre">offset-aware</span> <span class="pre">datetimes</span></code> <strong>とともにクラッシュします -- 何がいけませんか？</strong></p>
+<p>naive な datetime と aware な datetime を比較して、このエラーを再現してみましょう:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">aware</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naive</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">make_naive</span><span class="p">(</span><span class="n">aware</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naive</span> <span class="o">==</span> <span class="n">aware</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">TypeError</span>: <span class="n">can&#39;t compare offset-naive and offset-aware datetimes</span>
+</pre></div>
+</div>
+<p>このエラーに遭遇した場合、あなたのコードはこれら 2 つを比較している可能性が高いです:</p>
+<ul class="simple">
+<li><p>Django が提供する datetime -- 例えば、フォームやモデルフィールド から読み込んだ値。タイムゾーンのサポートが有効になっているので、aware です。</p></li>
+<li><p>あなたのコードによって生成された datetime。これは naive です（そうでなければ、あなたはこれを読んでいないでしょう）。</p></li>
+</ul>
+<p>通常、正しい解決策は、代わりに aware な datetime を使うようにコードを変更することです。</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> の値とは関係なく動作するようなプラグイン可能なアプリケーションを書いている場合、 <a class="reference internal" href="../../ref/utils.html#django.utils.timezone.now" title="django.utils.timezone.now"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.timezone.now()</span></code></a> が役に立つかもしれません。この関数は、 <code class="docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">False</span></code> の場合は naive な datetime として、 <code class="docutils literal notranslate"><span class="pre">USE_TZ</span> <span class="pre">=</span> <span class="pre">True</span></code> の場合は aware な datetime として現在の日時を返します。必要に応じて <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.timedelta</span></code></a> を足したり引いたりすることができます。</p>
+</li>
+<li><p><strong>多くの</strong> <code class="docutils literal notranslate"><span class="pre">RuntimeWarning:</span> <span class="pre">DateTimeField</span> <span class="pre">received</span> <span class="pre">a</span> <span class="pre">naive</span> <span class="pre">datetime</span></code> <code class="docutils literal notranslate"><span class="pre">(YYYY-MM-DD</span> <span class="pre">HH:MM:SS)</span></code> <code class="docutils literal notranslate"><span class="pre">while</span> <span class="pre">time</span> <span class="pre">zone</span> <span class="pre">support</span> <span class="pre">is</span> <span class="pre">active</span></code> <strong>が発生します。 -- これは悪いことですか？</strong></p>
+<p>タイムゾーンのサポートが有効になっている場合、データベース層はコードから aware な datetime だけを受け取ることを期待します。この警告は、naive な datetime を受け取ったときに発生します。これは、タイムゾーンをサポートするためのコードの移植が完了していないことを示しています。このプロセスのヒントについては <a class="reference internal" href="#time-zones-migration-guide"><span class="std std-ref">マイグレーションガイド</span></a> を参照してください。</p>
+<p>一方、後方互換性のために、datetime はデフォルトのタイムゾーンにあるとみなされます。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">now.date()</span></code> <strong>が昨日 (もしくは明日) になります！</strong></p>
+<p>常に naive な日時を使用してきた場合、<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime.date" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">date()</span></code></a> メソッドを呼び出すことで日時を日付に変換できると考えているかもしれません。また、<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a> は <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> に非常に似ているが、精度が低いとも考えるでしょう。</p>
+<p>タイムゾーンを意識した環境では、どれも正しくありません:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">zoneinfo</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">paris_tz</span> <span class="o">=</span> <span class="n">zoneinfo</span><span class="o">.</span><span class="n">ZoneInfo</span><span class="p">(</span><span class="s2">&quot;Europe/Paris&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_york_tz</span> <span class="o">=</span> <span class="n">zoneinfo</span><span class="o">.</span><span class="n">ZoneInfo</span><span class="p">(</span><span class="s2">&quot;America/New_York&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">paris</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2012</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">paris_tz</span><span class="p">)</span>
+<span class="go"># This is the correct way to convert between time zones.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_york</span> <span class="o">=</span> <span class="n">paris</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">new_york_tz</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">paris</span> <span class="o">==</span> <span class="n">new_york</span><span class="p">,</span> <span class="n">paris</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">==</span> <span class="n">new_york</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+<span class="go">(True, False)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">paris</span> <span class="o">-</span> <span class="n">new_york</span><span class="p">,</span> <span class="n">paris</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">-</span> <span class="n">new_york</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+<span class="go">(datetime.timedelta(0), datetime.timedelta(1))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">paris</span>
+<span class="go">datetime.datetime(2012, 3, 3, 1, 30, tzinfo=zoneinfo.ZoneInfo(key=&#39;Europe/Paris&#39;))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_york</span>
+<span class="go">datetime.datetime(2012, 3, 2, 19, 30, tzinfo=zoneinfo.ZoneInfo(key=&#39;America/New_York&#39;))</span>
+</pre></div>
+</div>
+<p>この例が示すように、同じdatetimeでも、それを表現するタイムゾーンによって日付が異なります。しかし、本当の問題はもっと根本的なところにあります。</p>
+<p>datetime は <strong>時点</strong> を表します。それは絶対的なもので、何にも依存しません。逆に、日付は <strong>カレンダーの概念</strong> です。その境界は日付が扱われるタイムゾーンに依存します。このように、この2つの概念は根本的に異なっており、datetime を date に変換することは決定論的な操作ではありません。</p>
+<p>これは実際のところ何を意味するのでしょうか？</p>
+<p>一般的に、 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> を <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">date</span></code></a> に変換することは避けるべきです。例えば、 <a class="reference internal" href="../../ref/templates/builtins.html#std-templatefilter-date"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">date</span></code></a> テンプレートフィルタを使うと、datetime の日付部分だけを表示できます。このフィルタは datetime をフォーマットする前にカレントタイムゾーンに変換し、結果が正しく表示されるようにします。</p>
+<p>どうしても自分で変換する必要がある場合は、まず datetime が適切なタイムゾーンに変換されていることを確認する必要があります。通常、これはカレントタイムゾーンになります:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timezone</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="n">zoneinfo</span><span class="o">.</span><span class="n">ZoneInfo</span><span class="p">(</span><span class="s2">&quot;Asia/Singapore&quot;</span><span class="p">))</span>
+<span class="go"># For this example, we set the time zone to Singapore, but here&#39;s how</span>
+<span class="go"># you would obtain the current time zone in the general case.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">current_tz</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">get_current_timezone</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">local</span> <span class="o">=</span> <span class="n">paris</span><span class="o">.</span><span class="n">astimezone</span><span class="p">(</span><span class="n">current_tz</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">local</span>
+<span class="go">datetime.datetime(2012, 3, 3, 8, 30, tzinfo=zoneinfo.ZoneInfo(key=&#39;Asia/Singapore&#39;))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">local</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+<span class="go">datetime.date(2012, 3, 3)</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>エラーが発生しました</strong> &quot;<code class="docutils literal notranslate"><span class="pre">Are</span> <span class="pre">time</span> <span class="pre">zone</span> <span class="pre">definitions</span> <span class="pre">for</span> <span class="pre">your</span> <span class="pre">database</span> <span class="pre">installed?</span></code>&quot;</p>
+<p>MySQLを使用している場合は、MySQLノートの <a class="reference internal" href="../../ref/databases.html#mysql-time-zone-definitions"><span class="std std-ref">タイムゾーンの定義</span></a> セクションを参照してタイムゾーン定義を読み込んでください。</p>
+</li>
+</ol>
+</section>
+<section id="s-usage">
+<span id="usage"></span><h3>使い方<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h3>
+<ol class="arabic">
+<li><p><strong>文字列</strong> <code class="docutils literal notranslate"><span class="pre">&quot;2012-02-21</span> <span class="pre">10:28:45&quot;</span></code> <strong>があり、</strong> <code class="docutils literal notranslate"><span class="pre">&quot;Europe/Helsinki&quot;</span></code> <strong>タイムゾーンであることが分かっています。aware な日時に変換するにはどうすればよいですか？</strong></p>
+<p>この場合、必要な <code class="docutils literal notranslate"><span class="pre">ZoneInfo</span></code> インスタンスを作成し、それを naive な datetime に付加する必要があります。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">zoneinfo</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.dateparse</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naive</span> <span class="o">=</span> <span class="n">parse_datetime</span><span class="p">(</span><span class="s2">&quot;2012-02-21 10:28:45&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">naive</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">zoneinfo</span><span class="o">.</span><span class="n">ZoneInfo</span><span class="p">(</span><span class="s2">&quot;Europe/Helsinki&quot;</span><span class="p">))</span>
+<span class="go">datetime.datetime(2012, 2, 21, 10, 28, 45, tzinfo=zoneinfo.ZoneInfo(key=&#39;Europe/Helsinki&#39;))</span>
+</pre></div>
+</div>
+</li>
+<li><p><strong>カレントタイムゾーンで現地時刻を取得するにはどうすればよいですか？</strong></p>
+<p>そうですね。最初に質問させてください。それは本当に必要ですか？</p>
+<p>人間とやり取りするときだけ、現地時刻を使うべきです。そして、テンプレートレイヤは日時をあなたが選択したタイムゾーンに転換するための <a class="reference internal" href="#time-zones-in-templates"><span class="std std-ref">フィルタとタグ</span></a> を提供しています。</p>
+<p>さらに、Python は認識された datetime を比較する方法を知っており、必要に応じて UTC オフセットを考慮します。すべてのモデルやビューのコードを UTC で書く方がずっと簡単です (そしておそらく速い)。ですから、ほとんどの場合、 <a class="reference internal" href="../../ref/utils.html#django.utils.timezone.now" title="django.utils.timezone.now"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.timezone.now()</span></code></a> で返される UTC での datetime で十分です。</p>
+<p>ただし、完全のため、カレントタイムゾーンの現地時間が本当に必要な場合は、以下の方法で取得できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">timezone</span><span class="o">.</span><span class="n">localtime</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+<span class="go">datetime.datetime(2012, 3, 3, 20, 10, 53, 873365, tzinfo=zoneinfo.ZoneInfo(key=&#39;Europe/Paris&#39;))</span>
+</pre></div>
+</div>
+<p>この例では、カレントタイムゾーンは <code class="docutils literal notranslate"><span class="pre">&quot;Europe/Paris&quot;</span></code> です。</p>
+</li>
+<li><p><strong>全ての利用可能なタイムゾーンを参照するにはどうすればいいですか？</strong></p>
+<p><a class="reference external" href="https://docs.python.org/3/library/zoneinfo.html#zoneinfo.available_timezones" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">zoneinfo.available_timezones()</span></code></a> は、あなたのシステムで利用可能なIANAタイムゾーンの全ての有効なキーを提供します。使用上の注意についてはドキュメントを参照してください。</p>
+</li>
+</ol>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">タイムゾーン</a><ul>
+<li><a class="reference internal" href="#overview">概要</a></li>
+<li><a class="reference internal" href="#concepts">コンセプト</a><ul>
+<li><a class="reference internal" href="#naive-and-aware-datetime-objects">native と aware の日時オブジェクト</a></li>
+<li><a class="reference internal" href="#interpretation-of-naive-datetime-objects">native な datetime オブジェクトの変換</a></li>
+<li><a class="reference internal" href="#default-time-zone-and-current-time-zone">デフォルトタイムゾーンとカレントタイムゾーン</a></li>
+<li><a class="reference internal" href="#selecting-the-current-time-zone">カレントタイムゾーンを選択する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#time-zone-aware-input-in-forms">フォームでのタイムゾーン aware な入力</a></li>
+<li><a class="reference internal" href="#time-zone-aware-output-in-templates">テンプレートでのタイムゾーン aware な出力</a><ul>
+<li><a class="reference internal" href="#template-tags">テンプレートタグ</a><ul>
+<li><a class="reference internal" href="#localtime"><code class="docutils literal notranslate"><span class="pre">localtime</span></code></a></li>
+<li><a class="reference internal" href="#timezone"><code class="docutils literal notranslate"><span class="pre">timezone</span></code></a></li>
+<li><a class="reference internal" href="#get-current-timezone"><code class="docutils literal notranslate"><span class="pre">get_current_timezone</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#template-filters">テンプレートフィルタ</a><ul>
+<li><a class="reference internal" href="#std-templatefilter-localtime"><code class="docutils literal notranslate"><span class="pre">localtime</span></code></a></li>
+<li><a class="reference internal" href="#utc"><code class="docutils literal notranslate"><span class="pre">utc</span></code></a></li>
+<li><a class="reference internal" href="#std-templatefilter-timezone"><code class="docutils literal notranslate"><span class="pre">timezone</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#migration-guide">マイグレーションガイド</a><ul>
+<li><a class="reference internal" href="#database">データベース</a><ul>
+<li><a class="reference internal" href="#postgresql">PostgreSQL</a></li>
+<li><a class="reference internal" href="#other-databases">他のデータベース</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#code">コード</a></li>
+<li><a class="reference internal" href="#fixtures">フィクスチャ (fixture)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#faq">FAQ</a><ul>
+<li><a class="reference internal" href="#setup">セットアップ</a></li>
+<li><a class="reference internal" href="#troubleshooting">トラブルシューティング</a></li>
+<li><a class="reference internal" href="#usage">使い方</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="formatting.html"
+                          title="前の章へ">表示形式のローカライズ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="../logging.html"
+                          title="次の章へ">ロギング</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/i18n/timezones.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="formatting.html" title="表示形式のローカライズ">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="../logging.html" title="ロギング">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

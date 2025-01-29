@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ビューを記述する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="ビューのデコレータ" href="decorators.html" />
+    <link rel="prev" title="URL ディスパッチャ" href="urls.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="urls.html" title="URL ディスパッチャ">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="decorators.html" title="ビューのデコレータ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-http-views">
+            
+  <section id="s-writing-views">
+<span id="writing-views"></span><h1>ビューを記述する<a class="headerlink" href="#writing-views" title="Link to this heading">¶</a></h1>
+<p>ビュー関数、つまり <em>view</em> は、Web リクエストを受け取って Web レスポンスを返すPython 関数です。 このレスポンスは、WebページのHTMLコンテンツ、リダイレクトや404エラー、またはXMLドキュメントやイメージ、その他何にでもなり得ます (本当にそうなんです)。ビュー自体には、このレスポンスを返すために必要な、任意の論理が含まれます。 このコードは、Python パス上にあればどこでも好きな場所に置くことができます。それ以外の要件はありません -- つまり &quot;魔法&quot; はないのです。 コードを <em>どこかに</em> 置くために、慣習ではプロジェクトやアプリケーションのディレクトリに置かれた <code class="docutils literal notranslate"><span class="pre">views.py</span></code> というファイルにビューを記述します。</p>
+<section id="s-a-simple-view">
+<span id="a-simple-view"></span><h2>シンプルなビュー<a class="headerlink" href="#a-simple-view" title="Link to this heading">¶</a></h2>
+<p>以下は、HTML ドキュメントとして、現在の日付と時刻を返すビューです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">current_datetime</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="s1">&#39;&lt;html lang=&quot;en&quot;&gt;&lt;body&gt;It is now </span><span class="si">%s</span><span class="s1">.&lt;/body&gt;&lt;/html&gt;&#39;</span> <span class="o">%</span> <span class="n">now</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>1 行ずつコードを見ていきましょう:</p>
+<ul>
+<li><p>最初に、Python の <code class="docutils literal notranslate"><span class="pre">datetime</span></code> ライブラリ とともに、クラス <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> を <a class="reference internal" href="../../ref/request-response.html#module-django.http" title="django.http: Classes dealing with HTTP requests and responses."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.http</span></code></a> モジュールからインポートします。</p></li>
+<li><p>次に、<code class="docutils literal notranslate"><span class="pre">current_datetime</span></code> という関数を定義します。これがビュー関数です。それぞれのビュー関数は、<a class="reference internal" href="../../ref/request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> のオブジェクトを第 1 引数として受け取り、一般的には <code class="docutils literal notranslate"><span class="pre">request</span></code> と名付けられます。</p>
+<p>ビュー関数の名前は重要ではありません; Django が識別するために特別な方法で名前を付ける必要はありません。ここでは、<code class="docutils literal notranslate"><span class="pre">current_datetime</span></code> という名前はその機能を的確に表しているので、ビュー関数を <code class="docutils literal notranslate"><span class="pre">current_datetime</span></code> と呼ぶことにします。</p>
+</li>
+<li><p>このビューは、生成されたレスポンスを含む <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> のオブジェクトを返します。それぞれのビュー関数には、<a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトを返す義務があります。(例外もありますので、後で説明します。)</p></li>
+</ul>
+<div class="admonition-django-s-time-zone admonition">
+<p class="admonition-title">Django のタイムゾーン</p>
+<p>Django は <a class="reference internal" href="../../ref/settings.html#std-setting-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TIME_ZONE</span></code></a> 設定を含んでおり、デフォルトは <code class="docutils literal notranslate"><span class="pre">America/Chicago</span></code> です。これはあなたの住む場所ではないかもしれませんので、あなたの設定ファイルを変更する必要があるかもしれません。</p>
+</div>
+</section>
+<section id="s-mapping-urls-to-views">
+<span id="mapping-urls-to-views"></span><h2>URL をビューにマッピングする<a class="headerlink" href="#mapping-urls-to-views" title="Link to this heading">¶</a></h2>
+<p>要約すると、このビュー関数は現在の日付と時刻を含む HTML ページを返します。このビューを特定の URL で表示するには、<em>URLconf</em> を作成する必要があります。その方法は、<a class="reference internal" href="urls.html"><span class="doc">URL ディスパッチャ</span></a> を参照してください。</p>
+</section>
+<section id="s-returning-errors">
+<span id="returning-errors"></span><h2>エラーを返す<a class="headerlink" href="#returning-errors" title="Link to this heading">¶</a></h2>
+<p>Django には HTTP エラーコードを返す便利な方法が用意されています。(<em>&quot;OK&quot;</em> を意味する) 200 以外の数ある一般的なHTTPステータスコードに対して、<a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> サブクラスがあります。使用可能なサブクラスの完全なリストは、<a class="reference internal" href="../../ref/request-response.html#ref-httpresponse-subclasses"><span class="std std-ref">request/response</span></a> ドキュメントにあります。エラーを知らせるためには、通常の <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> の代わりに、これらのサブクラスのインスタンスを返してください。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseNotFound</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="k">if</span> <span class="n">foo</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponseNotFound</span><span class="p">(</span><span class="s2">&quot;&lt;h1&gt;Page not found&lt;/h1&gt;&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;&lt;h1&gt;Page was found&lt;/h1&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>レスポンスコードの多くは使用頻度が低いため、発生しうる HTTP レスポンスコードすべてにそれぞれ特化したサブクラスが用意されているわけではありません。 しかし、<a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> のドキュメントに書かれているように、HTTP ステータスコードをコンストラクタに渡して、<a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> が任意のステータスコードを返すクラスを作成することもできます。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+
+    <span class="c1"># Return a &quot;created&quot; (201) response code.</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">status</span><span class="o">=</span><span class="mi">201</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>404 エラーは最も一般的な HTTP エラーなので、簡単に扱える方法があります。</p>
+<section id="s-the-http404-exception">
+<span id="the-http404-exception"></span><h3><code class="docutils literal notranslate"><span class="pre">Http404</span></code> 例外<a class="headerlink" href="#the-http404-exception" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.Http404">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.http.</span></span><span class="sig-name descname"><span class="pre">Http404</span></span><a class="headerlink" href="#django.http.Http404" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>エラーを返すときは (例えば <a class="reference internal" href="../../ref/request-response.html#django.http.HttpResponseNotFound" title="django.http.HttpResponseNotFound"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseNotFound</span></code></a>)、エラーページを結果とする HTML を定義する責任があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">return</span> <span class="n">HttpResponseNotFound</span><span class="p">(</span><span class="s2">&quot;&lt;h1&gt;Page not found&lt;/h1&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>利便性に加え、サイト全体を通じて一貫性のある 404 ページを表示できるようにするため、Djangoは <code class="docutils literal notranslate"><span class="pre">Http404</span></code> 例外を提供しています。ビュー関数の任意のポイントで <code class="docutils literal notranslate"><span class="pre">Http404</span></code> を発生させると、Djangoはそれをキャッチして、アプリケーションの標準エラーページとHTTPエラーコード404を返します。</p>
+<p>使用例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">Http404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">polls.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Poll</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">poll_id</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">Poll</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">poll_id</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">Poll</span><span class="o">.</span><span class="n">DoesNotExist</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">(</span><span class="s2">&quot;Poll does not exist&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;polls/detail.html&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;poll&quot;</span><span class="p">:</span> <span class="n">p</span><span class="p">})</span>
+</pre></div>
+</div>
+<p>Django が 404 を返したときに独自の HTML を表示したいときは、<code class="docutils literal notranslate"><span class="pre">404.html</span></code> という名前の HTML テンプレートを作成し、テンプレートツリーのトップレベルの場所に置いてください。<a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">False</span></code> にセットされているとき、このテンプレートが使われます。</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、<code class="docutils literal notranslate"><span class="pre">Http404</span></code> にメッセージを提供し、標準的な 404 デバッグテンプレートに表示させることができます。このメッセージ機能はデバッグ用に使用してください; 通常、プロダクトの404 テンプレートとしては不向きです。</p>
+</section>
+</section>
+<section id="s-customizing-error-views">
+<span id="s-id1"></span><span id="customizing-error-views"></span><span id="id1"></span><h2>エラービューをカスタマイズする<a class="headerlink" href="#customizing-error-views" title="Link to this heading">¶</a></h2>
+<p>Django のデフォルトのエラービューは、ほとんどの Web アプリケーションで十分ですが、独自の動作が必要な場合は簡単にオーバーライドできます。 URLconf で以下のようにハンドラを指定してください (他の場所で設定しても効果はありません)。</p>
+<p><a class="reference internal" href="../../ref/views.html#django.views.defaults.page_not_found" title="django.views.defaults.page_not_found"><code class="xref py py-func docutils literal notranslate"><span class="pre">page_not_found()</span></code></a> ビューは <a class="reference internal" href="../../ref/urls.html#django.conf.urls.handler404" title="django.conf.urls.handler404"><code class="xref py py-data docutils literal notranslate"><span class="pre">handler404</span></code></a> でオーバーライドされます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">handler404</span> <span class="o">=</span> <span class="s2">&quot;mysite.views.my_custom_page_not_found_view&quot;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../ref/views.html#django.views.defaults.server_error" title="django.views.defaults.server_error"><code class="xref py py-func docutils literal notranslate"><span class="pre">server_error()</span></code></a> ビューは <a class="reference internal" href="../../ref/urls.html#django.conf.urls.handler500" title="django.conf.urls.handler500"><code class="xref py py-data docutils literal notranslate"><span class="pre">handler500</span></code></a> でオーバーライドされます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">handler500</span> <span class="o">=</span> <span class="s2">&quot;mysite.views.my_custom_error_view&quot;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../ref/views.html#django.views.defaults.permission_denied" title="django.views.defaults.permission_denied"><code class="xref py py-func docutils literal notranslate"><span class="pre">permission_denied()</span></code></a> ビューは <a class="reference internal" href="../../ref/urls.html#django.conf.urls.handler403" title="django.conf.urls.handler403"><code class="xref py py-data docutils literal notranslate"><span class="pre">handler403</span></code></a> でオーバーライドされます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">handler403</span> <span class="o">=</span> <span class="s2">&quot;mysite.views.my_custom_permission_denied_view&quot;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="../../ref/views.html#django.views.defaults.bad_request" title="django.views.defaults.bad_request"><code class="xref py py-func docutils literal notranslate"><span class="pre">bad_request()</span></code></a> ビューは <a class="reference internal" href="../../ref/urls.html#django.conf.urls.handler400" title="django.conf.urls.handler400"><code class="xref py py-data docutils literal notranslate"><span class="pre">handler400</span></code></a> でオーバーライドされます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">handler400</span> <span class="o">=</span> <span class="s2">&quot;mysite.views.my_custom_bad_request_view&quot;</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>CSRF エラービューをオーバーライドするには、<a class="reference internal" href="../../ref/settings.html#std-setting-CSRF_FAILURE_VIEW"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_FAILURE_VIEW</span></code></a> 設定を使用してください。</p>
+</div>
+<section id="s-testing-custom-error-views">
+<span id="testing-custom-error-views"></span><h3>カスタムエラービューのテスト<a class="headerlink" href="#testing-custom-error-views" title="Link to this heading">¶</a></h3>
+<p>カスタムエラーのハンドラーのレスポンスをテストするには、たとえば以下のように、テストビューの中で適切な例外を起こします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">PermissionDenied</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleTestCase</span><span class="p">,</span> <span class="n">override_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">response_error_handler</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">exception</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Error handler content&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="mi">403</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">permission_denied_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="n">PermissionDenied</span>
+
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;403/&quot;</span><span class="p">,</span> <span class="n">permission_denied_view</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">handler403</span> <span class="o">=</span> <span class="n">response_error_handler</span>
+
+
+<span class="c1"># ROOT_URLCONF must specify the module that contains handler403 = ...</span>
+<span class="nd">@override_settings</span><span class="p">(</span><span class="n">ROOT_URLCONF</span><span class="o">=</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomErrorHandlerTests</span><span class="p">(</span><span class="n">SimpleTestCase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_handler_renders_template_response</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/403/&quot;</span><span class="p">)</span>
+        <span class="c1"># Make assertions on the response here. For example:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertContains</span><span class="p">(</span><span class="n">response</span><span class="p">,</span> <span class="s2">&quot;Error handler content&quot;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="mi">403</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-async-views">
+<span id="s-id2"></span><span id="async-views"></span><span id="id2"></span><h2>非同期ビュー<a class="headerlink" href="#async-views" title="Link to this heading">¶</a></h2>
+<p>同期関数だけでなく、ビューは非同期(&quot;async&quot;)関数にすることもでき、通常は Python の <code class="docutils literal notranslate"><span class="pre">async</span> <span class="pre">def</span></code> 構文を使って定義します。Django はこれらを自動的に検出し、非同期コンテキストで実行します。しかし、そのパフォーマンス上の利点を得るには、 ASGI ベースの非同期サーバを使う必要があります。</p>
+<p>以下は非同期ビューの例です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">current_datetime</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">html</span> <span class="o">=</span> <span class="s1">&#39;&lt;html lang=&quot;en&quot;&gt;&lt;body&gt;It is now </span><span class="si">%s</span><span class="s1">.&lt;/body&gt;&lt;/html&gt;&#39;</span> <span class="o">%</span> <span class="n">now</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Django の非同期サポートや、非同期ビューの最適な使い方については、 <a class="reference internal" href="../async.html"><span class="doc">非同期サポート</span></a> を参照してください。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ビューを記述する</a><ul>
+<li><a class="reference internal" href="#a-simple-view">シンプルなビュー</a></li>
+<li><a class="reference internal" href="#mapping-urls-to-views">URL をビューにマッピングする</a></li>
+<li><a class="reference internal" href="#returning-errors">エラーを返す</a><ul>
+<li><a class="reference internal" href="#the-http404-exception"><code class="docutils literal notranslate"><span class="pre">Http404</span></code> 例外</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#customizing-error-views">エラービューをカスタマイズする</a><ul>
+<li><a class="reference internal" href="#testing-custom-error-views">カスタムエラービューのテスト</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#async-views">非同期ビュー</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="urls.html"
+                          title="前の章へ">URL ディスパッチャ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="decorators.html"
+                          title="次の章へ">ビューのデコレータ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/http/views.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="urls.html" title="URL ディスパッチャ">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="decorators.html" title="ビューのデコレータ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django のローカライズ &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="バグレポートと機能のリクエスト" href="bugs-and-features.html" />
+    <link rel="prev" title="ドキュメントを書く" href="writing-documentation.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="writing-documentation.html" title="ドキュメントを書く">previous</a>
+     |
+    <a href="../index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="bugs-and-features.html" title="バグレポートと機能のリクエスト">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="internals-contributing-localizing">
+            
+  <section id="s-localizing-django">
+<span id="localizing-django"></span><h1>Django のローカライズ<a class="headerlink" href="#localizing-django" title="Link to this heading">¶</a></h1>
+<p>管理者サイトや検証のエラーメッセージなど、Django の各種パーツは国際化されています。つまり、これらのメッセージはユーザーの言語や国によって異なるように表示することができるようになっています。そのため、Django では、Django アプリケーションに共通の国際化・ローカライズのインフラを使用しています。詳しくは <a class="reference internal" href="../../topics/i18n/index.html"><span class="doc">i18n documentation</span></a> で説明されています。</p>
+<section id="s-translations">
+<span id="translations"></span><h2>翻訳<a class="headerlink" href="#translations" title="Link to this heading">¶</a></h2>
+<p>翻訳文字列は、世界中の Django ユーザーにより提供されています。翻訳作業は <a class="reference external" href="https://www.transifex.com/">Transifex</a> で協力して行われています。</p>
+<p>不正確な翻訳や特定の翻訳について議論したいときは、<a class="reference external" href="https://app.transifex.com/django/django/">Django プロジェクトのページ</a> に行ってください。翻訳を助けたりまだ未翻訳の言語を追加したい場合は、以下のことを行ってください。</p>
+<ul>
+<li><p><a class="reference external" href="https://forum.djangoproject.com/c/internals/i18n/14">Django 国際化フォーラム</a> で自己紹介する。</p></li>
+<li><p><a class="reference internal" href="../../topics/i18n/translation.html#specialties-of-django-i18n"><span class="std std-ref">Djangoの翻訳の特徴</span></a> に関する注意事項を読んで確認する。</p></li>
+<li><p><a class="reference external" href="https://www.transifex.com/">Transifex</a> にサインアップし、<a class="reference external" href="https://app.transifex.com/django/django/">Django project page</a> を訪問する。</p></li>
+<li><p><a class="reference external" href="https://app.transifex.com/django/django/">Django project page</a> で、作業したい言語を選択するか、 <strong>あるいは</strong> -- 言語がまだ存在しない場合 -- &quot;Request language&quot; リンクをクリックして適切な言語を選択し、新しい言語チームをリクエストしてください。</p></li>
+<li><p>次に、「このチームに参加する」ボタンをクリックして、このチームのメンバーになってください。すべてのチームには、少なくとも1人のコーディネーターがおり、あなたの加入申請を確認する責任があります。また、チーム・コーディネーターに連絡すれば、手続き上の問題を明確にしたり、実際の翻訳プロセスを処理したりすることができます。</p></li>
+<li><p>チームのメンバーになったら、チームページで更新したい翻訳リソースを選択してください。例えば、&quot;core &quot;リソースは、contrib以外のすべての翻訳を含む翻訳カタログを指します。それぞれのcontribアプリにもリソースがあります（接頭辞は &quot;contrib&quot;）。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>Transifex の使い方に関する詳しい情報については、 <a class="reference external" href="https://help.transifex.com/">Transifex User Guide</a> を読んでください。</p>
+</div>
+</li>
+</ul>
+<p>Transifex からの翻訳が Django リポジトリに取り入れられるのは、新しい <a class="reference internal" href="../release-process.html#term-Feature-release"><span class="xref std std-term">フィーチャーリリース</span></a> のタイミングのみです。将来の <a class="reference internal" href="../release-process.html#term-Patch-release"><span class="xref std std-term">パッチリリース</span></a> の1つで2回目に更新を試みますが、これは翻訳マネージャーが作業可能かどうかによります。そのため、あなたの言語の翻訳を完了・修正するためには、文字列フリーズの期間 (リリース候補とフィーチャーリリースの間の期間) を逃さないようにしてください！</p>
+</section>
+<section id="s-formats">
+<span id="formats"></span><h2>フォーマット<a class="headerlink" href="#formats" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">conf/locale/&lt;locale&gt;/formats.py</span></code> ファイルもレビューできます。このファイルは日付、時刻、数値に関するロケール特有のフォーマットについて記述しています。詳細については <a class="reference internal" href="../../topics/i18n/formatting.html"><span class="doc">表示形式のローカライズ</span></a> を参照してください。</p>
+<p>The format files aren't managed by the use of Transifex. To change them, you
+must:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="writing-code/submitting-patches.html"><span class="doc">Create a pull request</span></a> against the
+Django Git <code class="docutils literal notranslate"><span class="pre">main</span></code> branch, as for any code change.</p></li>
+<li><p>Open a ticket in Django's ticket system, set its <code class="docutils literal notranslate"><span class="pre">Component</span></code> field to
+<code class="docutils literal notranslate"><span class="pre">Translations</span></code>, set the &quot;has patch&quot; flag, and include the link to the pull
+request.</p></li>
+</ul>
+</section>
+<section id="s-documentation">
+<span id="s-translating-documentation"></span><span id="documentation"></span><span id="translating-documentation"></span><h2>ドキュメント<a class="headerlink" href="#documentation" title="Link to this heading">¶</a></h2>
+<p>ドキュメントを翻訳する機会もありますが、完全に翻訳するのは大変な作業です（警告しましたよ！）。私たちは同じ <a class="reference external" href="https://app.transifex.com/django/django-docs/">Transifex tool</a> を使っています。少なくとも <code class="docutils literal notranslate"><span class="pre">docs/intro/*</span></code> ファイルがあなたの言語で完全に翻訳されると、 <code class="docutils literal notranslate"><span class="pre">https://docs.djangoproject.com/&lt;language_code&gt;/</span></code> に翻訳が表示されます。</p>
+<p>翻訳が公開されると、Transifex からの更新版は不定期に <a class="reference external" href="https://github.com/django/django-docs-translations">django/django-docs-translations</a> リポジトリとドキュメンテーションウェブサイトに移植されます。最新の安定版 Django リリースの翻訳だけが更新されます。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Django のローカライズ</a><ul>
+<li><a class="reference internal" href="#translations">翻訳</a></li>
+<li><a class="reference internal" href="#formats">フォーマット</a></li>
+<li><a class="reference internal" href="#documentation">ドキュメント</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="writing-documentation.html"
+                          title="前の章へ">ドキュメントを書く</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="bugs-and-features.html"
+                          title="次の章へ">バグレポートと機能のリクエスト</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/internals/contributing/localizing.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="writing-documentation.html" title="ドキュメントを書く">previous</a>
+     |
+    <a href="../index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="bugs-and-features.html" title="バグレポートと機能のリクエスト">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

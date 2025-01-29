@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>contenttypes フレームワーク &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="フラットページ (flatpages) アプリ" href="flatpages.html" />
+    <link rel="prev" title="django.contrib.auth" href="auth.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="auth.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.contrib.auth&lt;/span&gt;&lt;/code&gt;">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="flatpages.html" title="フラットページ (flatpages) アプリ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-contenttypes">
+            
+  <section id="s-module-django.contrib.contenttypes">
+<span id="s-the-contenttypes-framework"></span><span id="module-django.contrib.contenttypes"></span><span id="the-contenttypes-framework"></span><h1>contenttypes フレームワーク<a class="headerlink" href="#module-django.contrib.contenttypes" title="Link to this heading">¶</a></h1>
+<p>Django には <a class="reference internal" href="#module-django.contrib.contenttypes" title="django.contrib.contenttypes: Provides generic interface to installed models."><code class="xref py py-mod docutils literal notranslate"><span class="pre">contenttypes</span></code></a> アプリケーションが含まれており、 Django を使ったプロジェクトにインストールされているすべてのモデルを追跡し、モデルを扱うための高レベルで汎用的なインターフェースを提供します。</p>
+<section id="s-overview">
+<span id="overview"></span><h2>概要<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>contenttypes アプリケーションの中心にあるのは、 <code class="docutils literal notranslate"><span class="pre">django.contrib.contenttypes.models.ContentType</span></code> にある <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> モデルです。 <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> のインスタンスは、プロジェクトにインストールされたモデルに関する情報を表し、格納します。新しい <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> のインスタンスは、新しいモデルがインストールされるたびに自動的に作成されます。</p>
+<p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> のインスタンスは <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> が表すモデルクラスを返すメソッドと、それらのモデルからオブジェクトを問い合わせるメソッドを持っています。また、 <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> を操作するためのメソッドや、特定のモデルの <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> のインスタンスを取得するためのメソッドを追加する <a class="reference internal" href="../../topics/db/managers.html#custom-managers"><span class="std std-ref">カスタムマネージャ</span></a> もあります。</p>
+<p>あなたのモデルと <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> の間のリレーションシップを利用することで、あなたのモデルのインスタンスとインストールされている任意のモデルのインスタンスとの間で「汎用的（ジェネリック）」なリレーションシップを有効にすることもできます。</p>
+</section>
+<section id="s-installing-the-contenttypes-framework">
+<span id="installing-the-contenttypes-framework"></span><h2>contenttypes フレームワークをインストールする<a class="headerlink" href="#installing-the-contenttypes-framework" title="Link to this heading">¶</a></h2>
+<p>contenttypes フレームワークは、<code class="docutils literal notranslate"><span class="pre">django-admin</span> <span class="pre">startproject</span></code> によって作成されるデフォルトの <a class="reference internal" href="../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> リストに含まれていますが、もし削除したり、手動で <a class="reference internal" href="../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> リストを設定した場合は、 <code class="docutils literal notranslate"><span class="pre">'django.contrib.contenttypes'</span></code> を <a class="reference internal" href="../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 設定に追加することで有効にできます。</p>
+<p>通常は、contenttypes フレームワークをインストールしておくのがよいでしょう。Django の他のバンドルアプリケーションのいくつかはそれを必要とします:</p>
+<ul class="simple">
+<li><p>admin アプリケーションは、管理インターフェイスを通じて追加・変更された各オブジェクトの履歴を記録するためにこれを使用します。</p></li>
+<li><p>Django の <a class="reference internal" href="../../topics/auth/index.html#module-django.contrib.auth" title="django.contrib.auth: Django's authentication framework."><code class="xref py py-mod docutils literal notranslate"><span class="pre">認証フレームワーク</span></code></a> は、ユーザーの権限を特定のモデルに紐づけるのに使用されます。</p></li>
+</ul>
+</section>
+<section id="s-the-contenttype-model">
+<span id="the-contenttype-model"></span><h2><code class="docutils literal notranslate"><span class="pre">ContentType</span></code> モデル<a class="headerlink" href="#the-contenttype-model" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ContentType</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L134"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentType" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> の各インスタンスは、2 つのフィールドを持ち、それらを合わせると、インストールされたモデルを一意に特定します:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentType.app_label">
+<span class="sig-name descname"><span class="pre">app_label</span></span><a class="headerlink" href="#django.contrib.contenttypes.models.ContentType.app_label" title="Link to this definition">¶</a></dt>
+<dd><p>モデルが属するアプリケーションの名前です。これはモデルの <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType.app_label" title="django.contrib.contenttypes.models.ContentType.app_label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">app_label</span></code></a> 属性から取得され、アプリケーションの Python インポートパスの <em>最後</em> の部分のみが含まれます。例えば、 <code class="docutils literal notranslate"><span class="pre">django.contrib.contenttypes</span></code> の <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType.app_label" title="django.contrib.contenttypes.models.ContentType.app_label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">app_label</span></code></a> は <code class="docutils literal notranslate"><span class="pre">contenttypes</span></code> になります。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentType.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#django.contrib.contenttypes.models.ContentType.model" title="Link to this definition">¶</a></dt>
+<dd><p>モデルクラスの名前。</p>
+</dd></dl>
+
+<p>さらに、次のプロパティが利用可能です:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentType.name">
+<span class="sig-name descname"><span class="pre">name</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L149"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentType.name" title="Link to this definition">¶</a></dt>
+<dd><p>コンテンツタイプの人間が読める名前です。これはモデルの <a class="reference internal" href="../models/fields.html#django.db.models.Field.verbose_name" title="django.db.models.Field.verbose_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">verbose_name</span></code></a> 属性から取得されます。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>どのように動作するか、例を見てみましょう。すでに <a class="reference internal" href="#module-django.contrib.contenttypes" title="django.contrib.contenttypes: Provides generic interface to installed models."><code class="xref py py-mod docutils literal notranslate"><span class="pre">contenttypes</span></code></a> アプリケーションがインストールされていて、 <a class="reference internal" href="sites.html#module-django.contrib.sites" title="django.contrib.sites: Lets you operate multiple websites from the same database and Django project"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sites</span> <span class="pre">アプリケーション</span></code></a> を <a class="reference internal" href="../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 設定に追加し、 <code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">migrate</span></code> を実行してインストールすると、 <a class="reference internal" href="sites.html#django.contrib.sites.models.Site" title="django.contrib.sites.models.Site"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.sites.models.Site</span></code></a> というモデルがデータベースにインストールされます。それと一緒に <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> の新しいインスタンスが以下の値で作成されます:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType.app_label" title="django.contrib.contenttypes.models.ContentType.app_label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">app_label</span></code></a> は <code class="docutils literal notranslate"><span class="pre">'sites'</span></code> (Python のパス <code class="docutils literal notranslate"><span class="pre">django.contrib.sites</span></code> の最後の部分) に設定されます。</p></li>
+<li><p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType.model" title="django.contrib.contenttypes.models.ContentType.model"><code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code></a> は <code class="docutils literal notranslate"><span class="pre">'site'</span></code> に設定されます。</p></li>
+</ul>
+</section>
+<section id="s-methods-on-contenttype-instances">
+<span id="methods-on-contenttype-instances"></span><h2><code class="docutils literal notranslate"><span class="pre">ContentType</span></code> インスタンスのメソッド<a class="headerlink" href="#methods-on-contenttype-instances" title="Link to this heading">¶</a></h2>
+<p>各 <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> インスタンスには、そのインスタンスが表すモデルに移動したり、 <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> からオブジェクトを取得したりするためのメソッドがあります。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentType.get_object_for_this_type">
+<span class="sig-prename descclassname"><span class="pre">ContentType.</span></span><span class="sig-name descname"><span class="pre">get_object_for_this_type</span></span>(<em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L172"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentType.get_object_for_this_type" title="Link to this definition">¶</a></dt>
+<dd><p>モデルが表す <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> に対する有効な <a class="reference internal" href="../../topics/db/queries.html#field-lookups-intro"><span class="std std-ref">lookup 引数</span></a> のセットを受け取り、そのモデルで <a class="reference internal" href="../models/querysets.html#django.db.models.query.QuerySet.get" title="django.db.models.query.QuerySet.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span> <span class="pre">ルックアップ</span></code></a> を実行し、対応するオブジェクトを返します。 <code class="docutils literal notranslate"><span class="pre">using</span></code> 引数を使用することで、デフォルトとは異なるデータベースを指定できます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.1:</span> <p><code class="docutils literal notranslate"><span class="pre">using</span></code> 引数が追加されました。</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentType.model_class">
+<span class="sig-prename descclassname"><span class="pre">ContentType.</span></span><span class="sig-name descname"><span class="pre">model_class</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L165"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentType.model_class" title="Link to this definition">¶</a></dt>
+<dd><p>この <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> インスタンスが表すモデルクラスを返します。</p>
+</dd></dl>
+
+<p>たとえば、<a class="reference internal" href="auth.html#django.contrib.auth.models.User" title="django.contrib.auth.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a> モデルの <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> を調べることができます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContentType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user_type</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">app_label</span><span class="o">=</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;user&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user_type</span>
+<span class="go">&lt;ContentType: user&gt;</span>
+</pre></div>
+</div>
+<p>そして、特定の <a class="reference internal" href="auth.html#django.contrib.auth.models.User" title="django.contrib.auth.models.User"><code class="xref py py-class docutils literal notranslate"><span class="pre">User</span></code></a> に対するクエリ、または <code class="docutils literal notranslate"><span class="pre">User</span></code> モデルクラスへのアクセスを取得するために使用します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">user_type</span><span class="o">.</span><span class="n">model_class</span><span class="p">()</span>
+<span class="go">&lt;class &#39;django.contrib.auth.models.User&#39;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">user_type</span><span class="o">.</span><span class="n">get_object_for_this_type</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;Guido&quot;</span><span class="p">)</span>
+<span class="go">&lt;User: Guido&gt;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType.get_object_for_this_type" title="django.contrib.contenttypes.models.ContentType.get_object_for_this_type"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_object_for_this_type()</span></code></a> と <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType.model_class" title="django.contrib.contenttypes.models.ContentType.model_class"><code class="xref py py-meth docutils literal notranslate"><span class="pre">model_class()</span></code></a> を併用することで、2つの非常に重要なユースケースが可能になります:</p>
+<ol class="arabic simple">
+<li><p>これらのメソッドを使うことで、インストールされた任意のモデルに対してクエリを実行する高レベルの汎用コードを書くことができます。特定のモデルクラスをインポートして使うのではなく、実行時に <code class="docutils literal notranslate"><span class="pre">app_label</span></code> と <code class="docutils literal notranslate"><span class="pre">model</span></code> を <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> ルックアップに渡すことで、モデルクラスを操作したり、そこからオブジェクトを取得したりすることができます。</p></li>
+<li><p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> は、別のモデルと関連付けることができ、これによってそのインスタンスを特定のモデルクラスに紐付けることができます。これらのメソッドを使用することで、これらのモデルクラスにアクセスできます。</p></li>
+</ol>
+<p>Django のバンドルされているアプリケーションのいくつかは、後者のテクニックを利用しています。例えば、Django の認証フレームワークの <a class="reference internal" href="auth.html#django.contrib.auth.models.Permission" title="django.contrib.auth.models.Permission"><code class="xref py py-class docutils literal notranslate"><span class="pre">パーミッションシステム</span></code></a> は、 <a class="reference internal" href="auth.html#django.contrib.auth.models.Permission" title="django.contrib.auth.models.Permission"><code class="xref py py-class docutils literal notranslate"><span class="pre">Permission</span></code></a> モデルを <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> の外部キーとして使っています。これにより、 <a class="reference internal" href="auth.html#django.contrib.auth.models.Permission" title="django.contrib.auth.models.Permission"><code class="xref py py-class docutils literal notranslate"><span class="pre">Permission</span></code></a> は「ブログのエントリを追加できる」とか「ニュース記事を削除できる」といった概念を表現できます。</p>
+<section id="s-the-contenttypemanager">
+<span id="the-contenttypemanager"></span><h3><code class="docutils literal notranslate"><span class="pre">ContentTypeManager</span></code><a class="headerlink" href="#the-contenttypemanager" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentTypeManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ContentTypeManager</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L9"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentTypeManager" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> にはカスタムマネージャー <a class="reference internal" href="#django.contrib.contenttypes.models.ContentTypeManager" title="django.contrib.contenttypes.models.ContentTypeManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentTypeManager</span></code></a> もあり、以下のメソッドが追加されています:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentTypeManager.clear_cache">
+<span class="sig-name descname"><span class="pre">clear_cache</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L118"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentTypeManager.clear_cache" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> が使用する内部キャッシュをクリアし、 <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> インスタンスを作成したモデルの追跡を行います。おそらく、このメソッドを自分で呼び出す必要はほとんどありません。必要なタイミングでDjangoが自動的に呼び出します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentTypeManager.get_for_id">
+<span class="sig-name descname"><span class="pre">get_for_id</span></span>(<em class="sig-param"><span class="n"><span class="pre">id</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L104"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentTypeManager.get_for_id" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> を ID でルックアップします。このメソッドは <a class="reference internal" href="#django.contrib.contenttypes.models.ContentTypeManager.get_for_model" title="django.contrib.contenttypes.models.ContentTypeManager.get_for_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_for_model()</span></code></a> と同じ共有キャッシュを使用するので、通常の <code class="docutils literal notranslate"><span class="pre">ContentType.objects.get(pk=id)</span></code> よりもこのメソッドを使用することをお勧めします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentTypeManager.get_for_model">
+<span class="sig-name descname"><span class="pre">get_for_model</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_concrete_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L35"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentTypeManager.get_for_model" title="Link to this definition">¶</a></dt>
+<dd><p>モデルクラスかモデルのインスタンスを受け取り、そのモデルを表す <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> インスタンスを返します。 <code class="docutils literal notranslate"><span class="pre">for_concrete_model=False</span></code> はプロキシモデルの <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> を取得することを許可します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentTypeManager.get_for_models">
+<span class="sig-name descname"><span class="pre">get_for_models</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">models</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_concrete_models</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L63"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentTypeManager.get_for_models" title="Link to this definition">¶</a></dt>
+<dd><p>モデルクラスを任意の個数受け取り、モデルクラスを <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> インスタンスにマッピングした辞書を返します。 <code class="docutils literal notranslate"><span class="pre">for_concrete_models=False</span></code> により、プロキシモデルの <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> を取得できます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.models.ContentTypeManager.get_by_natural_key">
+<span class="sig-name descname"><span class="pre">get_by_natural_key</span></span>(<em class="sig-param"><span class="n"><span class="pre">app_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/models.py#L18"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.models.ContentTypeManager.get_by_natural_key" title="Link to this definition">¶</a></dt>
+<dd><p>与えられたアプリケーションラベルとモデル名で一意に識別される <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> インスタンスを返します。このメソッドの主な目的は、 <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> オブジェクトをデシリアライズ時に <a class="reference internal" href="../../topics/serialization.html#topics-serialization-natural-keys"><span class="std std-ref">ナチュラルキー</span></a> から参照できるようにすることです。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentTypeManager.get_for_model" title="django.contrib.contenttypes.models.ContentTypeManager.get_for_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_for_model()</span></code></a> メソッドは、 <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> を扱う必要があることがわかっているが、わざわざモデルのメタデータを取得して手動でルックアップを行うのは面倒だという場合に特に便利です:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">User</span><span class="p">)</span>
+<span class="go">&lt;ContentType: user&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-generic-relations">
+<span id="s-module-django.contrib.contenttypes.fields"></span><span id="s-id1"></span><span id="generic-relations"></span><span id="module-django.contrib.contenttypes.fields"></span><span id="id1"></span><h2>ジェネリックリレーション（汎用リレーション）<a class="headerlink" href="#generic-relations" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> に自分のモデルの外部キーを追加することで、上記の <a class="reference internal" href="auth.html#django.contrib.auth.models.Permission" title="django.contrib.auth.models.Permission"><code class="xref py py-class docutils literal notranslate"><span class="pre">Permission</span></code></a> モデルの例のように、モデル自身を他のモデルクラスに効果的に結びつけることができます。しかし、もう一歩進んで <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> を使うことで、モデル間の本当に汎用的な (時に &quot;多相的 (ポリモーフィック)&quot; と呼ばれる) リレーションシップを実現できます。</p>
+<p>たとえば、次のようにしてタグ付けシステムに使用できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericForeignKey</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TaggedItem</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">tag</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">SlugField</span><span class="p">()</span>
+    <span class="n">content_type</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">ContentType</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">object_id</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">PositiveIntegerField</span><span class="p">()</span>
+    <span class="n">content_object</span> <span class="o">=</span> <span class="n">GenericForeignKey</span><span class="p">(</span><span class="s2">&quot;content_type&quot;</span><span class="p">,</span> <span class="s2">&quot;object_id&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">tag</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">models</span><span class="o">.</span><span class="n">Index</span><span class="p">(</span><span class="n">fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;content_type&quot;</span><span class="p">,</span> <span class="s2">&quot;object_id&quot;</span><span class="p">]),</span>
+        <span class="p">]</span>
+</pre></div>
+</div>
+<p>通常の <a class="reference internal" href="../models/fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> は、ほかのモデルを単一指定することしかできません。つまり、 <code class="docutils literal notranslate"><span class="pre">TaggedItem</span></code> モデルが <a class="reference internal" href="../models/fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> を使用する場合、タグを格納する単一のモデルを選択する必要があります。contenttypes アプリケーションは特別なフィールド型(<code class="docutils literal notranslate"><span class="pre">GenericForeignKey</span></code>) を提供し、これにより、リレーションシップを任意のモデルと設定できます。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.fields.GenericForeignKey">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericForeignKey</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/fields.py#L28"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> の設定には3つの部分があります:</p>
+<ol class="arabic simple">
+<li><p>モデルに <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> への <a class="reference internal" href="../models/fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> を持たせます。通常、このフィールドの名前は &quot;content_type&quot; となります。</p></li>
+<li><p>モデルに、リレーション先モデルのプライマリキー値を格納できるフィールドを与えます。ほとんどのモデルの場合、これは <a class="reference internal" href="../models/fields.html#django.db.models.PositiveIntegerField" title="django.db.models.PositiveIntegerField"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositiveIntegerField</span></code></a> を意味します。このフィールドの通常の名前は &quot;object_id&quot; です。</p></li>
+<li><p>モデルに <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> を与え、上記の2つのフィールド名を渡します。これらのフィールドの名前が &quot;content_type&quot; と &quot;object_id&quot; である場合、省略できます。これらは <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> が探すデフォルトのフィールド名です。</p></li>
+</ol>
+<p><a class="reference internal" href="../models/fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> とは異なり、データベースインデックスは <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> には自動的に作成 <em>されません</em> ので、 <a class="reference internal" href="../models/options.html#django.db.models.Options.indexes" title="django.db.models.Options.indexes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Meta.indexes</span></code></a> を使って独自の複数カラムインデックスを追加することをお勧めします。この動作は将来 <a class="extlink-ticket reference external" href="https://code.djangoproject.com/ticket/23435">変更されるかも知れません</a> 。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model">
+<span class="sig-name descname"><span class="pre">for_concrete_model</span></span><a class="headerlink" href="#django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">False</span></code> の場合、フィールドはプロキシモデルを参照できます。デフォルトは <code class="docutils literal notranslate"><span class="pre">True</span></code> です。これは <a class="reference internal" href="#django.contrib.contenttypes.models.ContentTypeManager.get_for_model" title="django.contrib.contenttypes.models.ContentTypeManager.get_for_model"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_for_model()</span></code></a> への引数 <code class="docutils literal notranslate"><span class="pre">for_concrete_model</span></code> を反映したものです。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition-primary-key-type-compatibility admonition">
+<p class="admonition-title">プライマリキーの型の互換性</p>
+<p>&quot;object_id&quot; フィールドは、リレーション先モデルのプライマリキーフィールドと同じ型である必要はありませんが、そのプライマリキーの値は、&quot;object_id&quot; フィールドの <a class="reference internal" href="../models/fields.html#django.db.models.Field.get_db_prep_value" title="django.db.models.Field.get_db_prep_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_db_prep_value()</span></code></a> メソッドによって同じ型に変換可能でなければなりません。</p>
+<p>たとえば、 <a class="reference internal" href="../models/fields.html#django.db.models.IntegerField" title="django.db.models.IntegerField"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegerField</span></code></a> または <a class="reference internal" href="../models/fields.html#django.db.models.CharField" title="django.db.models.CharField"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a> のどちらかのプライマリキーフィールドを持つモデルに対してジェネリックリレーションを許可したい場合、モデルの &quot;object_id&quot; フィールドには <a class="reference internal" href="../models/fields.html#django.db.models.CharField" title="django.db.models.CharField"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharField</span></code></a> を使用できます。整数は <a class="reference internal" href="../models/fields.html#django.db.models.Field.get_db_prep_value" title="django.db.models.Field.get_db_prep_value"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_db_prep_value()</span></code></a> によって文字列に変換できるためです。</p>
+<p>最大の柔軟性を得るには、定義された最大長がない <a class="reference internal" href="../models/fields.html#django.db.models.TextField" title="django.db.models.TextField"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextField</span></code></a> を使用できますが、データベースのバックエンドによっては、それにより重大なパフォーマンスペナルティが発生する可能性があります。</p>
+<p>どのフィールドタイプが最適かについて、汎用的な解決策はありません。参照するモデルを評価し、ユースケースに最も効果的な解決策を決定してください。</p>
+</div>
+<div class="admonition-serializing-references-to-contenttype-objects admonition">
+<p class="admonition-title"><code class="docutils literal notranslate"><span class="pre">ContentType</span></code> オブジェクトへの参照をシリアライズする</p>
+<p>ジェネリックリレーションを実装したモデルからデータをシリアライズする場合 (例えば <a class="reference internal" href="../../topics/testing/tools.html#django.test.TransactionTestCase.fixtures" title="django.test.TransactionTestCase.fixtures"><code class="xref py py-class docutils literal notranslate"><span class="pre">fixtures</span></code></a> を生成する場合)、関連する <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> オブジェクトを一意に識別するためにナチュラルキーを使用する必要があるでしょう。詳しくは <a class="reference internal" href="../../topics/serialization.html#topics-serialization-natural-keys"><span class="std std-ref">ナチュラルキー</span></a> と <a class="reference internal" href="../django-admin.html#cmdoption-dumpdata-natural-foreign"><code class="xref std std-option docutils literal notranslate"><span class="pre">dumpdata</span> <span class="pre">--natural-foreign</span></code></a> を参照してください。</p>
+</div>
+<p>これにより、通常の <a class="reference internal" href="../models/fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> と同じような API が利用できるようになります。各 <code class="docutils literal notranslate"><span class="pre">TaggedItem</span></code> は、関連するオブジェクトを返す <code class="docutils literal notranslate"><span class="pre">content_object</span></code> フィールドを持ち、そのフィールドに代入したり、 <code class="docutils literal notranslate"><span class="pre">TaggedItem</span></code> を作成する際に使用したりすることができます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">guido</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;Guido&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">TaggedItem</span><span class="p">(</span><span class="n">content_object</span><span class="o">=</span><span class="n">guido</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;bdfl&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">content_object</span>
+<span class="go">&lt;User: Guido&gt;</span>
+</pre></div>
+</div>
+<p>リレーション先オブジェクトが削除された場合、 <code class="docutils literal notranslate"><span class="pre">content_type</span></code> フィールドと <code class="docutils literal notranslate"><span class="pre">object_id</span></code> フィールドは元の値のままとなり、 <code class="docutils literal notranslate"><span class="pre">GenericForeignKey</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">guido</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">content_object</span>  <span class="c1"># returns None</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> が実装されているため、このようなフィールドをデータベース API 経由のフィルタ (<code class="docutils literal notranslate"><span class="pre">filter()</span></code> や <code class="docutils literal notranslate"><span class="pre">exclude()</span></code> など) で直接使用することはできません。 <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> は通常のフィールドオブジェクトではないので、これらの例は動作 <em>しません</em> :</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="go"># This will fail</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content_object</span><span class="o">=</span><span class="n">guido</span><span class="p">)</span>
+<span class="go"># This will also fail</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">content_object</span><span class="o">=</span><span class="n">guido</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>同様に、 <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> は <a class="reference internal" href="../../topics/forms/modelforms.html#django.forms.ModelForm" title="django.forms.ModelForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelForm</span></code></a> 内には表示されません。</p>
+<section id="s-reverse-generic-relations">
+<span id="reverse-generic-relations"></span><h3>逆ジェネリックリレーション (Reverse generic relation)<a class="headerlink" href="#reverse-generic-relations" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.fields.GenericRelation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericRelation</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/fields.py#L305"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.fields.GenericRelation" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.fields.GenericRelation.related_query_name">
+<span class="sig-name descname"><span class="pre">related_query_name</span></span><a class="headerlink" href="#django.contrib.contenttypes.fields.GenericRelation.related_query_name" title="Link to this definition">¶</a></dt>
+<dd><p>リレーション先オブジェクトに対する逆のリレーションはデフォルトでは存在しません。 <code class="docutils literal notranslate"><span class="pre">related_query_name</span></code> を設定すると、リレーション先オブジェクトからこのオブジェクトへのリレーションが作成されます。これにより、リレーション先オブジェクトからのクエリやフィルタリングが可能になります。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>どのモデルをよく使うかわかっている場合は、&quot;逆&quot; ジェネリックリレーションシップを追加して、追加のAPIを有効にすることもできます。たとえば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.fields</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericRelation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Bookmark</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">URLField</span><span class="p">()</span>
+    <span class="n">tags</span> <span class="o">=</span> <span class="n">GenericRelation</span><span class="p">(</span><span class="n">TaggedItem</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>各 &quot;Bookmark&quot; インスタンスには、 <code class="docutils literal notranslate"><span class="pre">tags</span></code> という属性があります。これを使用して、リレーション先の <code class="docutils literal notranslate"><span class="pre">TaggedItems</span></code> を取得できます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Bookmark</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.djangoproject.com/&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span> <span class="o">=</span> <span class="n">TaggedItem</span><span class="p">(</span><span class="n">content_object</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;django&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span> <span class="o">=</span> <span class="n">TaggedItem</span><span class="p">(</span><span class="n">content_object</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">&lt;QuerySet [&lt;TaggedItem: django&gt;, &lt;TaggedItem: python&gt;]&gt;</span>
+</pre></div>
+</div>
+<p>また、 <code class="docutils literal notranslate"><span class="pre">add()</span></code>, <code class="docutils literal notranslate"><span class="pre">create()</span></code>, <code class="docutils literal notranslate"><span class="pre">set()</span></code> を使ってリレーションシップを作成することもできます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t3</span> <span class="o">=</span> <span class="n">TaggedItem</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s2">&quot;Web development&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t3</span><span class="p">,</span> <span class="n">bulk</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s2">&quot;Web framework&quot;</span><span class="p">)</span>
+<span class="go">&lt;TaggedItem: Web framework&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">&lt;QuerySet [&lt;TaggedItem: django&gt;, &lt;TaggedItem: python&gt;, &lt;TaggedItem: Web development&gt;, &lt;TaggedItem: Web framework&gt;]&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">set</span><span class="p">([</span><span class="n">t1</span><span class="p">,</span> <span class="n">t3</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">&lt;QuerySet [&lt;TaggedItem: django&gt;, &lt;TaggedItem: Web development&gt;]&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">remove()</span></code> メソッドは指定されたモデルオブジェクトを一括で削除します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">t3</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">&lt;QuerySet [&lt;TaggedItem: django&gt;]&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">&lt;QuerySet [&lt;TaggedItem: django&gt;]&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">clear()</span></code> メソッドは、インスタンスのリレーション先のすべてのオブジェクトを一括削除するために使用できます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">&lt;QuerySet []&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">&lt;QuerySet []&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">related_query_name</span></code> を設定して <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericRelation" title="django.contrib.contenttypes.fields.GenericRelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericRelation</span></code></a> を定義すると、リレーション先オブジェクトからクエリを行うことができます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tags</span> <span class="o">=</span> <span class="n">GenericRelation</span><span class="p">(</span><span class="n">TaggedItem</span><span class="p">,</span> <span class="n">related_query_name</span><span class="o">=</span><span class="s2">&quot;bookmark&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>これにより、<code class="docutils literal notranslate"><span class="pre">TaggedItem</span></code> から <code class="docutils literal notranslate"><span class="pre">Bookmark</span></code> に対するフィルタリング、ソート、その他のクエリ操作が可能になります:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get all tags belonging to bookmarks containing `django` in the url</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">bookmark__url__contains</span><span class="o">=</span><span class="s2">&quot;django&quot;</span><span class="p">)</span>
+<span class="go">&lt;QuerySet [&lt;TaggedItem: django&gt;, &lt;TaggedItem: python&gt;]&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">related_query_name</span></code> を追加しない場合、同様のルックアップを手動で行うことができます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">bookmarks</span> <span class="o">=</span> <span class="n">Bookmark</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">url__contains</span><span class="o">=</span><span class="s2">&quot;django&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bookmark_type</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_for_model</span><span class="p">(</span><span class="n">Bookmark</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">content_type__pk</span><span class="o">=</span><span class="n">bookmark_type</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">object_id__in</span><span class="o">=</span><span class="n">bookmarks</span><span class="p">)</span>
+<span class="go">&lt;QuerySet [&lt;TaggedItem: django&gt;, &lt;TaggedItem: python&gt;]&gt;</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> が content-type と object-ID フィールドの名前を引数として受け取るのと同様に、 <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericRelation" title="django.contrib.contenttypes.fields.GenericRelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericRelation</span></code></a> も引数として受け取ります。ジェネリック外部キーを持つモデルがこれらのフィールドにデフォルト以外の名前を使用している場合、 <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericRelation" title="django.contrib.contenttypes.fields.GenericRelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericRelation</span></code></a> を設定する際にフィールド名を渡す必要があります。例えば、上記の <code class="docutils literal notranslate"><span class="pre">TaggedItem</span></code> モデルが <code class="docutils literal notranslate"><span class="pre">content_type_fk</span></code> と <code class="docutils literal notranslate"><span class="pre">object_primary_key</span></code> というフィールドを使用してジェネリック外部キーを作成した場合、 <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericRelation" title="django.contrib.contenttypes.fields.GenericRelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericRelation</span></code></a> を以下のように定義する必要があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tags</span> <span class="o">=</span> <span class="n">GenericRelation</span><span class="p">(</span>
+    <span class="n">TaggedItem</span><span class="p">,</span>
+    <span class="n">content_type_field</span><span class="o">=</span><span class="s2">&quot;content_type_fk&quot;</span><span class="p">,</span>
+    <span class="n">object_id_field</span><span class="o">=</span><span class="s2">&quot;object_primary_key&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>また、 <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericRelation" title="django.contrib.contenttypes.fields.GenericRelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericRelation</span></code></a> を持つオブジェクトを削除した場合、 <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> を持つオブジェクトも削除されることに注意してください。上の例では、 <code class="docutils literal notranslate"><span class="pre">Bookmark</span></code> オブジェクトが削除された場合、それを指す <code class="docutils literal notranslate"><span class="pre">TaggedItem</span></code> オブジェクトも同時に削除されることを意味します。</p>
+<p><a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> は、<a class="reference internal" href="../models/fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> とは異なり、 <a class="reference internal" href="../models/fields.html#django.db.models.ForeignKey.on_delete" title="django.db.models.ForeignKey.on_delete"><code class="xref py py-attr docutils literal notranslate"><span class="pre">on_delete</span></code></a> 引数を受け入れず、この動作をカスタマイズすることはできません。必要なら、 <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericRelation" title="django.contrib.contenttypes.fields.GenericRelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericRelation</span></code></a> を使用せずに、カスケード削除を回避でき、 代替の動作は <a class="reference internal" href="../signals.html#django.db.models.signals.pre_delete" title="django.db.models.signals.pre_delete"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_delete</span></code></a> シグナルを介して提供できます。</p>
+</section>
+<section id="s-generic-relations-and-aggregation">
+<span id="generic-relations-and-aggregation"></span><h3>ジェネリックリレーション (generic relation) と集計 (aggregation)<a class="headerlink" href="#generic-relations-and-aggregation" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../../topics/db/aggregation.html"><span class="doc">Django のデータベース集計 API</span></a> は <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericRelation" title="django.contrib.contenttypes.fields.GenericRelation"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericRelation</span></code></a> で動作します。例えば、すべてのブックマークのタグの数を調べることができます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Bookmark</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">aggregate</span><span class="p">(</span><span class="n">Count</span><span class="p">(</span><span class="s2">&quot;tags&quot;</span><span class="p">))</span>
+<span class="go">{&#39;tags__count&#39;: 3}</span>
+</pre></div>
+</div>
+</section>
+<section id="s-generic-relation-in-forms">
+<span id="s-module-django.contrib.contenttypes.forms"></span><span id="generic-relation-in-forms"></span><span id="module-django.contrib.contenttypes.forms"></span><h3>フォームにおけるジェネリックリレーション<a class="headerlink" href="#generic-relation-in-forms" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="#module-django.contrib.contenttypes.forms" title="django.contrib.contenttypes.forms"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.contenttypes.forms</span></code></a> モジュールは、下記を提供します:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#django.contrib.contenttypes.forms.BaseGenericInlineFormSet" title="django.contrib.contenttypes.forms.BaseGenericInlineFormSet"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseGenericInlineFormSet</span></code></a></p></li>
+<li><p><a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey" title="django.contrib.contenttypes.fields.GenericForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericForeignKey</span></code></a> を使用するためのフォームセットファクトリ、 <a class="reference internal" href="#django.contrib.contenttypes.forms.generic_inlineformset_factory" title="django.contrib.contenttypes.forms.generic_inlineformset_factory"><code class="xref py py-func docutils literal notranslate"><span class="pre">generic_inlineformset_factory()</span></code></a> 。</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.forms.BaseGenericInlineFormSet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseGenericInlineFormSet</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/forms.py#L7"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.forms.BaseGenericInlineFormSet" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.forms.generic_inlineformset_factory">
+<span class="sig-name descname"><span class="pre">generic_inlineformset_factory</span></span>(<em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">form</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ModelForm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">BaseGenericInlineFormSet</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ct_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'content_type'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fk_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'object_id'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">can_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">can_delete</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">formfield_callback</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">for_concrete_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validate_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absolute_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">can_delete_extra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/forms.py#L77"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.forms.generic_inlineformset_factory" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../forms/models.html#django.forms.models.modelformset_factory" title="django.forms.models.modelformset_factory"><code class="xref py py-func docutils literal notranslate"><span class="pre">modelformset_factory()</span></code></a> を使用して <code class="docutils literal notranslate"><span class="pre">GenericInlineFormSet</span></code> を返します。</p>
+<p>デフォルトの <code class="docutils literal notranslate"><span class="pre">content_type</span></code> と <code class="docutils literal notranslate"><span class="pre">object_id</span></code> と異なる場合は、それぞれ <code class="docutils literal notranslate"><span class="pre">ct_field</span></code> と <code class="docutils literal notranslate"><span class="pre">fk_field</span></code> を指定する必要があります。その他のパラメータは <a class="reference internal" href="../forms/models.html#django.forms.models.modelformset_factory" title="django.forms.models.modelformset_factory"><code class="xref py py-func docutils literal notranslate"><span class="pre">modelformset_factory()</span></code></a> と <a class="reference internal" href="../forms/models.html#django.forms.models.inlineformset_factory" title="django.forms.models.inlineformset_factory"><code class="xref py py-func docutils literal notranslate"><span class="pre">inlineformset_factory()</span></code></a> で説明されているものと同様です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">for_concrete_model</span></code> 引数は <code class="docutils literal notranslate"><span class="pre">GenericForeignKey</span></code> の <a class="reference internal" href="#django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model" title="django.contrib.contenttypes.fields.GenericForeignKey.for_concrete_model"><code class="xref py py-class docutils literal notranslate"><span class="pre">for_concrete_model</span></code></a> 引数に対応します。</p>
+</dd></dl>
+
+</section>
+<section id="s-generic-relations-in-admin">
+<span id="s-module-django.contrib.contenttypes.admin"></span><span id="generic-relations-in-admin"></span><span id="module-django.contrib.contenttypes.admin"></span><h3>admin におけるジェネリックリレーション<a class="headerlink" href="#generic-relations-in-admin" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="#module-django.contrib.contenttypes.admin" title="django.contrib.contenttypes.admin"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.contenttypes.admin</span></code></a> モジュールは、 <a class="reference internal" href="#django.contrib.contenttypes.admin.GenericTabularInline" title="django.contrib.contenttypes.admin.GenericTabularInline"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericTabularInline</span></code></a> と <a class="reference internal" href="#django.contrib.contenttypes.admin.GenericStackedInline" title="django.contrib.contenttypes.admin.GenericStackedInline"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericStackedInline</span></code></a> (<a class="reference internal" href="#django.contrib.contenttypes.admin.GenericInlineModelAdmin" title="django.contrib.contenttypes.admin.GenericInlineModelAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericInlineModelAdmin</span></code></a> のサブクラス) を提供します。</p>
+<p>これらのクラスと関数は、フォームや admin アプリケーションでジェネリックリレーションを利用できるようにします。詳細に、<a class="reference internal" href="../../topics/forms/modelforms.html"><span class="doc">モデルフォームセット</span></a> および <a class="reference internal" href="admin/index.html#using-generic-relations-as-an-inline"><span class="std std-ref">admin アプリケーション</span></a> のドキュメントを参照してください。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.admin.GenericInlineModelAdmin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericInlineModelAdmin</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/admin.py#L91"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.admin.GenericInlineModelAdmin" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.contenttypes.admin.GenericInlineModelAdmin" title="django.contrib.contenttypes.admin.GenericInlineModelAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericInlineModelAdmin</span></code></a> クラスは <a class="reference internal" href="admin/index.html#django.contrib.admin.InlineModelAdmin" title="django.contrib.admin.InlineModelAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">InlineModelAdmin</span></code></a> クラスの全てのプロパティを継承します。しかし、ジェネリックリレーションを扱うための独自のプロパティをいくつか追加しています:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_field">
+<span class="sig-name descname"><span class="pre">ct_field</span></span><a class="headerlink" href="#django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_field" title="Link to this definition">¶</a></dt>
+<dd><p>モデルの外部キーフィールド <a class="reference internal" href="#django.contrib.contenttypes.models.ContentType" title="django.contrib.contenttypes.models.ContentType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ContentType</span></code></a> の名前。デフォルトは <code class="docutils literal notranslate"><span class="pre">content_type</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_fk_field">
+<span class="sig-name descname"><span class="pre">ct_fk_field</span></span><a class="headerlink" href="#django.contrib.contenttypes.admin.GenericInlineModelAdmin.ct_fk_field" title="Link to this definition">¶</a></dt>
+<dd><p>リレーション先オブジェクトの ID を表す整数フィールドの名前。デフォルトは <code class="docutils literal notranslate"><span class="pre">object_id</span></code> です。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.admin.GenericTabularInline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericTabularInline</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/admin.py#L142"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.admin.GenericTabularInline" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.admin.GenericStackedInline">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericStackedInline</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/admin.py#L138"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.admin.GenericStackedInline" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.contenttypes.admin.GenericInlineModelAdmin" title="django.contrib.contenttypes.admin.GenericInlineModelAdmin"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericInlineModelAdmin</span></code></a> のサブクラスで、それぞれスタックレイアウトと表形式のレイアウトを持っています。</p>
+</dd></dl>
+
+</section>
+<section id="s-genericprefetch">
+<span id="s-module-django.contrib.contenttypes.prefetch"></span><span id="genericprefetch"></span><span id="module-django.contrib.contenttypes.prefetch"></span><h3><code class="docutils literal notranslate"><span class="pre">GenericPrefetch()</span></code><a class="headerlink" href="#genericprefetch" title="Link to this heading">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.contenttypes.prefetch.GenericPrefetch">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericPrefetch</span></span>(<em class="sig-param"><span class="n"><span class="pre">lookup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">querysets</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_attr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/contenttypes/prefetch.py#L5"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.contenttypes.prefetch.GenericPrefetch" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>このルックアップは <code class="docutils literal notranslate"><span class="pre">Prefetch()</span></code> に類似しており、<code class="docutils literal notranslate"><span class="pre">GenericForeignKey</span></code> 専用に使用されるべきです。<code class="docutils literal notranslate"><span class="pre">querysets</span></code> 引数は異なる <code class="docutils literal notranslate"><span class="pre">ContentType</span></code> 向けのクエリセットのリストを受け入れます。これは、結果が均質でない <code class="docutils literal notranslate"><span class="pre">GenericForeignKey</span></code> に便利です。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.contenttypes.prefetch</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericPrefetch</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">bookmark</span> <span class="o">=</span> <span class="n">Bookmark</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://www.djangoproject.com/&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">animal</span> <span class="o">=</span> <span class="n">Animal</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;lion&quot;</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s2">&quot;great&quot;</span><span class="p">,</span> <span class="n">content_object</span><span class="o">=</span><span class="n">bookmark</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">tag</span><span class="o">=</span><span class="s2">&quot;awesome&quot;</span><span class="p">,</span> <span class="n">content_object</span><span class="o">=</span><span class="n">animal</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">prefetch</span> <span class="o">=</span> <span class="n">GenericPrefetch</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="s2">&quot;content_object&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">Bookmark</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">Animal</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">only</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)]</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">TaggedItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">prefetch_related</span><span class="p">(</span><span class="n">prefetch</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+<span class="go">&lt;QuerySet [&lt;TaggedItem: Great&gt;, &lt;TaggedItem: Awesome&gt;]&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">contenttypes フレームワーク</a><ul>
+<li><a class="reference internal" href="#overview">概要</a></li>
+<li><a class="reference internal" href="#installing-the-contenttypes-framework">contenttypes フレームワークをインストールする</a></li>
+<li><a class="reference internal" href="#the-contenttype-model"><code class="docutils literal notranslate"><span class="pre">ContentType</span></code> モデル</a></li>
+<li><a class="reference internal" href="#methods-on-contenttype-instances"><code class="docutils literal notranslate"><span class="pre">ContentType</span></code> インスタンスのメソッド</a><ul>
+<li><a class="reference internal" href="#the-contenttypemanager"><code class="docutils literal notranslate"><span class="pre">ContentTypeManager</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#generic-relations">ジェネリックリレーション（汎用リレーション）</a><ul>
+<li><a class="reference internal" href="#reverse-generic-relations">逆ジェネリックリレーション (Reverse generic relation)</a></li>
+<li><a class="reference internal" href="#generic-relations-and-aggregation">ジェネリックリレーション (generic relation) と集計 (aggregation)</a></li>
+<li><a class="reference internal" href="#generic-relation-in-forms">フォームにおけるジェネリックリレーション</a></li>
+<li><a class="reference internal" href="#generic-relations-in-admin">admin におけるジェネリックリレーション</a></li>
+<li><a class="reference internal" href="#genericprefetch"><code class="docutils literal notranslate"><span class="pre">GenericPrefetch()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="auth.html"
+                          title="前の章へ"><code class="docutils literal notranslate"><span class="pre">django.contrib.auth</span></code></a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="flatpages.html"
+                          title="次の章へ">フラットページ (flatpages) アプリ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/contrib/contenttypes.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="auth.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.contrib.auth&lt;/span&gt;&lt;/code&gt;">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="flatpages.html" title="フラットページ (flatpages) アプリ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

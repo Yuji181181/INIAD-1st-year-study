@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>バグレポートと機能のリクエスト &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="チケットをトリアージする" href="triaging-tickets.html" />
+    <link rel="prev" title="Django のローカライズ" href="localizing.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="localizing.html" title="Django のローカライズ">previous</a>
+     |
+    <a href="../index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="triaging-tickets.html" title="チケットをトリアージする">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="internals-contributing-bugs-and-features">
+            
+  <section id="s-reporting-bugs-and-requesting-features">
+<span id="reporting-bugs-and-requesting-features"></span><h1>バグレポートと機能のリクエスト<a class="headerlink" href="#reporting-bugs-and-requesting-features" title="Link to this heading">¶</a></h1>
+<div class="admonition important">
+<p class="admonition-title">重要</p>
+<p>セキュリティイシューは <a class="reference external" href="mailto:security&#37;&#52;&#48;djangoproject&#46;com">security<span>&#64;</span>djangoproject<span>&#46;</span>com</a> に <strong>のみ</strong> 報告してください。これは長年にわたり信頼性の高いDjango開発者のみに公開されているプライベートなリストであり、そのアーカイブは公開されていません。詳細は <a class="reference internal" href="../security.html"><span class="doc">our security policies</span></a> を見てください。</p>
+</div>
+<p>そうでなければ、 <a class="reference external" href="https://code.djangoproject.com/">ticket tracker</a> にバグ報告や新機能提案をする前に、以下のことを検討してください：</p>
+<ul class="simple">
+<li><p>ticket tracker で、 <a class="reference external" href="https://code.djangoproject.com/search">searching</a> または <a class="reference external" href="https://code.djangoproject.com/query">custom queries</a> を動かすことで、ほかの人がバグや機能のリクエストをファイルしていないことを確認してください。</p></li>
+<li><p>Don't use the ticket system to ask support questions. Use the
+<a class="reference internal" href="../mailing-lists.html#django-users-mailing-list"><span class="std std-ref">django-users</span></a> list or the <a class="reference external" href="https://chat.djangoproject.com">Django Discord server</a> for that.</p></li>
+<li><p><a class="reference external" href="https://forum.djangoproject.com/">Django Forum</a> や <a class="reference internal" href="../mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a> メーリングリストでコンセンサスを得ずに、 &quot;wontfix&quot; とされた問題を再オープンしないでください。</p></li>
+<li><p>長い議論にチケットトラッカーを使わないでください。議論になりそうなチケットは <a class="reference external" href="https://forum.djangoproject.com/">Django Forum</a> や <a class="reference internal" href="../mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a> メーリングリストに移動してください。</p></li>
+</ul>
+<section id="s-reporting-bugs">
+<span id="s-id1"></span><span id="reporting-bugs"></span><span id="id1"></span><h2>バグレポート<a class="headerlink" href="#reporting-bugs" title="Link to this heading">¶</a></h2>
+<p>よく書かれたバグレポートは信じられないくらい有益です。しなしながら、バグチケットシステムの作業には手間がかかるため、チケットトラッカーを可能な限り便利に保つようにご協力をお願いします。特に、</p>
+<ul class="simple">
+<li><p>あなたの疑問が一般的なものである可能性がある際は、 <a class="reference internal" href="../../faq/index.html"><span class="doc">FAQ</span></a> を読んでください。</p></li>
+<li><p><strong>Do</strong> ask on <a class="reference internal" href="../mailing-lists.html#django-users-mailing-list"><span class="std std-ref">django-users</span></a> or the <a class="reference external" href="https://chat.djangoproject.com">Django Discord server</a> <em>first</em> if
+you're not sure if what you're seeing is a bug.</p></li>
+<li><p>完全で再現可能な明確なバグレポートを作成してください。問題を明確かつ簡潔に記載し、再現方法を指示してください。コードの抜粋、テストケース、バックトレースのエクセプションやスクリーンショットなど、可能な限りの情報も追加してください。無駄のない小さなテストケースが最高のバグレポートであり、バグを確認する最善の方法です。</p></li>
+<li><p>バグレポートを提出したことだけで|django-developers| に投稿しないでください。全てのチケットは開発者や興味があるコミュニティーメンバ向けの|django-updates|で配信されるため、バグレポートの提出についてもそちらで確認します。</p></li>
+</ul>
+<p>以前に作成されたticketのライフサイクルを理解するため、ドキュメントの <a class="reference internal" href="triaging-tickets.html"><span class="doc">チケットをトリアージする</span></a> を参照してください。</p>
+</section>
+<section id="s-reporting-user-interface-bugs-and-features">
+<span id="reporting-user-interface-bugs-and-features"></span><h2>ユーザーインターフェイスのバグや機能について報告する<a class="headerlink" href="#reporting-user-interface-bugs-and-features" title="Link to this heading">¶</a></h2>
+<p>あなたが報告するバグや機能が何らかの視覚的に確認できるものである場合は、以下の追加のガイドラインに従ってください。</p>
+<ul class="simple">
+<li><p>最小のテストケースが視覚的に理解できるスクリーンショットをチケットに含めてください。あなたの素晴らしいブラウザのカスタマイズではなく、問題を示してください。</p></li>
+<li><p>問題をスクリーンショットで示すのが難しい場合は、 <em>簡潔な</em> スクリーンキャストを撮影することを検討してください。可能なソフトウェアなら、問題に関連する領域のみを撮影するようにしてください。</p></li>
+<li><p>Django UIの挙動や見た目を変更するパッチを提案する場合は、 <em>必ず</em> 変更前と後のスクリーンショット/スクリーンキャストを添付してください。これらが含まれないチケットは、優先度を付けることが困難です。</p></li>
+<li><p>スクリーンショットは他のよいレポート方法を免除するものではありません。URL、コードの抜粋、スクリーンショットの挙動を再現するための詳細な手順が含まれていることを確認してください。</p></li>
+<li><p>チケットに UI/UX フラグを設定するのを忘れないでください。このフラグがあると、関係する人たちがチケットをすぐに発見することができます。</p></li>
+</ul>
+</section>
+<section id="s-requesting-features">
+<span id="requesting-features"></span><h2>機能のリクエスト<a class="headerlink" href="#requesting-features" title="Link to this heading">¶</a></h2>
+<p>我々は常にDjangoをより良くしようと努めており、ユーザーからの機能のリクエストは重要なパーツになります。リクエストを最も効果的に行うためのヒントをいくつか示します。</p>
+<ul class="simple">
+<li><p>リクエストする機能は、本当にDjangoコアの改修が必要かどうか確認してください。例えば、データベースエンジンの追加要望のような、独立したアプリケーションやモジュールの開発で対応可能な場合は、独立した開発をお勧めします。その後、あなたのプロジェクトがコミュニティーから十分に支持されれば、Djangoに含めるか検討することになります。</p></li>
+<li><p>まずは <a class="reference external" href="https://forum.djangoproject.com/">Django Forum</a> や <a class="reference internal" href="../mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a> メーリングリストで機能をリクエストしてください。メーリングリストであれば、より詳しく読まれるでしょう。これは大規模な機能要望の場合はさらに重要です。私たちは、Django のコアに対する大きな変更は、実際に作業する前に議論したいのです。</p></li>
+<li><p>不足している機能とどのように実装したいのかを明瞭かつ簡潔に記載してください。可能であればコード例も含めてください(機能しなくても問題ありません)。</p></li>
+<li><p><em>なぜ</em> その機能が必要なのか説明してください。最小のユースケースを説明することで、他の人がその機能がどこに適合するのか、既に他の方法で同じ事が達成されていないかを理解する助けになります。</p></li>
+</ul>
+<p>その機能に関するコンセンサスの合意があれば、チケットを作成するのが適切です。チケットの説明にディスカッションへのリンクを含めてください。</p>
+<p>ほとんどのオープンソースプロジェクトと同様に、コードは語ります。もしあなたがその機能のコードを自分で書く気があるなら、あるいはもっといいのは、すでに書いてあるなら、それが受け入れられる可能性はずっと高くなります。GitHub で Django をフォークして、機能ブランチを作成し、あなたの作品を私たちに見せてください！</p>
+<p><a class="reference internal" href="writing-documentation.html#documenting-new-features"><span class="std std-ref">新機能のドキュメントを書く</span></a>. も参照してください。</p>
+</section>
+<section id="s-requesting-performance-optimizations">
+<span id="requesting-performance-optimizations"></span><h2>Requesting performance optimizations<a class="headerlink" href="#requesting-performance-optimizations" title="Link to this heading">¶</a></h2>
+<p>Reports of a performance regression, or suggested performance optimizations,
+should provide benchmarks and commands for the ticket triager to reproduce.</p>
+<p>See the <a class="reference internal" href="writing-code/submitting-patches.html#django-asv-benchmarks"><span class="std std-ref">django-asv benchmarks</span></a> for more details of Django's existing
+benchmarks.</p>
+</section>
+<section id="s-how-we-make-decisions">
+<span id="s-id2"></span><span id="how-we-make-decisions"></span><span id="id2"></span><h2>どのように決定が下されるか<a class="headerlink" href="#how-we-make-decisions" title="Link to this heading">¶</a></h2>
+<p>可能な限り、私たちは大まかな合意を目指しています。そのため、機能についての非公式の投票を <a class="reference internal" href="../mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a> や Django Forum で行うことがよくあります。これらの投票では、Apacheが発明しPython自体で使用されている投票スタイルに従い、投票は +1, +0, -0, または -1 として行われます。大まかに訳すと、これらの投票は以下のような意味を持ちます:</p>
+<ul class="simple">
+<li><p>+1: &quot;私はこのアイデアが大好きで、強くコミットしています。&quot;</p></li>
+<li><p>+0: &quot; 私は OKだと思います。&quot;</p></li>
+<li><p>-0: &quot;ワクワクはしないけど、邪魔にはならないと思います。&quot;</p></li>
+<li><p>-1: &quot;私は強く反対しますし、このアイデアが現実になるのを見るのは非常に不愉快です。&quot;</p></li>
+</ul>
+<p>これらの投票は非公式なものですが、非常に真摯に受け止められます。適切な投票期間の後、明らかなコンセンサスが得られれば、投票に従います。</p>
+<p>しかし、常にコンセンサスが得られるとは限りません。コンセンサスが得られない場合、あるいはコンセンサスに向けた議論が具体的な決定がなされないまま頓挫した場合、その決定は <a class="reference internal" href="../organization.html#steering-council"><span class="std std-ref">運営委員会 (steering council)</span></a> に委ねられることがあります。</p>
+<p>内部的には、運営委員会も同じ投票メカニズムを使用します。以下を満たす場合、議案は可決されたとみなされます:</p>
+<ul class="simple">
+<li><p>運営委員会のメンバーから少なくとも3票の &quot;+1&quot; 投票があること。</p></li>
+<li><p>運営委員会のどのメンバーからも &quot;-1&quot; の票が入らないこと。</p></li>
+</ul>
+<p>投票は1週間以内に提出してください。</p>
+<p>このプロセスでは、どの運営委員も提案に拒否権を行使できるため、 &quot;-1&quot; 票には、その &quot;-1&quot; を最低でも &quot;+0&quot; に変えるには何が必要かという説明を添えるべきです。</p>
+<p>技術的なことに関する投票は、 <a class="reference internal" href="../mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a> メーリングリストか <a class="reference external" href="https://forum.djangoproject.com/">Django Forum</a> で公開で発表され、行われるべきです。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">バグレポートと機能のリクエスト</a><ul>
+<li><a class="reference internal" href="#reporting-bugs">バグレポート</a></li>
+<li><a class="reference internal" href="#reporting-user-interface-bugs-and-features">ユーザーインターフェイスのバグや機能について報告する</a></li>
+<li><a class="reference internal" href="#requesting-features">機能のリクエスト</a></li>
+<li><a class="reference internal" href="#requesting-performance-optimizations">Requesting performance optimizations</a></li>
+<li><a class="reference internal" href="#how-we-make-decisions">どのように決定が下されるか</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="localizing.html"
+                          title="前の章へ">Django のローカライズ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="triaging-tickets.html"
+                          title="次の章へ">チケットをトリアージする</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/internals/contributing/bugs-and-features.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="localizing.html" title="Django のローカライズ">previous</a>
+     |
+    <a href="../index.html" title="Django internals" accesskey="U">up</a>
+   |
+    <a href="triaging-tickets.html" title="チケットをトリアージする">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

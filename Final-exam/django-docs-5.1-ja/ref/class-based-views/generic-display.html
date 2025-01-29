@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ジェネリック表示ビュー (Generic display view) &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="ジェネリック編集ビュー (Generic editing view)" href="generic-editing.html" />
+    <link rel="prev" title="ベース・ビュー" href="base.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="base.html" title="ベース・ビュー">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="generic-editing.html" title="ジェネリック編集ビュー (Generic editing view)">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-class-based-views-generic-display">
+            
+  <section id="s-generic-display-views">
+<span id="generic-display-views"></span><h1>ジェネリック表示ビュー (Generic display view)<a class="headerlink" href="#generic-display-views" title="Link to this heading">¶</a></h1>
+<p>以下の2つのクラスベースのジェネリックビューは、データを表示 (display) するために設計されています。多くのプロジェクトで、これらは最もよく使われるビューです。</p>
+<section id="s-detailview">
+<span id="detailview"></span><h2><code class="docutils literal notranslate"><span class="pre">DetailView</span></code><a class="headerlink" href="#detailview" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.generic.detail.DetailView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.views.generic.detail.</span></span><span class="sig-name descname"><span class="pre">DetailView</span></span><a class="headerlink" href="#django.views.generic.detail.DetailView" title="Link to this definition">¶</a></dt>
+<dd><p>このビューが動作している間、<code class="docutils literal notranslate"><span class="pre">self.object</span></code> はビューが操作しているオブジェクトを含みます。</p>
+<p><strong>継承元 (MRO)</strong></p>
+<p>このメソッドは、以下のビューからメソッドと属性を継承しています:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectTemplateResponseMixin" title="django.views.generic.detail.SingleObjectTemplateResponseMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.detail.SingleObjectTemplateResponseMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-simple.html#django.views.generic.base.TemplateResponseMixin" title="django.views.generic.base.TemplateResponseMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.TemplateResponseMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="#django.views.generic.detail.BaseDetailView" title="django.views.generic.detail.BaseDetailView"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.detail.BaseDetailView</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin" title="django.views.generic.detail.SingleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.detail.SingleObjectMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View" title="django.views.generic.base.View"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.View</span></code></a></p></li>
+</ul>
+<p><strong>メソッドのフローチャート</strong></p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View.setup" title="django.views.generic.base.View.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View.dispatch" title="django.views.generic.base.View.dispatch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispatch()</span></code></a></p></li>
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View.http_method_not_allowed" title="django.views.generic.base.View.http_method_not_allowed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">http_method_not_allowed()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-simple.html#django.views.generic.base.TemplateResponseMixin.get_template_names" title="django.views.generic.base.TemplateResponseMixin.get_template_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_template_names()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.get_slug_field" title="django.views.generic.detail.SingleObjectMixin.get_slug_field"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_slug_field()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.get_queryset" title="django.views.generic.detail.SingleObjectMixin.get_queryset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_queryset()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.get_object" title="django.views.generic.detail.SingleObjectMixin.get_object"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_object()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.get_context_object_name" title="django.views.generic.detail.SingleObjectMixin.get_context_object_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_context_object_name()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.get_context_data" title="django.views.generic.detail.SingleObjectMixin.get_context_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_context_data()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#django.views.generic.detail.BaseDetailView.get" title="django.views.generic.detail.BaseDetailView.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-simple.html#django.views.generic.base.TemplateResponseMixin.render_to_response" title="django.views.generic.base.TemplateResponseMixin.render_to_response"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render_to_response()</span></code></a></p></li>
+</ol>
+<p><strong>例 myapp/views.py</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic.detail</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetailView</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">articles.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ArticleDetailView</span><span class="p">(</span><span class="n">DetailView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Article</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">context</span>
+</pre></div>
+</div>
+<p><strong>例 myapp/urls.py</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">article.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArticleDetailView</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;&lt;slug:slug&gt;/&quot;</span><span class="p">,</span> <span class="n">ArticleDetailView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;article-detail&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>例 myapp/article_detail.html</strong>:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">object.headline</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">object.content</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Reporter: <span class="cp">{{</span> <span class="nv">object.reporter</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Published: <span class="cp">{{</span> <span class="nv">object.pub_date</span><span class="o">|</span><span class="nf">date</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>Date: <span class="cp">{{</span> <span class="nv">now</span><span class="o">|</span><span class="nf">date</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.generic.detail.BaseDetailView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.views.generic.detail.</span></span><span class="sig-name descname"><span class="pre">BaseDetailView</span></span><a class="headerlink" href="#django.views.generic.detail.BaseDetailView" title="Link to this definition">¶</a></dt>
+<dd><p>単一のオブジェクトを表示するための基本ビューです。直接使用するのではなく、 <a class="reference internal" href="#django.views.generic.detail.DetailView" title="django.views.generic.detail.DetailView"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.detail.DetailView</span></code></a> や他のオブジェクトの詳細を表示するビューの親クラスとして使用することを想定しています。</p>
+<p><strong>継承元 (MRO)</strong></p>
+<p>このメソッドは、以下のビューからメソッドと属性を継承しています:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin" title="django.views.generic.detail.SingleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.detail.SingleObjectMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View" title="django.views.generic.base.View"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.View</span></code></a></p></li>
+</ul>
+<p><strong>メソッド</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.detail.BaseDetailView.get">
+<span class="sig-name descname"><span class="pre">get</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.views.generic.detail.BaseDetailView.get" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">object</span></code> をコンテキストに追加します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-listview">
+<span id="listview"></span><h2><code class="docutils literal notranslate"><span class="pre">ListView</span></code><a class="headerlink" href="#listview" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.generic.list.ListView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.views.generic.list.</span></span><span class="sig-name descname"><span class="pre">ListView</span></span><a class="headerlink" href="#django.views.generic.list.ListView" title="Link to this definition">¶</a></dt>
+<dd><p>オブジェクトのリストを表示するページです。</p>
+<p>このビューが動作している間、<code class="docutils literal notranslate"><span class="pre">self.object_list</span></code> はビューが操作しているオブジェクト (通常はクエリセットですが、そうとは限りません) のリストを含みます。</p>
+<p><strong>継承元 (MRO)</strong></p>
+<p>このメソッドは、以下のビューからメソッドと属性を継承しています:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="mixins-multiple-object.html#django.views.generic.list.MultipleObjectTemplateResponseMixin" title="django.views.generic.list.MultipleObjectTemplateResponseMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.list.MultipleObjectTemplateResponseMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-simple.html#django.views.generic.base.TemplateResponseMixin" title="django.views.generic.base.TemplateResponseMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.TemplateResponseMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="#django.views.generic.list.BaseListView" title="django.views.generic.list.BaseListView"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.list.BaseListView</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-multiple-object.html#django.views.generic.list.MultipleObjectMixin" title="django.views.generic.list.MultipleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.list.MultipleObjectMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View" title="django.views.generic.base.View"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.View</span></code></a></p></li>
+</ul>
+<p><strong>メソッドのフローチャート</strong></p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View.setup" title="django.views.generic.base.View.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a></p></li>
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View.dispatch" title="django.views.generic.base.View.dispatch"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dispatch()</span></code></a></p></li>
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View.http_method_not_allowed" title="django.views.generic.base.View.http_method_not_allowed"><code class="xref py py-meth docutils literal notranslate"><span class="pre">http_method_not_allowed()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-simple.html#django.views.generic.base.TemplateResponseMixin.get_template_names" title="django.views.generic.base.TemplateResponseMixin.get_template_names"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_template_names()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-multiple-object.html#django.views.generic.list.MultipleObjectMixin.get_queryset" title="django.views.generic.list.MultipleObjectMixin.get_queryset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_queryset()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-multiple-object.html#django.views.generic.list.MultipleObjectMixin.get_context_object_name" title="django.views.generic.list.MultipleObjectMixin.get_context_object_name"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_context_object_name()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-multiple-object.html#django.views.generic.list.MultipleObjectMixin.get_context_data" title="django.views.generic.list.MultipleObjectMixin.get_context_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_context_data()</span></code></a></p></li>
+<li><p><a class="reference internal" href="#django.views.generic.list.BaseListView.get" title="django.views.generic.list.BaseListView.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-simple.html#django.views.generic.base.TemplateResponseMixin.render_to_response" title="django.views.generic.base.TemplateResponseMixin.render_to_response"><code class="xref py py-meth docutils literal notranslate"><span class="pre">render_to_response()</span></code></a></p></li>
+</ol>
+<p><strong>Example views.py</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic.list</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListView</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">articles.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ArticleListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Article</span>
+    <span class="n">paginate_by</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># if pagination is desired</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;now&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">context</span>
+</pre></div>
+</div>
+<p><strong>例 myapp/urls.py</strong>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">article.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">ArticleListView</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">ArticleListView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;article-list&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><strong>例 myapp/article_list.html</strong>:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">h1</span><span class="p">&gt;</span>Articles<span class="p">&lt;/</span><span class="nt">h1</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">article</span> <span class="k">in</span> <span class="nv">object_list</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">article.pub_date</span><span class="o">|</span><span class="nf">date</span> <span class="cp">}}</span> - <span class="cp">{{</span> <span class="nv">article.headline</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">empty</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>No articles yet.<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>ページ分割を使用している場合は、 <a class="reference internal" href="../../topics/pagination.html#paginating-a-list-view"><span class="std std-ref">ページ分割のドキュメントのテンプレート例</span></a> を適用できます。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.generic.list.BaseListView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.views.generic.list.</span></span><span class="sig-name descname"><span class="pre">BaseListView</span></span><a class="headerlink" href="#django.views.generic.list.BaseListView" title="Link to this definition">¶</a></dt>
+<dd><p>オブジェクトのリストを描画するための基本ビューです。直接使用されるのではなく、 <a class="reference internal" href="#django.views.generic.list.ListView" title="django.views.generic.list.ListView"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.list.ListView</span></code></a> の親クラスやオブジェクトのリストを表す他のビューとして使用されることを想定しています。</p>
+<p><strong>継承元 (MRO)</strong></p>
+<p>このメソッドは、以下のビューからメソッドと属性を継承しています:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="mixins-multiple-object.html#django.views.generic.list.MultipleObjectMixin" title="django.views.generic.list.MultipleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.list.MultipleObjectMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View" title="django.views.generic.base.View"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.View</span></code></a></p></li>
+</ul>
+<p><strong>メソッド</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.list.BaseListView.get">
+<span class="sig-name descname"><span class="pre">get</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.views.generic.list.BaseListView.get" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">object_list</span></code> をコンテキストに追加します。<a class="reference internal" href="mixins-multiple-object.html#django.views.generic.list.MultipleObjectMixin.allow_empty" title="django.views.generic.list.MultipleObjectMixin.allow_empty"><code class="xref py py-attr docutils literal notranslate"><span class="pre">allow_empty</span></code></a> が True の場合、空のリストを描画します。<a class="reference internal" href="mixins-multiple-object.html#django.views.generic.list.MultipleObjectMixin.allow_empty" title="django.views.generic.list.MultipleObjectMixin.allow_empty"><code class="xref py py-attr docutils literal notranslate"><span class="pre">allow_empty</span></code></a> が False の場合、 404 エラーを投げます。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ジェネリック表示ビュー (Generic display view)</a><ul>
+<li><a class="reference internal" href="#detailview"><code class="docutils literal notranslate"><span class="pre">DetailView</span></code></a></li>
+<li><a class="reference internal" href="#listview"><code class="docutils literal notranslate"><span class="pre">ListView</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="base.html"
+                          title="前の章へ">ベース・ビュー</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="generic-editing.html"
+                          title="次の章へ">ジェネリック編集ビュー (Generic editing view)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/class-based-views/generic-display.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="base.html" title="ベース・ビュー">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="generic-editing.html" title="ジェネリック編集ビュー (Generic editing view)">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

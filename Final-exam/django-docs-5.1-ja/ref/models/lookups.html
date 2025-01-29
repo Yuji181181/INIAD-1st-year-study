@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ルックアップ API リファレンス &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="クエリ式 (Query Expression)" href="expressions.html" />
+    <link rel="prev" title="QuerySet API リファレンス" href="querysets.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="querysets.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;QuerySet&lt;/span&gt;&lt;/code&gt; API リファレンス">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="expressions.html" title="クエリ式 (Query Expression)">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-models-lookups">
+            
+  <section id="s-module-django.db.models.lookups">
+<span id="s-lookup-api-reference"></span><span id="module-django.db.models.lookups"></span><span id="lookup-api-reference"></span><h1>ルックアップ API リファレンス<a class="headerlink" href="#module-django.db.models.lookups" title="Link to this heading">¶</a></h1>
+<p>このドキュメントには、データベースクエリの <code class="docutils literal notranslate"><span class="pre">WHERE</span></code> 句を構築するための Django API であるルックアップの API リファレンスがあります。ルックアップの <em>使い方</em> については <a class="reference internal" href="../../topics/db/queries.html"><span class="doc">クエリを作成する</span></a> を、新しいルックアップの <em>作り方</em> については <a class="reference internal" href="../../howto/custom-lookups.html"><span class="doc">カスタムのルックアップを書く</span></a> を参照してください。</p>
+<p>ルックアップAPIには2つのコンポーネントがあります。ルックアップを登録する <a class="reference internal" href="#django.db.models.lookups.RegisterLookupMixin" title="django.db.models.lookups.RegisterLookupMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">RegisterLookupMixin</span></code></a> クラスと、ルックアップとして登録するためにクラスが実装しなければならないメソッドのセットである <a class="reference internal" href="#query-expression"><span class="std std-ref">クエリ式 API</span></a> です。</p>
+<p>Django には、クエリ式 API に従う 2 つの基本クラスがあり、すべての Django 組み込みルックアップはここから派生しています:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#django.db.models.Lookup" title="django.db.models.Lookup"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lookup</span></code></a>: フィールドをルックアップします (例えば <code class="docutils literal notranslate"><span class="pre">field_name__exact</span></code> の <code class="docutils literal notranslate"><span class="pre">exact</span></code>)</p></li>
+<li><p><a class="reference internal" href="#django.db.models.Transform" title="django.db.models.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a>: フィールドをトランスフォーム（変換）します。</p></li>
+</ul>
+<p>ルックアップ式は3つの部分で構成されています:</p>
+<ul class="simple">
+<li><p>フィールド部分（例: <code class="docutils literal notranslate"><span class="pre">Book.objects.filter(author__best_friends__first_name...</span></code> ）;</p></li>
+<li><p>トランスフォーム（変換）部分（省略可） (<code class="docutils literal notranslate"><span class="pre">lower__first3chars__reversed</span></code> など);</p></li>
+<li><p>ルックアップ部分 (<code class="docutils literal notranslate"><span class="pre">__icontains</span></code> など)。省略した場合のデフォルトは <code class="docutils literal notranslate"><span class="pre">__exact</span></code> です。</p></li>
+</ul>
+<section id="s-registration-api">
+<span id="s-lookup-registration-api"></span><span id="registration-api"></span><span id="lookup-registration-api"></span><h2>登録API<a class="headerlink" href="#registration-api" title="Link to this heading">¶</a></h2>
+<p>Django は <a class="reference internal" href="#django.db.models.lookups.RegisterLookupMixin" title="django.db.models.lookups.RegisterLookupMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">RegisterLookupMixin</span></code></a> を使って、自分自身やそのインスタンスにルックアップを登録するインターフェイスをクラスに与えます。代表的な例は <a class="reference internal" href="fields.html#django.db.models.Field" title="django.db.models.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> で、これはすべてのモデルフィールドの基底クラスです。 <a class="reference internal" href="#django.db.models.Transform" title="django.db.models.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> もその一つで、これはすべての Django トランスフォームの基底クラスです。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.db.models.lookups.RegisterLookupMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">lookups.</span></span><span class="sig-name descname"><span class="pre">RegisterLookupMixin</span></span><a class="headerlink" href="#django.db.models.lookups.RegisterLookupMixin" title="Link to this definition">¶</a></dt>
+<dd><p>クラスのルックアップ API を実装するミックスインです。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.lookups.RegisterLookupMixin.register_lookup">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_lookup</span></span>(<em class="sig-param"><span class="n"><span class="pre">lookup</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lookup_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.db.models.lookups.RegisterLookupMixin.register_lookup" title="Link to this definition">¶</a></dt>
+<dd><p>クラスまたはクラスのインスタンスに新しいルックアップを登録します。たとえば、次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DateField</span><span class="o">.</span><span class="n">register_lookup</span><span class="p">(</span><span class="n">YearExact</span><span class="p">)</span>
+<span class="n">User</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="s2">&quot;date_joined&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">register_lookup</span><span class="p">(</span><span class="n">MonthExact</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このコードは <code class="docutils literal notranslate"><span class="pre">DateField</span></code> の <code class="docutils literal notranslate"><span class="pre">YearExact</span></code> ルックアップと <code class="docutils literal notranslate"><span class="pre">User.date_joined</span></code> の <code class="docutils literal notranslate"><span class="pre">MonthExact</span></code> ルックアップを登録します（ <a class="reference internal" href="meta.html#model-meta-field-api"><span class="std std-ref">フィールドアクセス API</span></a> を使用して単一のフィールドインスタンスを取得できます）。このルックアップは既に存在する同じ名前のルックアップを上書きします。フィールドインスタンスに登録されたルックアップはクラスに登録されたルックアップよりも優先されます。 <code class="docutils literal notranslate"><span class="pre">lookup.lookup_name</span></code> が指定された場合は <code class="docutils literal notranslate"><span class="pre">lookup_name</span></code> が使用され、指定されなかった場合は <code class="docutils literal notranslate"><span class="pre">lookup.lookup_name</span></code> が使用されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.lookups.RegisterLookupMixin.get_lookup">
+<span class="sig-name descname"><span class="pre">get_lookup</span></span>(<em class="sig-param"><span class="n"><span class="pre">lookup_name</span></span></em>)<a class="headerlink" href="#django.db.models.lookups.RegisterLookupMixin.get_lookup" title="Link to this definition">¶</a></dt>
+<dd><p>クラスまたはクラスインスタンスに登録されている <code class="docutils literal notranslate"><span class="pre">lookup_name</span></code> という名前の <a class="reference internal" href="#django.db.models.Lookup" title="django.db.models.Lookup"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lookup</span></code></a> を、呼び出しに応じて返します。デフォルトの実装では、全ての親クラスを再帰的にルックアップし、 <code class="docutils literal notranslate"><span class="pre">lookup_name</span></code> という名前のルックアップが登録されているかどうかをチェックし、最初にマッチしたものを返します。インスタンスのルックアップは同じ <code class="docutils literal notranslate"><span class="pre">Lookup_name</span></code> を持つクラスのルックアップを上書きします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.lookups.RegisterLookupMixin.get_lookups">
+<span class="sig-name descname"><span class="pre">get_lookups</span></span>()<a class="headerlink" href="#django.db.models.lookups.RegisterLookupMixin.get_lookups" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.db.models.Lookup" title="django.db.models.Lookup"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lookup</span></code></a> クラスにマップされたクラスまたはクラスインスタンスに登録されているルックアップ名の辞書を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.lookups.RegisterLookupMixin.get_transform">
+<span class="sig-name descname"><span class="pre">get_transform</span></span>(<em class="sig-param"><span class="n"><span class="pre">transform_name</span></span></em>)<a class="headerlink" href="#django.db.models.lookups.RegisterLookupMixin.get_transform" title="Link to this definition">¶</a></dt>
+<dd><p>クラスまたはクラスインスタンスに登録されている <code class="docutils literal notranslate"><span class="pre">transform_name</span></code> という <a class="reference internal" href="#django.db.models.Transform" title="django.db.models.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> を返します。デフォルトの実装では、すべての親クラスを再帰的に検索し、 <code class="docutils literal notranslate"><span class="pre">transform_name</span></code> という名前のトランスフォームが登録されているかどうかを調べ、最初にマッチしたものを返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>クラスがルックアップであるためには、 <a class="reference internal" href="#query-expression"><span class="std std-ref">クエリ式 API</span></a> に従わなければなりません。 <a class="reference internal" href="#django.db.models.Lookup" title="django.db.models.Lookup"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lookup</span></code></a> と <a class="reference internal" href="#django.db.models.Transform" title="django.db.models.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a> は当然この API に従います。</p>
+</section>
+<section id="s-the-query-expression-api">
+<span id="s-query-expression"></span><span id="the-query-expression-api"></span><span id="query-expression"></span><h2>クエリ式 API<a class="headerlink" href="#the-query-expression-api" title="Link to this heading">¶</a></h2>
+<p>クエリ式 API はクラスがクエリ式で使用できるように定義するメソッドの共通セットで、クラス自身を SQL 式に変換します。フィールドの直接参照、集計（Aggregation）、 <code class="docutils literal notranslate"><span class="pre">Transform</span></code> はこのAPIに従う例です。あるクラスが以下のメソッドを実装している場合、そのクラスはクエリ式APIに従っていると言えます:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.as_sql">
+<span class="sig-name descname"><span class="pre">as_sql</span></span>(<em class="sig-param"><span class="n"><span class="pre">compiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>)<a class="headerlink" href="#django.db.models.as_sql" title="Link to this definition">¶</a></dt>
+<dd><p>式の SQL フラグメントを生成します。タプル <code class="docutils literal notranslate"><span class="pre">(sql,</span> <span class="pre">params)</span></code> を返します。<code class="docutils literal notranslate"><span class="pre">sql</span></code> は SQL 文字列で、<code class="docutils literal notranslate"><span class="pre">params</span></code> はクエリパラメータのリストまたはタプルです。 <code class="docutils literal notranslate"><span class="pre">compiler</span></code> は <code class="docutils literal notranslate"><span class="pre">SQLCompiler</span></code> オブジェクトで、他の式をコンパイルするための <code class="docutils literal notranslate"><span class="pre">compile()</span></code> メソッドを持っています。 <code class="docutils literal notranslate"><span class="pre">connection</span></code> はクエリの実行に使用する接続です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">expression.as_sql()</span></code> の呼び出しは通常正しくありません。 代わりに <code class="docutils literal notranslate"><span class="pre">compiler.compile(expression)</span></code> を使用する必要があります。 <code class="docutils literal notranslate"><span class="pre">compiler.compile()</span></code> メソッドは式のベンダ固有のメソッドの呼び出しを行います。</p>
+<p><code class="docutils literal notranslate"><span class="pre">as_vendorname()</span></code> メソッドやサブクラスがSQL文字列の生成を上書きするためにデータを提供する必要がありそうな場合は、このメソッドにカスタムキーワード引数を定義できます。たとえば、 <a class="reference internal" href="expressions.html#django.db.models.Func.as_sql" title="django.db.models.Func.as_sql"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Func.as_sql()</span></code></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.as_vendorname">
+<span class="sig-name descname"><span class="pre">as_vendorname</span></span>(<em class="sig-param"><span class="n"><span class="pre">compiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>)<a class="headerlink" href="#django.db.models.as_vendorname" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">as_sql()</span></code> メソッドと同じように動作します。式が <code class="docutils literal notranslate"><span class="pre">compiler.compile()</span></code> によってコンパイルされると、Django はまず <code class="docutils literal notranslate"><span class="pre">as_vendorname()</span></code> を呼び出そうとします。ここで <code class="docutils literal notranslate"><span class="pre">vendorname</span></code> はクエリを実行するバックエンドのベンダ名です。 <code class="docutils literal notranslate"><span class="pre">vendorname</span></code> は Django の組み込みバックエンドでは <code class="docutils literal notranslate"><span class="pre">postgresql</span></code> 、 <code class="docutils literal notranslate"><span class="pre">oracle</span></code> 、 <code class="docutils literal notranslate"><span class="pre">sqlite</span></code> 、 <code class="docutils literal notranslate"><span class="pre">mysql</span></code> のいずれかです。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.get_lookup">
+<span class="sig-name descname"><span class="pre">get_lookup</span></span>(<em class="sig-param"><span class="n"><span class="pre">lookup_name</span></span></em>)<a class="headerlink" href="#django.db.models.get_lookup" title="Link to this definition">¶</a></dt>
+<dd><p>ルックアップ名 <code class="docutils literal notranslate"><span class="pre">lookup_name</span></code> を返さなければなりません。インスタンスンスでは <code class="docutils literal notranslate"><span class="pre">self.output_field.get_lookup(lookup_name)</span></code> を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.get_transform">
+<span class="sig-name descname"><span class="pre">get_transform</span></span>(<em class="sig-param"><span class="n"><span class="pre">transform_name</span></span></em>)<a class="headerlink" href="#django.db.models.get_transform" title="Link to this definition">¶</a></dt>
+<dd><p>ルックアップ名 <code class="docutils literal notranslate"><span class="pre">transform_name</span></code> を返さなければなりません。インスタンスンスでは <code class="docutils literal notranslate"><span class="pre">self.output_field.get_transform(transform_name)</span></code> を返します。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.output_field">
+<span class="sig-name descname"><span class="pre">output_field</span></span><a class="headerlink" href="#django.db.models.output_field" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">get_lookup()</span></code> メソッドが返すクラスの型を定義します。これは <a class="reference internal" href="fields.html#django.db.models.Field" title="django.db.models.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> インスタンスでなければなりません。</p>
+</dd></dl>
+
+</section>
+<section id="s-transform-reference">
+<span id="transform-reference"></span><h2><code class="docutils literal notranslate"><span class="pre">Transform</span></code> リファレンス<a class="headerlink" href="#transform-reference" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.db.models.Transform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Transform</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/models/lookups.py#L196"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.models.Transform" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">Transform</span></code> はフィールドの変換を実装するための汎用クラスです。主な例は <code class="docutils literal notranslate"><span class="pre">DateField</span></code> を <code class="docutils literal notranslate"><span class="pre">IntegerField</span></code> に変換する <code class="docutils literal notranslate"><span class="pre">__year</span></code> です。</p>
+<p>ルックアップ式で <code class="docutils literal notranslate"><span class="pre">Transform</span></code> を使用する場合の表記は <code class="docutils literal notranslate"><span class="pre">&lt;expression&gt;__&lt;transformation&gt;</span></code> (例 <code class="docutils literal notranslate"><span class="pre">date__year</span></code>) です。</p>
+<p>このクラスは <a class="reference internal" href="#query-expression"><span class="std std-ref">クエリ式 API</span></a> に従っており、 <code class="docutils literal notranslate"><span class="pre">&lt;expression&gt;__&lt;transform1&gt;__&lt;transform2&gt;</span></code> を使用できます。これは <a class="reference internal" href="expressions.html#func-expressions"><span class="std std-ref">Func() 式</span></a> に特化したもので、引数を一つだけ受け取ることができます。 また、フィルタの右辺やアノテーションとして直接使用することもできます。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Transform.bilateral">
+<span class="sig-name descname"><span class="pre">bilateral</span></span><a class="headerlink" href="#django.db.models.Transform.bilateral" title="Link to this definition">¶</a></dt>
+<dd><p>このトランスフォームを <code class="docutils literal notranslate"><span class="pre">lhs</span></code> と <code class="docutils literal notranslate"><span class="pre">rhs</span></code> の両方に適用するかどうかを示すブール値です。両者の変換は <code class="docutils literal notranslate"><span class="pre">rhs</span></code> に対して、ルックアップ式に現れる順番で適用されます。デフォルトでは <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定されています。たとえば、 <a class="reference internal" href="../../howto/custom-lookups.html"><span class="doc">カスタムのルックアップを書く</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Transform.lhs">
+<span class="sig-name descname"><span class="pre">lhs</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/models/lookups.py#L206"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.models.Transform.lhs" title="Link to this definition">¶</a></dt>
+<dd><p>左辺 - 変換されるもの。これは <a class="reference internal" href="#query-expression"><span class="std std-ref">クエリ式API</span></a> に従わなければなりません。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Transform.lookup_name">
+<span class="sig-name descname"><span class="pre">lookup_name</span></span><a class="headerlink" href="#django.db.models.Transform.lookup_name" title="Link to this definition">¶</a></dt>
+<dd><p>クエリ式のパース時に使用するルックアップ名です。文字列 <code class="docutils literal notranslate"><span class="pre">&quot;__&quot;</span></code> を含むことはできません。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Transform.output_field">
+<span class="sig-name descname"><span class="pre">output_field</span></span><a class="headerlink" href="#django.db.models.Transform.output_field" title="Link to this definition">¶</a></dt>
+<dd><p>このトランスフォームが出力するクラスを定義します。これは <a class="reference internal" href="fields.html#django.db.models.Field" title="django.db.models.Field"><code class="xref py py-class docutils literal notranslate"><span class="pre">Field</span></code></a> インスタンスでなければなりません。デフォルトでは <code class="docutils literal notranslate"><span class="pre">lhs.output_field</span></code> と同じです。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-lookup-reference">
+<span id="lookup-reference"></span><h2><code class="docutils literal notranslate"><span class="pre">Lookup</span></code> リファレンス<a class="headerlink" href="#lookup-reference" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.db.models.Lookup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Lookup</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/models/lookups.py#L23"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.models.Lookup" title="Link to this definition">¶</a></dt>
+<dd><p>ルックアップ <code class="docutils literal notranslate"><span class="pre">Lookup</span></code> はルックアップを実装するための汎用クラスです。ルックアップは左辺 <a class="reference internal" href="#django.db.models.Lookup.lhs" title="django.db.models.Lookup.lhs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lhs</span></code></a>; 右辺 <a class="reference internal" href="#django.db.models.Lookup.rhs" title="django.db.models.Lookup.rhs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">rhs</span></code></a>; <code class="docutils literal notranslate"><span class="pre">lookup_name</span></code> を持つクエリ式で、 <code class="docutils literal notranslate"><span class="pre">lhs</span> <span class="pre">in</span> <span class="pre">rhs</span></code> や <code class="docutils literal notranslate"><span class="pre">lhs</span> <span class="pre">&gt;</span> <span class="pre">rhs</span></code> のように <code class="docutils literal notranslate"><span class="pre">lhs</span></code> と <code class="docutils literal notranslate"><span class="pre">rhs</span></code> をブール値で比較します。</p>
+<p>式の中でルックアップを使用するための主な記法は <code class="docutils literal notranslate"><span class="pre">&lt;lhs&gt;__&lt;lookup_name&gt;=&lt;rhs&gt;</span></code> です。ルックアップは下記のように <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> フィルタの中で直接使うこともできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">LessThan</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="s2">&quot;word_count&quot;</span><span class="p">),</span> <span class="mi">7500</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>...下記のように、アノテーションでも使用できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">is_short_story</span><span class="o">=</span><span class="n">LessThan</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="s2">&quot;word_count&quot;</span><span class="p">),</span> <span class="mi">7500</span><span class="p">))</span>
+</pre></div>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Lookup.lhs">
+<span class="sig-name descname"><span class="pre">lhs</span></span><a class="headerlink" href="#django.db.models.Lookup.lhs" title="Link to this definition">¶</a></dt>
+<dd><p>左辺 - ルックアップされる対象。オブジェクトは通常 <a class="reference internal" href="#query-expression"><span class="std std-ref">クエリ式API</span></a> に従います。プレーンな値の場合もあります。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Lookup.rhs">
+<span class="sig-name descname"><span class="pre">rhs</span></span><a class="headerlink" href="#django.db.models.Lookup.rhs" title="Link to this definition">¶</a></dt>
+<dd><p>右辺 - <code class="docutils literal notranslate"><span class="pre">lhs</span></code> と比較されるもの。これは単なる値であったり、SQL にコンパイルされるものであったり、一般的には <code class="docutils literal notranslate"><span class="pre">F()</span></code> オブジェクトや <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> であったりします。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Lookup.lookup_name">
+<span class="sig-name descname"><span class="pre">lookup_name</span></span><a class="headerlink" href="#django.db.models.Lookup.lookup_name" title="Link to this definition">¶</a></dt>
+<dd><p>このルックアップの名前で、クエリ式をパースする際に識別するために使用します。文字列 <code class="docutils literal notranslate"><span class="pre">&quot;__&quot;</span></code> を含むことはできません。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.Lookup.prepare_rhs">
+<span class="sig-name descname"><span class="pre">prepare_rhs</span></span><a class="headerlink" href="#django.db.models.Lookup.prepare_rhs" title="Link to this definition">¶</a></dt>
+<dd><p>デフォルトは <code class="docutils literal notranslate"><span class="pre">True</span></code> です。 <a class="reference internal" href="#django.db.models.Lookup.rhs" title="django.db.models.Lookup.rhs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">rhs</span></code></a> がプレーンな値の場合、 <a class="reference internal" href="#django.db.models.Lookup.prepare_rhs" title="django.db.models.Lookup.prepare_rhs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">prepare_rhs</span></code></a> はクエリのパラメータとして使用するために、その値を準備するかどうかを決定します。そのために、 <code class="docutils literal notranslate"><span class="pre">lhs.output_field.get_prep_value()</span></code> が定義されていれば呼び出され、そうでなければ <code class="docutils literal notranslate"><span class="pre">rhs</span></code> は <a class="reference internal" href="expressions.html#django.db.models.Value" title="django.db.models.Value"><code class="xref py py-class docutils literal notranslate"><span class="pre">Value()</span></code></a> でラップされます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.Lookup.process_lhs">
+<span class="sig-name descname"><span class="pre">process_lhs</span></span>(<em class="sig-param"><span class="n"><span class="pre">compiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lhs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/models/lookups.py#L101"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.models.Lookup.process_lhs" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">compiler.compile(lhs)</span></code> が返すタプル <code class="docutils literal notranslate"><span class="pre">(lhs_string,</span> <span class="pre">lhs_params)</span></code> を返します。このメソッドをオーバーライドすることで、 <code class="docutils literal notranslate"><span class="pre">lhs</span></code> の処理方法を調整できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">compiler</span></code> は <code class="docutils literal notranslate"><span class="pre">SQLCompiler</span></code> オブジェクトで、 <code class="docutils literal notranslate"><span class="pre">lhs</span></code> をコンパイルする際に <code class="docutils literal notranslate"><span class="pre">compiler.compile(lhs)</span></code> のように使用します。 <code class="docutils literal notranslate"><span class="pre">connection</span></code> はベンダ固有の SQL をコンパイルする際に使用します。 <code class="docutils literal notranslate"><span class="pre">lhs</span></code> が <code class="docutils literal notranslate"><span class="pre">None</span></code> でない場合は、 <code class="docutils literal notranslate"><span class="pre">self.lhs</span></code> の代わりに <code class="docutils literal notranslate"><span class="pre">lhs</span></code> を使用します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.Lookup.process_rhs">
+<span class="sig-name descname"><span class="pre">process_rhs</span></span>(<em class="sig-param"><span class="n"><span class="pre">compiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/db/models/lookups.py#L111"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.db.models.Lookup.process_rhs" title="Link to this definition">¶</a></dt>
+<dd><p>右辺については <a class="reference internal" href="#django.db.models.Lookup.process_lhs" title="django.db.models.Lookup.process_lhs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_lhs()</span></code></a> と同じように扱います。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ルックアップ API リファレンス</a><ul>
+<li><a class="reference internal" href="#registration-api">登録API</a></li>
+<li><a class="reference internal" href="#the-query-expression-api">クエリ式 API</a></li>
+<li><a class="reference internal" href="#transform-reference"><code class="docutils literal notranslate"><span class="pre">Transform</span></code> リファレンス</a></li>
+<li><a class="reference internal" href="#lookup-reference"><code class="docutils literal notranslate"><span class="pre">Lookup</span></code> リファレンス</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="querysets.html"
+                          title="前の章へ"><code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> API リファレンス</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="expressions.html"
+                          title="次の章へ">クエリ式 (Query Expression)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/models/lookups.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="querysets.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;QuerySet&lt;/span&gt;&lt;/code&gt; API リファレンス">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="expressions.html" title="クエリ式 (Query Expression)">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

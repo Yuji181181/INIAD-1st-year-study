@@ -1,0 +1,87 @@
+(function(){
+let audios = document.getElementsByTagName("audio");
+while(audios.length > 0){
+	const audioFile = new Audio(audios[0].getAttribute("src"));
+	const canvas = document.createElement("canvas");
+	audios[0].insertAdjacentElement("beforebegin",canvas);
+	const _id = audios[0].id;
+	audios[0].remove();
+	canvas.id = _id;
+	canvas.classList.add("audio");
+	canvas.width = 600;
+	canvas.height = 40;
+	
+	const audioPjt = new PItS_canvas.Project(canvas.id);
+	const player = audioPjt.appendScene("player");
+	let playButton = new PItS_canvas.Button(
+		new PItS_canvas.Polygon([[5,5],[5,35],[35,35],[35,5]],{color: "#3F3F3F"}),
+		{play: new PItS_canvas.Polygon([[10,10],[10,30],[30,20]],{color: "#FFFFFF"}), pause1: new PItS_canvas.Polygon([[9,8],[9,32],[17,32],[17,8]],{color: "#FFFFFF"}), pause2: new PItS_canvas.Polygon([[23,8],[23,32],[31,32],[31,8]],{color: "#FFFFFF"}), draw: function(){
+			if(audioFile.paused){this.play.display = this.display; this.play.draw();}
+			else{this.pause1.display = this.pause2.display = this.display; this.pause1.draw(); this.pause2.draw();}
+		}},
+		function(){
+			if(audioFile.paused) audioFile.play();
+			else audioFile.pause();
+		}
+	);
+	let slider = new PItS_canvas.Slider(60,15,{type: "circle", radius: 10, mouseOverColor: "#000000", mouseOverOpacity: 0.2},{horizontal: true, min: 0, max: 350, scale: 1, trackWidth: 10});
+	slider._draw = slider.draw;
+	slider.draw = function(){
+		this.val = Math.floor(audioFile.currentTime/audioFile.duration*this.max);
+		this._draw();
+	};
+	slider.onMouseDown = slider.onClick = function(){
+		if(this.isInternal(this.pjt.dragStartPoint)){
+			if(this.vertical){
+				audioFile.currentTime = audioFile.duration*Math.max(this.min,Math.min(this.max,this.max+(this.pjt.cursor.Y-this.posY)*this.scale))/this.max;
+			} else {
+				audioFile.currentTime = audioFile.duration*Math.max(this.min,Math.min(this.max,(this.pjt.cursor.X-this.posX)*this.scale))/this.max;
+			}
+		}
+	};
+	slider.onMouseMove = function(){
+		if(this.isInternal(this.pjt.dragStartPoint)){
+			audioFile.pause();
+			if(this.vertical){
+				audioFile.currentTime = audioFile.duration*Math.max(this.min,Math.min(this.max,this.max+(this.pjt.cursor.Y-this.posY)*this.scale))/this.max;
+			} else {
+				audioFile.currentTime = audioFile.duration*Math.max(this.min,Math.min(this.max,(this.pjt.cursor.X-this.posX)*this.scale))/this.max;
+			}
+		}
+	}
+	function secToString(current,duration){
+		let currentMin = Math.floor(current/60);
+		let currentSec = ("0" + Math.floor(current-currentMin*60)).slice(-2);
+		let durationMin = Math.floor(duration/60);
+		let durationSec = ("0" + Math.floor(duration-durationMin*60)).slice(-2);
+		return currentMin + ":" + currentSec + "/" + durationMin + ":" + durationSec;
+	}
+	let timeText = new PItS_canvas.Text(function(){return secToString(audioFile.currentTime,audioFile.duration);},425,20,{font: "18px 游明朝", textBaseline: "middle"});
+	let back5secButton = new PItS_canvas.Button(
+		new PItS_canvas.Polygon([[530,5],[530,35],[560,35],[560,5]],{color: "#3F3F3F"}),
+		{triangle: new PItS_canvas.Polygon([[555,10],[555,30],[535,20]],{color: "#FFFFFF"}), five: new PItS_canvas.Text("5",545,20,{color: "#000000", font: "12px 游明朝", textBaseline: "middle"}), draw: function(){
+			this.triangle.display = this.five.display = this.display; this.triangle.draw(); this.five.draw();
+		}},
+		function(){
+			audioFile.currentTime = Math.max(0,audioFile.currentTime-5);
+		}
+	);
+	let go5secButton = new PItS_canvas.Button(
+		new PItS_canvas.Polygon([[565,5],[565,35],[595,35],[595,5]],{color: "#3F3F3F"}),
+		{triangle: new PItS_canvas.Polygon([[570,10],[570,30],[590,20]],{color: "#FFFFFF"}), five: new PItS_canvas.Text("5",573,20,{color: "#000000", font: "12px 游明朝", textBaseline: "middle"}), draw: function(){
+			this.triangle.display = this.five.display = this.display; this.triangle.draw(); this.five.draw();
+		}},
+		function(){
+			audioFile.currentTime = Math.min(audioFile.duration,audioFile.currentTime+5);
+		}
+	);
+	player.appendElement("background",new PItS_canvas.Polygon([[0,0],[canvas.width,0],[canvas.width,canvas.height],[0,canvas.height]],{color: "#000000"}));
+	player.appendElement("playButton",playButton);
+	player.appendElement("slider",slider);
+	player.appendElement("time",timeText);
+	player.appendElement("back5secButton",back5secButton);
+	player.appendElement("go5secButton",go5secButton);
+	audioPjt.changeScene("player");
+	audioPjt.play();
+}
+}());

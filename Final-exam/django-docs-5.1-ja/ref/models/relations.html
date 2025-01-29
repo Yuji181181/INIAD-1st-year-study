@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>リレーション先オブジェクトのリファレンス &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="Model クラスのリファレンス" href="class.html" />
+    <link rel="prev" title="モデル _meta API" href="meta.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="meta.html" title="モデル &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;_meta&lt;/span&gt;&lt;/code&gt; API">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="class.html" title="Model クラスのリファレンス">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-models-relations">
+            
+  <section id="s-related-objects-reference">
+<span id="related-objects-reference"></span><h1>リレーション先オブジェクトのリファレンス<a class="headerlink" href="#related-objects-reference" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RelatedManager</span></span><a class="headerlink" href="#django.db.models.fields.related.RelatedManager" title="Link to this definition">¶</a></dt>
+<dd><p>&quot;関係マネージャ（related manager）&quot;とは、1対多または多対多の関係するコンテキストで使用されるマネージャのことです。これは2つのケースで起こります:</p>
+<ul>
+<li><p><a class="reference internal" href="fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> リレーションの &quot;反対側&quot;。つまり:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Blog</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Entry</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">blog</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Blog</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>上記の例では、以下のメソッドがマネージャ <code class="docutils literal notranslate"><span class="pre">blog.entry_set</span></code> で利用可能です。</p>
+</li>
+<li><p><a class="reference internal" href="fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> リレーションの両側:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Topping</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この例では、以下のメソッドは <code class="docutils literal notranslate"><span class="pre">topping.pizza_set</span></code> と <code class="docutils literal notranslate"><span class="pre">pizza.toppings</span></code> の両方で利用できます。</p>
+</li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.add">
+<span class="sig-name descname"><span class="pre">add</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">through_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.add" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.aadd">
+<span class="sig-name descname"><span class="pre">aadd</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">through_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.aadd" title="Link to this definition">¶</a></dt>
+<dd><p><em>非同期バージョン</em>: <code class="docutils literal notranslate"><span class="pre">aadd()</span></code></p>
+<p>リレーション先オブジェクトのセットに、指定したモデルオブジェクトを追加します。</p>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">234</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entry_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>  <span class="c1"># Associates Entry e with Blog b.</span>
+</pre></div>
+</div>
+<p>上の例では、 <a class="reference internal" href="fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> リレーションの場合、 <a class="reference internal" href="querysets.html#django.db.models.query.QuerySet.update" title="django.db.models.query.QuerySet.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QuerySet.update()</span></code></a> を使って更新を行います。これにはオブジェクトが既に保存されている必要があります。</p>
+<p>引数 <code class="docutils literal notranslate"><span class="pre">bulk=False</span></code> を使用することで、関係マネージャが <code class="docutils literal notranslate"><span class="pre">e.save()</span></code> を呼び出して更新を行うことができます。</p>
+<p>しかし、多対多のリレーションシップで <code class="docutils literal notranslate"><span class="pre">add()</span></code> を使用すると、 <code class="docutils literal notranslate"><span class="pre">save()</span></code> メソッドは呼び出しません (<code class="docutils literal notranslate"><span class="pre">bulk</span></code> 引数は存在しません)。 <a class="reference internal" href="querysets.html#django.db.models.query.QuerySet.bulk_create" title="django.db.models.query.QuerySet.bulk_create"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QuerySet.bulk_create()</span></code></a> を使用してリレーションシップを作成します。リレーションシップの作成時にカスタムロジックを実行する必要がある場合は、 <a class="reference internal" href="../signals.html#django.db.models.signals.m2m_changed" title="django.db.models.signals.m2m_changed"><code class="xref py py-data docutils literal notranslate"><span class="pre">m2m_changed</span></code></a> シグナルを待ち受けます。</p>
+<p>すでに存在するリレーションに <code class="docutils literal notranslate"><span class="pre">add()</span></code> を使っても、リレーションは複製されませんが、シグナルは発生します。</p>
+<p>多対多のリレーションシップの場合、 <code class="docutils literal notranslate"><span class="pre">add()</span></code> は <code class="docutils literal notranslate"><span class="pre">*objs</span></code> 引数としてモデルインスタンスかフィールドの値（通常はプライマリキー）を受け付けます。</p>
+<p>必要であれば、引数 <code class="docutils literal notranslate"><span class="pre">through_defaults</span></code> を使用して、新しい <a class="reference internal" href="../../topics/db/models.html#intermediary-manytomany"><span class="std std-ref">中間モデル</span></a> インスタンスの値を指定します。呼び出し可能オブジェクトを <code class="docutils literal notranslate"><span class="pre">through_defaults</span></code> 辞書の値として使用することができ、中間インスタンスを作成する前に一度だけ評価されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.create">
+<span class="sig-name descname"><span class="pre">create</span></span>(<em class="sig-param"><span class="n"><span class="pre">through_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.create" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.acreate">
+<span class="sig-name descname"><span class="pre">acreate</span></span>(<em class="sig-param"><span class="n"><span class="pre">through_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.acreate" title="Link to this definition">¶</a></dt>
+<dd><p><em>非同期バージョン</em>: <code class="docutils literal notranslate"><span class="pre">acreate()</span></code></p>
+<p>新しいオブジェクトを作成して保存し、リレーション先オブジェクトのセットに入れます。新しく作成されたオブジェクトを返します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">b</span><span class="o">.</span><span class="n">entry_set</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">headline</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="n">body_text</span><span class="o">=</span><span class="s2">&quot;Hi&quot;</span><span class="p">,</span> <span class="n">pub_date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">... </span><span class="p">)</span>
+
+<span class="go"># No need to call e.save() at this point -- it&#39;s already been saved.</span>
+</pre></div>
+</div>
+<p>これは下記のコードと等価です（しかし、よりシンプルです）:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="p">(</span><span class="n">blog</span><span class="o">=</span><span class="n">b</span><span class="p">,</span> <span class="n">headline</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span> <span class="n">body_text</span><span class="o">=</span><span class="s2">&quot;Hi&quot;</span><span class="p">,</span> <span class="n">pub_date</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">force_insert</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>リレーションシップを定義するモデルのキーワード引数を指定する必要はないことに注意してください。上の例では、 <code class="docutils literal notranslate"><span class="pre">create()</span></code> にパラメータ <code class="docutils literal notranslate"><span class="pre">blog</span></code> を渡していません。Django は新しい <code class="docutils literal notranslate"><span class="pre">Entry</span></code> オブジェクトの <code class="docutils literal notranslate"><span class="pre">blog</span></code> フィールドを <code class="docutils literal notranslate"><span class="pre">b</span></code> に設定すべきであると判断します。</p>
+<p>必要であれば、 <code class="docutils literal notranslate"><span class="pre">through_defaults</span></code> 引数を使用して、新しい <a class="reference internal" href="../../topics/db/models.html#intermediary-manytomany"><span class="std std-ref">中間モデル</span></a> インスタンスの値を指定します。呼び出し可能オブジェクトを <code class="docutils literal notranslate"><span class="pre">through_defaults</span></code> 辞書の値として使用できます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.remove">
+<span class="sig-name descname"><span class="pre">remove</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.remove" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.aremove">
+<span class="sig-name descname"><span class="pre">aremove</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.aremove" title="Link to this definition">¶</a></dt>
+<dd><p><em>非同期バージョン</em>: <code class="docutils literal notranslate"><span class="pre">aremove()</span></code></p>
+<p>リレーション先オブジェクトのセットから指定されたモデルオブジェクトを削除します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span> <span class="o">=</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">234</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entry_set</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>  <span class="c1"># Disassociates Entry e from Blog b.</span>
+</pre></div>
+</div>
+<p>上記の例では <a class="reference internal" href="#django.db.models.fields.related.RelatedManager.add" title="django.db.models.fields.related.RelatedManager.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> と同様に <code class="docutils literal notranslate"><span class="pre">e.save()</span></code> が呼び出されて更新が行われます。しかし、多対多のリレーションシップで <code class="docutils literal notranslate"><span class="pre">remove()</span></code> を使用すると、 <a class="reference internal" href="querysets.html#django.db.models.query.QuerySet.delete" title="django.db.models.query.QuerySet.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QuerySet.delete()</span></code></a> を使用してリレーションシップを削除するので、モデルの <code class="docutils literal notranslate"><span class="pre">save()</span></code> メソッドは呼び出されません。リレーションシップが削除されたときにカスタムコードを実行したい場合は、 <a class="reference internal" href="../signals.html#django.db.models.signals.m2m_changed" title="django.db.models.signals.m2m_changed"><code class="xref py py-data docutils literal notranslate"><span class="pre">m2m_changed</span></code></a> シグナルを待ち受けます。</p>
+<p>多対多のリレーションシップの場合、 <code class="docutils literal notranslate"><span class="pre">remove()</span></code> は <code class="docutils literal notranslate"><span class="pre">*objs</span></code> 引数としてモデルインスタンスかフィールドの値（通常はプライマリキー）を受け付けます。</p>
+<p><a class="reference internal" href="fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> オブジェクトでは、このメソッドは <code class="docutils literal notranslate"><span class="pre">null=True</span></code> の場合のみ存在します。リレーション先フィールドを <code class="docutils literal notranslate"><span class="pre">None</span></code> (<code class="docutils literal notranslate"><span class="pre">NULL</span></code>) に設定できない場合、リレーション先オブジェクトを別のオブジェクトに追加せずに削除することはできません。上の例では、 <code class="docutils literal notranslate"><span class="pre">b.entry_set()</span></code> から <code class="docutils literal notranslate"><span class="pre">e</span></code> を削除することは <code class="docutils literal notranslate"><span class="pre">e.blog</span> <span class="pre">=</span> <span class="pre">None</span></code> と等価であり、 <code class="docutils literal notranslate"><span class="pre">blog</span></code> <a class="reference internal" href="fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> には <code class="docutils literal notranslate"><span class="pre">null=True</span></code> がないので、これは無効です。</p>
+<p><a class="reference internal" href="fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> オブジェクトの場合、このメソッドは <code class="docutils literal notranslate"><span class="pre">bulk</span></code> 引数を受け取り、操作の実行方法を制御します。もし <code class="docutils literal notranslate"><span class="pre">True</span></code> (デフォルト) なら、 <code class="docutils literal notranslate"><span class="pre">QuerySet.update()</span></code> が使用されます。もし <code class="docutils literal notranslate"><span class="pre">bulk=False</span></code> なら、代わりに個々のモデルインスタンスの <code class="docutils literal notranslate"><span class="pre">save()</span></code> メソッドが呼び出されます。これはパフォーマンスを犠牲にし、 <a class="reference internal" href="../signals.html#django.db.models.signals.pre_save" title="django.db.models.signals.pre_save"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_save</span></code></a> シグナルと <a class="reference internal" href="../signals.html#django.db.models.signals.post_save" title="django.db.models.signals.post_save"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_save</span></code></a> シグナルをトリガーします。</p>
+<p>多対多のリレーションシップの場合、キーワード引数 <code class="docutils literal notranslate"><span class="pre">bulk</span></code> は存在しません。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.clear">
+<span class="sig-name descname"><span class="pre">clear</span></span>(<em class="sig-param"><span class="n"><span class="pre">bulk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.clear" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.aclear">
+<span class="sig-name descname"><span class="pre">aclear</span></span>(<em class="sig-param"><span class="n"><span class="pre">bulk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.aclear" title="Link to this definition">¶</a></dt>
+<dd><p><em>非同期バージョン</em>: <code class="docutils literal notranslate"><span class="pre">aclear()</span></code></p>
+<p>リレーション先オブジェクトのセットからすべてのオブジェクトを削除します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">Blog</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span><span class="o">.</span><span class="n">entry_set</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>これはリレーション先のオブジェクトを削除するのではなく、単に関連付けを解除するだけであることに注意してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">remove()</span></code> と同様に、 <code class="docutils literal notranslate"><span class="pre">clear()</span></code> は <a class="reference internal" href="fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> で <code class="docutils literal notranslate"><span class="pre">null=True</span></code> の場合にのみ使用可能で、 <code class="docutils literal notranslate"><span class="pre">bulk</span></code> キーワード引数も受け付けます。</p>
+<p>多対多のリレーションシップの場合、キーワード引数 <code class="docutils literal notranslate"><span class="pre">bulk</span></code> は存在しません。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.set">
+<span class="sig-name descname"><span class="pre">set</span></span>(<em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">through_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.set" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.db.models.fields.related.RelatedManager.aset">
+<span class="sig-name descname"><span class="pre">aset</span></span>(<em class="sig-param"><span class="n"><span class="pre">objs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bulk</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clear</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">through_defaults</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.db.models.fields.related.RelatedManager.aset" title="Link to this definition">¶</a></dt>
+<dd><p><em>非同期バージョン</em>: <code class="docutils literal notranslate"><span class="pre">aset()</span></code></p>
+<p>リレーション先のオブジェクトのセットを置き換えます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">new_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj1</span><span class="p">,</span> <span class="n">obj2</span><span class="p">,</span> <span class="n">obj3</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">e</span><span class="o">.</span><span class="n">related_set</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">new_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このメソッドには <code class="docutils literal notranslate"><span class="pre">clear</span></code> 引数を渡すことができます。もし <code class="docutils literal notranslate"><span class="pre">False</span></code> (デフォルト) なら、 <code class="docutils literal notranslate"><span class="pre">remove()</span></code> を使って新しいセットから欠けている要素を削除し、新しい要素だけを追加します。もし <code class="docutils literal notranslate"><span class="pre">clear=True</span></code> なら、代わりに <code class="docutils literal notranslate"><span class="pre">clear()</span></code> メソッドが呼び出され、セット全体が一度に追加されます。</p>
+<p><a class="reference internal" href="fields.html#django.db.models.ForeignKey" title="django.db.models.ForeignKey"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForeignKey</span></code></a> オブジェクトの場合、 <code class="docutils literal notranslate"><span class="pre">bulk</span></code> 引数は <a class="reference internal" href="#django.db.models.fields.related.RelatedManager.add" title="django.db.models.fields.related.RelatedManager.add"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add()</span></code></a> と <a class="reference internal" href="#django.db.models.fields.related.RelatedManager.remove" title="django.db.models.fields.related.RelatedManager.remove"><code class="xref py py-meth docutils literal notranslate"><span class="pre">remove()</span></code></a> に渡されます。</p>
+<p>多対多のリレーションシップの場合、キーワード引数 <code class="docutils literal notranslate"><span class="pre">bulk</span></code> は存在しません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">set()</span></code> は複合操作であるため、競合状態になりやすいことに注意してください。例えば、 <code class="docutils literal notranslate"><span class="pre">clear()</span></code> を呼び出してから <code class="docutils literal notranslate"><span class="pre">add()</span></code> を呼び出すまでの間に、新しいオブジェクトがデータベースに追加される可能性があります。</p>
+<p>多対多のリレーションシップの場合、 <code class="docutils literal notranslate"><span class="pre">set()</span></code> は <code class="docutils literal notranslate"><span class="pre">objs</span></code> 引数としてモデルインスタンスかフィールド値（通常はプライマリキー）のリストを受け付けます。</p>
+<p>必要であれば、引数 <code class="docutils literal notranslate"><span class="pre">through_defaults</span></code> を使用して、新しい <a class="reference internal" href="../../topics/db/models.html#intermediary-manytomany"><span class="std std-ref">中間モデル</span></a> インスタンスの値を指定します。呼び出し可能オブジェクトを <code class="docutils literal notranslate"><span class="pre">through_defaults</span></code> 辞書の値として使用することができ、中間インスタンスを作成する前に一度だけ評価されます。</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">add()</span></code>, <code class="docutils literal notranslate"><span class="pre">aadd()</span></code>, <code class="docutils literal notranslate"><span class="pre">create()</span></code>, <code class="docutils literal notranslate"><span class="pre">acreate()</span></code>, <code class="docutils literal notranslate"><span class="pre">remove()</span></code>, <code class="docutils literal notranslate"><span class="pre">aremove()</span></code>, <code class="docutils literal notranslate"><span class="pre">clear()</span></code>, <code class="docutils literal notranslate"><span class="pre">aclear()</span></code>, <code class="docutils literal notranslate"><span class="pre">set()</span></code>, そして <code class="docutils literal notranslate"><span class="pre">aset()</span></code> はすべて、すべてのタイプのリレーション先のフィールドに対してデータベースの変更を即座に適用することに注意してください。つまり、リレーションシップのどちらの側でも <code class="docutils literal notranslate"><span class="pre">save()</span></code>/<code class="docutils literal notranslate"><span class="pre">asave()</span></code> を呼び出す必要はありません。</p>
+<p><a class="reference internal" href="querysets.html#django.db.models.query.QuerySet.prefetch_related" title="django.db.models.query.QuerySet.prefetch_related"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prefetch_related()</span></code></a> を使用すると、 <code class="docutils literal notranslate"><span class="pre">add()</span></code>, <code class="docutils literal notranslate"><span class="pre">aadd()</span></code>, <code class="docutils literal notranslate"><span class="pre">remove()</span></code>, <code class="docutils literal notranslate"><span class="pre">aremove()</span></code>, <code class="docutils literal notranslate"><span class="pre">clear()</span></code>, <code class="docutils literal notranslate"><span class="pre">aclear()</span></code>, <code class="docutils literal notranslate"><span class="pre">set()</span></code>, <code class="docutils literal notranslate"><span class="pre">aset()</span></code> メソッドがプリフェッチキャッシュをクリアします。</p>
+</div>
+</dd></dl>
+
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="meta.html"
+                          title="前の章へ">モデル <code class="docutils literal notranslate"><span class="pre">_meta</span></code> API</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="class.html"
+                          title="次の章へ">Model クラスのリファレンス</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/models/relations.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="meta.html" title="モデル &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;_meta&lt;/span&gt;&lt;/code&gt; API">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="class.html" title="Model クラスのリファレンス">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

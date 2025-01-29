@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CSVを出力する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="PDFファイルを作成する" href="outputting-pdf.html" />
+    <link rel="prev" title="カスタムのルックアップを書く" href="custom-lookups.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="custom-lookups.html" title="カスタムのルックアップを書く">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="outputting-pdf.html" title="PDFファイルを作成する">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-outputting-csv">
+            
+  <section id="s-how-to-create-csv-output">
+<span id="how-to-create-csv-output"></span><h1>CSVを出力する<a class="headerlink" href="#how-to-create-csv-output" title="Link to this heading">¶</a></h1>
+<p>このドキュメントでは、Django のビューを使って動的に CSV (Comma Separated Values) を出力する方法を説明しています。そのためには、Python のCSV ライブラリか Django のテンプレートシステムを使います。</p>
+<section id="s-using-the-python-csv-library">
+<span id="using-the-python-csv-library"></span><h2>Python の CSV ライブラリを使う<a class="headerlink" href="#using-the-python-csv-library" title="Link to this heading">¶</a></h2>
+<p>Python の標準ライブラリには CSV のライブラリ <a class="reference external" href="https://docs.python.org/3/library/csv.html#module-csv" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">csv</span></code></a> が含まれています。Django でこのライブラリを使うコツは、<a class="reference external" href="https://docs.python.org/3/library/csv.html#module-csv" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">csv</span></code></a> モジュールの CSV 生成機能がファイルライクオブジェクトに対して働くことを利用します。Django の <a class="reference internal" href="../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトもまた、ファイルライクオブジェクトなのです。</p>
+<p>以下に例を示します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">some_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># Create the HttpResponse object with the appropriate CSV header.</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span>
+        <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;text/csv&quot;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Content-Disposition&quot;</span><span class="p">:</span> <span class="s1">&#39;attachment; filename=&quot;somefilename.csv&quot;&#39;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;First row&quot;</span><span class="p">,</span> <span class="s2">&quot;Foo&quot;</span><span class="p">,</span> <span class="s2">&quot;Bar&quot;</span><span class="p">,</span> <span class="s2">&quot;Baz&quot;</span><span class="p">])</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">([</span><span class="s2">&quot;Second row&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s1">&#39;&quot;Testing&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;Here&#39;s a quote&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p>コードとコメントが自分自身の意味を説明しているはずですが、いくつかの点には言及しておくべきでしょう。</p>
+<ul class="simple">
+<li><p>レスポンスは特別な MIME タイプ (<em class="mimetype">text/csv</em>) を受け取ります。これにより、ブラウザは、ドキュメントが HTML ではなく CSV ファイルであることを判断します。もしこの MIME タイプの設定を忘れると、ブラウザは出力を HTML と解釈し、ブラウザウィンドウに醜くて恐ろしいぐちゃぐちゃの文字列が現れてしまう恐れがあります。</p></li>
+<li><p>レスポンスには、追加の <code class="docutils literal notranslate"><span class="pre">Content-Disposition</span></code> ヘッダに CSV のファイル名を設定することができます。ファイル名はどんなものでも構いません。ここで指定した名前は、ブラウザが「別名で保存」ダイアログなどで使用します。</p></li>
+<li><p>CSV 生成 API にフックするには、<code class="docutils literal notranslate"><span class="pre">csv.writer</span></code> の最初の引数として <code class="docutils literal notranslate"><span class="pre">response</span></code> を渡すだけです。<code class="docutils literal notranslate"><span class="pre">csv.writer</span></code> 関数はファイルライクなオブジェクトを要求しますが、<a class="reference internal" href="../ref/request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトはこの要求に適合しています。</p></li>
+<li><p>CSV ファイルの行ごとに <code class="docutils literal notranslate"><span class="pre">writer.writerow</span></code> を呼び、<a class="reference external" href="https://docs.python.org/3/glossary.html#term-iterable" title="(in Python v3.13)"><span class="xref std std-term">iterable</span></a> を渡します。</p></li>
+<li><p>CSV モジュールは引用を適切に処理するので、引用符やカンマでの文字列のエスケープについて心配する必要はありません。生の文字列を <code class="docutils literal notranslate"><span class="pre">writerow()</span></code> に渡すことで適切に処理されます。</p></li>
+</ul>
+<section id="s-streaming-large-csv-files">
+<span id="s-streaming-csv-files"></span><span id="streaming-large-csv-files"></span><span id="streaming-csv-files"></span><h3>サイズの大きな CSV ファイルをストリーミングする<a class="headerlink" href="#streaming-large-csv-files" title="Link to this heading">¶</a></h3>
+<p>大きなサイズのレスポンスを生成するビューを取り扱うときには、代わりに Django の <a class="reference internal" href="../ref/request-response.html#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> の使用を考えてみてください。例えば、生成に長時間を要するファイルをストリーミングことで、サーバーがレスポンスを生成している間にタイムアウトしてしまうような接続でも、ロードバランサが接続をドロップすることを防げます。</p>
+<p>この例では、Python のジェネレータを最大限使用して、サイズの大きな CSV ファイルの組み立てと伝達を効率的に扱います。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">csv</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">StreamingHttpResponse</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Echo</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;An object that implements just the write method of the file-like</span>
+<span class="sd">    interface.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write the value by returning it, instead of storing in a buffer.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">some_streaming_csv_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A view that streams a large CSV file.&quot;&quot;&quot;</span>
+    <span class="c1"># Generate a sequence of rows. The range is based on the maximum number of</span>
+    <span class="c1"># rows that can be handled by a single sheet in most spreadsheet</span>
+    <span class="c1"># applications.</span>
+    <span class="n">rows</span> <span class="o">=</span> <span class="p">([</span><span class="s2">&quot;Row </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">idx</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">idx</span><span class="p">)]</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">65536</span><span class="p">))</span>
+    <span class="n">pseudo_buffer</span> <span class="o">=</span> <span class="n">Echo</span><span class="p">()</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">pseudo_buffer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">StreamingHttpResponse</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">),</span>
+        <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;text/csv&quot;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Content-Disposition&quot;</span><span class="p">:</span> <span class="s1">&#39;attachment; filename=&quot;somefilename.csv&quot;&#39;</span><span class="p">},</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-using-the-template-system">
+<span id="using-the-template-system"></span><h2>テンプレートシステムを使う<a class="headerlink" href="#using-the-template-system" title="Link to this heading">¶</a></h2>
+<p>もしくは、<a class="reference internal" href="../topics/templates.html"><span class="doc">Django のテンプレートシステム</span></a> を使って CSV を生成することもできます。Python の <a class="reference external" href="https://docs.python.org/3/library/csv.html#module-csv" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">csv</span></code></a> モジュールの利便性には劣りますが、完全性のために提供されています。</p>
+<p>考え方としては、テンプレートに項目のリストを渡すというものです。そして、テンプレートの <a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-for"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">for</span></code></a> ループの中でカンマを出力させます。</p>
+<p>以下の例は、上述の例と同じ CSV ファイルを生成します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">loader</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">some_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># Create the HttpResponse object with the appropriate CSV header.</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span>
+        <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;text/csv&quot;</span><span class="p">,</span>
+        <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Content-Disposition&quot;</span><span class="p">:</span> <span class="s1">&#39;attachment; filename=&quot;somefilename.csv&quot;&#39;</span><span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="c1"># The data is hard-coded here, but you could load it from a database or</span>
+    <span class="c1"># some other source.</span>
+    <span class="n">csv_data</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="s2">&quot;First row&quot;</span><span class="p">,</span> <span class="s2">&quot;Foo&quot;</span><span class="p">,</span> <span class="s2">&quot;Bar&quot;</span><span class="p">,</span> <span class="s2">&quot;Baz&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Second row&quot;</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">,</span> <span class="s1">&#39;&quot;Testing&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;Here&#39;s a quote&quot;</span><span class="p">),</span>
+    <span class="p">)</span>
+
+    <span class="n">t</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;my_template_name.txt&quot;</span><span class="p">)</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">csv_data</span><span class="p">}</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">c</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">response</span>
+</pre></div>
+</div>
+<p>この例と上述の例の唯一の違いは、この例では CSV モジュールの代わりにテンプレートを呼び出していることです。残りのコード部分 (例えば <code class="docutils literal notranslate"><span class="pre">content_type='text/csv'</span></code>) は同じです。</p>
+<p>そして、以下のテンプレートのコードを用いて、テンプレート <code class="docutils literal notranslate"><span class="pre">my_template_name.txt</span></code> を作成しましょう。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">row</span> <span class="k">in</span> <span class="nv">data</span> <span class="cp">%}</span>&quot;<span class="cp">{{</span> <span class="nv">row.0</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;, &quot;<span class="cp">{{</span> <span class="nv">row.1</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;, &quot;<span class="cp">{{</span> <span class="nv">row.2</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;, &quot;<span class="cp">{{</span> <span class="nv">row.3</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;, &quot;<span class="cp">{{</span> <span class="nv">row.4</span><span class="o">|</span><span class="nf">addslashes</span> <span class="cp">}}</span>&quot;
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>この短いテンプレートは与えられたデータを繰り返し処理し、各行の CSV 行を表示します。引用符の問題がないように <a class="reference internal" href="../ref/templates/builtins.html#std-templatefilter-addslashes"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">addslashes</span></code></a> テンプレートフィルタを使用します。</p>
+</section>
+<section id="s-other-text-based-formats">
+<span id="other-text-based-formats"></span><h2>他のテキストベースのフォーマット<a class="headerlink" href="#other-text-based-formats" title="Link to this heading">¶</a></h2>
+<p>ここで説明した CSV (特定の出力フォーマットの 1 つ)のような、フォーマット特有の説明は特にありません。あなたの望むテキストベースのフォーマットを出力するときには、ここで説明したテクニックを活用してみてください。また、任意のバイナリデータを生成するときにも、ここでのテクニックが参考になります; <a class="reference internal" href="outputting-pdf.html"><span class="doc">PDFファイルを作成する</span></a> で例を参照してください。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">CSVを出力する</a><ul>
+<li><a class="reference internal" href="#using-the-python-csv-library">Python の CSV ライブラリを使う</a><ul>
+<li><a class="reference internal" href="#streaming-large-csv-files">サイズの大きな CSV ファイルをストリーミングする</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-the-template-system">テンプレートシステムを使う</a></li>
+<li><a class="reference internal" href="#other-text-based-formats">他のテキストベースのフォーマット</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="custom-lookups.html"
+                          title="前の章へ">カスタムのルックアップを書く</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="outputting-pdf.html"
+                          title="次の章へ">PDFファイルを作成する</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/outputting-csv.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="custom-lookups.html" title="カスタムのルックアップを書く">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="outputting-pdf.html" title="PDFファイルを作成する">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

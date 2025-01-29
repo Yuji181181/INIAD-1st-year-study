@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>モデルに初期データを投入する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="レガシーなデータベースと Django の統合" href="legacy-databases.html" />
+    <link rel="prev" title="How-to ガイド" href="index.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="index.html" title="How-to ガイド">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="legacy-databases.html" title="レガシーなデータベースと Django の統合">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-initial-data">
+            
+  <section id="s-how-to-provide-initial-data-for-models">
+<span id="how-to-provide-initial-data-for-models"></span><h1>モデルに初期データを投入する<a class="headerlink" href="#how-to-provide-initial-data-for-models" title="Link to this heading">¶</a></h1>
+<p>アプリを最初にセットアップするとき、データベースに、ハードコーディングされたデータをあらかじめ入力しておくと便利なことがあります。マイグレーションまたはフィクスチャで初期データを提供できます。</p>
+<section id="s-provide-initial-data-with-migrations">
+<span id="provide-initial-data-with-migrations"></span><h2>マイグレーションで初期データを投入する<a class="headerlink" href="#provide-initial-data-with-migrations" title="Link to this heading">¶</a></h2>
+<p>アプリの初期データを自動的にロードするには、 <a class="reference internal" href="../topics/migrations.html#data-migrations"><span class="std std-ref">データマイグレーション</span></a> を作成します。マイグレーションはテストデータベースのセットアップ時に実行されるため、 <a class="reference internal" href="../topics/testing/overview.html#test-case-serialized-rollback"><span class="std std-ref">いくつかの条件</span></a> を満たすことで、データが利用できるようになります。</p>
+</section>
+<section id="s-provide-data-with-fixtures">
+<span id="s-initial-data-via-fixtures"></span><span id="provide-data-with-fixtures"></span><span id="initial-data-via-fixtures"></span><h2>フィクスチャでデータを投入する<a class="headerlink" href="#provide-data-with-fixtures" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../topics/db/fixtures.html#fixtures-explanation"><span class="std std-ref">フィクスチャ</span></a> (fixture) を使ってデータを投入することもできますが、 <a class="reference internal" href="../topics/testing/tools.html#django.test.TransactionTestCase.fixtures" title="django.test.TransactionTestCase.fixtures"><code class="xref py py-attr docutils literal notranslate"><span class="pre">TransactionTestCase.fixtures</span></code></a> を使わない限り、このデータは自動的にはロードされません。</p>
+<p>フィクスチャは、Djangoがデータベースにインポートする方法を知っているデータのコレクションです。 すでにいくつかのデータがある場合、フィクスチャを作成する最も簡単な方法は <a class="reference internal" href="../ref/django-admin.html#django-admin-dumpdata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">dumpdata</span></code></a> コマンドを使用することです。 もしくは、フィクスチャを手動で書くこともできます; フィクスチャは JSON、XML、または (<a class="reference external" href="https://pyyaml.org/">PyYAML</a> をインストールして) YAML ドキュメントとして記述できます。 <a class="reference internal" href="../topics/serialization.html"><span class="doc">シリアライズのドキュメント</span></a> でサポートされている各 <a class="reference internal" href="../topics/serialization.html#serialization-formats"><span class="std std-ref">シリアライズフォーマット</span></a> の詳細を確認できます。</p>
+<p>例として、 <code class="docutils literal notranslate"><span class="pre">Person</span></code> モデルのフィクスチャをJSONで書くと次のようになります:</p>
+<div class="highlight-js notranslate"><div class="highlight"><pre><span></span><span class="p">[</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="s2">&quot;model&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;myapp.person&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pk&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;fields&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="s2">&quot;first_name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;John&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;last_name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Lennon&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="s2">&quot;model&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;myapp.person&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;pk&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;fields&quot;</span><span class="o">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">      </span><span class="s2">&quot;first_name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Paul&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="s2">&quot;last_name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;McCartney&quot;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>YAML のフィクスチャだと以下のようになります:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myapp.person</span>
+<span class="w">  </span><span class="nt">pk</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">fields</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">first_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">John</span>
+<span class="w">    </span><span class="nt">last_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Lennon</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myapp.person</span>
+<span class="w">  </span><span class="nt">pk</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">fields</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">first_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Paul</span>
+<span class="w">    </span><span class="nt">last_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">McCartney</span>
+</pre></div>
+</div>
+<p>このデータは、アプリケーション内の <code class="docutils literal notranslate"><span class="pre">fixtures</span></code> ディレクトリ内に保存しておくことができます。</p>
+<p>データを読み込むには、 <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">loaddata</span></code></a> <code class="docutils literal notranslate"><span class="pre">&lt;fixturename&gt;</span></code> を呼び出します。ここで <code class="docutils literal notranslate"><span class="pre">&lt;fixturename&gt;</span></code> は作成したフィクスチャファイルの名前です。 <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">loaddata</span></code></a> を実行するたびに、フィクスチャからデータが読み込まれ、データベースに再ロードされます。これは、フィクスチャによって作成された行の一つを変更してから <a class="reference internal" href="../ref/django-admin.html#django-admin-loaddata"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">loaddata</span></code></a> を再度実行すると、変更が元に戻ってしまうことを意味します。</p>
+<section id="s-tell-django-where-to-look-for-fixture-files">
+<span id="tell-django-where-to-look-for-fixture-files"></span><h3>フィクスチャファイルを探す場所を Django に教える<a class="headerlink" href="#tell-django-where-to-look-for-fixture-files" title="Link to this heading">¶</a></h3>
+<p>デフォルトでは、Djangoは各アプリ内の <code class="docutils literal notranslate"><span class="pre">fixtures</span></code> ディレクトリでフィクスチャを探すため、<code class="docutils literal notranslate"><span class="pre">loaddata</span> <span class="pre">sample</span></code> コマンドで <code class="docutils literal notranslate"><span class="pre">my_app/fixtures/sample.json</span></code> ファイルを見つけられます。相対パスも使用できるため、<code class="docutils literal notranslate"><span class="pre">loaddata</span> <span class="pre">my_app/sample</span></code> とすると <code class="docutils literal notranslate"><span class="pre">my_app/fixtures/my_app/sample.json</span></code> ファイルを見つけられます。</p>
+<p>Django は <a class="reference internal" href="../ref/settings.html#std-setting-FIXTURE_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">FIXTURE_DIRS</span></code></a> 設定で指定されたディレクトリのリストからもフィクスチャを探します。</p>
+<p>デフォルトの検索を完全に無効にするには、フィクスチャファイルの場所を絶対パスで指定します。例えば、<code class="docutils literal notranslate"><span class="pre">loaddata</span> <span class="pre">/path/to/sample</span></code> のようにします。</p>
+<div class="admonition-namespace-your-fixture-files admonition">
+<p class="admonition-title">フィクスチャファイルの名前空間を指定する</p>
+<p>Django は、名前が一致するフィクスチャファイルを最初に見つけると、そのフィクスチャ ファイルを使います。そのため、異なるアプリケーションに同じ名前のフィクスチャファイルがあると、 <code class="docutils literal notranslate"><span class="pre">loaddata</span></code> コマンドでそれらを区別できなくなります。この問題を避ける最も簡単な方法は、フィクスチャファイルを <em>名前空間</em> で区切ることです。つまり、上記の相対パスの例のように、アプリケーションに応じた名前のディレクトリにファイルを置くことです。</p>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>フィクスチャは <a class="reference internal" href="../topics/testing/tools.html#topics-testing-fixtures"><span class="std std-ref">テストフレームワーク</span></a> でも利用でき、テスト環境の一貫性を保つのに役立ちます。</p>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">モデルに初期データを投入する</a><ul>
+<li><a class="reference internal" href="#provide-initial-data-with-migrations">マイグレーションで初期データを投入する</a></li>
+<li><a class="reference internal" href="#provide-data-with-fixtures">フィクスチャでデータを投入する</a><ul>
+<li><a class="reference internal" href="#tell-django-where-to-look-for-fixture-files">フィクスチャファイルを探す場所を Django に教える</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="index.html"
+                          title="前の章へ">How-to ガイド</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="legacy-databases.html"
+                          title="次の章へ">レガシーなデータベースと Django の統合</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/initial-data.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="index.html" title="How-to ガイド">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="legacy-databases.html" title="レガシーなデータベースと Django の統合">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

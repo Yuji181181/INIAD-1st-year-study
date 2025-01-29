@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Unicode データ &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="django.urls ユーティリティ関数" href="urlresolvers.html" />
+    <link rel="prev" title="TemplateResponse および SimpleTemplateResponse" href="template-response.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="template-response.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;TemplateResponse&lt;/span&gt;&lt;/code&gt; および &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;SimpleTemplateResponse&lt;/span&gt;&lt;/code&gt;">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="urlresolvers.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.urls&lt;/span&gt;&lt;/code&gt; ユーティリティ関数">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-unicode">
+            
+  <section id="s-unicode-data">
+<span id="unicode-data"></span><h1>Unicode データ<a class="headerlink" href="#unicode-data" title="Link to this heading">¶</a></h1>
+<p>Django はどこでも Unicode データをサポートしています。</p>
+<p>この文書は、ASCII以外のエンコーディングでデータやテンプレートを使用するアプリケーションを書く場合に、知っておくべきことを説明します。</p>
+<section id="s-creating-the-database">
+<span id="creating-the-database"></span><h2>データベースの作成<a class="headerlink" href="#creating-the-database" title="Link to this heading">¶</a></h2>
+<p>データベースが任意の文字列データを保存できるように設定されていることを確認してください。通常、これは UTF-8 または UTF-16 のエンコーディングを使用することを意味します。もっと制限のあるエンコーディング -- 例えば、latin1 (iso8859-1) -- を使用する場合、特定の文字をデータベースに保存することができず、情報が失われることになります。</p>
+<ul class="simple">
+<li><p>MySQLユーザーの場合、データベースの文字セットエンコーディングを設定または変更する方法の詳細については、 <a class="reference external" href="https://dev.mysql.com/doc/refman/en/charset-database.html">MySQL manual</a> を参照してください。</p></li>
+<li><p>PostgreSQL を使用している場合は、適切なエンコーディングでデータベースを作成するための詳細については、 <a class="reference external" href="https://www.postgresql.org/docs/current/multibyte.html#MULTIBYTE-SETTING">PostgreSQL manual</a> を参照してください。</p></li>
+<li><p>Oracle ユーザーは、データベースの文字セットエンコーディングを設定（ <a class="reference external" href="https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/choosing-character-set.html">section 2</a> ）する方法や変更（ <a class="reference external" href="https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/character-set-migration.html">section 11</a> ）する方法の詳細については、 <a class="reference external" href="https://docs.oracle.com/en/database/oracle/oracle-database/21/nlspg/index.html">Oracle manual</a> を参照してください。</p></li>
+<li><p>SQLite を使用しているユーザーは、何もする必要はありません。SQLite は常に UTF-8 を内部エンコーディングに使用します。</p></li>
+</ul>
+<p>Djangoのデータベースバックエンドはすべて自動的に、データベースと通信するために適切なエンコーディングへ文字列を変換します。また、データベースから取得した文字列も自動的に文字列に変換します。データベースが使用しているエンコーディングをDjangoに伝える必要はまったくありません。それは透過的に処理されます。</p>
+<p>詳細については、以下の「データベース API」セクションを参照してください。</p>
+</section>
+<section id="s-general-string-handling">
+<span id="general-string-handling"></span><h2>一般的な文字列操作<a class="headerlink" href="#general-string-handling" title="Link to this heading">¶</a></h2>
+<p>Djangoを使用する際、例えば、データベース検索やテンプレートのレンダリングなど、どこでも、文字列に対して2つのエンコーディング選択肢があります。通常の文字列を使用するか、バイト文字列（'b' で始まる）を使用できます。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>バイト文字列は、そのエンコーディングに関する情報を何も持っていません。そのため、我々は仮定を立てなければなりません。そして、Djangoはすべてのバイト文字列がUTF-8であると仮定します。</p>
+<p>Django に他の形式でエンコードされた文字列を渡すと、興味深い方法で問題が発生します。通常、いずれかのタイミングで Django は <code class="docutils literal notranslate"><span class="pre">UnicodeDecodeError</span></code> を発生させます。</p>
+</div>
+<p>コードが ASCII データのみを使用している場合、ASCII は UTF-8 のサブセットなので、通常の文字列を自由に使って渡すことが安全です。</p>
+<p><a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定を <code class="docutils literal notranslate"><span class="pre">'utf-8'</span></code> 以外に設定しているからといって、バイト文字列でその他のエンコーディングを使用できると思わないでください！ <a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> は、テンプレートのレンダリング結果（および電子メール）として生成された文字列にのみ適用されます。Django は、内部的なバイト文字列については常に UTF-8 エンコーディングを想定します。その理由は、 <a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定が実際には（アプリケーション開発者であるあなたの）制御下にないからです。それは、あなたのアプリケーションをインストールして使用している人が制御しています ― そして、その人が異なる設定を選択した場合でも、あなたのコードは引き続き動作しなければなりません。したがって、その設定に依存することはできません。</p>
+<p>Djangoが文字列を扱う場合、大抵の場合、何をするにもまずそれらを文字列に変換します。従って、一般的なルールとして、バイト文字列を渡した場合は、結果として文字列を受け取る準備をしておくべきです。</p>
+<section id="s-translated-strings">
+<span id="translated-strings"></span><h3>翻訳された文字列<a class="headerlink" href="#translated-strings" title="Link to this heading">¶</a></h3>
+<p>文字列やバイト文字列とは別に、Djangoを使用しているときに遭遇する可能性がある文字列型のオブジェクトがもう一つあります。フレームワークの国際化機能は「遅延翻訳（lazy な翻訳）」という概念を導入しています ― 翻訳済みとマークされているが、オブジェクトが文字列として使用されるまで実際の翻訳結果が決定されない文字列です。この機能は、文字列が最初に作成されたときにはコードがインポートされたにもかかわらず、文字列が使用されるまで翻訳ロケールが不明な場合に便利です。</p>
+<p>通常、遅延翻訳について心配する必要はありません。ただし、オブジェクトを調べたときに <code class="docutils literal notranslate"><span class="pre">django.utils.functional.__proxy__</span></code> オブジェクトであると表示される場合は、それが遅延翻訳であることに注意してください。遅延翻訳を引数として <code class="docutils literal notranslate"><span class="pre">str()</span></code> を呼び出すと、現在のロケールの文字列が生成されます。</p>
+<p>詳細については、 <a class="reference internal" href="../topics/i18n/index.html"><span class="doc">国際化</span></a> ドキュメントを参照してください。</p>
+</section>
+<section id="s-useful-utility-functions">
+<span id="useful-utility-functions"></span><h3>便利なユーティリティ関数<a class="headerlink" href="#useful-utility-functions" title="Link to this heading">¶</a></h3>
+<p>いくつかの文字列操作は度々必要とされるため、Django には文字列やバイト文字列の操作を少し簡単にする便利な関数がいくつか含まれています。</p>
+<section id="s-conversion-functions">
+<span id="conversion-functions"></span><h4>変換関数<a class="headerlink" href="#conversion-functions" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">django.utils.encoding</span></code> モジュールには、文字列とバイト列との間で相互に変換するために便利ないくつかの関数が含まれています。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">smart_str(s,</span> <span class="pre">encoding='utf-8',</span> <span class="pre">strings_only=False,</span> <span class="pre">errors='strict')</span></code> は、その入力を文字列に変換します。 <code class="docutils literal notranslate"><span class="pre">encoding</span></code> パラメータは入力エンコーディングを指定します（例えば、Djangoはこれを内部で使用して、UTF-8 エンコードされていないかもしれないフォーム入力データを処理します）。 <code class="docutils literal notranslate"><span class="pre">strings_only</span></code> パラメータが True に設定されている場合、Python の数値、真偽値、そして <code class="docutils literal notranslate"><span class="pre">None</span></code> は文字列に変換されずに元の型を保持します。 <code class="docutils literal notranslate"><span class="pre">errors</span></code> パラメータは、Python の <code class="docutils literal notranslate"><span class="pre">str()</span></code> 関数がエラーハンドリングに受け入れる値のいずれかを取ります。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">force_str(s,</span> <span class="pre">encoding='utf-8',</span> <span class="pre">strings_only=False,</span> <span class="pre">errors='strict')</span></code> は、ほとんどの場合 <code class="docutils literal notranslate"><span class="pre">smart_str()</span></code> と同じです。違いは、最初の引数が <a class="reference internal" href="../topics/i18n/translation.html#lazy-translations"><span class="std std-ref">遅延翻訳（Lazyな翻訳）</span></a> インスタンスである場合です。<code class="docutils literal notranslate"><span class="pre">smart_str()</span></code> は遅延翻訳を保持しますが、<code class="docutils literal notranslate"><span class="pre">force_str()</span></code> はそれらのオブジェクトを文字列に強制します（翻訳が発生します）。通常は <code class="docutils literal notranslate"><span class="pre">smart_str()</span></code> を使用しますが、文字列に絶対に <em>変換する必要がある</em> テンプレートタグやフィルタには <code class="docutils literal notranslate"><span class="pre">force_str()</span></code> が役立ちます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">smart_bytes(s,</span> <span class="pre">encoding='utf-8',</span> <span class="pre">strings_only=False,</span> <span class="pre">errors='strict')</span></code> は基本的に <code class="docutils literal notranslate"><span class="pre">smart_str()</span></code> の反対です。第一引数をバイト文字列に強制します。 <code class="docutils literal notranslate"><span class="pre">strings_only</span></code> パラメータは、<code class="docutils literal notranslate"><span class="pre">smart_str()</span></code> および <code class="docutils literal notranslate"><span class="pre">force_str()</span></code> と同じ動作をします。これは Python の組み込み関数 <code class="docutils literal notranslate"><span class="pre">str()</span></code> とは少し異なる意味論ですが、Django の内部で必要とされるいくつかの場所での違いです。</p></li>
+</ul>
+<p>通常、<code class="docutils literal notranslate"><span class="pre">force_str()</span></code> を使用するだけで十分です。文字列またはバイト文字列の可能性があるあらゆる入力データに対して、できるだけ早くそれを呼び出しましょう。そうすることで、その結果を常に文字列として扱うことができます。</p>
+</section>
+<section id="s-uri-and-iri-handling">
+<span id="s-id1"></span><span id="uri-and-iri-handling"></span><span id="id1"></span><h4>URI と IRI の処理<a class="headerlink" href="#uri-and-iri-handling" title="Link to this heading">¶</a></h4>
+<p>Web フレームワークは URL（IRI の一種）を扱う必要があります。URL の要件の1つは、ASCII 文字のみを使用してエンコードされることです。しかし、国際的な環境では、Unicode 文字を含むことができる <span class="target" id="index-7"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3987.html"><strong>IRI</strong></a> から URL を構築する必要があるかもしれません。IRI を URI に引用して変換するためには、これらの関数を使用します。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="utils.html#django.utils.encoding.iri_to_uri" title="django.utils.encoding.iri_to_uri"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.encoding.iri_to_uri()</span></code></a> 関数は、<span class="target" id="index-8"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3987.html#section-3.1"><strong>RFC 3987 Section 3.1</strong></a> で要求されるように、IRIからURIへの変換を実装しています。</p></li>
+<li><p>Python 標準ライブラリからの <a class="reference external" href="https://docs.python.org/3/library/urllib.parse.html#urllib.parse.quote" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">urllib.parse.quote()</span></code></a> と <a class="reference external" href="https://docs.python.org/3/library/urllib.parse.html#urllib.parse.quote_plus" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">urllib.parse.quote_plus()</span></code></a> 関数。</p></li>
+</ul>
+<p>これら2つの関数のグループは、わずかに異なる目的があり、それらを区別することが重要です。通常、&quot;&amp;&quot; や &quot;%&quot; のような予約文字が正しくエンコードされるように、IRI や URI パスの個々の部分に <code class="docutils literal notranslate"><span class="pre">quote()</span></code> を使用します。その後、完全な IRI に <code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> を適用し、非 ASCII 文字を正しいエンコード値に変換します。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>技術的に言うと、<code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> が IRI 仕様の完全なアルゴリズムを実装していると言うのは正確ではありません。まだ、アルゴリズムの国際ドメイン名エンコーディング部分を実行していません。</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> 関数は、URL で許可されている ASCII 文字を変更しません。したがって、例えば、文字 &quot;%&quot; は <code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> に渡されたときに、さらにエンコードされることはありません。これは、完全な URL をこの関数に渡しても、クエリ文字列やそれに類するものを台無しにすることはないという意味です。</p>
+<p>ここで例を挙げるとより理解しやすくなります:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">quote</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.encoding</span><span class="w"> </span><span class="kn">import</span> <span class="n">iri_to_uri</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">quote</span><span class="p">(</span><span class="s2">&quot;Paris &amp; Orléans&quot;</span><span class="p">)</span>
+<span class="go">&#39;Paris%20%26%20Orl%C3%A9ans&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">iri_to_uri</span><span class="p">(</span><span class="s2">&quot;/favorites/François/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">quote</span><span class="p">(</span><span class="s2">&quot;Paris &amp; Orléans&quot;</span><span class="p">))</span>
+<span class="go">&#39;/favorites/Fran%C3%A7ois/Paris%20%26%20Orl%C3%A9ans&#39;</span>
+</pre></div>
+</div>
+<p>よく見ると、2番目の例で <code class="docutils literal notranslate"><span class="pre">quote()</span></code> によって生成された部分が <code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> に渡された際に二重引用符で囲まれていないことがわかります。これは非常に重要で便利な機能です。つまり、IRIを構築する際に、非ASCII文字が含まれているかどうかを心配せずに、最後になってから結果に対して <code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> を呼び出すことができるということです。</p>
+<p>同様に、Djangoは <a class="reference internal" href="utils.html#django.utils.encoding.uri_to_iri" title="django.utils.encoding.uri_to_iri"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.encoding.uri_to_iri()</span></code></a> を提供しており、これは <span class="target" id="index-9"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3987.html#section-3.2"><strong>RFC 3987 Section 3.2</strong></a> に従ってURIからIRIへの変換を実装しています。</p>
+<p>デモンストレーションの例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.encoding</span><span class="w"> </span><span class="kn">import</span> <span class="n">uri_to_iri</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uri_to_iri</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">%E</span><span class="s2">2</span><span class="si">%99%</span><span class="s2">A5</span><span class="si">%E</span><span class="s2">2</span><span class="si">%99%</span><span class="s2">A5/?utf8=</span><span class="si">%E</span><span class="s2">2%9C%93&quot;</span><span class="p">)</span>
+<span class="go">&#39;/♥♥/?utf8=✓&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">uri_to_iri</span><span class="p">(</span><span class="s2">&quot;%A9hello</span><span class="si">%3F</span><span class="s2">world&quot;</span><span class="p">)</span>
+<span class="go">&#39;%A9hello%3Fworld&#39;</span>
+</pre></div>
+</div>
+<p>最初の例では、UTF-8 の文字はクォートされていません。2番目の例では、パーセントエンコーディングは、有効な UTF-8 の範囲外にあるか、予約された文字を表しているため、変更されません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> と <code class="docutils literal notranslate"><span class="pre">uri_to_iri()</span></code> 関数は冪等であり、つまり以下が常に真であることを意味します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">iri_to_uri</span><span class="p">(</span><span class="n">iri_to_uri</span><span class="p">(</span><span class="n">some_string</span><span class="p">))</span> <span class="o">==</span> <span class="n">iri_to_uri</span><span class="p">(</span><span class="n">some_string</span><span class="p">)</span>
+<span class="n">uri_to_iri</span><span class="p">(</span><span class="n">uri_to_iri</span><span class="p">(</span><span class="n">some_string</span><span class="p">))</span> <span class="o">==</span> <span class="n">uri_to_iri</span><span class="p">(</span><span class="n">some_string</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>同じURI/IRIに対して複数回安全に呼び出すことができます。二重引用符の問題を気にする必要はありません。</p>
+</section>
+</section>
+</section>
+<section id="s-models">
+<span id="models"></span><h2>モデル<a class="headerlink" href="#models" title="Link to this heading">¶</a></h2>
+<p>データベースから返される全ての文字列が <code class="docutils literal notranslate"><span class="pre">str</span></code> オブジェクトとして返されるため、文字ベースのモデルフィールド(CharField、TextField、URLField など)には、Django がデータベースからデータを取得する際、Unicode の値が格納されます。これは、データが ASCII バイト文字列に収まる場合でも、 <em>常に</em> 当てはまります。</p>
+<p>モデルを作成する際やフィールドに値を設定する際にバイト文字列を渡すことができ、Django は必要に応じてそれを文字列に変換します。</p>
+<section id="s-taking-care-in-get-absolute-url">
+<span id="taking-care-in-get-absolute-url"></span><h3><code class="docutils literal notranslate"><span class="pre">get_absolute_url()</span></code> の注意事項<a class="headerlink" href="#taking-care-in-get-absolute-url" title="Link to this heading">¶</a></h3>
+<p>URL は ASCII 文字のみを含むことができます。ASCII でないデータの断片から URL を構築している場合は、URL に適した方法で結果をエンコードすることに注意してください。 <a class="reference internal" href="urlresolvers.html#django.urls.reverse" title="django.urls.reverse"><code class="xref py py-func docutils literal notranslate"><span class="pre">reverse()</span></code></a> 関数は、これを自動的に処理してくれます。</p>
+<p>URL を手動で構築している場合（つまり、 <code class="docutils literal notranslate"><span class="pre">reverse()</span></code> 関数を <em>使用していない</em> 場合）、エンコーディングを自分で処理する必要があります。この場合、 <a class="reference internal" href="#id1">above</a> で説明された <code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> 関数と <code class="docutils literal notranslate"><span class="pre">quote()</span></code> 関数を使用してください。例えば：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">quote</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.encoding</span><span class="w"> </span><span class="kn">import</span> <span class="n">iri_to_uri</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_absolute_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;/person/</span><span class="si">%s</span><span class="s2">/?x=0&amp;y=0&quot;</span> <span class="o">%</span> <span class="n">quote</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">iri_to_uri</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この関数は、 <code class="docutils literal notranslate"><span class="pre">self.location</span></code> が &quot;Jack visited Paris &amp; Orléans&quot; のようなものであっても、正しくエンコードされた URL を返します。（実際には、上記の例では <code class="docutils literal notranslate"><span class="pre">iri_to_uri()</span></code> 呼び出しは厳密には必要ありません。なぜなら、最初の行での引用符によってすべての非 ASCII 文字が削除されていたからです。）</p>
+</section>
+</section>
+<section id="s-templates">
+<span id="templates"></span><h2>テンプレート<a class="headerlink" href="#templates" title="Link to this heading">¶</a></h2>
+<p>手動でテンプレートを作成する際には文字列を使用します：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">Template</span>
+
+<span class="n">t2</span> <span class="o">=</span> <span class="n">Template</span><span class="p">(</span><span class="s2">&quot;This is a string template.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>通常は、ファイルシステムからテンプレートを読み込むことが一般的です。テンプレートファイルが UTF-8 エンコーディングで保存されていない場合は、<a class="reference internal" href="settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> 設定を調整してください。組み込みの <a class="reference internal" href="../topics/templates.html#module-django.template.backends.django" title="django.template.backends.django"><code class="xref py py-mod docutils literal notranslate"><span class="pre">django</span></code></a> バックエンドは、ディスクからファイルを読み込む際に使用するエンコーディングを変更するための <code class="docutils literal notranslate"><span class="pre">'file_charset'</span></code> オプションを提供しています。</p>
+<p><a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定は、レンダリングされたテンプレートのエンコーディングを制御します。これはデフォルトで UTF-8 に設定されています。</p>
+<section id="s-template-tags-and-filters">
+<span id="template-tags-and-filters"></span><h3>テンプレートタグとフィルタ<a class="headerlink" href="#template-tags-and-filters" title="Link to this heading">¶</a></h3>
+<p>自分自身のテンプレートタグとフィルタを書く際に覚えておくべきヒントをいくつか紹介します:</p>
+<ul class="simple">
+<li><p>テンプレートタグの <code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドとテンプレートフィルタからは、常に文字列を返してください。</p></li>
+<li><p>これらの場所では、<code class="docutils literal notranslate"><span class="pre">smart_str()</span></code> よりも <code class="docutils literal notranslate"><span class="pre">force_str()</span></code> を優先して使用してください。タグのレンダリングとフィルタの呼び出しは、テンプレートがレンダリングされている間に発生するため、遅延翻訳オブジェクトを文字列に変換することを遅らせる利点はありません。その時点で文字列のみを扱う方が簡単です。</p></li>
+</ul>
+</section>
+</section>
+<section id="s-files">
+<span id="s-unicode-files"></span><span id="files"></span><span id="unicode-files"></span><h2>ファイル<a class="headerlink" href="#files" title="Link to this heading">¶</a></h2>
+<p>ユーザーにファイルのアップロードを許可するつもりであれば、Django を実行する環境が非 ASCII ファイル名に対応しているよう設定する必要があります。環境が正しく設定されていない場合、非 ASCII 文字を含むファイル名や内容のファイルを保存しようとしたときに <code class="docutils literal notranslate"><span class="pre">UnicodeEncodeError</span></code> 例外に遭遇します。</p>
+<p>UTF-8ファイル名に対するファイルシステムのサポートは変わることがあり、環境に依存する場合があります。現在の設定をインタラクティブなPythonシェルで確認するには、次のコマンドを実行してください：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">sys</span><span class="o">.</span><span class="n">getfilesystemencoding</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>これは &quot;UTF-8&quot; と出力されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">LANG</span></code> 環境変数は、Unixプラットフォームにおいて予期されるエンコーディングを設定する責任があります。この変数を設定する適切な構文と場所については、使用するオペレーティングシステムとアプリケーションサーバーのドキュメントを参照してください。例については、 <a class="reference internal" href="../howto/deployment/wsgi/modwsgi.html"><span class="doc">Django を Apache と mod_wsgi とともに使うには？</span></a> を参照してください。</p>
+<p>開発環境では、<code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> に次のような設定を追加する必要があるかもしれません。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">LANG</span><span class="o">=</span><span class="s2">&quot;en_US.UTF-8&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="s-form-submission">
+<span id="form-submission"></span><h2>フォームの送信<a class="headerlink" href="#form-submission" title="Link to this heading">¶</a></h2>
+<p>HTML フォームの送信は、難しい領域です。送信がエンコーディング情報を含むとは限らず、それはフレームワークが送信されたデータのエンコーディングを推測しなければならないことを意味します。</p>
+<p>Djangoはフォームデータのデコードに対して「遅延」アプローチを採用しています。<code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> オブジェクト内のデータは、アクセスしたときにのみデコードされます。実際には、ほとんどのデータはデコードされません。<code class="docutils literal notranslate"><span class="pre">HttpRequest.GET</span></code> と <code class="docutils literal notranslate"><span class="pre">HttpRequest.POST</span></code> データ構造のみがデコードが適用されます。これら二つのフィールドは、メンバーをUnicodeデータとして返します。<code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> の他の属性やメソッドは、クライアントによって送信されたデータをそのまま正確に返します。</p>
+<p>デフォルトでは、 <a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定がフォームデータの想定されるエンコーディングとして使用されます。特定のフォームに対してこれを変更する必要がある場合は、 <code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> インスタンスの <code class="docutils literal notranslate"><span class="pre">encoding</span></code> 属性を設定できます。例えば：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">some_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># We know that the data must be encoded as KOI8-R (for some reason).</span>
+    <span class="n">request</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="s2">&quot;koi8-r&quot;</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">request.GET</span></code> や <code class="docutils literal notranslate"><span class="pre">request.POST</span></code> にアクセスした後であっても、エンコーディングを変更することができ、以降のすべてのアクセスでは新しいエンコーディングが使用されます。</p>
+<p>ほとんどの開発者はフォームのエンコーディングを変更することを心配する必要はありませんが、制御できないレガシーシステムと通信するアプリケーションにとって、これは便利な機能です。</p>
+<p>Django はファイルアップロードのデータをデコードしません。そのデータは通常、文字列ではなくバイトのコレクションとして扱われるからです。そこでの自動デコードは、バイトストリームの意味を変更してしまうでしょう。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Unicode データ</a><ul>
+<li><a class="reference internal" href="#creating-the-database">データベースの作成</a></li>
+<li><a class="reference internal" href="#general-string-handling">一般的な文字列操作</a><ul>
+<li><a class="reference internal" href="#translated-strings">翻訳された文字列</a></li>
+<li><a class="reference internal" href="#useful-utility-functions">便利なユーティリティ関数</a><ul>
+<li><a class="reference internal" href="#conversion-functions">変換関数</a></li>
+<li><a class="reference internal" href="#uri-and-iri-handling">URI と IRI の処理</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#models">モデル</a><ul>
+<li><a class="reference internal" href="#taking-care-in-get-absolute-url"><code class="docutils literal notranslate"><span class="pre">get_absolute_url()</span></code> の注意事項</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#templates">テンプレート</a><ul>
+<li><a class="reference internal" href="#template-tags-and-filters">テンプレートタグとフィルタ</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#files">ファイル</a></li>
+<li><a class="reference internal" href="#form-submission">フォームの送信</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="template-response.html"
+                          title="前の章へ"><code class="docutils literal notranslate"><span class="pre">TemplateResponse</span></code> および <code class="docutils literal notranslate"><span class="pre">SimpleTemplateResponse</span></code></a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="urlresolvers.html"
+                          title="次の章へ"><code class="docutils literal notranslate"><span class="pre">django.urls</span></code> ユーティリティ関数</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/unicode.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="template-response.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;TemplateResponse&lt;/span&gt;&lt;/code&gt; および &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;SimpleTemplateResponse&lt;/span&gt;&lt;/code&gt;">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="urlresolvers.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.urls&lt;/span&gt;&lt;/code&gt; ユーティリティ関数">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

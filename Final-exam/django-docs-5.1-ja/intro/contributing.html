@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Djangoにはじめて貢献する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="Django を使う" href="../topics/index.html" />
+    <link rel="prev" title="次のステップへ" href="whatsnext.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);(function($) {
+    $(document).ready(function() {
+        $(".c-tab-unix").on("click", function() {
+            $("section.c-content-unix").show();
+            $("section.c-content-win").hide();
+            $(".c-tab-unix").prop("checked", true);
+        });
+        $(".c-tab-win").on("click", function() {
+            $("section.c-content-win").show();
+            $("section.c-content-unix").hide();
+            $(".c-tab-win").prop("checked", true);
+        });
+    });
+})(jQuery);</script>
+<link rel="stylesheet" href="../_static/console-tabs.css">
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="whatsnext.html" title="次のステップへ">previous</a>
+     |
+    <a href="index.html" title="さぁ始めましょう" accesskey="U">up</a>
+   |
+    <a href="../topics/index.html" title="Django を使う">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="intro-contributing">
+            
+  <section id="s-writing-your-first-contribution-for-django">
+<span id="writing-your-first-contribution-for-django"></span><h1>Djangoにはじめて貢献する<a class="headerlink" href="#writing-your-first-contribution-for-django" title="Link to this heading">¶</a></h1>
+<section id="s-introduction">
+<span id="introduction"></span><h2>はじめに<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>小さなものでも、コミュニティへ恩返しすることに興味がありますか？ たとえば、Django に直してほしいバグを見つけたり、ちょっとした機能を追加してほしいと思っているかもしれません。</p>
+<p>その願いを叶える一番の方法は Django 自体にコントリビュートすることです。最初はすごく大変なことだと想像するかもしれませんが、あなたを助けてくれるドキュメント、ツール、コミュニティとともに多くの人が通る道でもあります。これからコントリビュートのプロセス全体を順番に詳しく解説していくので、例を通して理解できると思います。</p>
+<section id="s-who-s-this-tutorial-for">
+<span id="who-s-this-tutorial-for"></span><h3>このチュートリアルの対象者は誰ですか？<a class="headerlink" href="#who-s-this-tutorial-for" title="Link to this heading">¶</a></h3>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>パッチを書く方法の細かい参照文献を探しているなら <a class="reference internal" href="../internals/contributing/writing-code/index.html"><span class="doc">Contributing code</span></a> ドキュメントを参照してください。</p>
+</div>
+<p>このチュートリアルでは、少なくとも Django がどのように動作するかについて基本的な理解を持っていることを期待します。つまり、 <a class="reference internal" href="tutorial01.html"><span class="doc">はじめての Django アプリ作成</span></a> にある既存のチュートリアルを一通り読んで慣れている必要があります。加えて、Python 自体をよく理解している必要があります。しかし、もしそうでなければ、 <a class="reference external" href="https://diveintopython3.net/">Dive Into Python</a> は Python プログラマの初心者のための素晴らしい (そして無料の) オンラインブックです。</p>
+<p>バージョン管理システムや Trac をよく知らない方でも、このチュートリアルとリンク先から、コントリビュートに必要な情報は十分得られます。しかし、Django に定期的に貢献したい場合は、このツールの詳細を知っておいた方がいいでしょう。</p>
+<p>このチュートリアルでは、できるだけ多くの方が使用できるように、可能な限り詳しく説明したいと思います。</p>
+<div class="admonition-where-to-get-help admonition">
+<p class="admonition-title">困ったときは:</p>
+<p>If you're having trouble going through this tutorial, please post a message
+on the <a class="reference external" href="https://forum.djangoproject.com/">Django Forum</a>, <a class="reference internal" href="../internals/mailing-lists.html#django-developers-mailing-list"><span class="std std-ref">django-developers</span></a>, or drop by the
+<a class="reference external" href="https://chat.djangoproject.com">Django Discord server</a> to chat with other Django users who might be able
+to help.</p>
+</div>
+</section>
+<section id="s-what-does-this-tutorial-cover">
+<span id="what-does-this-tutorial-cover"></span><h3>このチュートリアルはどの範囲をカバーしていますか？<a class="headerlink" href="#what-does-this-tutorial-cover" title="Link to this heading">¶</a></h3>
+<p>これから、Djangoへの初めてのコントリビューションについて説明します。このチュートリアルの終わりまでに、使用するツールと関連するプロセスの基本を理解できるようになります。具体的には、以下の内容を取り上げます。</p>
+<ul class="simple">
+<li><p>Git のインストール</p></li>
+<li><p>Django 開発版の複製をダウンロードする</p></li>
+<li><p>Django のテストスイートの実行</p></li>
+<li><p>変更のためのテストを書く</p></li>
+<li><p>変更のためのコードを書く</p></li>
+<li><p>変更をテストする</p></li>
+<li><p>プルリクエストを送る</p></li>
+<li><p>より多くの情報を得る方法</p></li>
+</ul>
+<p>チュートリアルを終えたら、次は <a class="reference internal" href="../internals/contributing/index.html"><span class="doc">Django への貢献</span></a> を参照してください。このドキュメントには、多くの重要な情報が含まれており、Django に定期的に貢献したい方は是非一読してください。あなたの疑問への答えが見つかるはずです。</p>
+<div class="admonition-python-3-required admonition">
+<p class="admonition-title">3系の Python が必要です！</p>
+<p>Django の現在のバージョンは、Python 2.7 をサポートしません。<a class="reference external" href="https://www.python.org/downloads/">Python のダウンロードページ</a> や OS のパッケージ管理システムを用いて Python 3 をインストールしてください。</p>
+</div>
+<div class="admonition-for-windows-users admonition">
+<p class="admonition-title">Windows を使用している方へ</p>
+<p>Windowsのドキュメントの <a class="reference internal" href="../howto/windows.html#install-python-windows"><span class="std std-ref">Python をインストールする</span></a> をみてください。</p>
+</div>
+</section>
+</section>
+<section id="s-code-of-conduct">
+<span id="code-of-conduct"></span><h2>ソースコードの管理<a class="headerlink" href="#code-of-conduct" title="Link to this heading">¶</a></h2>
+<p>Django へ貢献を行う上では、Django コミュニティをオープンで誰にでも開かれたものに保つよう心がけてください。 <a class="reference external" href="https://www.djangoproject.com/conduct/">行動規範</a> をよく読み、それに従ってください。</p>
+</section>
+<section id="s-installing-git">
+<span id="installing-git"></span><h2>Git のインストール<a class="headerlink" href="#installing-git" title="Link to this heading">¶</a></h2>
+<p>このチュートリアルでは、Djangoの現在の開発バージョンをダウンロードし、変更内容に対応するブランチを作成するために、Git をインストールしておく必要があります。</p>
+<p>Git がインストールされているかどうかを確認するために、コマンドラインで <code class="docutils literal notranslate"><span class="pre">git</span></code> を入力します。もし入っていない場合は、ダウンロード及びインストールするために、 <a class="reference external" href="https://git-scm.com/download">Git's download page</a> を参照してください。</p>
+<p>もし Git について詳しく知らない場合は、(インストール後に) コマンドラインから <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">help</span></code> と入力するとコマンドの使い方を確認できます。</p>
+</section>
+<section id="s-getting-a-copy-of-django-s-development-version">
+<span id="getting-a-copy-of-django-s-development-version"></span><h2>Django 開発版の複製を取得<a class="headerlink" href="#getting-a-copy-of-django-s-development-version" title="Link to this heading">¶</a></h2>
+<p>Django へ貢献するためのはじめの一歩は、ソースコードのコピーです。まず、 <a class="reference external" href="https://github.com/django/django/fork">GitHub で Django をフォーク</a> して、コマンドラインからリポジトリのクローンを作り、 <code class="docutils literal notranslate"><span class="pre">cd</span></code> コマンドで Django のローカルコピーのディレクトリに移動しましょう。</p>
+<p>以下のコマンドで Django のソースコードリポジトリをダウンロードします:</p>
+<div class="console-block" id="console-block-0">
+<input class="c-tab-unix" id="c-tab-0-unix" type="radio" name="console-0" checked>
+<label for="c-tab-0-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-0-win" type="radio" name="console-0">
+<label for="c-tab-0-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-0-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/YourGitHubName/django.git
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-0-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> git clone https://github.com/YourGitHubName/django.git
+</pre></div>
+</section>
+</div>
+<div class="admonition-low-bandwidth-connection admonition">
+<p class="admonition-title">低帯域の回線をご利用ですか？</p>
+<p><code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span></code> に <code class="docutils literal notranslate"><span class="pre">--depth</span> <span class="pre">1</span></code> という引数を追加すると、Djangoのコミット履歴のダウンロードをスキップすることができます。これによってデータの転送量が70〜250MB程度減ります。</p>
+</div>
+<p>Django のローカルコピーがあるので、 <code class="docutils literal notranslate"><span class="pre">pip</span></code> を使ってパッケージをインストールするのと同じようにインストールすることができます。そのための最も便利な方法は、Python に組み込まれている機能である <em>仮想環境</em> を使用することです。これにより、相互に干渉しないようにプロジェクトごとにインストールされたパッケージの別々のディレクトリを保つことができます。</p>
+<p>例えばホームディレクトリ下の <code class="docutils literal notranslate"><span class="pre">.virtualenvs/</span></code> にすべての仮想環境を置くことが出来ます。</p>
+<p>次のコマンドで、新しい仮想環境を作成します:</p>
+<div class="console-block" id="console-block-1">
+<input class="c-tab-unix" id="c-tab-1-unix" type="radio" name="console-1" checked>
+<label for="c-tab-1-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-1-win" type="radio" name="console-1">
+<label for="c-tab-1-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-1-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>~/.virtualenvs/djangodev
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-1-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py -m venv <span class="nv">%HOMEPATH%</span>\.virtualenvs\djangodev
+</pre></div>
+</section>
+</div>
+<p>新しい環境があるパスはコンピュータに保存されました。</p>
+<p>最後のステップとして仮想環境を有効化します：</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">source</span><span class="w"> </span>~/.virtualenvs/djangodev/bin/activate
+</pre></div>
+</div>
+<p>もし <code class="docutils literal notranslate"><span class="pre">source</span></code> コマンドが使えない場合、代わりに <code class="docutils literal notranslate"><span class="pre">.</span></code> を試してみてください:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>.<span class="w"> </span>~/.virtualenvs/djangodev/bin/activate
+</pre></div>
+</div>
+<p>新しいターミナルウィンドウを開くたびに仮想環境を有効にする必要があります。</p>
+<div class="admonition-for-windows-users admonition">
+<p class="admonition-title">Windows を使用している方へ</p>
+<p>実行してWindowsでの仮想環境を有効化します：</p>
+<div class="highlight-doscon notranslate"><div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> <span class="nv">%HOMEPATH%</span>\.virtualenvs\djangodev\Scripts\activate.bat
+</pre></div>
+</div>
+</div>
+<p>その時点で有効な仮想環境の名前がコマンドライン上に表示されます。これによってどの仮想環境を利用しているのかが分かります。仮想環境のもとで <code class="docutils literal notranslate"><span class="pre">pip</span></code> によるインストールを行うと、表示されている仮想環境内にインストールされます。他の仮想環境やパッケージインストールによるシステムとは区別されます。</p>
+<p id="intro-contributing-install-local-copy">先に進んで、以前にクローンしたDjangoのコピーをインストールしてください:</p>
+<div class="console-block" id="console-block-2">
+<input class="c-tab-unix" id="c-tab-2-unix" type="radio" name="console-2" checked>
+<label for="c-tab-2-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-2-win" type="radio" name="console-2">
+<label for="c-tab-2-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-2-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>/path/to/your/local/clone/django/
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-2-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py -m pip install -e \path\to\your\local\clone\django\
+</pre></div>
+</section>
+</div>
+<p>Djangoのインストールされたバージョンは、編集可能モードでインストールすることにより、ローカルコピーを指すようになります。これにより、加えた変更が即座に反映されるため、初めてのコントリビューションを書く際に非常に役立ちます。</p>
+<section id="s-creating-projects-with-a-local-copy-of-django">
+<span id="creating-projects-with-a-local-copy-of-django"></span><h3>ローカルに複製した Django でプロジェクトを作成する<a class="headerlink" href="#creating-projects-with-a-local-copy-of-django" title="Link to this heading">¶</a></h3>
+<p>ローカルの変更をDjangoプロジェクトでテストすることは有意義です。まず、新しい仮想環境を作成し、<a class="reference internal" href="#intro-contributing-install-local-copy"><span class="std std-ref">先ほどクローンしたDjangoのローカルコピーを編集可能モードでインストール</span></a> し、Djangoのローカルコピーの外側に新しいDjangoプロジェクトを作成します。この設定により、新しいプロジェクト内でDjangoに加えた変更が即座に反映されるため、特にUIの変更をテストする場合、初めてのコントリビューションを書く際に非常に役立ちます。</p>
+<p>Djangoプロジェクトの作り方については、 <a class="reference internal" href="tutorial01.html"><span class="doc">チュートリアル</span></a> を参照してください。</p>
+</section>
+</section>
+<section id="s-running-django-s-test-suite-for-the-first-time">
+<span id="running-django-s-test-suite-for-the-first-time"></span><h2>最初に Django のテストスイートを実行する<a class="headerlink" href="#running-django-s-test-suite-for-the-first-time" title="Link to this heading">¶</a></h2>
+<p>Django に貢献する際には、コードの変更が Django の他の領域にバグを持ち込まないようにすることが非常に重要です。変更を行った後もDjangoが動作するかどうかを確認する方法の1つは、Djangoのテストスイートを実行することです。すべてのテストに合格していれば、あなたの変更が機能し、Django の他の部分を壊していないことを合理的に確認することができます。 Django のテストスイートを実行したことがない人は、事前に一度実行して出力に慣れておくと良いでしょう。</p>
+<p>テストスイートを実行するする前に <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">tests</span></code> コマンドを使って Django の <code class="docutils literal notranslate"><span class="pre">tests/</span></code> ディレクトリに移動し、実行することでテストの依存関係をインストールします。</p>
+<div class="console-block" id="console-block-3">
+<input class="c-tab-unix" id="c-tab-3-unix" type="radio" name="console-3" checked>
+<label for="c-tab-3-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-3-win" type="radio" name="console-3">
+<label for="c-tab-3-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-3-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements/py3.txt
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-3-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> py -m pip install -r requirements\py3.txt
+</pre></div>
+</section>
+</div>
+<p>もしこのインストールの間にエラーが発生した場合は、システムが Python のうちの 1 つ以上の依存パッケージが見つからない可能性があります。失敗したパッケージのドキュメントを調べるか、発生したエラーメッセージをウェブで検索してください。</p>
+<p>これでテストスイートを実行する準備が整いました:</p>
+<div class="console-block" id="console-block-4">
+<input class="c-tab-unix" id="c-tab-4-unix" type="radio" name="console-4" checked>
+<label for="c-tab-4-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-4-win" type="radio" name="console-4">
+<label for="c-tab-4-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-4-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./runtests.py
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-4-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> runtests.py 
+</pre></div>
+</section>
+</div>
+<p>さあ、座ってリラックスしてください。Django のテストスイート全体には何千ものテストがあり、コンピュータの速度にもよりますが、実行には少なくとも数分かかります。</p>
+<p>Django のテストスイートを実行中に、各テストの完了時のステータスを表す一連の文字が表示されます。 <code class="docutils literal notranslate"><span class="pre">E</span></code> はテストにエラーが発生したことを表し、 <code class="docutils literal notranslate"><span class="pre">F</span></code> はテストのアサーションが失敗したことを表しています。これらは共にテスト失敗となります。<code class="docutils literal notranslate"><span class="pre">x</span></code> と <code class="docutils literal notranslate"><span class="pre">s</span></code> はそれぞれ期待する失敗とスキップを表しています。ドットはテストの成功を表しています。</p>
+<p>スキップされたテストは、テストを実行するために必要な外部ライブラリがインストールされていないことが原因です; 依存については <a class="reference internal" href="../internals/contributing/writing-code/unit-tests.html#running-unit-tests-dependencies"><span class="std std-ref">Running all the tests</span></a> を参照し、あなたの変更に関連するテストにする依存ライブラリがインストールしてください (このチュートリアルでは必要ありません)。いくつかのテストは、特定のデータベースバックエンドに固有であり、そのバックエンドでテストされない場合はスキップされます。 SQLite は、デフォルト設定のバックエンドです。別のバックエンドを使用してテストを実行するには、 <a class="reference internal" href="../internals/contributing/writing-code/unit-tests.html#running-unit-tests-settings"><span class="std std-ref">Using another settings module</span></a> を参照してください。</p>
+<p>テストが終了するとテストが成功したか､失敗したかを知らせるメッセージが表示されます｡まだ Django のコードに変更を加えていなければ､テストは全て <strong>パスするはずです</strong> ｡もし失敗するかエラーが起こる場合は､これまでの全ステップを適切に実行してください｡ <a class="reference internal" href="../internals/contributing/writing-code/unit-tests.html#running-unit-tests"><span class="std std-ref">Running the unit tests</span></a> で､よりテストについて知れます｡</p>
+<p>最新の Django の main ブランチは常に安定しているとは限りません。 main バージョンで開発を行う場合、 <a class="reference external" href="https://djangoci.com">Django の継続インテグレーションビルド</a> をチェックしてください。これで、テストの失敗があなたのマシンだけのものか､ Django 公式のビルドによるものかが分かります。各ビルドについてのリンクをクリックすれば､ &quot;Configuration Matrix&quot; という、各 Python のバージョン、 DB バックエンドに対応したテストの失敗を閲覧できます｡</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>このチュートリアルや、各チケットで作業する際は、SQLiteのテストで十分です。しかし、可能（か必要）な場合は、 <a class="reference internal" href="../internals/contributing/writing-code/unit-tests.html#running-unit-tests-settings"><span class="std std-ref">他のデータベースでテストを実行する</span></a> を参照してください。 UIを変更する場合は、 <a class="reference internal" href="../internals/contributing/writing-code/unit-tests.html#running-selenium-tests"><span class="std std-ref">Seleniumのテストを実行する</span></a> 必要があります。</p>
+</div>
+</section>
+<section id="s-working-on-a-feature">
+<span id="working-on-a-feature"></span><h2>取りかかる<a class="headerlink" href="#working-on-a-feature" title="Link to this heading">¶</a></h2>
+<p>このチュートリアルでは、ケーススタディとして「架空のチケット」を使って作業を進めます。以下はその架空の詳細です。</p>
+<div class="admonition-ticket-99999-allow-making-toast admonition">
+<p class="admonition-title">チケット #99999 -- トーストを焼くようにする</p>
+<p>Django は、<code class="docutils literal notranslate"><span class="pre">toast</span></code> を返す関数 <code class="docutils literal notranslate"><span class="pre">django.shortcuts.make_toast()</span></code> を提供しなければなりません。</p>
+</div>
+<p>これよりこの機能と関連するテストを実装します。</p>
+</section>
+<section id="s-creating-a-branch">
+<span id="creating-a-branch"></span><h2>ブランチを作る<a class="headerlink" href="#creating-a-branch" title="Link to this heading">¶</a></h2>
+<p>変更を加える前に、チケット用に新しいブランチを作ります。</p>
+<div class="console-block" id="console-block-5">
+<input class="c-tab-unix" id="c-tab-5-unix" type="radio" name="console-5" checked>
+<label for="c-tab-5-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-5-win" type="radio" name="console-5">
+<label for="c-tab-5-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-5-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>ticket_99999
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-5-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> git checkout -b ticket_99999
+</pre></div>
+</section>
+</div>
+<p>ブランチ名は好きな名前で構いません。&quot;ticket_99999&quot; は一例です。新しいブランチ内で行ったすべての変更は、先ほどクローンしたコードのマスターコピーには影響しません。</p>
+</section>
+<section id="s-writing-some-tests-for-your-ticket">
+<span id="writing-some-tests-for-your-ticket"></span><h2>チケットにテストを書く<a class="headerlink" href="#writing-some-tests-for-your-ticket" title="Link to this heading">¶</a></h2>
+<p>ほとんどの場合、Djangoにコントリビューションが採用されるには、テストを含める必要があります。バグ修正のコントリビューションの場合、後で同じバグがDjangoに再導入されないようにするため、リグレッションテストを作成する必要があります。リグレッションテストは、バグが存在する間は失敗し、修正されたら成功するように記述してください。新機能を含むコントリビューションの場合、その新機能が正しく動作することを確認するためのテストを含める必要があります。この場合も、機能が存在しない場合は失敗し、実装されると成功するようにテストを作成してください。</p>
+<p>新しいテストをコードの変更前に書くのは良い方法です。この開発スタイルはテスト駆動開発 <a class="reference external" href="https://en.wikipedia.org/wiki/Test-driven_development">test-driven development</a> と呼ばれ、プロジェクト全体や個々の変更に適用できます。テストを書いたら、それを実行して、実際に失敗することを確認します（まだバグを修正していない、または機能を追加していないため）。新しいテストが失敗しない場合は、修正して失敗するようにする必要があります。なぜなら、バグが存在しているかどうかに関係なく成功するリグレッションテストは、そのバグが再発するのを防ぐのにあまり役立たないからです。</p>
+<p>ハンズオンでの例題に移りましょう。</p>
+<section id="s-writing-a-test-for-ticket-99999">
+<span id="writing-a-test-for-ticket-99999"></span><h3>チケット #99999 に対するテストの実装<a class="headerlink" href="#writing-a-test-for-ticket-99999" title="Link to this heading">¶</a></h3>
+<p>このチケットを解決するために、 <code class="docutils literal notranslate"><span class="pre">make_toast()</span></code> 関数に <code class="docutils literal notranslate"><span class="pre">django.shortcuts</span></code> モジュールに追加します。まずはこの関数を使うためのテストを書いて、関数の出力が正しいことを確認しましょう。</p>
+<p>Djangoの <code class="docutils literal notranslate"><span class="pre">tests/shortcuts/</span></code> フォルダへ移動して <code class="docutils literal notranslate"><span class="pre">test_make_toast.py</span></code> というファイルを新たに作ります。以下のコードを追加してください。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_toast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleTestCase</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MakeToastTests</span><span class="p">(</span><span class="n">SimpleTestCase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_make_toast</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">make_toast</span><span class="p">(),</span> <span class="s2">&quot;toast&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このテストは <code class="docutils literal notranslate"><span class="pre">make_toast()</span></code> が <code class="docutils literal notranslate"><span class="pre">toast</span></code> を返すかを確認します。</p>
+<div class="admonition-but-this-testing-thing-looks-kinda-hard admonition">
+<p class="admonition-title">でもテストをするのはすこし難しそうです……</p>
+<p>テストを書いたことがない場合は、最初は難しく見えるかもしれません。ですが実は、テストすることはプログラミングにおいて <em>とても</em> 重要なことです。ここではテストについて詳細に紹介します。</p>
+<ul class="simple">
+<li><p>Django のための良いテストの書き方は <a class="reference internal" href="../topics/testing/overview.html"><span class="doc">テストを書いて実行する</span></a> のドキュメントに記載されています。</p></li>
+<li><p>Dive Into Python (Python初心者のための､オンラインの無料の本) には素晴らしい <a class="reference external" href="https://diveintopython3.net/unit-testing.html">初めてのユニットテスト</a> という章があります｡</p></li>
+<li><p>Dive Into Python を読んだあと、もう少し情報が欲しい場合は、Python の <a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a> のドキュメントを参照してください｡</p></li>
+</ul>
+</div>
+</section>
+<section id="s-running-your-new-test">
+<span id="running-your-new-test"></span><h3>新しいテストを走らせる<a class="headerlink" href="#running-your-new-test" title="Link to this heading">¶</a></h3>
+<p>まだ <code class="docutils literal notranslate"><span class="pre">django.shortcuts</span></code> に変更を加えていないため、テストは失敗します。 <code class="docutils literal notranslate"><span class="pre">shortcuts</span></code> フォルダ内の全てのテストを実行して、どうなるか見てみましょう。 <code class="docutils literal notranslate"><span class="pre">cd</span></code> でDjangoの <code class="docutils literal notranslate"><span class="pre">tests/</span></code> ディレクトリへと移動してから実行してください。</p>
+<div class="console-block" id="console-block-6">
+<input class="c-tab-unix" id="c-tab-6-unix" type="radio" name="console-6" checked>
+<label for="c-tab-6-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-6-win" type="radio" name="console-6">
+<label for="c-tab-6-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-6-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./runtests.py<span class="w"> </span>shortcuts
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-6-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> runtests.py shortcuts
+</pre></div>
+</section>
+</div>
+<p>テストが正しく実行されれば追加したテストメソッドに対して、こちらのエラーとともに１つテストが失敗しているはずです。</p>
+<div class="highlight-pytb notranslate"><div class="highlight"><pre><span></span><span class="x">ImportError: cannot import name &#39;make_toast&#39; from &#39;django.shortcuts&#39;</span>
+</pre></div>
+</div>
+<p>テストがすべて通れば､上記した新しいテストを正しいフォルダ､クラスに追加したことを確認してください｡</p>
+</section>
+</section>
+<section id="s-writing-the-code-for-your-ticket">
+<span id="writing-the-code-for-your-ticket"></span><h2>チケットにコードを書く<a class="headerlink" href="#writing-the-code-for-your-ticket" title="Link to this heading">¶</a></h2>
+<p>続いては <code class="docutils literal notranslate"><span class="pre">make_toast()</span></code> 関数を追加します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">django/</span></code> フォルダに移動して <code class="docutils literal notranslate"><span class="pre">shortcuts.py</span></code> ファイルを開きます。最下行に以下を追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">make_toast</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;toast&quot;</span>
+</pre></div>
+</div>
+<p>さて、先ほど書いたテストが成功したことを確認する必要があるので、追加したコードが正しく機能しているかどうかを確認できます。もう一度、Django の <code class="docutils literal notranslate"><span class="pre">tests/</span></code> ディレクトリに移動して以下を実行します:</p>
+<div class="console-block" id="console-block-7">
+<input class="c-tab-unix" id="c-tab-7-unix" type="radio" name="console-7" checked>
+<label for="c-tab-7-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-7-win" type="radio" name="console-7">
+<label for="c-tab-7-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-7-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./runtests.py<span class="w"> </span>shortcuts
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-7-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> runtests.py shortcuts
+</pre></div>
+</section>
+</div>
+<p>テストはすべて成功するはずです。失敗した場合は、正しいファイルに対して正しく関数を追加しているかどうかを確認してください。</p>
+</section>
+<section id="s-running-django-s-test-suite-for-the-second-time">
+<span id="running-django-s-test-suite-for-the-second-time"></span><h2>Django の テストスイートをもう一度走らせる<a class="headerlink" href="#running-django-s-test-suite-for-the-second-time" title="Link to this heading">¶</a></h2>
+<p>変更内容とテストが正しく動作していることを確認したら、Django全体のテストスイートを実行するのがおすすめです。これにより、あなたの変更がDjangoの他の部分にバグを引き起こしていないことを確認できます。テストスイートをすべて成功させることがコードの完全なバグ修正を保証するわけではありませんが、多くのバグや見逃されがちなリグレッションを特定するのに役立ちます。</p>
+<p>Django の全てのテストスイートを走らせるには <code class="docutils literal notranslate"><span class="pre">cd</span></code> で Django の <code class="docutils literal notranslate"><span class="pre">tests/</span></code> ディレクトリ移動して実行してください:</p>
+<div class="console-block" id="console-block-8">
+<input class="c-tab-unix" id="c-tab-8-unix" type="radio" name="console-8" checked>
+<label for="c-tab-8-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-8-win" type="radio" name="console-8">
+<label for="c-tab-8-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-8-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>./runtests.py
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-8-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> runtests.py 
+</pre></div>
+</section>
+</div>
+</section>
+<section id="s-writing-documentation">
+<span id="writing-documentation"></span><h2>ドキュメントを書く<a class="headerlink" href="#writing-documentation" title="Link to this heading">¶</a></h2>
+<p>これは新たな機能です。したがってドキュメントを作る必要があります。ファイル <code class="docutils literal notranslate"><span class="pre">docs/topics/http/shortcuts.txt</span></code> を開いて、このファイルの最終行に以下を加えます。</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="gh">``make_toast()``</span>
+<span class="gh">================</span>
+
+<span class="p">..</span> <span class="ow">function</span><span class="p">::</span> make_toast()
+
+<span class="p">..</span> <span class="ow">versionadded</span><span class="p">::</span> 2.2
+
+Returns <span class="s">``&#39;toast&#39;``</span>.
+</pre></div>
+</div>
+<p>この新機能は将来のリリースとともに、Django 次期バージョンのリリースノートにも含まれます。ファイル <code class="docutils literal notranslate"><span class="pre">docs/releases/</span></code> の最新バージョン、このページの執筆時点では <code class="docutils literal notranslate"><span class="pre">2.2.txt</span></code> のリリースノートを開き、&quot;Minor Feature&quot; ヘッダの下にノートを追記してください。</p>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="gh">:mod:`django.shortcuts`</span>
+<span class="gh">~~~~~~~~~~~~~~~~~~~~~~~</span>
+
+<span class="m">*</span> The new <span class="na">:func:</span><span class="nv">`django.shortcuts.make_toast`</span> function returns <span class="s">``&#39;toast&#39;``</span>.
+</pre></div>
+</div>
+<p>ドキュメントの書き方についてもっと知りたい場合は <a class="reference internal" href="../internals/contributing/writing-documentation.html"><span class="doc">ドキュメントを書く</span></a> を参照してください｡ここでは､ <code class="docutils literal notranslate"><span class="pre">versionadded</span></code> の書き方についてや､ ドキュメントのコピーをローカルでビルドしてみて､ HTML をプレビューする方法などが書かれています｡</p>
+</section>
+<section id="s-previewing-your-changes">
+<span id="previewing-your-changes"></span><h2>変更点を確認する<a class="headerlink" href="#previewing-your-changes" title="Link to this heading">¶</a></h2>
+<p>次に、ブランチで行った変更を確認します。すべての変更をステージングしてコミットの準備をするには、次のコマンドを実行します:</p>
+<div class="console-block" id="console-block-9">
+<input class="c-tab-unix" id="c-tab-9-unix" type="radio" name="console-9" checked>
+<label for="c-tab-9-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-9-win" type="radio" name="console-9">
+<label for="c-tab-9-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-9-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>add<span class="w"> </span>--all
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-9-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> git add --all
+</pre></div>
+</section>
+</div>
+<p>上により Django のカレントコピー (修正内容を含む) と、チュートリアル冒頭において行っていたチェックアウトリビジョンとの違いが表示されます。</p>
+<div class="console-block" id="console-block-10">
+<input class="c-tab-unix" id="c-tab-10-unix" type="radio" name="console-10" checked>
+<label for="c-tab-10-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-10-win" type="radio" name="console-10">
+<label for="c-tab-10-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-10-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>diff<span class="w"> </span>--cached
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-10-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> git diff --cached
+</pre></div>
+</section>
+</div>
+<p>ページを進めるには上下キーを使います。</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="gh">diff --git a/django/shortcuts.py b/django/shortcuts.py</span>
+<span class="gh">index 7ab1df0e9d..8dde9e28d9 100644</span>
+<span class="gd">--- a/django/shortcuts.py</span>
+<span class="gi">+++ b/django/shortcuts.py</span>
+<span class="gu">@@ -156,3 +156,7 @@ def resolve_url(to, *args, **kwargs):</span>
+
+<span class="w"> </span>    # Finally, fall back and assume it&#39;s a URL
+<span class="w"> </span>    return to
+<span class="gi">+</span>
+<span class="gi">+</span>
+<span class="gi">+def make_toast():</span>
+<span class="gi">+    return &#39;toast&#39;</span>
+<span class="gh">diff --git a/docs/releases/2.2.txt b/docs/releases/2.2.txt</span>
+<span class="gh">index 7d85d30c4a..81518187b3 100644</span>
+<span class="gd">--- a/docs/releases/2.2.txt</span>
+<span class="gi">+++ b/docs/releases/2.2.txt</span>
+<span class="gu">@@ -40,6 +40,11 @@ database constraints. Constraints are added to models using the</span>
+<span class="w"> </span>Minor features
+<span class="w"> </span>--------------
+
+<span class="gi">+:mod:`django.shortcuts`</span>
+<span class="gi">+~~~~~~~~~~~~~~~~~~~~~~~</span>
+<span class="gi">+</span>
+<span class="gi">+* The new :func:`django.shortcuts.make_toast` function returns ``&#39;toast&#39;``.</span>
+<span class="gi">+</span>
+<span class="w"> </span>:mod:`django.contrib.admin`
+<span class="w"> </span>~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+<span class="gh">diff --git a/docs/topics/http/shortcuts.txt b/docs/topics/http/shortcuts.txt</span>
+<span class="gh">index 7b3a3a2c00..711bf6bb6d 100644</span>
+<span class="gd">--- a/docs/topics/http/shortcuts.txt</span>
+<span class="gi">+++ b/docs/topics/http/shortcuts.txt</span>
+<span class="gu">@@ -271,3 +271,12 @@ This example is equivalent to::</span>
+<span class="w"> </span>        my_objects = list(MyModel.objects.filter(published=True))
+<span class="w"> </span>        if not my_objects:
+<span class="w"> </span>            raise Http404(&quot;No MyModel matches the given query.&quot;)
+<span class="gi">+</span>
+<span class="gi">+``make_toast()``</span>
+<span class="gi">+================</span>
+<span class="gi">+</span>
+<span class="gi">+.. function:: make_toast()</span>
+<span class="gi">+</span>
+<span class="gi">+.. versionadded:: 2.2</span>
+<span class="gi">+</span>
+<span class="gi">+Returns ``&#39;toast&#39;``.</span>
+<span class="gh">diff --git a/tests/shortcuts/test_make_toast.py b/tests/shortcuts/test_make_toast.py</span>
+new file mode 100644
+<span class="gh">index 0000000000..6f4c627b6e</span>
+<span class="gd">--- /dev/null</span>
+<span class="gi">+++ b/tests/shortcuts/test_make_toast.py</span>
+<span class="gu">@@ -0,0 +1,7 @@</span>
+<span class="gi">+from django.shortcuts import make_toast</span>
+<span class="gi">+from django.test import SimpleTestCase</span>
+<span class="gi">+</span>
+<span class="gi">+</span>
+<span class="gi">+class MakeToastTests(SimpleTestCase):</span>
+<span class="gi">+    def test_make_toast(self):</span>
+<span class="gi">+        self.assertEqual(make_toast(), &#39;toast&#39;)</span>
+</pre></div>
+</div>
+<p>変更内容のプレビューが終わったら、<code class="docutils literal notranslate"><span class="pre">q</span></code> キーを押してコマンドラインに戻ります。差分が問題なさそうであれば、変更をコミットする準備が整いました。</p>
+</section>
+<section id="s-committing-the-changes">
+<span id="committing-the-changes"></span><h2>変更をコミットする<a class="headerlink" href="#committing-the-changes" title="Link to this heading">¶</a></h2>
+<p>変更点をコミットするには、次のコマンドを実行します。</p>
+<div class="console-block" id="console-block-11">
+<input class="c-tab-unix" id="c-tab-11-unix" type="radio" name="console-11" checked>
+<label for="c-tab-11-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-11-win" type="radio" name="console-11">
+<label for="c-tab-11-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-11-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>commit
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-11-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> git commit
+</pre></div>
+</section>
+</div>
+<p>すると、コミットメッセージを入力するためのテキストエディタが開きます。 <a class="reference internal" href="../internals/contributing/committing-code.html#committing-guidelines"><span class="std std-ref">コミットメッセージガイドライン</span></a> に従って、次のようにメッセージを入力します。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Fixed #99999 -- Added a shortcut function to make toast.
+</pre></div>
+</div>
+</section>
+<section id="s-pushing-the-commit-and-making-a-pull-request">
+<span id="pushing-the-commit-and-making-a-pull-request"></span><h2>コミットのプッシュとプルリクエストの作成<a class="headerlink" href="#pushing-the-commit-and-making-a-pull-request" title="Link to this heading">¶</a></h2>
+<p>変更をコミットした後、それをGitHubのフォークに送信します（ブランチ名が異なる場合は、&quot;ticket_99999&quot; をその名前に置き換えてください）:</p>
+<div class="console-block" id="console-block-12">
+<input class="c-tab-unix" id="c-tab-12-unix" type="radio" name="console-12" checked>
+<label for="c-tab-12-unix" title="Linux/macOS">&#xf17c/&#xf179</label>
+<input class="c-tab-win" id="c-tab-12-win" type="radio" name="console-12">
+<label for="c-tab-12-win" title="Windows">&#xf17a</label>
+<section class="c-content-unix" id="c-content-12-unix">
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>ticket_99999
+</pre></div>
+</div>
+</section>
+<section class="c-content-win" id="c-content-12-win">
+<div class="highlight"><pre><span></span><span class="gp">...\&gt;</span> git push origin ticket_99999
+</pre></div>
+</section>
+</div>
+<p>プルリクエストは <a class="reference external" href="https://github.com/django/django/">Django の GitHub ページ</a> から作成できます。&quot;Your recently pushed branches&quot; の下にあなたのブランチが表示されているはずです。その下の &quot;Compare &amp; pull request&quot; ボタンをクリックします。</p>
+<p>このチュートリアルでは実行してはいけませんが、次のページで変更のプレビューが表示されたら、「Create pull request」ボタンをクリックします。</p>
+</section>
+<section id="s-next-steps">
+<span id="next-steps"></span><h2>次のステップ<a class="headerlink" href="#next-steps" title="Link to this heading">¶</a></h2>
+<p>おめでとうございます！ これで Django へのプルリクエストの作成方法を学ぶことができました。応用テクニックについて詳しくは <a class="reference internal" href="../internals/contributing/writing-code/working-with-git.html"><span class="doc">Working with Git and GitHub</span></a> を読んでください。</p>
+<p>これで、Django のコードベースを改良する手助けができるようになりました。</p>
+<section id="s-more-information-for-new-contributors">
+<span id="more-information-for-new-contributors"></span><h3>新しいコントリビューターのための追加情報<a class="headerlink" href="#more-information-for-new-contributors" title="Link to this heading">¶</a></h3>
+<p>Djangoへのコントリビューションに本格的に取り組む前に、確認しておくべきいくつかの追加情報があります。以下を参考にしてください:</p>
+<ul class="simple">
+<li><p>Djangoの <a class="reference internal" href="../internals/contributing/writing-code/submitting-patches.html"><span class="doc">チケットの取得とプルリクエストの送信</span></a> に関するドキュメントを必ず読んでください。このドキュメントでは、Tracのエチケット、チケットの取得方法、コードとドキュメントのコーディングスタイルの期待事項、その他の重要な詳細について説明しています。</p></li>
+<li><p>Django への初めてのコントリビューターは <a class="reference internal" href="../internals/contributing/new-contributors.html"><span class="doc">初めてのコントリビューターへのドキュメント</span></a> を読んでください｡Django に初めて協力する人たちへの良いアドバイスがあります｡</p></li>
+<li><p>貢献について､より多くの情報を知りたいなら､ <a class="reference internal" href="../internals/contributing/index.html"><span class="doc">貢献についての Django のドキュメント</span></a> を参照してください｡そこにはたくさん有用な情報がありまし､質問があれば､このドキュメントが1番役に立ちます｡</p></li>
+</ul>
+</section>
+<section id="s-finding-your-first-real-ticket">
+<span id="finding-your-first-real-ticket"></span><h3>実際にチケットを探してみましょう<a class="headerlink" href="#finding-your-first-real-ticket" title="Link to this heading">¶</a></h3>
+<p>これらの情報に目を通したら、自分で取り組むチケットを見つける準備が整います。「easy pickings」のラベルが付いたチケットに特に注目してください。これらのチケットは、内容が比較的簡単で、初めてのコントリビューションに最適です。Djangoへのコントリビューションに慣れてきたら、より難しく複雑なチケットにも取り組み始めることができます。</p>
+<p>すぐに始めたい場合（誰もあなたを責めません！）、<a class="reference external" href="https://code.djangoproject.com/query?status=new&amp;status=reopened&amp;has_patch=0&amp;easy=1&amp;col=id&amp;col=summary&amp;col=status&amp;col=owner&amp;col=type&amp;col=milestone&amp;order=priority">easy tickets without a branch</a> や、<a class="reference external" href="https://code.djangoproject.com/query?status=new&amp;status=reopened&amp;needs_better_patch=1&amp;easy=1&amp;col=id&amp;col=summary&amp;col=status&amp;col=owner&amp;col=type&amp;col=milestone&amp;order=priority">easy tickets that have branches which need improvement</a> のリストを確認してみてください。テストを書くことに慣れている場合は、<a class="reference external" href="https://code.djangoproject.com/query?status=new&amp;status=reopened&amp;needs_tests=1&amp;easy=1&amp;col=id&amp;col=summary&amp;col=status&amp;col=owner&amp;col=type&amp;col=milestone&amp;order=priority">easy tickets that need tests</a> のリストも参考にするとよいでしょう。チケットを取得する際は、<a class="reference internal" href="../internals/contributing/writing-code/submitting-patches.html"><span class="doc">チケットの取得とブランチの送信</span></a> に記載されているガイドラインを必ず遵守してください。</p>
+</section>
+<section id="s-what-s-next-after-creating-a-pull-request">
+<span id="what-s-next-after-creating-a-pull-request"></span><h3>プルリクエストを作ったあとは？<a class="headerlink" href="#what-s-next-after-creating-a-pull-request" title="Link to this heading">¶</a></h3>
+<p>チケットにブランチが作成された後は、別の人によるレビューが必要です。プルリクエストを提出した後は、チケットのメタデータを更新して、フラグを &quot;has patch&quot; や &quot;doesn't need tests&quot; などに設定してください。これにより、他の人がレビューのために見つけやすくなります。貢献することは、必ずしもコードをゼロから書くことだけではありません。オープンなプルリクエストをレビューすることも非常に有益な貢献です。詳細については、 <a class="reference internal" href="../internals/contributing/triaging-tickets.html"><span class="doc">チケットをトリアージする</span></a> を参照してください。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Djangoにはじめて貢献する</a><ul>
+<li><a class="reference internal" href="#introduction">はじめに</a><ul>
+<li><a class="reference internal" href="#who-s-this-tutorial-for">このチュートリアルの対象者は誰ですか？</a></li>
+<li><a class="reference internal" href="#what-does-this-tutorial-cover">このチュートリアルはどの範囲をカバーしていますか？</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#code-of-conduct">ソースコードの管理</a></li>
+<li><a class="reference internal" href="#installing-git">Git のインストール</a></li>
+<li><a class="reference internal" href="#getting-a-copy-of-django-s-development-version">Django 開発版の複製を取得</a><ul>
+<li><a class="reference internal" href="#creating-projects-with-a-local-copy-of-django">ローカルに複製した Django でプロジェクトを作成する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#running-django-s-test-suite-for-the-first-time">最初に Django のテストスイートを実行する</a></li>
+<li><a class="reference internal" href="#working-on-a-feature">取りかかる</a></li>
+<li><a class="reference internal" href="#creating-a-branch">ブランチを作る</a></li>
+<li><a class="reference internal" href="#writing-some-tests-for-your-ticket">チケットにテストを書く</a><ul>
+<li><a class="reference internal" href="#writing-a-test-for-ticket-99999">チケット #99999 に対するテストの実装</a></li>
+<li><a class="reference internal" href="#running-your-new-test">新しいテストを走らせる</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#writing-the-code-for-your-ticket">チケットにコードを書く</a></li>
+<li><a class="reference internal" href="#running-django-s-test-suite-for-the-second-time">Django の テストスイートをもう一度走らせる</a></li>
+<li><a class="reference internal" href="#writing-documentation">ドキュメントを書く</a></li>
+<li><a class="reference internal" href="#previewing-your-changes">変更点を確認する</a></li>
+<li><a class="reference internal" href="#committing-the-changes">変更をコミットする</a></li>
+<li><a class="reference internal" href="#pushing-the-commit-and-making-a-pull-request">コミットのプッシュとプルリクエストの作成</a></li>
+<li><a class="reference internal" href="#next-steps">次のステップ</a><ul>
+<li><a class="reference internal" href="#more-information-for-new-contributors">新しいコントリビューターのための追加情報</a></li>
+<li><a class="reference internal" href="#finding-your-first-real-ticket">実際にチケットを探してみましょう</a></li>
+<li><a class="reference internal" href="#what-s-next-after-creating-a-pull-request">プルリクエストを作ったあとは？</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="whatsnext.html"
+                          title="前の章へ">次のステップへ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="../topics/index.html"
+                          title="次の章へ">Django を使う</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/intro/contributing.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="whatsnext.html" title="次のステップへ">previous</a>
+     |
+    <a href="index.html" title="さぁ始めましょう" accesskey="U">up</a>
+   |
+    <a href="../topics/index.html" title="Django を使う">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ミックスイン (mixin) を編集する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="日付ベースのミックスイン (mixin)" href="mixins-date-based.html" />
+    <link rel="prev" title="複数オブジェクトミックスイン (Multiple object mixin)" href="mixins-multiple-object.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="mixins-multiple-object.html" title="複数オブジェクトミックスイン (Multiple object mixin)">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="mixins-date-based.html" title="日付ベースのミックスイン (mixin)">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-class-based-views-mixins-editing">
+            
+  <section id="s-editing-mixins">
+<span id="editing-mixins"></span><h1>ミックスイン (mixin) を編集する<a class="headerlink" href="#editing-mixins" title="Link to this heading">¶</a></h1>
+<p>以下のミックスイン (mixin) は、Djangoの編集ビューを構築するのに使用されます。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#django.views.generic.edit.FormMixin" title="django.views.generic.edit.FormMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.edit.FormMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="#django.views.generic.edit.ModelFormMixin" title="django.views.generic.edit.ModelFormMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.edit.ModelFormMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="#django.views.generic.edit.ProcessFormView" title="django.views.generic.edit.ProcessFormView"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.edit.ProcessFormView</span></code></a></p></li>
+<li><p><a class="reference internal" href="#django.views.generic.edit.DeletionMixin" title="django.views.generic.edit.DeletionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.edit.DeletionMixin</span></code></a></p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>これらの編集ビューへの結合され方の例は、 <a class="reference internal" href="generic-editing.html"><span class="doc">ジェネリック編集ビュー (Generic editing view)</span></a> を参照してください。</p>
+</div>
+<section id="s-formmixin">
+<span id="formmixin"></span><h2><code class="docutils literal notranslate"><span class="pre">FormMixin</span></code><a class="headerlink" href="#formmixin" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.views.generic.edit.</span></span><span class="sig-name descname"><span class="pre">FormMixin</span></span><a class="headerlink" href="#django.views.generic.edit.FormMixin" title="Link to this definition">¶</a></dt>
+<dd><p>フォームを作成したり表示したりする機能を提供するmixinクラス。</p>
+<p><strong>ミックスイン</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="mixins-simple.html#django.views.generic.base.ContextMixin" title="django.views.generic.base.ContextMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.ContextMixin</span></code></a></p></li>
+</ul>
+<p><strong>メソッドと属性</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.initial">
+<span class="sig-name descname"><span class="pre">initial</span></span><a class="headerlink" href="#django.views.generic.edit.FormMixin.initial" title="Link to this definition">¶</a></dt>
+<dd><p>フォームの初期化データのディクショナリ。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.form_class">
+<span class="sig-name descname"><span class="pre">form_class</span></span><a class="headerlink" href="#django.views.generic.edit.FormMixin.form_class" title="Link to this definition">¶</a></dt>
+<dd><p>インスタンス化するフォームクラス。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.success_url">
+<span class="sig-name descname"><span class="pre">success_url</span></span><a class="headerlink" href="#django.views.generic.edit.FormMixin.success_url" title="Link to this definition">¶</a></dt>
+<dd><p>フォームが正常に処理されたときにリダイレクトするURL。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.prefix">
+<span class="sig-name descname"><span class="pre">prefix</span></span><a class="headerlink" href="#django.views.generic.edit.FormMixin.prefix" title="Link to this definition">¶</a></dt>
+<dd><p>生成されるフォームの <a class="reference internal" href="../forms/api.html#django.forms.Form.prefix" title="django.forms.Form.prefix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">prefix</span></code></a> 。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.get_initial">
+<span class="sig-name descname"><span class="pre">get_initial</span></span>()<a class="headerlink" href="#django.views.generic.edit.FormMixin.get_initial" title="Link to this definition">¶</a></dt>
+<dd><p>フォームの初期データを取得します。デフォルトでは、 <a class="reference internal" href="#django.views.generic.edit.FormMixin.initial" title="django.views.generic.edit.FormMixin.initial"><code class="xref py py-attr docutils literal notranslate"><span class="pre">initial</span></code></a> のコピーを返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.get_form_class">
+<span class="sig-name descname"><span class="pre">get_form_class</span></span>()<a class="headerlink" href="#django.views.generic.edit.FormMixin.get_form_class" title="Link to this definition">¶</a></dt>
+<dd><p>インスタンス化するフォームクラスを取得します。デフォルトでは <a class="reference internal" href="#django.views.generic.edit.FormMixin.form_class" title="django.views.generic.edit.FormMixin.form_class"><code class="xref py py-attr docutils literal notranslate"><span class="pre">form_class</span></code></a> です。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.get_form">
+<span class="sig-name descname"><span class="pre">get_form</span></span>(<em class="sig-param"><span class="n"><span class="pre">form_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.FormMixin.get_form" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.views.generic.edit.FormMixin.get_form_kwargs" title="django.views.generic.edit.FormMixin.get_form_kwargs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_form_kwargs()</span></code></a> を使用して <code class="docutils literal notranslate"><span class="pre">form_class</span></code> のインスタンスを生成します。 <code class="docutils literal notranslate"><span class="pre">form_class</span></code> が指定されていない場合は <a class="reference internal" href="#django.views.generic.edit.FormMixin.get_form_class" title="django.views.generic.edit.FormMixin.get_form_class"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_form_class()</span></code></a> が使用されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.get_form_kwargs">
+<span class="sig-name descname"><span class="pre">get_form_kwargs</span></span>()<a class="headerlink" href="#django.views.generic.edit.FormMixin.get_form_kwargs" title="Link to this definition">¶</a></dt>
+<dd><p>フォームのインスタンス化に必要なキーワード引数を構築します。</p>
+<p>引数 <code class="docutils literal notranslate"><span class="pre">initial</span></code> には <a class="reference internal" href="#django.views.generic.edit.FormMixin.get_initial" title="django.views.generic.edit.FormMixin.get_initial"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_initial()</span></code></a> を指定します。 リクエストが <code class="docutils literal notranslate"><span class="pre">POST</span></code> または <code class="docutils literal notranslate"><span class="pre">PUT</span></code> の場合、リクエストデータ (<code class="docutils literal notranslate"><span class="pre">request.POST</span></code> と <code class="docutils literal notranslate"><span class="pre">request.FILES</span></code>) も提供されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.get_prefix">
+<span class="sig-name descname"><span class="pre">get_prefix</span></span>()<a class="headerlink" href="#django.views.generic.edit.FormMixin.get_prefix" title="Link to this definition">¶</a></dt>
+<dd><p>生成されるフォームの <a class="reference internal" href="../forms/api.html#django.forms.Form.prefix" title="django.forms.Form.prefix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">prefix</span></code></a> を特定します。 デフォルトでは <a class="reference internal" href="#django.views.generic.edit.FormMixin.prefix" title="django.views.generic.edit.FormMixin.prefix"><code class="xref py py-attr docutils literal notranslate"><span class="pre">prefix</span></code></a> を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.get_success_url">
+<span class="sig-name descname"><span class="pre">get_success_url</span></span>()<a class="headerlink" href="#django.views.generic.edit.FormMixin.get_success_url" title="Link to this definition">¶</a></dt>
+<dd><p>フォームのバリデーションに成功したときにリダイレクトする URL を特定します。 デフォルトでは <a class="reference internal" href="#django.views.generic.edit.FormMixin.success_url" title="django.views.generic.edit.FormMixin.success_url"><code class="xref py py-attr docutils literal notranslate"><span class="pre">success_url</span></code></a> を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.form_valid">
+<span class="sig-name descname"><span class="pre">form_valid</span></span>(<em class="sig-param"><span class="n"><span class="pre">form</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.FormMixin.form_valid" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.views.generic.edit.FormMixin.get_success_url" title="django.views.generic.edit.FormMixin.get_success_url"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_success_url()</span></code></a> にリダイレクトします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.form_invalid">
+<span class="sig-name descname"><span class="pre">form_invalid</span></span>(<em class="sig-param"><span class="n"><span class="pre">form</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.FormMixin.form_invalid" title="Link to this definition">¶</a></dt>
+<dd><p>無効なフォームをコンテキストとして提供し、レスポンスをレンダリングします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.FormMixin.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span>(<em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.FormMixin.get_context_data" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.views.generic.edit.FormMixin.get_form" title="django.views.generic.edit.FormMixin.get_form"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_form()</span></code></a> を呼び出して、その結果を &quot;form&quot; という名前でコンテキストデータに追加します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-modelformmixin">
+<span id="modelformmixin"></span><h2><code class="docutils literal notranslate"><span class="pre">ModelFormMixin</span></code><a class="headerlink" href="#modelformmixin" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.views.generic.edit.</span></span><span class="sig-name descname"><span class="pre">ModelFormMixin</span></span><a class="headerlink" href="#django.views.generic.edit.ModelFormMixin" title="Link to this definition">¶</a></dt>
+<dd><p>単独のフォームではなく <code class="docutils literal notranslate"><span class="pre">ModelForms</span></code> で動作するフォームミックスインです。</p>
+<p>これは <a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin" title="django.views.generic.detail.SingleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleObjectMixin</span></code></a> のサブクラスなので、このミックスインのインスタンスは <code class="docutils literal notranslate"><span class="pre">ModelForm</span></code> が操作するオブジェクトのタイプを記述して <a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.model" title="django.views.generic.detail.SingleObjectMixin.model"><code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code></a> と <a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.queryset" title="django.views.generic.detail.SingleObjectMixin.queryset"><code class="xref py py-attr docutils literal notranslate"><span class="pre">queryset</span></code></a> 属性にアクセスできます。</p>
+<p><a class="reference internal" href="#django.views.generic.edit.ModelFormMixin.fields" title="django.views.generic.edit.ModelFormMixin.fields"><code class="xref py py-attr docutils literal notranslate"><span class="pre">fields</span></code></a> 属性と <a class="reference internal" href="#django.views.generic.edit.FormMixin.form_class" title="django.views.generic.edit.FormMixin.form_class"><code class="xref py py-attr docutils literal notranslate"><span class="pre">form_class</span></code></a> 属性の両方を指定した場合、 <a class="reference internal" href="../exceptions.html#django.core.exceptions.ImproperlyConfigured" title="django.core.exceptions.ImproperlyConfigured"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ImproperlyConfigured</span></code></a> 例外が発生します。</p>
+<p><strong>ミックスイン</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#django.views.generic.edit.FormMixin" title="django.views.generic.edit.FormMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.edit.FormMixin</span></code></a></p></li>
+<li><p><a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin" title="django.views.generic.detail.SingleObjectMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.detail.SingleObjectMixin</span></code></a></p></li>
+</ul>
+<p><strong>メソッドと属性</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin.model">
+<span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#django.views.generic.edit.ModelFormMixin.model" title="Link to this definition">¶</a></dt>
+<dd><p>モデルクラス。明示的に指定することもできますが、そうでない場合は <code class="docutils literal notranslate"><span class="pre">self.object</span></code> または <a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.queryset" title="django.views.generic.detail.SingleObjectMixin.queryset"><code class="xref py py-attr docutils literal notranslate"><span class="pre">queryset</span></code></a> を調べて決定されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin.fields">
+<span class="sig-name descname"><span class="pre">fields</span></span><a class="headerlink" href="#django.views.generic.edit.ModelFormMixin.fields" title="Link to this definition">¶</a></dt>
+<dd><p>フィールド名のリストです。これは <a class="reference internal" href="../../topics/forms/modelforms.html#django.forms.ModelForm" title="django.forms.ModelForm"><code class="xref py py-class docutils literal notranslate"><span class="pre">ModelForm</span></code></a> の <code class="docutils literal notranslate"><span class="pre">Meta.fields</span></code> 属性と同じように解釈されます。</p>
+<p>フォームクラスを自動生成する場合、この属性は必須です (<code class="docutils literal notranslate"><span class="pre">model</span></code> を使用するなど)。この属性を省略すると <a class="reference internal" href="../exceptions.html#django.core.exceptions.ImproperlyConfigured" title="django.core.exceptions.ImproperlyConfigured"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ImproperlyConfigured</span></code></a> 例外が発生します。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin.success_url">
+<span class="sig-name descname"><span class="pre">success_url</span></span><a class="headerlink" href="#django.views.generic.edit.ModelFormMixin.success_url" title="Link to this definition">¶</a></dt>
+<dd><p>フォームが正常に処理されたときにリダイレクトするURL。</p>
+<p><code class="docutils literal notranslate"><span class="pre">success_url</span></code> は辞書文字列のフォーマットを含むことができ、オブジェクトのフィールド属性に対して補間されます。例えば、 <code class="docutils literal notranslate"><span class="pre">success_url=&quot;/polls/{slug}/&quot;</span></code> を使用すると、モデルの <code class="docutils literal notranslate"><span class="pre">slug</span></code> フィールドから構成される URL にリダイレクトできます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin.get_form_class">
+<span class="sig-name descname"><span class="pre">get_form_class</span></span>()<a class="headerlink" href="#django.views.generic.edit.ModelFormMixin.get_form_class" title="Link to this definition">¶</a></dt>
+<dd><p>インスタンス化するフォームクラスを取得します。<a class="reference internal" href="#django.views.generic.edit.FormMixin.form_class" title="django.views.generic.edit.FormMixin.form_class"><code class="xref py py-attr docutils literal notranslate"><span class="pre">form_class</span></code></a> が指定されていれば、そのクラスが使用されます。そうでない場合は、 <a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.queryset" title="django.views.generic.detail.SingleObjectMixin.queryset"><code class="xref py py-attr docutils literal notranslate"><span class="pre">queryset</span></code></a> に関連付けられたモデルか、 <a class="reference internal" href="mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.model" title="django.views.generic.detail.SingleObjectMixin.model"><code class="xref py py-attr docutils literal notranslate"><span class="pre">model</span></code></a> に関連付けられたモデルを使って <code class="docutils literal notranslate"><span class="pre">ModelForm</span></code> がインスタンス化されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin.get_form_kwargs">
+<span class="sig-name descname"><span class="pre">get_form_kwargs</span></span>()<a class="headerlink" href="#django.views.generic.edit.ModelFormMixin.get_form_kwargs" title="Link to this definition">¶</a></dt>
+<dd><p>現在のインスタンス (<code class="docutils literal notranslate"><span class="pre">self.object</span></code>) を標準の <a class="reference internal" href="#django.views.generic.edit.FormMixin.get_form_kwargs" title="django.views.generic.edit.FormMixin.get_form_kwargs"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_form_kwargs()</span></code></a> に追加します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin.get_success_url">
+<span class="sig-name descname"><span class="pre">get_success_url</span></span>()<a class="headerlink" href="#django.views.generic.edit.ModelFormMixin.get_success_url" title="Link to this definition">¶</a></dt>
+<dd><p>フォームのバリデーションに成功したときにリダイレクトする URL を特定します。指定されていれば <a class="reference internal" href="#django.views.generic.edit.ModelFormMixin.success_url" title="django.views.generic.edit.ModelFormMixin.success_url"><code class="xref py py-attr docutils literal notranslate"><span class="pre">django.views.generic.edit.ModelFormMixin.success_url</span></code></a> を返し、指定されていなければオブジェクトの <code class="docutils literal notranslate"><span class="pre">get_absolute_url()</span></code> を使おうとします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin.form_valid">
+<span class="sig-name descname"><span class="pre">form_valid</span></span>(<em class="sig-param"><span class="n"><span class="pre">form</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.ModelFormMixin.form_valid" title="Link to this definition">¶</a></dt>
+<dd><p>フォームインスタンスを保存し、ビューのカレントオブジェクトを設定し、 <a class="reference internal" href="#django.views.generic.edit.FormMixin.get_success_url" title="django.views.generic.edit.FormMixin.get_success_url"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_success_url()</span></code></a> にリダイレクトします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.ModelFormMixin.form_invalid">
+<span class="sig-name descname"><span class="pre">form_invalid</span></span>(<em class="sig-param"><span class="n"><span class="pre">form</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.ModelFormMixin.form_invalid" title="Link to this definition">¶</a></dt>
+<dd><p>無効なフォームをコンテキストとして提供し、レスポンスをレンダリングします。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-processformview">
+<span id="processformview"></span><h2><code class="docutils literal notranslate"><span class="pre">ProcessFormView</span></code><a class="headerlink" href="#processformview" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.generic.edit.ProcessFormView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.views.generic.edit.</span></span><span class="sig-name descname"><span class="pre">ProcessFormView</span></span><a class="headerlink" href="#django.views.generic.edit.ProcessFormView" title="Link to this definition">¶</a></dt>
+<dd><p>基本的な HTTP GET および POST ワークフローを提供するミックスインです。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>これは &quot;ProcessFormView&quot; という名前で、 <a class="reference internal" href="base.html#django.views.generic.base.View" title="django.views.generic.base.View"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.View</span></code></a> を直接継承していますが、単独で使用すると壊れてしまうので、ミックスインとして扱う方が自然です。</p>
+</div>
+<p><strong>親クラス</strong></p>
+<ul class="simple">
+<li><p><a class="reference internal" href="base.html#django.views.generic.base.View" title="django.views.generic.base.View"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.views.generic.base.View</span></code></a></p></li>
+</ul>
+<p><strong>メソッドと属性</strong></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.ProcessFormView.get">
+<span class="sig-name descname"><span class="pre">get</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.ProcessFormView.get" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.views.generic.edit.FormMixin.get_context_data" title="django.views.generic.edit.FormMixin.get_context_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_context_data()</span></code></a> で作成したコンテキストを使ってレスポンスをレンダリングします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.ProcessFormView.post">
+<span class="sig-name descname"><span class="pre">post</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.ProcessFormView.post" title="Link to this definition">¶</a></dt>
+<dd><p>フォームを構築し、フォームのバリデーションを行い、それに応じて処理します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.ProcessFormView.put">
+<span class="sig-name descname"><span class="pre">put</span></span>(<em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.ProcessFormView.put" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">PUT</span></code> アクションも処理され、すべてのパラメータを <a class="reference internal" href="#django.views.generic.edit.ProcessFormView.post" title="django.views.generic.edit.ProcessFormView.post"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post()</span></code></a> に渡します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-deletionmixin">
+<span id="deletionmixin"></span><h2><code class="docutils literal notranslate"><span class="pre">DeletionMixin</span></code><a class="headerlink" href="#deletionmixin" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.views.generic.edit.DeletionMixin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">django.views.generic.edit.</span></span><span class="sig-name descname"><span class="pre">DeletionMixin</span></span><a class="headerlink" href="#django.views.generic.edit.DeletionMixin" title="Link to this definition">¶</a></dt>
+<dd><p>HTTP アクション <code class="docutils literal notranslate"><span class="pre">DELETE</span></code> の処理を有効にします。</p>
+<p><strong>メソッドと属性</strong></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.views.generic.edit.DeletionMixin.success_url">
+<span class="sig-name descname"><span class="pre">success_url</span></span><a class="headerlink" href="#django.views.generic.edit.DeletionMixin.success_url" title="Link to this definition">¶</a></dt>
+<dd><p>指定したオブジェクトが正常に削除されたときにリダイレクトする URL。</p>
+<p><code class="docutils literal notranslate"><span class="pre">success_url</span></code> は辞書文字列のフォーマットを含むことができ、オブジェクトのフィールド属性に対して補間されます。例えば、 <code class="docutils literal notranslate"><span class="pre">success_url=&quot;/parent/{parent_id}/&quot;</span></code> を使用すると、モデルの <code class="docutils literal notranslate"><span class="pre">parent_id</span></code> フィールドから構成される URL にリダイレクトできます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.DeletionMixin.delete">
+<span class="sig-name descname"><span class="pre">delete</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.views.generic.edit.DeletionMixin.delete" title="Link to this definition">¶</a></dt>
+<dd><p>対象のオブジェクトを取得し、その <code class="docutils literal notranslate"><span class="pre">delete()</span></code> メソッドを呼び出して、success URL にリダイレクトします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.views.generic.edit.DeletionMixin.get_success_url">
+<span class="sig-name descname"><span class="pre">get_success_url</span></span>()<a class="headerlink" href="#django.views.generic.edit.DeletionMixin.get_success_url" title="Link to this definition">¶</a></dt>
+<dd><p>指定したオブジェクトが正常に削除された場合にリダイレクトする URL を返します。デフォルトでは <a class="reference internal" href="#django.views.generic.edit.DeletionMixin.success_url" title="django.views.generic.edit.DeletionMixin.success_url"><code class="xref py py-attr docutils literal notranslate"><span class="pre">success_url</span></code></a> を返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ミックスイン (mixin) を編集する</a><ul>
+<li><a class="reference internal" href="#formmixin"><code class="docutils literal notranslate"><span class="pre">FormMixin</span></code></a></li>
+<li><a class="reference internal" href="#modelformmixin"><code class="docutils literal notranslate"><span class="pre">ModelFormMixin</span></code></a></li>
+<li><a class="reference internal" href="#processformview"><code class="docutils literal notranslate"><span class="pre">ProcessFormView</span></code></a></li>
+<li><a class="reference internal" href="#deletionmixin"><code class="docutils literal notranslate"><span class="pre">DeletionMixin</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="mixins-multiple-object.html"
+                          title="前の章へ">複数オブジェクトミックスイン (Multiple object mixin)</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="mixins-date-based.html"
+                          title="次の章へ">日付ベースのミックスイン (mixin)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/class-based-views/mixins-editing.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="mixins-multiple-object.html" title="複数オブジェクトミックスイン (Multiple object mixin)">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="mixins-date-based.html" title="日付ベースのミックスイン (mixin)">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

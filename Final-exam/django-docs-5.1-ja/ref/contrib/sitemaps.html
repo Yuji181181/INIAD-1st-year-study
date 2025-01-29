@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>サイトマップ・フレームワーク &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="&#34;sites&#34; フレームワーク" href="sites.html" />
+    <link rel="prev" title="redirects （リダイレクト）アプリ" href="redirects.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="redirects.html" title="redirects （リダイレクト）アプリ">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="sites.html" title="&amp;quot;sites&amp;quot; フレームワーク">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-sitemaps">
+            
+  <section id="s-module-django.contrib.sitemaps">
+<span id="s-the-sitemap-framework"></span><span id="module-django.contrib.sitemaps"></span><span id="the-sitemap-framework"></span><h1>サイトマップ・フレームワーク<a class="headerlink" href="#module-django.contrib.sitemaps" title="Link to this heading">¶</a></h1>
+<p>Djangoには、 <a class="reference external" href="https://www.sitemaps.org/">sitemap</a> XML ファイルを作成するための高レベルなサイトマップ生成フレームワークが付属しています。</p>
+<section id="s-overview">
+<span id="overview"></span><h2>概要<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
+<p>サイトマップとは、検索エンジンのインデクサーに、ページの変更頻度や、あるページがサイト内の他のページと比較してどの程度「重要」であるかを伝える、ウェブサイト上のXMLファイルのことです。この情報は、検索エンジンがあなたのサイトをインデックスするのに役立ちます。</p>
+<p>Django サイトマップフレームワークは、この情報を Python コードで表現することで、XML ファイルの作成を自動化します。</p>
+<p>これは Django の <a class="reference internal" href="syndication.html"><span class="doc">配信 (syndication) フレームワーク</span></a> のように動作します。サイトマップを作成するには、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap" title="django.contrib.sitemaps.Sitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></a> クラスを書き、 <a class="reference internal" href="../../topics/http/urls.html"><span class="doc">URLconf</span></a> の中でそれを指定します。</p>
+</section>
+<section id="s-installation">
+<span id="installation"></span><h2>インストール<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>サイトマップ アプリをインストールするには、以下の手順に従ってください。</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'django.contrib.sitemaps'</span></code> を <a class="reference internal" href="../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 設定に追加します。</p></li>
+<li><p><a class="reference internal" href="../settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> 設定には、<code class="docutils literal notranslate"><span class="pre">DjangoTemplates</span></code> バックエンドが含まれており、<code class="docutils literal notranslate"><span class="pre">APP_DIRS</span></code> オプションが <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定されていることを確認してください。これはデフォルトで設定されているので、設定を変更していない場合は、この設定を変更する必要はありません。</p></li>
+<li><p><a class="reference internal" href="sites.html#module-django.contrib.sites" title="django.contrib.sites: Lets you operate multiple websites from the same database and Django project"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sites</span> <span class="pre">フレームワーク</span></code></a> がインストールされていることを確認してください。</p></li>
+</ol>
+<p>(注意: サイトマップアプリケーションはデータベーステーブルをインストールしません。 <a class="reference internal" href="../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> に入れる必要があるのは、 <a class="reference internal" href="../templates/api.html#django.template.loaders.app_directories.Loader" title="django.template.loaders.app_directories.Loader"><code class="xref py py-func docutils literal notranslate"><span class="pre">Loader()</span></code></a> テンプレートローダーがデフォルトのテンプレートを見つけられるようにするためです)。</p>
+</section>
+<section id="s-initialization">
+<span id="initialization"></span><h2>初期設定<a class="headerlink" href="#initialization" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.views.sitemap">
+<span class="sig-prename descclassname"><span class="pre">views.</span></span><span class="sig-name descname"><span class="pre">sitemap</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sitemaps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">section</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sitemap.xml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'application/xml'</span></span></em>)<a class="headerlink" href="#django.contrib.sitemaps.views.sitemap" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Django サイトでサイトマップの生成を有効にするには、 <a class="reference internal" href="../../topics/http/urls.html"><span class="doc">URLconf</span></a> に以下の行を追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.sitemaps.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">sitemap</span>
+
+<span class="n">path</span><span class="p">(</span>
+    <span class="s2">&quot;sitemap.xml&quot;</span><span class="p">,</span>
+    <span class="n">sitemap</span><span class="p">,</span>
+    <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="n">sitemaps</span><span class="p">},</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;django.contrib.sitemaps.views.sitemap&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>これは Django に、クライアントが <code class="file docutils literal notranslate"><span class="pre">/sitemap.xml</span></code> にアクセスしたときにサイトマップを構築するように指示します。</p>
+<p>サイトマップファイルの名前は重要ではありませんが、場所は重要です。検索エンジンは、現在のURLレベル以下のサイトマップのリンクだけをインデックスします。例えば、 <code class="file docutils literal notranslate"><span class="pre">sitemap.xml</span></code> がルートディレクトリにある場合、サイト内のどのURLでも参照できます。しかし、サイトマップが <code class="file docutils literal notranslate"><span class="pre">/content/sitemap.xml</span></code> にある場合は、 <code class="file docutils literal notranslate"><span class="pre">/content/</span></code> で始まるURLのみを参照できます。</p>
+<p>サイトマップビューは追加の必須引数を取ります: <code class="docutils literal notranslate"><span class="pre">{'sitemaps':</span> <span class="pre">sitemaps}</span></code>. <code class="docutils literal notranslate"><span class="pre">sitemaps</span></code> は短いセクションラベル (例えば <code class="docutils literal notranslate"><span class="pre">blog</span></code> や <code class="docutils literal notranslate"><span class="pre">news</span></code>) を <a class="reference internal" href="#django.contrib.sitemaps.Sitemap" title="django.contrib.sitemaps.Sitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></a> クラス (例えば <code class="docutils literal notranslate"><span class="pre">BlogSitemap</span></code> や <code class="docutils literal notranslate"><span class="pre">NewsSitemap</span></code>) にマップする辞書です。また、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap" title="django.contrib.sitemaps.Sitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></a> クラスの <em>インスタンス</em> (例えば <code class="docutils literal notranslate"><span class="pre">BlogSitemap(some_var)</span></code>) にマップすることもできます。</p>
+</section>
+<section id="s-sitemap-classes">
+<span id="sitemap-classes"></span><h2><code class="docutils literal notranslate"><span class="pre">Sitemap</span></code> クラス<a class="headerlink" href="#sitemap-classes" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap" title="django.contrib.sitemaps.Sitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></a> クラスは、サイトマップ内のエントリの「セクション」を表す Python クラスです。例えば、1 つの <a class="reference internal" href="#django.contrib.sitemaps.Sitemap" title="django.contrib.sitemaps.Sitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></a> クラスはブログのすべてのエントリを表し、別のクラスはイベントカレンダー内のすべてのイベントを表すことができます。</p>
+<p>最も単純なケースでは、これらのセクションはすべて1つの <code class="file docutils literal notranslate"><span class="pre">sitemap.xml</span></code> にまとめられますが、フレームワークを使って、セクションごとに1つのサイトマップファイルを参照するサイトマップインデックスを生成することもできます。(下記の <a class="reference internal" href="#creating-a-sitemap-index">Creating a sitemap index</a> を参照してください)。</p>
+<p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap" title="django.contrib.sitemaps.Sitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></a> クラスは <code class="docutils literal notranslate"><span class="pre">django.contrib.sitemaps.Sitemap</span></code> のサブクラスでなければなりません。これらはコードベースのどこにあっても構いません。</p>
+</section>
+<section id="s-an-example">
+<span id="an-example"></span><h2>例<a class="headerlink" href="#an-example" title="Link to this heading">¶</a></h2>
+<p>たとえば、 <code class="docutils literal notranslate"><span class="pre">Entry</span></code> モデルのブログシステムがあり、サイトマップに個々のブログエントリへのリンクをすべて含めたいとします。サイトマップクラスは次のようになります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.sitemaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sitemap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blog.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Entry</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BlogSitemap</span><span class="p">(</span><span class="n">Sitemap</span><span class="p">):</span>
+    <span class="n">changefreq</span> <span class="o">=</span> <span class="s2">&quot;never&quot;</span>
+    <span class="n">priority</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_draft</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">lastmod</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">pub_date</span>
+</pre></div>
+</div>
+<p>備考:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.changefreq" title="django.contrib.sitemaps.Sitemap.changefreq"><code class="xref py py-attr docutils literal notranslate"><span class="pre">changefreq</span></code></a> と <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.priority" title="django.contrib.sitemaps.Sitemap.priority"><code class="xref py py-attr docutils literal notranslate"><span class="pre">priority</span></code></a> はそれぞれ <code class="docutils literal notranslate"><span class="pre">&lt;changefreq&gt;</span></code> と <code class="docutils literal notranslate"><span class="pre">&lt;priority&gt;</span></code> 要素に対応するクラス属性です。これらは例の <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a> のように関数として呼び出すことができます。</p></li>
+<li><p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> はオブジェクトの <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.13)"><span class="xref std std-term">sequence</span></a> または <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を返すメソッドです。返されたオブジェクトはサイトマップのプロパティに対応する呼び出し可能なメソッドに渡されます (<a class="reference internal" href="#django.contrib.sitemaps.Sitemap.location" title="django.contrib.sitemaps.Sitemap.location"><code class="xref py py-attr docutils literal notranslate"><span class="pre">location</span></code></a>、<a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a>、<a class="reference internal" href="#django.contrib.sitemaps.Sitemap.changefreq" title="django.contrib.sitemaps.Sitemap.changefreq"><code class="xref py py-attr docutils literal notranslate"><span class="pre">changefreq</span></code></a>、<a class="reference internal" href="#django.contrib.sitemaps.Sitemap.priority" title="django.contrib.sitemaps.Sitemap.priority"><code class="xref py py-attr docutils literal notranslate"><span class="pre">priority</span></code></a>)。</p></li>
+<li><p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a> は <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> を返すべきです。</p></li>
+<li><p>この例では <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.location" title="django.contrib.sitemaps.Sitemap.location"><code class="xref py py-attr docutils literal notranslate"><span class="pre">location</span></code></a> メソッドはありませんが、オブジェクトのURLを指定するために使用できます。デフォルトでは <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.location" title="django.contrib.sitemaps.Sitemap.location"><code class="xref py py-attr docutils literal notranslate"><span class="pre">location()</span></code></a> は各オブジェクトに対して <code class="docutils literal notranslate"><span class="pre">get_absolute_url()</span></code> を呼び出し、その結果を返します。</p></li>
+</ul>
+</section>
+<section id="s-sitemap-class-reference">
+<span id="sitemap-class-reference"></span><h2><code class="docutils literal notranslate"><span class="pre">Sitemap</span></code> クラス リファレンス<a class="headerlink" href="#sitemap-class-reference" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sitemap</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sitemaps/__init__.py#L8"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sitemaps.Sitemap" title="Link to this definition">¶</a></dt>
+<dd><p>サイトマップ <code class="docutils literal notranslate"><span class="pre">Sitemap</span></code> クラスは以下のメソッドや属性を定義できます:</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.items">
+<span class="sig-name descname"><span class="pre">items</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sitemaps/__init__.py#L75"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.items" title="Link to this definition">¶</a></dt>
+<dd><p><strong>必須項目.</strong> オブジェクトの <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.13)"><span class="xref std std-term">sequence</span></a> または <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> を返すメソッド。フレームワークはこれらのオブジェクトの <em>タイプ</em> が何であるかについては関心を持ちません; 大切なのはこれらのオブジェクトが <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.location" title="django.contrib.sitemaps.Sitemap.location"><code class="xref py py-attr docutils literal notranslate"><span class="pre">location()</span></code></a>, <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod()</span></code></a>, <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.changefreq" title="django.contrib.sitemaps.Sitemap.changefreq"><code class="xref py py-attr docutils literal notranslate"><span class="pre">changefreq()</span></code></a>、および <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.priority" title="django.contrib.sitemaps.Sitemap.priority"><code class="xref py py-attr docutils literal notranslate"><span class="pre">priority()</span></code></a> メソッドに渡されることです。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.location">
+<span class="sig-name descname"><span class="pre">location</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sitemaps/__init__.py#L78"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.location" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong> メソッドまたは属性のいずれか。</p>
+<p>メソッドであれば、<a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> が返すオブジェクトの絶対パスを返す必要があります。</p>
+<p>属性である場合、その値は <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> が返す <em>すべての</em> オブジェクトに使用する絶対パスを表す文字列でなければなりません。</p>
+<p>どちらの場合も、「絶対パス」とは、プロトコルやドメインを含まないURLを意味します。たとえば:</p>
+<ul class="simple">
+<li><p>良い例: <code class="docutils literal notranslate"><span class="pre">'/foo/bar/'</span></code></p></li>
+<li><p>悪い例: <code class="docutils literal notranslate"><span class="pre">'example.com/foo/bar/'</span></code></p></li>
+<li><p>悪い例: <code class="docutils literal notranslate"><span class="pre">'https://example.com/foo/bar/'</span></code></p></li>
+</ul>
+<p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.location" title="django.contrib.sitemaps.Sitemap.location"><code class="xref py py-attr docutils literal notranslate"><span class="pre">location</span></code></a> が提供されていない場合、フレームワークは <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> が返す各オブジェクトに対して <code class="docutils literal notranslate"><span class="pre">get_absolute_url()</span></code> メソッドを呼び出します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">'http'</span></code> 以外のプロトコルを指定するには、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.protocol" title="django.contrib.sitemaps.Sitemap.protocol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">protocol</span></code></a> を使用してください。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.lastmod">
+<span class="sig-name descname"><span class="pre">lastmod</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.lastmod" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong> メソッドまたは属性のいずれか。</p>
+<p>メソッドであれば、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> が返すオブジェクトを引数に取り、そのオブジェクトの最終更新日時を <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> として返す必要があります。</p>
+<p>属性であれば、その値は <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> で返されるすべてのオブジェクトの最終更新日時を表す <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> である必要があります。</p>
+<p>サイトマップ内のすべてのアイテムに <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a> がある場合、 <a class="reference internal" href="#django.contrib.sitemaps.views.sitemap" title="django.contrib.sitemaps.views.sitemap"><code class="xref py py-func docutils literal notranslate"><span class="pre">views.sitemap()</span></code></a> によって生成されるサイトマップには、最新の <code class="docutils literal notranslate"><span class="pre">lastmod</span></code> に等しい <code class="docutils literal notranslate"><span class="pre">Last-Modified</span></code> ヘッダーが付きます。リクエストに <code class="docutils literal notranslate"><span class="pre">If-Modified-Since</span></code> ヘッダーがある場合、Django が適切に応答するようにするには、 <a class="reference internal" href="../middleware.html#django.middleware.http.ConditionalGetMiddleware" title="django.middleware.http.ConditionalGetMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConditionalGetMiddleware</span></code></a> をアクティブにします。これにより、サイトマップが変更されていない場合には送信を防ぎます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.paginator">
+<span class="sig-name descname"><span class="pre">paginator</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sitemaps/__init__.py#L72"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.paginator" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong></p>
+<p>このプロパティは、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> のための <a class="reference internal" href="../paginator.html#django.core.paginator.Paginator" title="django.core.paginator.Paginator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Paginator</span></code></a> を返します。サイトマップを一括生成する場合は、複数の <code class="docutils literal notranslate"><span class="pre">items()</span></code> 呼び出しを避けるためにこのキャッシュされたプロパティをオーバーライドすると良いでしょう。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.changefreq">
+<span class="sig-name descname"><span class="pre">changefreq</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.changefreq" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong> メソッドまたは属性のいずれか。</p>
+<p>メソッドの場合、1つの引数 (<a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> で返されるオブジェクト) を取るべきであり、そのオブジェクトの変更頻度を文字列で返すべきです。</p>
+<p>属性であれば、その値は <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> が返す <em>すべての</em> オブジェクトの変更頻度を表す文字列でなければなりません。</p>
+<p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.changefreq" title="django.contrib.sitemaps.Sitemap.changefreq"><code class="xref py py-attr docutils literal notranslate"><span class="pre">changefreq</span></code></a> の可能な値は、メソッドの場合も属性の場合も、以下の通りです。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'always'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'hourly'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'daily'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'weekly'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'monthly'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'yearly'</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'never'</span></code></p></li>
+</ul>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.priority">
+<span class="sig-name descname"><span class="pre">priority</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.priority" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong> メソッドまたは属性のいずれか。</p>
+<p>メソッドであれば、1つの引数 (<a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> が返すオブジェクト) を取り、そのオブジェクトの優先順位を文字列か浮動小数点数で返します。</p>
+<p>属性であれば、その値は、<a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> で返される <em>すべて</em> のオブジェクトの優先度を表す文字列または浮動小数点数である必要があります。</p>
+<p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.priority" title="django.contrib.sitemaps.Sitemap.priority"><code class="xref py py-attr docutils literal notranslate"><span class="pre">priority</span></code></a> の例として、<code class="docutils literal notranslate"><span class="pre">0.4</span></code>、<code class="docutils literal notranslate"><span class="pre">1.0</span></code> を指定します。ページのデフォルトの優先度は <code class="docutils literal notranslate"><span class="pre">0.5</span></code> です。詳細については、<a class="reference external" href="https://www.sitemaps.org/protocol.html#prioritydef">sitemaps.org documentation</a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.protocol">
+<span class="sig-name descname"><span class="pre">protocol</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.protocol" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong></p>
+<p>この属性はサイトマップのURLのプロトコル (<code class="docutils literal notranslate"><span class="pre">'http'</span></code> または <code class="docutils literal notranslate"><span class="pre">'https'</span></code>) を定義します。設定されていない場合は、サイトマップがリクエストされたプロトコルが使用されます。サイトマップがリクエストのコンテキスト外で作成された場合、デフォルトは <code class="docutils literal notranslate"><span class="pre">'https'</span></code> です。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>古いバージョンでは、リクエストのコンテキスト外に構築されたサイトマップのデフォルトプロトコルは <code class="docutils literal notranslate"><span class="pre">'http'</span></code> でした。</p>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.limit">
+<span class="sig-name descname"><span class="pre">limit</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.limit" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong></p>
+<p>この属性はサイトマップの各ページに含まれるURLの最大数を定義します。この値はデフォルト値の <code class="docutils literal notranslate"><span class="pre">50000</span></code> を超えてはいけません。これは <a class="reference external" href="https://www.sitemaps.org/protocol.html#index">Sitemaps protocol</a> で許可されている上限値です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.i18n">
+<span class="sig-name descname"><span class="pre">i18n</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.i18n" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong></p>
+<p>このサイトマップのURLを <a class="reference internal" href="../settings.html#std-setting-LANGUAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LANGUAGES</span></code></a> のすべてを使用して生成するかどうかを定義するブール値の属性です。デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.languages">
+<span class="sig-name descname"><span class="pre">languages</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.languages" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong></p>
+<p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.i18n" title="django.contrib.sitemaps.Sitemap.i18n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i18n</span></code></a> が有効のときに代替リンクを生成するために使用する <a class="reference internal" href="../../topics/i18n/index.html#term-language-code"><span class="xref std std-term">言語コード</span></a> の <a class="reference external" href="https://docs.python.org/3/glossary.html#term-sequence" title="(in Python v3.13)"><span class="xref std std-term">sequence</span></a>。デフォルトは <a class="reference internal" href="../settings.html#std-setting-LANGUAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LANGUAGES</span></code></a>。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.alternates">
+<span class="sig-name descname"><span class="pre">alternates</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.alternates" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong></p>
+<p>真偽値属性。これを <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.i18n" title="django.contrib.sitemaps.Sitemap.i18n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i18n</span></code></a> と併用すると、生成される各URLには他言語バージョンを指す代替リンクのリストがあり、 <a class="reference external" href="https://developers.google.com/search/docs/advanced/crawling/localized-versions">hreflang attribute</a> を使用します。デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.x_default">
+<span class="sig-name descname"><span class="pre">x_default</span></span><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.x_default" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong></p>
+<p>真偽値属性です。<code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.alternates" title="django.contrib.sitemaps.Sitemap.alternates"><code class="xref py py-attr docutils literal notranslate"><span class="pre">alternates</span></code></a> によって生成された代替リンクには、 <code class="docutils literal notranslate"><span class="pre">hreflang=&quot;x-default&quot;</span></code> フォールバックエントリーが含まれ、その値は <a class="reference internal" href="../settings.html#std-setting-LANGUAGE_CODE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LANGUAGE_CODE</span></code></a> になります。デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.get_latest_lastmod">
+<span class="sig-name descname"><span class="pre">get_latest_lastmod</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sitemaps/__init__.py#L106"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.get_latest_lastmod" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong> <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a> で返される最新の値を返すメソッド。この関数は、 <a class="reference internal" href="#sitemap-index-context-variables"><span class="std std-ref">Sitemap インデックス コンテキスト変数</span></a> に <code class="docutils literal notranslate"><span class="pre">lastmod</span></code> 属性を追加するために使用されます。</p>
+<p>デフォルトでは、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.get_latest_lastmod" title="django.contrib.sitemaps.Sitemap.get_latest_lastmod"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_latest_lastmod()</span></code></a> は以下を返します:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a> が属性の場合:  <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a> 。</p></li>
+<li><p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a> がメソッドの場合、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Sitemap.items()</span></code></a> で返されるすべてのアイテムを使用してメソッドを呼び出した結果、最新の <code class="docutils literal notranslate"><span class="pre">lastmod</span></code> が返されます。</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.Sitemap.get_languages_for_item">
+<span class="sig-name descname"><span class="pre">get_languages_for_item</span></span>(<em class="sig-param"><span class="n"><span class="pre">item</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sitemaps/__init__.py#L42"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sitemaps.Sitemap.get_languages_for_item" title="Link to this definition">¶</a></dt>
+<dd><p><strong>オプション。</strong> アイテムが表示される言語コードのシーケンスを返すメソッド。デフォルトでは、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.get_languages_for_item" title="django.contrib.sitemaps.Sitemap.get_languages_for_item"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_languages_for_item()</span></code></a> は <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.languages" title="django.contrib.sitemaps.Sitemap.languages"><code class="xref py py-attr docutils literal notranslate"><span class="pre">languages</span></code></a> を返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-shortcuts">
+<span id="shortcuts"></span><h2>ショートカット<a class="headerlink" href="#shortcuts" title="Link to this heading">¶</a></h2>
+<p>サイトマップフレームワークは、一般的なケースに対する便利なクラスを提供します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.GenericSitemap">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GenericSitemap</span></span>(<em class="sig-param"><span class="n"><span class="pre">info_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">changefreq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protocol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sitemaps/__init__.py#L173"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sitemaps.GenericSitemap" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.sitemaps.GenericSitemap" title="django.contrib.sitemaps.GenericSitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.sitemaps.GenericSitemap</span></code></a> クラスでは、少なくとも <code class="docutils literal notranslate"><span class="pre">queryset</span></code> エントリを含む辞書を渡すことで、サイトマップを作成できます。この <code class="docutils literal notranslate"><span class="pre">queryset</span></code> は、サイトマップのアイテムを生成するために使用されます。また、<code class="docutils literal notranslate"><span class="pre">queryset</span></code> から取得されたオブジェクトの日付フィールドを指定する <code class="docutils literal notranslate"><span class="pre">date_field</span></code> エントリを持つこともできます。これは、生成されたサイトマップの <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.lastmod" title="django.contrib.sitemaps.Sitemap.lastmod"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lastmod</span></code></a> 属性および <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.get_latest_lastmod" title="django.contrib.sitemaps.Sitemap.get_latest_lastmod"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_latest_lastmod()</span></code></a> メソッドに使用されます。</p>
+<p><a class="reference internal" href="#django.contrib.sitemaps.Sitemap.priority" title="django.contrib.sitemaps.Sitemap.priority"><code class="xref py py-attr docutils literal notranslate"><span class="pre">priority</span></code></a> 、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.changefreq" title="django.contrib.sitemaps.Sitemap.changefreq"><code class="xref py py-attr docutils literal notranslate"><span class="pre">changefreq</span></code></a>、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.protocol" title="django.contrib.sitemaps.Sitemap.protocol"><code class="xref py py-attr docutils literal notranslate"><span class="pre">protocol</span></code></a> キーワード引数を使用すると、すべてのURLに対してこれらの属性を指定できます。</p>
+</dd></dl>
+
+<section id="s-example">
+<span id="example"></span><h3>カスタマイズ例<a class="headerlink" href="#example" title="Link to this heading">¶</a></h3>
+<p>以下は <a class="reference internal" href="#django.contrib.sitemaps.GenericSitemap" title="django.contrib.sitemaps.GenericSitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">GenericSitemap</span></code></a> を使用した <a class="reference internal" href="../../topics/http/urls.html"><span class="doc">URLconf</span></a> の例です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.sitemaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">GenericSitemap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.sitemaps.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">sitemap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">blog.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Entry</span>
+
+<span class="n">info_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;queryset&quot;</span><span class="p">:</span> <span class="n">Entry</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span>
+    <span class="s2">&quot;date_field&quot;</span><span class="p">:</span> <span class="s2">&quot;pub_date&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># some generic view using info_dict</span>
+    <span class="c1"># ...</span>
+    <span class="c1"># the sitemap</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;sitemap.xml&quot;</span><span class="p">,</span>
+        <span class="n">sitemap</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;blog&quot;</span><span class="p">:</span> <span class="n">GenericSitemap</span><span class="p">(</span><span class="n">info_dict</span><span class="p">,</span> <span class="n">priority</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)}},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;django.contrib.sitemaps.views.sitemap&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-sitemap-for-static-views">
+<span id="sitemap-for-static-views"></span><h2>静的ビューのサイトマップ<a class="headerlink" href="#sitemap-for-static-views" title="Link to this heading">¶</a></h2>
+<p>検索エンジンのクローラに、オブジェクト詳細ページでもフラットページでもないビューをインデックスさせたいことがよくあります。その解決策は、 <code class="docutils literal notranslate"><span class="pre">items</span></code> にこれらのビューの URL 名を明示的に列挙し、サイトマップの <code class="docutils literal notranslate"><span class="pre">location</span></code> メソッドで <a class="reference internal" href="../urlresolvers.html#django.urls.reverse" title="django.urls.reverse"><code class="xref py py-func docutils literal notranslate"><span class="pre">reverse()</span></code></a> を呼び出すことです。例えば次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># sitemaps.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib</span><span class="w"> </span><span class="kn">import</span> <span class="n">sitemaps</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">StaticViewSitemap</span><span class="p">(</span><span class="n">sitemaps</span><span class="o">.</span><span class="n">Sitemap</span><span class="p">):</span>
+    <span class="n">priority</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">changefreq</span> <span class="o">=</span> <span class="s2">&quot;daily&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;main&quot;</span><span class="p">,</span> <span class="s2">&quot;about&quot;</span><span class="p">,</span> <span class="s2">&quot;license&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">location</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+
+
+<span class="c1"># urls.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.sitemaps.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">sitemap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.sitemaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">StaticViewSitemap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span>
+
+<span class="n">sitemaps</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;static&quot;</span><span class="p">:</span> <span class="n">StaticViewSitemap</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">main</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;main&quot;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;about/&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">about</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;about&quot;</span><span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;license/&quot;</span><span class="p">,</span> <span class="n">views</span><span class="o">.</span><span class="n">license</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;license&quot;</span><span class="p">),</span>
+    <span class="c1"># ...</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;sitemap.xml&quot;</span><span class="p">,</span>
+        <span class="n">sitemap</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="n">sitemaps</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;django.contrib.sitemaps.views.sitemap&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="s-creating-a-sitemap-index">
+<span id="creating-a-sitemap-index"></span><h2>サイトマップインデックスを作成する<a class="headerlink" href="#creating-a-sitemap-index" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.contrib.sitemaps.views.index">
+<span class="sig-prename descclassname"><span class="pre">views.</span></span><span class="sig-name descname"><span class="pre">index</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sitemaps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'sitemap_index.xml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'application/xml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sitemap_url_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'django.contrib.sitemaps.views.sitemap'</span></span></em>)<a class="headerlink" href="#django.contrib.sitemaps.views.index" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>サイトマップフレームワークには、 <code class="docutils literal notranslate"><span class="pre">sitemaps</span></code> 辞書で定義された各セクションごとに1つずつ、個別のサイトマップファイルを参照するサイトマップインデックスを作成する機能もあります。使用上の唯一の違いは下記です:</p>
+<ul class="simple">
+<li><p>URLconf で 2 つのビューを使用しています: <a class="reference internal" href="#django.contrib.sitemaps.views.index" title="django.contrib.sitemaps.views.index"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.contrib.sitemaps.views.index()</span></code></a> と <a class="reference internal" href="#django.contrib.sitemaps.views.sitemap" title="django.contrib.sitemaps.views.sitemap"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.contrib.sitemaps.views.sitemap()</span></code></a> 。</p></li>
+<li><p><a class="reference internal" href="#django.contrib.sitemaps.views.sitemap" title="django.contrib.sitemaps.views.sitemap"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.contrib.sitemaps.views.sitemap()</span></code></a> ビューは、<code class="docutils literal notranslate"><span class="pre">section</span></code> キーワード引数を受け取るべきです。</p></li>
+</ul>
+<p>上記の例に対する関連するURLconfの行は、次のようになります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.sitemaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;sitemap.xml&quot;</span><span class="p">,</span>
+        <span class="n">views</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="n">sitemaps</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;django.contrib.sitemaps.views.index&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;sitemap-&lt;section&gt;.xml&quot;</span><span class="p">,</span>
+        <span class="n">views</span><span class="o">.</span><span class="n">sitemap</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="n">sitemaps</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;django.contrib.sitemaps.views.sitemap&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>これにより、自動的に <code class="file docutils literal notranslate"><span class="pre">sitemap.xml</span></code> ファイルが生成され、 <code class="file docutils literal notranslate"><span class="pre">sitemap-flatpages.xml</span></code> と <code class="file docutils literal notranslate"><span class="pre">sitemap-blog.xml</span></code> の両方が参照されます。 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap" title="django.contrib.sitemaps.Sitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></a> クラスと <code class="docutils literal notranslate"><span class="pre">sitemaps</span></code> 辞書は全く変わりません。</p>
+<p>すべてのサイトマップが <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.get_latest_lastmod" title="django.contrib.sitemaps.Sitemap.get_latest_lastmod"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Sitemap.get_latest_lastmod()</span></code></a> で返される <code class="docutils literal notranslate"><span class="pre">lastmod</span></code> を持っている場合、サイトマップインデックスは最新の <code class="docutils literal notranslate"><span class="pre">lastmod</span></code> と同じ <code class="docutils literal notranslate"><span class="pre">Last-Modified</span></code> ヘッダーを持ちます。</p>
+<p>サイトマップの URL が 50,000 を超える場合は、インデックスファイルを作成すべきです。この場合、 Django は自動的にサイトマップをページ分割し、インデックスに反映します。</p>
+<p>通常のサイトマップビューを使用していない場合 (たとえば、キャッシュデコレータでラップされている場合) は、サイトマップビューに名前を付けて、インデックスビューに <code class="docutils literal notranslate"><span class="pre">sitemap_url_name</span></code> を渡さなければなりません:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.sitemaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span> <span class="k">as</span> <span class="n">sitemaps_views</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">cache_page</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;sitemap.xml&quot;</span><span class="p">,</span>
+        <span class="n">cache_page</span><span class="p">(</span><span class="mi">86400</span><span class="p">)(</span><span class="n">sitemaps_views</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
+        <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="n">sitemaps</span><span class="p">,</span> <span class="s2">&quot;sitemap_url_name&quot;</span><span class="p">:</span> <span class="s2">&quot;sitemaps&quot;</span><span class="p">},</span>
+    <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;sitemap-&lt;section&gt;.xml&quot;</span><span class="p">,</span>
+        <span class="n">cache_page</span><span class="p">(</span><span class="mi">86400</span><span class="p">)(</span><span class="n">sitemaps_views</span><span class="o">.</span><span class="n">sitemap</span><span class="p">),</span>
+        <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="n">sitemaps</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="s-template-customization">
+<span id="template-customization"></span><h2>テンプレートをカスタマイズする<a class="headerlink" href="#template-customization" title="Link to this heading">¶</a></h2>
+<p>サイト上で利用可能な各サイトマップやサイトマップインデックスごとに異なるテンプレートを使用したい場合は、URLconf を介して <code class="docutils literal notranslate"><span class="pre">sitemap</span></code> ビューや <code class="docutils literal notranslate"><span class="pre">index</span></code> ビューに <code class="docutils literal notranslate"><span class="pre">template_name</span></code> パラメータを渡すことで指定できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.sitemaps</span><span class="w"> </span><span class="kn">import</span> <span class="n">views</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;custom-sitemap.xml&quot;</span><span class="p">,</span>
+        <span class="n">views</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="n">sitemaps</span><span class="p">,</span> <span class="s2">&quot;template_name&quot;</span><span class="p">:</span> <span class="s2">&quot;custom_sitemap.html&quot;</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;django.contrib.sitemaps.views.index&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="s2">&quot;custom-sitemap-&lt;section&gt;.xml&quot;</span><span class="p">,</span>
+        <span class="n">views</span><span class="o">.</span><span class="n">sitemap</span><span class="p">,</span>
+        <span class="p">{</span><span class="s2">&quot;sitemaps&quot;</span><span class="p">:</span> <span class="n">sitemaps</span><span class="p">,</span> <span class="s2">&quot;template_name&quot;</span><span class="p">:</span> <span class="s2">&quot;custom_sitemap.html&quot;</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;django.contrib.sitemaps.views.sitemap&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>これらのビューは <a class="reference internal" href="../template-response.html#django.template.response.TemplateResponse" title="django.template.response.TemplateResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateResponse</span></code></a> インスタンスを返し、レンダリング前のレスポンスデータを簡単にカスタマイズできます。詳細は <a class="reference internal" href="../template-response.html"><span class="doc">TemplateResponse のドキュメント</span></a> を参照してください。</p>
+<section id="s-context-variables">
+<span id="context-variables"></span><h3>コンテキスト変数<a class="headerlink" href="#context-variables" title="Link to this heading">¶</a></h3>
+<p>テンプレートをカスタマイズする際に、 <a class="reference internal" href="#django.contrib.sitemaps.views.index" title="django.contrib.sitemaps.views.index"><code class="xref py py-func docutils literal notranslate"><span class="pre">index()</span></code></a> と <a class="reference internal" href="#django.contrib.sitemaps.views.sitemap" title="django.contrib.sitemaps.views.sitemap"><code class="xref py py-func docutils literal notranslate"><span class="pre">sitemap()</span></code></a> ビューには、以下のコンテキスト変数に依存できます。</p>
+</section>
+<section id="s-index">
+<span id="s-sitemap-index-context-variables"></span><span id="index"></span><span id="sitemap-index-context-variables"></span><h3>インデックス<a class="headerlink" href="#index" title="Link to this heading">¶</a></h3>
+<p>変数 <code class="docutils literal notranslate"><span class="pre">sitemaps</span></code> は各サイトマップの <code class="docutils literal notranslate"><span class="pre">location</span></code> と <code class="docutils literal notranslate"><span class="pre">lastmod</span></code> 属性を含むオブジェクトのリストです。各URLは以下の属性を持ちます:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">location</span></code>: サイトマップの場所 (URLとページ)。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lastmod</span></code>: 各サイトマップに対して <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.get_latest_lastmod" title="django.contrib.sitemaps.Sitemap.get_latest_lastmod"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_latest_lastmod()</span></code></a> メソッドによって設定されます。</p></li>
+</ul>
+</section>
+<section id="s-id1">
+<span id="id1"></span><h3>サイトマップ<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p>変数 <code class="docutils literal notranslate"><span class="pre">urlset</span></code> は、サイトマップに表示されるべきURLのリストです。各URLは、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap" title="django.contrib.sitemaps.Sitemap"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sitemap</span></code></a> クラスで定義された属性を公開しています。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">alternates</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">changefreq</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">item</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">lastmod</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">location</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">priority</span></code></p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">alternates</span></code> 属性は、 <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.i18n" title="django.contrib.sitemaps.Sitemap.i18n"><code class="xref py py-attr docutils literal notranslate"><span class="pre">i18n</span></code></a> と <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.alternates" title="django.contrib.sitemaps.Sitemap.alternates"><code class="xref py py-attr docutils literal notranslate"><span class="pre">alternates</span></code></a> が有効になっている場合に利用可能です。それは、各URLに対してオプションの <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.x_default" title="django.contrib.sitemaps.Sitemap.x_default"><code class="xref py py-attr docutils literal notranslate"><span class="pre">x_default</span></code></a> フォールバックを含む、他の言語バージョンのリストです。各代替バージョンは、<code class="docutils literal notranslate"><span class="pre">location</span></code> と <code class="docutils literal notranslate"><span class="pre">lang_code</span></code> キーを持つ辞書です。</p>
+<p>各URLに <code class="docutils literal notranslate"><span class="pre">item</span></code> 属性が追加され、<a class="reference external" href="https://support.google.com/news/publisher-center/answer/9606710">Google news sitemaps</a> のようなテンプレートをより柔軟にカスタマイズできるようになりました。Sitemapの <a class="reference internal" href="#django.contrib.sitemaps.Sitemap.items" title="django.contrib.sitemaps.Sitemap.items"><code class="xref py py-attr docutils literal notranslate"><span class="pre">items()</span></code></a> が <code class="docutils literal notranslate"><span class="pre">publication_data</span></code> と <code class="docutils literal notranslate"><span class="pre">tags</span></code> フィールドを持つアイテムのリストを返すと仮定すると、このようにGoogleニュース互換のサイトマップが生成されます:</p>
+<div class="highlight-xml+django notranslate"><div class="highlight"><pre><span></span><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;urlset</span>
+<span class="w">  </span><span class="na">xmlns=</span><span class="s">&quot;https://www.sitemaps.org/schemas/sitemap/0.9&quot;</span>
+<span class="w">  </span><span class="na">xmlns:news=</span><span class="s">&quot;https://www.google.com/schemas/sitemap-news/0.9&quot;</span><span class="nt">&gt;</span>
+<span class="cp">{%</span> <span class="k">spaceless</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">url</span> <span class="k">in</span> <span class="nv">urlset</span> <span class="cp">%}</span>
+<span class="w">  </span><span class="nt">&lt;url&gt;</span>
+<span class="w">    </span><span class="nt">&lt;loc&gt;</span><span class="cp">{{</span> <span class="nv">url.location</span> <span class="cp">}}</span><span class="nt">&lt;/loc&gt;</span>
+<span class="w">    </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">url.lastmod</span> <span class="cp">%}</span><span class="nt">&lt;lastmod&gt;</span><span class="cp">{{</span> <span class="nv">url.lastmod</span><span class="o">|</span><span class="nf">date</span><span class="s2">:&quot;Y-m-d&quot;</span> <span class="cp">}}</span><span class="nt">&lt;/lastmod&gt;</span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<span class="w">    </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">url.changefreq</span> <span class="cp">%}</span><span class="nt">&lt;changefreq&gt;</span><span class="cp">{{</span> <span class="nv">url.changefreq</span> <span class="cp">}}</span><span class="nt">&lt;/changefreq&gt;</span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<span class="w">    </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">url.priority</span> <span class="cp">%}</span><span class="nt">&lt;priority&gt;</span><span class="cp">{{</span> <span class="nv">url.priority</span> <span class="cp">}}</span><span class="nt">&lt;/priority&gt;</span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<span class="w">    </span><span class="nt">&lt;news:news&gt;</span>
+<span class="w">      </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">url.item.publication_date</span> <span class="cp">%}</span><span class="nt">&lt;news:publication_date&gt;</span><span class="cp">{{</span> <span class="nv">url.item.publication_date</span><span class="o">|</span><span class="nf">date</span><span class="s2">:&quot;Y-m-d&quot;</span> <span class="cp">}}</span><span class="nt">&lt;/news:publication_date&gt;</span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<span class="w">      </span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">url.item.tags</span> <span class="cp">%}</span><span class="nt">&lt;news:keywords&gt;</span><span class="cp">{{</span> <span class="nv">url.item.tags</span> <span class="cp">}}</span><span class="nt">&lt;/news:keywords&gt;</span><span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
+<span class="w">    </span><span class="nt">&lt;/news:news&gt;</span>
+<span class="w">   </span><span class="nt">&lt;/url&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="cp">{%</span> <span class="k">endspaceless</span> <span class="cp">%}</span>
+<span class="nt">&lt;/urlset&gt;</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">サイトマップ・フレームワーク</a><ul>
+<li><a class="reference internal" href="#overview">概要</a></li>
+<li><a class="reference internal" href="#installation">インストール</a></li>
+<li><a class="reference internal" href="#initialization">初期設定</a></li>
+<li><a class="reference internal" href="#sitemap-classes"><code class="docutils literal notranslate"><span class="pre">Sitemap</span></code> クラス</a></li>
+<li><a class="reference internal" href="#an-example">例</a></li>
+<li><a class="reference internal" href="#sitemap-class-reference"><code class="docutils literal notranslate"><span class="pre">Sitemap</span></code> クラス リファレンス</a></li>
+<li><a class="reference internal" href="#shortcuts">ショートカット</a><ul>
+<li><a class="reference internal" href="#example">カスタマイズ例</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sitemap-for-static-views">静的ビューのサイトマップ</a></li>
+<li><a class="reference internal" href="#creating-a-sitemap-index">サイトマップインデックスを作成する</a></li>
+<li><a class="reference internal" href="#template-customization">テンプレートをカスタマイズする</a><ul>
+<li><a class="reference internal" href="#context-variables">コンテキスト変数</a></li>
+<li><a class="reference internal" href="#index">インデックス</a></li>
+<li><a class="reference internal" href="#id1">サイトマップ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="redirects.html"
+                          title="前の章へ">redirects （リダイレクト）アプリ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="sites.html"
+                          title="次の章へ">&quot;sites&quot; フレームワーク</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/contrib/sitemaps.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="redirects.html" title="redirects （リダイレクト）アプリ">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="sites.html" title="&amp;quot;sites&amp;quot; フレームワーク">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

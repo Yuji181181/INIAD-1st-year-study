@@ -1,0 +1,45 @@
+function spoil(target){
+	const element = target.nextElementSibling;
+	if(element === null) return;
+	if(element.style.display == 'none') element.style.display = 'block';
+	else element.style.display = 'none';
+}
+function spoilAll(){
+	const targets = document.getElementsByClassName('spoiler');
+	for(const target of targets){
+		const element = target.nextElementSibling;
+		if(element !== null) element.style.display = 'none';
+	}
+}
+function toggleSide(e){
+	const side = document.getElementById('side');
+	if(side.style.display === ''){
+		document.body.style.overflow = 'hidden';
+		side.style.display = 'block';
+		e.target.innerText = 'BA\nCK';
+	} else {
+		document.body.style.overflow = '';
+		side.style.display = '';
+		e.target.innerText = 'ME\nNU';
+	}
+}
+function sideMenu(){
+	const side = document.getElementById('side');
+	const sideButton = document.getElementById('overlay_side_button');
+	if(window.matchMedia('(max-width: 980px)').matches){
+		side.classList.add('overlay_side');
+		sideButton.style.display = 'grid';
+		sideButton.onclick = toggleSide;
+		sideButton.innerText = 'ME\nNU';
+	} else {
+		side.classList.remove('overlay_side');
+		sideButton.style.display = '';
+		if(document.body.style.overflow !== ''){
+			document.body.style.overflow = '';
+			side.style.display = '';
+		}
+	}
+}
+window.onresize = sideMenu;
+sideMenu();
+spoilAll();

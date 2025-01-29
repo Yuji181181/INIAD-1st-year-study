@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>組み込みのクラスベースのジェネリックビュー（汎用ビュー） &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="クラスベースのビューでフォームを扱う" href="generic-editing.html" />
+    <link rel="prev" title="クラスベースビュー入門" href="intro.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="intro.html" title="クラスベースビュー入門">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="generic-editing.html" title="クラスベースのビューでフォームを扱う">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-class-based-views-generic-display">
+            
+  <section id="s-built-in-class-based-generic-views">
+<span id="built-in-class-based-generic-views"></span><h1>組み込みのクラスベースのジェネリックビュー（汎用ビュー）<a class="headerlink" href="#built-in-class-based-generic-views" title="Link to this heading">¶</a></h1>
+<p>ウェブアプリケーションを書くのは、特定のパターンを何度も繰り返すことになるため、単調になりがちです。Django はモデルとテンプレート層で単調さを取り除くことを試みてきましたが、ウェブ開発者はビューレベルでもこの種の退屈な繰り返しを経験してきました。</p>
+<p>Django の <em>ジェネリックビュー（汎用ビュー）</em> は、この苦痛を軽減するために開発されました。ビューの開発には共通のイディオムとパターンが存在するため、それらを抽象化することで、共通のビューデータを少ないコードで素早く記述できます。</p>
+<p>私たちはオブジェクトのリスト表示のような特定の共通タスクを認識することで、<em>任意の</em> オブジェクトのリストを表示するコードを書きます。そして、対象のモデルを URLconf から追加の引数として渡します。</p>
+<p>Django のジェネリックビューを使うと、以下のことが可能になります。</p>
+<ul class="simple">
+<li><p>オブジェクトのリストと、1つのオブジェクトに対する詳細ページの表示。カンファレンスを管理するアプリケーションを作っている場合、リストビューの例としては、<code class="docutils literal notranslate"><span class="pre">TalkListView</span></code> や <code class="docutils literal notranslate"><span class="pre">RegisteredUserListView</span></code> といったものが考えられます。1つのトークの情報を表示するページが、いわゆる「詳細」ビューの一例です。</p></li>
+<li><p>日付を基本とするオブジェクトと、年・月・日のアーカイブページ、関連する詳細ページと「最新」ページの表示。</p></li>
+<li><p>認可の有無に関わらず、ユーザーにオブジェクトの作成・更新・削除を許可する。</p></li>
+</ul>
+<p>これらのビューを総合すると、開発者が遭遇する最も一般的なタスクを実行するためのインターフェースが提供されます。</p>
+<section id="s-extending-generic-views">
+<span id="extending-generic-views"></span><h2>ジェネリックビューを拡張する<a class="headerlink" href="#extending-generic-views" title="Link to this heading">¶</a></h2>
+<p>言うまでもなく、ジェネリックビューは実質的に開発をスピードアップさせてくれます。しかし、多くのプロジェクトでは遅かれ早かれジェネリックビューだけでは十分ではなくなる瞬間が訪れます。実際、新しい Django 開発者から最もよく聞かれる質問は、幅広い状況に対処するためにジェネリックビューを拡張するにはどうすれば良いのか、というものです。</p>
+<p>これが、1.3リリースでジェネリックビューが再設計された理由の一つです。以前のビューは、オプションが目まぐるしく変化するビュー関数でした。現在では、ジェネリックビューを拡張する推奨の方法は、URLconfで大量の設定を渡すのではなく、サブクラス化し、属性やメソッドをオーバーライドする方法です。</p>
+<p>上で述べたように、ジェネリックビューには限界があります。自作のビューをジェネリックビューのサブクラスとして実装することに四苦八苦していると、それよりも自作のクラスベースまたは関数ベースのビューを使った方が効率的なのではないかと思うかもしれません。</p>
+<p>ジェネリックビューの例はサードパーティアプリケーションでも利用できます。あるいは、自分で必要に応じてアプリケーションを作ることもできます。</p>
+</section>
+<section id="s-generic-views-of-objects">
+<span id="generic-views-of-objects"></span><h2>オブジェクトのジェネリックビュー<a class="headerlink" href="#generic-views-of-objects" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../../ref/class-based-views/base.html#django.views.generic.base.TemplateView" title="django.views.generic.base.TemplateView"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplateView</span></code></a> はたしかに便利ですが、Django のジェネリックビューが本当の輝きを見せるのは、データベース内のコンテンツを表示するビューを作成する時です。これは非常に一般的なタスクなので、Django はオブジェクトのリストと詳細ビューを非常に簡単に生成するための組み込みのジェネリックビューをいくつか用意しているのです。</p>
+<p>オブジェクトのリストや個々のオブジェクトを表示する例から見てみましょう。</p>
+<p>ここでは、以下のようなモデルを使用します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># models.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Publisher</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">address</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">city</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">state_province</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">country</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">website</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">URLField</span><span class="p">()</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-name&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Author</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">salutation</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+    <span class="n">headshot</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ImageField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s2">&quot;author_headshots&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Book</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">authors</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="s2">&quot;Author&quot;</span><span class="p">)</span>
+    <span class="n">publisher</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">on_delete</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">CASCADE</span><span class="p">)</span>
+    <span class="n">publication_date</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateField</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>次に、ビューを定義しましょう。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># views.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Publisher</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PublisherListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Publisher</span>
+</pre></div>
+</div>
+<p>最後に、このビューを URL にフックさせます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># urls.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublisherListView</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;publishers/&quot;</span><span class="p">,</span> <span class="n">PublisherListView</span><span class="o">.</span><span class="n">as_view</span><span class="p">()),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>書く必要のある Python コードは、これですべてです。まだテンプレートを書く必要はありますけれど。ビューで使用するテンプレート名を <code class="docutils literal notranslate"><span class="pre">template_name</span></code> 属性に明示的に書くこともできますが、この属性を省略した場合でも、Django はオブジェクト名から推論してくれます。この場合は、テンプレート名は <code class="docutils literal notranslate"><span class="pre">&quot;books/publisher_list.html&quot;</span></code> になります。&quot;books&quot; の部分はモデルを定義したアプリの名前から来ていますが、&quot;publisher&quot; の部分はモデル名を小文字にした名前になっています。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>したがって、たとえば <a class="reference internal" href="../../ref/settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> 内で <code class="docutils literal notranslate"><span class="pre">DjangoTemplates</span></code> バックエンドの <code class="docutils literal notranslate"><span class="pre">APP_DIRS</span></code> オプションを True に設定した場合、テンプレートの場所は次のパスになります。/path/to/project/books/templates/books/publisher_list.html</p>
+</div>
+<p>このテンプレートは、すべての publisher オブジェクトを含んだ <code class="docutils literal notranslate"><span class="pre">object_list</span></code> という変数を持つコンテキストとともにレンダリングされます。よって、テンプレートは次のように書けます。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">extends</span> <span class="s2">&quot;base.html&quot;</span> <span class="cp">%}</span>
+
+<span class="cp">{%</span> <span class="k">block</span> <span class="nv">content</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Publishers<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">for</span> <span class="nv">publisher</span> <span class="k">in</span> <span class="nv">object_list</span> <span class="cp">%}</span>
+            <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">publisher.name</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+        <span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+    <span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endblock</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>ジェネリックビューの優れた機能はすべて、ジェネリックビューに設定された属性を変更することで得られます。この <a class="reference internal" href="../../ref/class-based-views/index.html"><span class="doc">ジェネリックビューのリファレンス</span></a> のドキュメントの残りの部分では、ジェネリックビューをカスタマイズしたり拡張したりする一般的な方法のいくつかを検討します。本当にそれだけです。</p>
+<section id="s-making-friendly-template-contexts">
+<span id="making-friendly-template-contexts"></span><h3>「親切な」テンプレートコンテキストを作る<a class="headerlink" href="#making-friendly-template-contexts" title="Link to this heading">¶</a></h3>
+<p>コード例の出版社をリストするテンプレートが、すべての出版社を <code class="docutils literal notranslate"><span class="pre">object_list</span></code> という名前の変数に格納していたことに気づいたかもしれません。これでもたしかに機能的には正しく動作しますが、テンプレートを書く人にとっては、とてもではありませんが「親切」とは言えません。ここではこの変数には出版社のリストが入っているのだと「事実として知らなければならない」わけです。</p>
+<p>実は、モデルオブジェクトを扱っている場合には、この問題はすでに対処されています。オブジェクトまたは queryset を扱う時、Django はモデルのクラス名を小文字にした名前を使ってコンテキストを設定できます。デフォルトの <code class="docutils literal notranslate"><span class="pre">object_list</span></code> エントリーに加えて、たとえば <code class="docutils literal notranslate"><span class="pre">publisher_list</span></code> のような変数に、全く同じデータが格納されているのです。</p>
+<p>しかし、この名前でも良くないと感じるなら、コンテキストの変数名を手動で設定することもできます。次のように、ジェネリックビューの <code class="docutils literal notranslate"><span class="pre">context_object_name</span></code> 属性を設定すると、コンテキスト変数の名前として使えるようになります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># views.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Publisher</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PublisherListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Publisher</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s2">&quot;my_favorite_publishers&quot;</span>
+</pre></div>
+</div>
+<p>分かりやすい <code class="docutils literal notranslate"><span class="pre">context_object_name</span></code> を設定するのはいつでも良い考えです。テンプレートのデザイン担当の同僚に、きっと感謝されるでしょう。</p>
+</section>
+<section id="s-adding-extra-context">
+<span id="s-id1"></span><span id="adding-extra-context"></span><span id="id1"></span><h3>追加のコンテキストを追加する<a class="headerlink" href="#adding-extra-context" title="Link to this heading">¶</a></h3>
+<p>ジェネリックビューが提供する以外の追加情報が必要になることはよくあります。たとえば、各出版社の詳細ページで全書籍リストを表示したくなったとします。 <a class="reference internal" href="../../ref/class-based-views/generic-display.html#django.views.generic.detail.DetailView" title="django.views.generic.detail.DetailView"><code class="xref py py-class docutils literal notranslate"><span class="pre">DetailView</span></code></a> ジェネリックビューは出版社をコンテキストに設定してくれますが、テンプレートに必要な他の追加情報を使うにはどうすれば良いのでしょうか？</p>
+<p>その答えは、 <a class="reference internal" href="../../ref/class-based-views/generic-display.html#django.views.generic.detail.DetailView" title="django.views.generic.detail.DetailView"><code class="xref py py-class docutils literal notranslate"><span class="pre">DetailView</span></code></a> をサブクラス化して、 <code class="docutils literal notranslate"><span class="pre">get_context_data</span></code> メソッドを自分で実装することです。デフォルトの実装では、単にテンプレートで表示されるオブジェクトだけを追加しますが、ここで追加情報を送るようにオーバーライドできます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetailView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Book</span><span class="p">,</span> <span class="n">Publisher</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PublisherDetailView</span><span class="p">(</span><span class="n">DetailView</span><span class="p">):</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">Publisher</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># Call the base implementation first to get a context</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Add in a QuerySet of all the books</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;book_list&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">context</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>通常、 <code class="docutils literal notranslate"><span class="pre">get_context_data</span></code> はすべての親クラスのコンテキストデータを現在のクラスのコンテキストデータにマージします。コンテキストを変更したい自分のクラスでこの動作を維持するには、必ずスーパークラスで <code class="docutils literal notranslate"><span class="pre">get_context_data</span></code> を呼び出すようにしてください。2 つのクラスが同じキーを定義しようとしない場合、これは期待通りの結果をもたらします。しかし、親クラスがキーを設定した後に (super を呼び出した後に) あるクラスがキーをオーバーライドしようとした場合、そのクラスの子クラスも親クラスを確実にオーバーライドしたいのであれば、super の後に明示的にキーを設定する必要があります。問題がある場合は、ビューのメソッドの解決順序を見直してみてください。</p>
+<p>もうひとつの考慮点は、クラスベースのジェネリックビューのコンテキストデータが コンテキストプロセッサによって提供されるデータを上書きしてしまうことです。たとえば、 <a class="reference internal" href="../../ref/class-based-views/mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.get_context_data" title="django.views.generic.detail.SingleObjectMixin.get_context_data"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_context_data()</span></code></a> を参照してください。</p>
+</div>
+</section>
+<section id="s-viewing-subsets-of-objects">
+<span id="s-generic-views-list-subsets"></span><span id="viewing-subsets-of-objects"></span><span id="generic-views-list-subsets"></span><h3>オブジェクトのサブセットを表示する<a class="headerlink" href="#viewing-subsets-of-objects" title="Link to this heading">¶</a></h3>
+<p>それでは次に、すべての場所で使っていた <code class="docutils literal notranslate"><span class="pre">model</span></code> 引数について詳しく見ていきましょう。<code class="docutils literal notranslate"><span class="pre">model</span></code> 引数は、ビューの操作対象となるデータベースのモデルを指定します。この引数は、1オブジェクトまたは複数オブジェクトを操作するすべてのジェネリックビューで使用可能です。しかし、<code class="docutils literal notranslate"><span class="pre">model</span></code> 引数は操作対象のオブジェクトを指定する唯一の方法ではありません。次のように、<code class="docutils literal notranslate"><span class="pre">queryset</span></code> 引数を使ってオブジェクトを指定することもできます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetailView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Publisher</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PublisherDetailView</span><span class="p">(</span><span class="n">DetailView</span><span class="p">):</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s2">&quot;publisher&quot;</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">model</span> <span class="pre">=</span> <span class="pre">Publisher</span></code> を指定することは、<code class="docutils literal notranslate"><span class="pre">queryset</span> <span class="pre">=</span> <span class="pre">Publisher.objects.all()</span></code> と言うのと同じことです。しかし、<code class="docutils literal notranslate"><span class="pre">queryset</span></code> を使用してオブジェクトのフィルタリングされたリストを定義することで、ビューで表示されるオブジェクトについてより具体的にすることができます（<a class="reference internal" href="../../ref/models/querysets.html#django.db.models.query.QuerySet" title="django.db.models.query.QuerySet"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuerySet</span></code></a> オブジェクトについての詳細は <a class="reference internal" href="../db/queries.html"><span class="doc">クエリを作成する</span></a> を参照し、完全な詳細については <a class="reference internal" href="../../ref/class-based-views/index.html"><span class="doc">クラスベースのビューのリファレンス</span></a> を参照してください）。</p>
+<p>例として、本を出版日で新しい順に並び替えたくなったとしたら、次のように書けます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Book</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BookListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-publication_date&quot;</span><span class="p">)</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s2">&quot;book_list&quot;</span>
+</pre></div>
+</div>
+<p>これは小さな例ですが、queryset の概念は上手く表現できていると思います。普通はただ並び替える以上のことをすることになるでしょう。特定の出版社の書籍リストを表示したい場合にも、同じテクニックが使えます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Book</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AcmeBookListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s2">&quot;book_list&quot;</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">publisher__name</span><span class="o">=</span><span class="s2">&quot;ACME Publishing&quot;</span><span class="p">)</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;books/acme_list.html&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">queryset</span></code> がフィルタリングされただけではなく、テンプレート名も変更されているのがわかります。そうしないと、ジェネリックビューは「素の」オブジェクトリストと同じテンプレートを使ってしまいます。しかし、それは意図したものではないはずです。</p>
+<p>同時に注意しておきたいのは、この方法は特定の出版社の本をリストアップするにはあまりエレガントな方法ではないということです。新しく出版社のページを追加する必要が生じるたびにURLconf に数行を追加する必要があるので、これでは数社以上追加するとなるとすでに無理があると分かるでしょう。この問題の解決策は、次のセクションで議論します。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">/books/acme</span></code> のリクエスト時に 404 が表示された場合は、本当に 'ACME Publishing' という名前を持つ Publisher が存在しているか確認してください。このようなケースのためにジェネリックビューには <code class="docutils literal notranslate"><span class="pre">allow_empty</span></code> 引数というものもあります。詳しくは <a class="reference internal" href="../../ref/class-based-views/index.html"><span class="doc">クラスベースビューのリファレンス</span></a> を参照してください。</p>
+</div>
+</section>
+<section id="s-dynamic-filtering">
+<span id="dynamic-filtering"></span><h3>動的なフィルタリング<a class="headerlink" href="#dynamic-filtering" title="Link to this heading">¶</a></h3>
+<p>もう一つのよくあるニーズは、リストページの URL に指定した何らかのキーを使って、表示するオブジェクトをフィルタリングすることです。上の例では、出版社名を URLconf にハードコーディングしてしまっていましたが、もし任意の出版社に対するすべての書籍を表示するようなビューを書きたい場合には、どうすればいいでしょうか？</p>
+<p>便利なことに、 <code class="docutils literal notranslate"><span class="pre">ListView</span></code> にはオーバーライドできる <a class="reference internal" href="../../ref/class-based-views/mixins-multiple-object.html#django.views.generic.list.MultipleObjectMixin.get_queryset" title="django.views.generic.list.MultipleObjectMixin.get_queryset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_queryset()</span></code></a> メソッドがあります。デフォルトでは、 <code class="docutils literal notranslate"><span class="pre">queryset</span></code> 属性の値を返しますが、これを使用してロジックを追加できます。</p>
+<p>この機能がうまく動作するキーポイントは、クラスベースのビューが呼ばれる段階で <code class="docutils literal notranslate"><span class="pre">self</span></code> 内には様々な便利な値が格納されていることです。request (<code class="docutils literal notranslate"><span class="pre">self.request</span></code>)、位置引数 (<code class="docutils literal notranslate"><span class="pre">self.args</span></code>)、そして、キーワード引数 (<code class="docutils literal notranslate"><span class="pre">self.kwargs</span></code>) が、URLconf からキャプチャされてきています。</p>
+<p>ここでは、次のように URLconf に1つのキャプチャグループがあるとしましょう。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># urls.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">PublisherBookListView</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;books/&lt;publisher&gt;/&quot;</span><span class="p">,</span> <span class="n">PublisherBookListView</span><span class="o">.</span><span class="n">as_view</span><span class="p">()),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>次に、<code class="docutils literal notranslate"><span class="pre">PublisherBookListView</span></code> ビュー本体を書きます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># views.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">ListView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Book</span><span class="p">,</span> <span class="n">Publisher</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PublisherBookListView</span><span class="p">(</span><span class="n">ListView</span><span class="p">):</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;books/books_by_publisher.html&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Publisher</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;publisher&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">Book</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">publisher</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">publisher</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>queryset の選択に追加のロジックを加えるために <code class="docutils literal notranslate"><span class="pre">get_queryset</span></code> を使うテクニックは、便利で強力です。望むなら、たとえば <code class="docutils literal notranslate"><span class="pre">self.request.user</span></code> で現在のユーザーの情報でフィルタリングしたり、もっと複雑なロジックを追加したりすることも可能です。</p>
+<p>次のようにすれば、テンプレートで使えるように、出版社の情報を同時にコンテキストに追加することもできます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># ...</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># Call the base implementation first to get a context</span>
+    <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="c1"># Add in the publisher</span>
+    <span class="n">context</span><span class="p">[</span><span class="s2">&quot;publisher&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">publisher</span>
+    <span class="k">return</span> <span class="n">context</span>
+</pre></div>
+</div>
+</section>
+<section id="s-performing-extra-work">
+<span id="s-generic-views-extra-work"></span><span id="performing-extra-work"></span><span id="generic-views-extra-work"></span><h3>追加の処理を実行する<a class="headerlink" href="#performing-extra-work" title="Link to this heading">¶</a></h3>
+<p>最後に見る共通パターンは、ジェネリックビューの呼び出しの前後で追加の処理を実行するというものです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Author</span></code> モデルに <code class="docutils literal notranslate"><span class="pre">last_accessed</span></code> フィールドがあり、誰かが最後に著者の情報を見た時刻をトラッキングするのに使用しているとします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># models.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Author</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">salutation</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+    <span class="n">email</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">EmailField</span><span class="p">()</span>
+    <span class="n">headshot</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ImageField</span><span class="p">(</span><span class="n">upload_to</span><span class="o">=</span><span class="s2">&quot;author_headshots&quot;</span><span class="p">)</span>
+    <span class="n">last_accessed</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>汎用の <code class="docutils literal notranslate"><span class="pre">DetailView</span></code> クラスはこのフィールドについて何も知りませんが、このフィールドを最新の状態に保つためのカスタムビューをもう一度作成できます。</p>
+<p>まず、著者の詳細ビューを追加して、URLconf にカスタムビューを使うようにする必要があります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthorDetailView</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ...</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;authors/&lt;int:pk&gt;/&quot;</span><span class="p">,</span> <span class="n">AuthorDetailView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;author-detail&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>次に、新しいビューを記述します（ <code class="docutils literal notranslate"><span class="pre">get_object</span></code> はオブジェクトを取得するメソッドです）。そのため、オブジェクトをオーバーライドして、呼び出しをラップします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">DetailView</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">books.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Author</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthorDetailView</span><span class="p">(</span><span class="n">DetailView</span><span class="p">):</span>
+    <span class="n">queryset</span> <span class="o">=</span> <span class="n">Author</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_object</span><span class="p">()</span>
+        <span class="c1"># Record the last accessed date</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">last_accessed</span> <span class="o">=</span> <span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">obj</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>ここで URLconf は <code class="docutils literal notranslate"><span class="pre">pk</span></code> という名前のキャプチャグループを使っています。この名前は <code class="docutils literal notranslate"><span class="pre">DetailView</span></code> が queryset をフィルタするのに使うプライマリキーの値を見付けるためのデフォルトの名前です。</p>
+<p>グループを別の名前で呼び出したい場合は、ビューに <a class="reference internal" href="../../ref/class-based-views/mixins-single-object.html#django.views.generic.detail.SingleObjectMixin.pk_url_kwarg" title="django.views.generic.detail.SingleObjectMixin.pk_url_kwarg"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pk_url_kwarg</span></code></a> を指定します。</p>
+</div>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">組み込みのクラスベースのジェネリックビュー（汎用ビュー）</a><ul>
+<li><a class="reference internal" href="#extending-generic-views">ジェネリックビューを拡張する</a></li>
+<li><a class="reference internal" href="#generic-views-of-objects">オブジェクトのジェネリックビュー</a><ul>
+<li><a class="reference internal" href="#making-friendly-template-contexts">「親切な」テンプレートコンテキストを作る</a></li>
+<li><a class="reference internal" href="#adding-extra-context">追加のコンテキストを追加する</a></li>
+<li><a class="reference internal" href="#viewing-subsets-of-objects">オブジェクトのサブセットを表示する</a></li>
+<li><a class="reference internal" href="#dynamic-filtering">動的なフィルタリング</a></li>
+<li><a class="reference internal" href="#performing-extra-work">追加の処理を実行する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="intro.html"
+                          title="前の章へ">クラスベースビュー入門</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="generic-editing.html"
+                          title="次の章へ">クラスベースのビューでフォームを扱う</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/class-based-views/generic-display.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="intro.html" title="クラスベースビュー入門">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="generic-editing.html" title="クラスベースのビューでフォームを扱う">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

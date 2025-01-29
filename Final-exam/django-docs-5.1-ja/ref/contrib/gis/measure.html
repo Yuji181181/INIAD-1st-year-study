@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>測定オブジェクト &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="GEOS API" href="geos.html" />
+    <link rel="prev" title="地理情報データベース関数" href="functions.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="functions.html" title="地理情報データベース関数">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="geos.html" title="GEOS API">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-gis-measure">
+            
+  <section id="s-module-django.contrib.gis.measure">
+<span id="s-measurement-objects"></span><span id="module-django.contrib.gis.measure"></span><span id="measurement-objects"></span><h1>測定オブジェクト<a class="headerlink" href="#module-django.contrib.gis.measure" title="Link to this heading">¶</a></h1>
+<p><a class="reference internal" href="#module-django.contrib.gis.measure" title="django.contrib.gis.measure: GeoDjango's distance and area measurement objects."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.gis.measure</span></code></a> モジュールには、距離や面積の単位を便利に表現するためのオブジェクトが含まれています。 <a class="footnote-reference brackets" href="#id3" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> 具体的には、<a class="reference internal" href="#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> と <a class="reference internal" href="#django.contrib.gis.measure.Area" title="django.contrib.gis.measure.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">Area</span></code></a> の 2 つのオブジェクトを実装しており、それぞれ <a class="reference internal" href="#django.contrib.gis.measure.D" title="django.contrib.gis.measure.D"><code class="xref py py-class docutils literal notranslate"><span class="pre">D</span></code></a> と <a class="reference internal" href="#django.contrib.gis.measure.A" title="django.contrib.gis.measure.A"><code class="xref py py-class docutils literal notranslate"><span class="pre">A</span></code></a> の便利なエイリアスを介してアクセスできます。</p>
+<section id="s-example">
+<span id="example"></span><h2>カスタマイズ例<a class="headerlink" href="#example" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> オブジェクトは、単位のコンテキストを示すキーワード引数を用いてインスタンス化できます。以下の例では、異なる距離のオブジェクトを、キロメートル (<code class="docutils literal notranslate"><span class="pre">km</span></code>) とマイル (<code class="docutils literal notranslate"><span class="pre">mi</span></code>) の単位でインスタンス化しています。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.measure</span><span class="w"> </span><span class="kn">import</span> <span class="n">D</span><span class="p">,</span> <span class="n">Distance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d1</span> <span class="o">=</span> <span class="n">Distance</span><span class="p">(</span><span class="n">km</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">d1</span><span class="p">)</span>
+<span class="go">5.0 km</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d2</span> <span class="o">=</span> <span class="n">D</span><span class="p">(</span><span class="n">mi</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># `D` is an alias for `Distance`</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">d2</span><span class="p">)</span>
+<span class="go">5.0 mi</span>
+</pre></div>
+</div>
+<p>変換には、変換された距離の量を取得するために好ましい単位属性にアクセスします:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">d1</span><span class="o">.</span><span class="n">mi</span><span class="p">)</span>  <span class="c1"># Converting 5 kilometers to miles</span>
+<span class="go">3.10685596119</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">d2</span><span class="o">.</span><span class="n">km</span><span class="p">)</span>  <span class="c1"># Converting 5 miles to kilometers</span>
+<span class="go">8.04672</span>
+</pre></div>
+</div>
+<p>また、距離オブジェクト間で算術演算を行うこともできます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">d1</span> <span class="o">+</span> <span class="n">d2</span><span class="p">)</span>  <span class="c1"># Adding 5 miles to 5 kilometers</span>
+<span class="go">13.04672 km</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">d2</span> <span class="o">-</span> <span class="n">d1</span><span class="p">)</span>  <span class="c1"># Subtracting 5 kilometers from 5 miles</span>
+<span class="go">1.89314403881 mi</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> オブジェクト同士を掛け合わせると、その結果は、二乗の単位で表される <a class="reference internal" href="#django.contrib.gis.measure.Area" title="django.contrib.gis.measure.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">Area</span></code></a> オブジェクトとなります。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">d1</span> <span class="o">*</span> <span class="n">d2</span>  <span class="c1"># Returns an Area object.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="go">40.2336 sq_km</span>
+</pre></div>
+</div>
+<p>ユニットの属性略称を決定するには、<code class="docutils literal notranslate"><span class="pre">unit_attname</span></code> クラスメソッドを使用します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Distance</span><span class="o">.</span><span class="n">unit_attname</span><span class="p">(</span><span class="s2">&quot;US Survey Foot&quot;</span><span class="p">))</span>
+<span class="go">survey_ft</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">Distance</span><span class="o">.</span><span class="n">unit_attname</span><span class="p">(</span><span class="s2">&quot;centimeter&quot;</span><span class="p">))</span>
+<span class="go">cm</span>
+</pre></div>
+</div>
+</section>
+<section id="s-supported-units">
+<span id="s-id2"></span><span id="supported-units"></span><span id="id2"></span><h2>サポートされる単位<a class="headerlink" href="#supported-units" title="Link to this heading">¶</a></h2>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>単位 (unit) 属性</p></th>
+<th class="head"><p>フルネームまたはエイリアス</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">km</span></code></p></td>
+<td><p>Kilometre, Kilometer</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mi</span></code></p></td>
+<td><p>Mile</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">m</span></code></p></td>
+<td><p>Meter, Metre</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">yd</span></code></p></td>
+<td><p>Yard</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ft</span></code></p></td>
+<td><p>Foot, Foot (International)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">survey_ft</span></code></p></td>
+<td><p>U.S. Foot, US survey foot</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">inch</span></code></p></td>
+<td><p>Inches</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cm</span></code></p></td>
+<td><p>Centimeter</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mm</span></code></p></td>
+<td><p>Millimetre, Millimeter</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">um</span></code></p></td>
+<td><p>Micrometer, Micrometre</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">british_ft</span></code></p></td>
+<td><p>British foot (Sears 1922)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">british_yd</span></code></p></td>
+<td><p>British yard (Sears 1922)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">british_chain_sears</span></code></p></td>
+<td><p>British chain (Sears 1922)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">indian_yd</span></code></p></td>
+<td><p>Indian yard, Yard (Indian)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sears_yd</span></code></p></td>
+<td><p>Yard (Sears)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">clarke_ft</span></code></p></td>
+<td><p>Clarke's Foot</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">chain</span></code></p></td>
+<td><p>Chain</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">chain_benoit</span></code></p></td>
+<td><p>Chain (Benoit)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">chain_sears</span></code></p></td>
+<td><p>Chain (Sears)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">british_chain_benoit</span></code></p></td>
+<td><p>British chain (Benoit 1895 B)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">british_chain_sears_truncated</span></code></p></td>
+<td><p>British chain (Sears 1922 truncated)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">gold_coast_ft</span></code></p></td>
+<td><p>Gold Coast foot</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">link</span></code></p></td>
+<td><p>Link</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">link_benoit</span></code></p></td>
+<td><p>Link (Benoit)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">link_sears</span></code></p></td>
+<td><p>Link (Sears)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">clarke_link</span></code></p></td>
+<td><p>Clarke's link</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">fathom</span></code></p></td>
+<td><p>Fathom</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">rod</span></code></p></td>
+<td><p>Rod</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">furlong</span></code></p></td>
+<td><p>Furlong, Furrow Long</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nm</span></code></p></td>
+<td><p>Nautical Mile</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nm_uk</span></code></p></td>
+<td><p>Nautical Mile (UK)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">german_m</span></code></p></td>
+<td><p>German legal metre</p></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="#django.contrib.gis.measure.Area" title="django.contrib.gis.measure.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">Area</span></code></a> の属性は、 <a class="reference internal" href="#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> の属性と同じですが、プレフィックスが <code class="docutils literal notranslate"><span class="pre">sq_</span></code> になっています (面積の単位は平方です) 。例えば、 <code class="docutils literal notranslate"><span class="pre">Area(sq_m=2)</span></code> は、2平方メートルを表す <a class="reference internal" href="#django.contrib.gis.measure.Area" title="django.contrib.gis.measure.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">Area</span></code></a> オブジェクトを作成します。</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">sq_</span></code> プレフィックスが付いた単位に加えて、次の単位も <a class="reference internal" href="#django.contrib.gis.measure.Area" title="django.contrib.gis.measure.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">Area</span></code></a> でサポートされています：</p>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>単位 (unit) 属性</p></th>
+<th class="head"><p>フルネームまたはエイリアス</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ha</span></code></p></td>
+<td><p>ヘクタール</p></td>
+</tr>
+</tbody>
+</table>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.1:</span> <p><code class="docutils literal notranslate"><span class="pre">ha</span></code> 単位のサポートが追加されました。</p>
+</div>
+</section>
+<section id="s-measurement-api">
+<span id="measurement-api"></span><h2>測定API<a class="headerlink" href="#measurement-api" title="Link to this heading">¶</a></h2>
+<section id="s-distance">
+<span id="distance"></span><h3><code class="docutils literal notranslate"><span class="pre">Distance</span></code><a class="headerlink" href="#distance" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.measure.Distance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Distance</span></span>(<em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/measure.py#L248"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.measure.Distance" title="Link to this definition">¶</a></dt>
+<dd><p>距離オブジェクトを初期化するには、<a class="reference internal" href="#supported-units"><span class="std std-ref">単位属性名</span></a> に対応するキーワードを渡します。例えば、以下は5マイルを表す距離オブジェクトを作成します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dist</span> <span class="o">=</span> <span class="n">Distance</span><span class="p">(</span><span class="n">mi</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.gis.measure.Distance.__getattr__">
+<span class="sig-name descname"><span class="pre">__getattr__</span></span>(<em class="sig-param"><span class="n"><span class="pre">unit_att</span></span></em>)<a class="headerlink" href="#django.contrib.gis.measure.Distance.__getattr__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>与えられた単位属性に対応する単位で距離値を返します。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">dist</span><span class="o">.</span><span class="n">km</span><span class="p">)</span>
+<span class="go">8.04672</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.gis.measure.Distance.unit_attname">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unit_attname</span></span>(<em class="sig-param"><span class="n"><span class="pre">unit_name</span></span></em>)<a class="headerlink" href="#django.contrib.gis.measure.Distance.unit_attname" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>与えられた完全な単位名に対する距離単位の属性名を返します。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Distance</span><span class="o">.</span><span class="n">unit_attname</span><span class="p">(</span><span class="s2">&quot;Mile&quot;</span><span class="p">)</span>
+<span class="go">&#39;mi&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.measure.D">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">D</span></span><a class="headerlink" href="#django.contrib.gis.measure.D" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> クラスのエイリアス。</p>
+</dd></dl>
+
+</section>
+<section id="s-area">
+<span id="area"></span><h3><code class="docutils literal notranslate"><span class="pre">Area</span></code><a class="headerlink" href="#area" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.measure.Area">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Area</span></span>(<em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/measure.py#L347"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.measure.Area" title="Link to this definition">¶</a></dt>
+<dd><p>面積オブジェクトを初期化するには、<a class="reference internal" href="#supported-units"><span class="std std-ref">単位属性名</span></a> に対応するキーワードを渡します。例えば、以下は5平方マイルを表す面積オブジェクトを作成します:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">Area</span><span class="p">(</span><span class="n">sq_mi</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.gis.measure.Area.__getattr__">
+<span class="sig-name descname"><span class="pre">__getattr__</span></span>(<em class="sig-param"><span class="n"><span class="pre">unit_att</span></span></em>)<a class="headerlink" href="#django.contrib.gis.measure.Area.__getattr__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>与えられた単位属性に対応する単位で面積値を返します。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">sq_km</span><span class="p">)</span>
+<span class="go">12.949940551680001</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.gis.measure.Area.unit_attname">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unit_attname</span></span>(<em class="sig-param"><span class="n"><span class="pre">unit_name</span></span></em>)<a class="headerlink" href="#django.contrib.gis.measure.Area.unit_attname" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>指定された完全な単位名に対する面積単位属性名を返します。例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">Area</span><span class="o">.</span><span class="n">unit_attname</span><span class="p">(</span><span class="s2">&quot;Kilometer&quot;</span><span class="p">)</span>
+<span class="go">&#39;sq_km&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.measure.A">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">A</span></span><a class="headerlink" href="#django.contrib.gis.measure.A" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.contrib.gis.measure.Area" title="django.contrib.gis.measure.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">Area</span></code></a> クラスのエイリアス。</p>
+</dd></dl>
+
+<p class="rubric">脚注</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id3" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p><a class="reference external" href="https://koordinates.com/">Robert Coup</a> は、測定オブジェクトの初期の作者であり、 <a class="reference external" href="https://github.com/geopy/geopy/">geopy</a> の Brian Beck 氏の業績や、ロボット工学の寸法単位に関する Geoff Biggs 氏の博士号取得研究に触発されました。</p>
+</aside>
+</aside>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">測定オブジェクト</a><ul>
+<li><a class="reference internal" href="#example">カスタマイズ例</a></li>
+<li><a class="reference internal" href="#supported-units">サポートされる単位</a></li>
+<li><a class="reference internal" href="#measurement-api">測定API</a><ul>
+<li><a class="reference internal" href="#distance"><code class="docutils literal notranslate"><span class="pre">Distance</span></code></a></li>
+<li><a class="reference internal" href="#area"><code class="docutils literal notranslate"><span class="pre">Area</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="functions.html"
+                          title="前の章へ">地理情報データベース関数</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="geos.html"
+                          title="次の章へ">GEOS API</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/gis/measure.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="functions.html" title="地理情報データベース関数">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="geos.html" title="GEOS API">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

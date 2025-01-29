@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>メールを送信する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="国際化とローカライズ" href="i18n/index.html" />
+    <link rel="prev" title="暗号署名" href="signing.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="signing.html" title="暗号署名">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="i18n/index.html" title="国際化とローカライズ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-email">
+            
+  <section id="s-module-django.core.mail">
+<span id="s-sending-email"></span><span id="module-django.core.mail"></span><span id="sending-email"></span><h1>メールを送信する<a class="headerlink" href="#module-django.core.mail" title="Link to this heading">¶</a></h1>
+<p>Python は <a class="reference external" href="https://docs.python.org/3/library/smtplib.html#module-smtplib" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">smtplib</span></code></a> モジュールを使ってメール送信インタフェースを提供していますが、Django はさらにいくつかの軽いラッパーを用意しています。これらのラッパーは、 メールをよりすばやく送信したり、開発中にメール送信をテストしたり、SMTP を使用できないプラットフォームをサポートしたりするために用意されています。</p>
+<p>コードは <code class="docutils literal notranslate"><span class="pre">django.core.mail</span></code> モジュールにあります。</p>
+<section id="s-quick-examples">
+<span id="quick-examples"></span><h2>簡単な例<a class="headerlink" href="#quick-examples" title="Link to this heading">¶</a></h2>
+<p>簡単なメール送信には <a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-func docutils literal notranslate"><span class="pre">send_mail()</span></code></a> を使用します。たとえば、プレーンテキストのメッセージを送信するには、次のようにします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">send_mail</span>
+
+<span class="n">send_mail</span><span class="p">(</span>
+    <span class="s2">&quot;Subject here&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Here is the message.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;to@example.com&quot;</span><span class="p">],</span>
+    <span class="n">fail_silently</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>追加のメール送信機能が必要な場合は、<a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> または <a class="reference internal" href="#django.core.mail.EmailMultiAlternatives" title="django.core.mail.EmailMultiAlternatives"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMultiAlternatives</span></code></a> を使用してください。例えば、特定のテンプレートとカスタムヘッダーを使用して、HTMLバージョンとプレーンテキストバージョンの両方を含むマルチパートメールを送信する場合は、次のようにします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmailMultiAlternatives</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.template.loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">render_to_string</span>
+
+<span class="c1"># First, render the plain text content.</span>
+<span class="n">text_content</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span>
+    <span class="s2">&quot;templates/emails/my_email.txt&quot;</span><span class="p">,</span>
+    <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;my_variable&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c1"># Secondly, render the HTML content.</span>
+<span class="n">html_content</span> <span class="o">=</span> <span class="n">render_to_string</span><span class="p">(</span>
+    <span class="s2">&quot;templates/emails/my_email.html&quot;</span><span class="p">,</span>
+    <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;my_variable&quot;</span><span class="p">:</span> <span class="mi">42</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c1"># Then, create a multipart email instance.</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">EmailMultiAlternatives</span><span class="p">(</span>
+    <span class="s2">&quot;Subject here&quot;</span><span class="p">,</span>
+    <span class="n">text_content</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;to@example.com&quot;</span><span class="p">],</span>
+    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;List-Unsubscribe&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;mailto:unsub@example.com&gt;&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c1"># Lastly, attach the HTML content to the email instance and send.</span>
+<span class="n">msg</span><span class="o">.</span><span class="n">attach_alternative</span><span class="p">(</span><span class="n">html_content</span><span class="p">,</span> <span class="s2">&quot;text/html&quot;</span><span class="p">)</span>
+<span class="n">msg</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>設定内の <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_PORT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_PORT</span></code></a> で指定された SMTP ホストとポートを使用して、メールが送信されます。<a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST_USER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST_USER</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST_PASSWORD"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST_PASSWORD</span></code></a> が指定されている場合は、SMTP サーバーの認証に使われます。そして、<a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_USE_TLS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_USE_TLS</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_USE_SSL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_USE_SSL</span></code></a> 設定により、セキュアコネクションを使うかどうかをコントロールします。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">django.core.mail</span></code> で送信されるメールの文字セットは、<a class="reference internal" href="../ref/settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定の値にセットされます。</p>
+</div>
+</section>
+<section id="s-send-mail">
+<span id="send-mail"></span><h2><code class="docutils literal notranslate"><span class="pre">send_mail()</span></code><a class="headerlink" href="#send-mail" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.core.mail.send_mail">
+<span class="sig-name descname"><span class="pre">send_mail</span></span>(<em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_email</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recipient_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_silently</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">html_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/mail/__init__.py#L55"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.mail.send_mail" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>ほとんどの場合、 <code class="docutils literal notranslate"><span class="pre">django.core.mail.send_mail()</span></code> を使ってメールを送信できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">subject</span></code>、<code class="docutils literal notranslate"><span class="pre">message</span></code>、<code class="docutils literal notranslate"><span class="pre">from_email</span></code>、<code class="docutils literal notranslate"><span class="pre">recipient_list</span></code> の 4 つの引数は必須です。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">subject</span></code>: 文字列。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">message</span></code>: 文字列。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">from_email</span></code>: 文字列。もし <code class="docutils literal notranslate"><span class="pre">None</span></code> なら、 Django は <a class="reference internal" href="../ref/settings.html#std-setting-DEFAULT_FROM_EMAIL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_FROM_EMAIL</span></code></a> 設定の値を使います。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">recipient_list</span></code>: メールアドレスを表す文字列のリスト。<code class="docutils literal notranslate"><span class="pre">recipient_list</span></code> の各メンバーは、メールメッセージの &quot;To:&quot; フィールドで他の受信者を見ることができます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fail_silently</span></code>: 真偽値です。これが <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合、エラーが発生したときに <code class="docutils literal notranslate"><span class="pre">send_mail()</span></code> は <a class="reference external" href="https://docs.python.org/3/library/smtplib.html#smtplib.SMTPException" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">smtplib.SMTPException</span></code></a> を発生させます。可能な例外のリストについては <a class="reference external" href="https://docs.python.org/3/library/smtplib.html#module-smtplib" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">smtplib</span></code></a> のドキュメントを参照してください。これらの例外はすべて <a class="reference external" href="https://docs.python.org/3/library/smtplib.html#smtplib.SMTPException" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">SMTPException</span></code></a> のサブクラスです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">auth_user</span></code>: SMTP サーバー認証のためのユーザー名で、省略可能。指定されなかった場合、Django <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST_USER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST_USER</span></code></a> 設定の値を使います。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">auth_password</span></code>: SMTP サーバー認証のためのパスワードで、省略可能。指定されなかった場合、Django は <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST_PASSWORD"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST_PASSWORD</span></code></a> 設定の値を使います。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">connection</span></code>: メール送信のために使うバックエンドで、省略可能。指定しなかった場合、デフォルトのバックエンドのインスタンスが使われます。詳しくは <a class="reference internal" href="#topic-email-backends"><span class="std std-ref">メールのバックエンド</span></a> を参照してください。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">html_message</span></code>: <code class="docutils literal notranslate"><span class="pre">html_message</span></code> が指定された場合、送信されるメールは <em class="mimetype">multipart/alternative</em> となり、<em class="mimetype">text/plain</em> コンテンツタイプを持つ <code class="docutils literal notranslate"><span class="pre">message</span></code> と <em class="mimetype">text/html</em> コンテンツタイプを持つ <code class="docutils literal notranslate"><span class="pre">html_message</span></code> を合わせ持つものになります。</p></li>
+</ul>
+<p>返り値は、送信に成功したメッセージの数です (送信されるメッセージが 1 つだけの場合もあるため、<code class="docutils literal notranslate"><span class="pre">0</span></code> や <code class="docutils literal notranslate"><span class="pre">1</span></code> になることもあります)。</p>
+</section>
+<section id="s-send-mass-mail">
+<span id="send-mass-mail"></span><h2><code class="docutils literal notranslate"><span class="pre">send_mass_mail()</span></code><a class="headerlink" href="#send-mass-mail" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.core.mail.send_mass_mail">
+<span class="sig-name descname"><span class="pre">send_mass_mail</span></span>(<em class="sig-param"><span class="n"><span class="pre">datatuple</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_silently</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">auth_password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/mail/__init__.py#L91"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.mail.send_mass_mail" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">django.core.mail.send_mass_mail()</span></code> は、大量のメール送信を扱うために用意されています。</p>
+<p><code class="docutils literal notranslate"><span class="pre">datatuple</span></code> はメッセージの集合を表すタプルです。タプル内の各要素は、それぞれ1種類のメッセージを表すタプルであり、次の形式を持ちます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">from_email</span><span class="p">,</span> <span class="n">recipient_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">fail_silently</span></code>、<code class="docutils literal notranslate"><span class="pre">auth_user</span></code>、<code class="docutils literal notranslate"><span class="pre">auth_password</span></code> の 3 つは、<a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mail()</span></code></a> と同じように機能します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">datatuple</span></code> に含まれる各要素は、最終的には別々のメールメッセージとなります。<a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mail()</span></code></a> における挙動と同じく、<code class="docutils literal notranslate"><span class="pre">recipient_list</span></code> 内の受信者は、メールメッセージの &quot;To:&quot; フィールドに書かれている他の受信者のアドレスを見ることができます。</p>
+<p>たとえば、次のコードは異なる 2 つのメッセージを 異なる 2 つの受信者のセットに送信します。しかし、メールサーバーへのコネクションは 1 つしか開かれません。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">message1</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Subject here&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Here is the message&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;first@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;other@example.com&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">message2</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;Another Subject&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Here is another message&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;second@test.com&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">send_mass_mail</span><span class="p">((</span><span class="n">message1</span><span class="p">,</span> <span class="n">message2</span><span class="p">),</span> <span class="n">fail_silently</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>戻り値は、メッセージ送信に成功した数です。</p>
+<section id="s-send-mass-mail-vs-send-mail">
+<span id="send-mass-mail-vs-send-mail"></span><h3><code class="docutils literal notranslate"><span class="pre">send_mass_mail()</span></code> と <code class="docutils literal notranslate"><span class="pre">send_mail()</span></code> の比較<a class="headerlink" href="#send-mass-mail-vs-send-mail" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="#django.core.mail.send_mass_mail" title="django.core.mail.send_mass_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mass_mail()</span></code></a> と <a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mail()</span></code></a> 違いは、<a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mail()</span></code></a> が実行されるごとに毎回コネクションを開くのに対して、<a class="reference internal" href="#django.core.mail.send_mass_mail" title="django.core.mail.send_mass_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mass_mail()</span></code></a> はすべてのメッセージに対して 1 つだけコネクションを使います。これにより、<a class="reference internal" href="#django.core.mail.send_mass_mail" title="django.core.mail.send_mass_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mass_mail()</span></code></a> の方が若干効率がよくなっています。</p>
+</section>
+</section>
+<section id="s-mail-admins">
+<span id="mail-admins"></span><h2><code class="docutils literal notranslate"><span class="pre">mail_admins()</span></code><a class="headerlink" href="#mail-admins" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.core.mail.mail_admins">
+<span class="sig-name descname"><span class="pre">mail_admins</span></span>(<em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_silently</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">html_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/mail/__init__.py#L118"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.mail.mail_admins" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">django.core.mail.mail_admins()</span></code> は、<a class="reference internal" href="../ref/settings.html#std-setting-ADMINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ADMINS</span></code></a> 設定で定義されているサイト管理者 (admin) に対してメールを送信するためのショートカットです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">mail_admins()</span></code> は件名の前に <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_SUBJECT_PREFIX"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_SUBJECT_PREFIX</span></code></a> 設定の値を付けますが、デフォルトでは <code class="docutils literal notranslate"><span class="pre">&quot;[Django]</span> <span class="pre">&quot;</span></code> です。</p>
+<p>メールの &quot;From: &quot; ヘッダは <a class="reference internal" href="../ref/settings.html#std-setting-SERVER_EMAIL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SERVER_EMAIL</span></code></a> 設定の値になります。</p>
+<p>このメソッドは利便性と読みやすさのために存在します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">html_message</span></code> が指定された場合、送信されるメールは <em class="mimetype">multipart/alternative</em> となり、<em class="mimetype">text/plain</em> コンテンツタイプを持つ <code class="docutils literal notranslate"><span class="pre">message</span></code> と <em class="mimetype">text/html</em> コンテンツタイプを持つ <code class="docutils literal notranslate"><span class="pre">html_message</span></code> を合わせ持つものになります。</p>
+</section>
+<section id="s-mail-managers">
+<span id="mail-managers"></span><h2><code class="docutils literal notranslate"><span class="pre">mail_managers()</span></code><a class="headerlink" href="#mail-managers" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.core.mail.mail_managers">
+<span class="sig-name descname"><span class="pre">mail_managers</span></span>(<em class="sig-param"><span class="n"><span class="pre">subject</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_silently</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">html_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/mail/__init__.py#L138"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.mail.mail_managers" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">django.core.mail.mail_managers()</span></code> は、<code class="docutils literal notranslate"><span class="pre">mail_admins()</span></code> とほぼ同じで、<a class="reference internal" href="../ref/settings.html#std-setting-MANAGERS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MANAGERS</span></code></a> 設定で定義されているサイト管理者 (manager) にメールを送信します。</p>
+</section>
+<section id="s-examples">
+<span id="examples"></span><h2>例<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
+<p>以下の例は、<a class="reference external" href="mailto:john&#37;&#52;&#48;example&#46;com">john<span>&#64;</span>example<span>&#46;</span>com</a> と <a class="reference external" href="mailto:jane&#37;&#52;&#48;example&#46;com">jane<span>&#64;</span>example<span>&#46;</span>com</a> に1つのメールを送信します。2人とも &quot;To:&quot; 内に宛先が見られます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">send_mail</span><span class="p">(</span>
+    <span class="s2">&quot;Subject&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Message.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;john@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;jane@example.com&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>次の例は、<a class="reference external" href="mailto:john&#37;&#52;&#48;example&#46;com">john<span>&#64;</span>example<span>&#46;</span>com</a> と <a class="reference external" href="mailto:jane&#37;&#52;&#48;example&#46;com">jane<span>&#64;</span>example<span>&#46;</span>com</a> にメールを送信しますが、受信者はどちらも個別のメールを受け取ります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">datatuple</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Message.&quot;</span><span class="p">,</span> <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;john@example.com&quot;</span><span class="p">]),</span>
+    <span class="p">(</span><span class="s2">&quot;Subject&quot;</span><span class="p">,</span> <span class="s2">&quot;Message.&quot;</span><span class="p">,</span> <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;jane@example.com&quot;</span><span class="p">]),</span>
+<span class="p">)</span>
+<span class="n">send_mass_mail</span><span class="p">(</span><span class="n">datatuple</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="s-preventing-header-injection">
+<span id="preventing-header-injection"></span><h2>ヘッダインジェクションを防止する<a class="headerlink" href="#preventing-header-injection" title="Link to this heading">¶</a></h2>
+<p><a class="reference external" href="http://www.nyphp.org/phundamentals/8_Preventing-Email-Header-Injection.html">ヘッダインジェクション</a> は、攻撃者が 、スクリプトで生成されたメールメッセージの &quot;To:&quot; と &quot;From:&quot; をコントロールするために、メールヘッダを挿入してしまうセキュリティ上の脆弱性です。</p>
+<p>上述した Django のメール機能は、ヘッダー値の改行を禁止することによってヘッダインジェクションを防ぎます。 <code class="docutils literal notranslate"><span class="pre">subject</span></code>、<code class="docutils literal notranslate"><span class="pre">from_email</span></code>、<code class="docutils literal notranslate"><span class="pre">recipient_list</span></code> のいずれかに 改行 (Unix、Windows ないし Mac のスタイル) が含まれている場合、email 関数 (例えば <a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mail()</span></code></a>) は <code class="docutils literal notranslate"><span class="pre">django.core.mail.BadHeaderError</span></code> (<code class="docutils literal notranslate"><span class="pre">ValueError</span></code> のサブクラス) 投げるため、メールは送信されません。メール送信を行う関数にデータを渡す前に、開発者は責任を持ってすべてのデータを検証しておく必要があります。</p>
+<p>ヘッダーが含まれている文字列を <code class="docutils literal notranslate"><span class="pre">message</span></code> として渡した場合、ヘッダー部分はメールメッセージの冒頭に出力されます。</p>
+<p>次の例は、リクエストの POST データから <code class="docutils literal notranslate"><span class="pre">subject</span></code>、<code class="docutils literal notranslate"><span class="pre">message</span></code>、<code class="docutils literal notranslate"><span class="pre">from_email</span></code> を取得し、それを <a class="reference external" href="mailto:admin&#37;&#52;&#48;example&#46;com">admin<span>&#64;</span>example<span>&#46;</span>com</a> に送信し、完了したら &quot;/contact/thanks/&quot; にリダイレクトします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">BadHeaderError</span><span class="p">,</span> <span class="n">send_mail</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span><span class="p">,</span> <span class="n">HttpResponseRedirect</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">send_email</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">subject</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;subject&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">message</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">from_email</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;from_email&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">subject</span> <span class="ow">and</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">from_email</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">send_mail</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">from_email</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;admin@example.com&quot;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">BadHeaderError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Invalid header found.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponseRedirect</span><span class="p">(</span><span class="s2">&quot;/contact/thanks/&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># In reality we&#39;d use a form class</span>
+        <span class="c1"># to get proper validation errors.</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Make sure all fields are entered and valid.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="s-the-emailmessage-class">
+<span id="s-emailmessage-and-smtpconnection"></span><span id="the-emailmessage-class"></span><span id="emailmessage-and-smtpconnection"></span><h2><code class="docutils literal notranslate"><span class="pre">EmailMessage</span></code> クラス<a class="headerlink" href="#the-emailmessage-class" title="Link to this heading">¶</a></h2>
+<p>Django の <a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mail()</span></code></a> と <a class="reference internal" href="#django.core.mail.send_mass_mail" title="django.core.mail.send_mass_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mass_mail()</span></code></a> 関数は <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> クラスを実際に使うための小さなラッパーです。</p>
+<p><a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> クラスの機能のすべてが <a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mail()</span></code></a> やその他のラッパーで使用可能というわけではありません。高度な機能を使いたい場合 (例えば BCC の利用、ファイル添付やマルチパートのメールなど) <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> のインスタンスを直接作成する必要があります。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>これは設計特性です。<a class="reference internal" href="#django.core.mail.send_mail" title="django.core.mail.send_mail"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send_mail()</span></code></a> およびその関連の関数は、元は Django が提供した唯一のインタフェースでした。しかし、受け入れるパラメータのリストが次第に肥大化してきてしまったので、よりオブジェクト指向的な設計に移行し、元の関数は後方互換性確保のためだけに残すことになりました。</p>
+</div>
+<p><a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> はメールメッセージ本体を作成する役割を担っており、その後、<a class="reference internal" href="#topic-email-backends"><span class="std std-ref">メールのバックエンド</span></a> がメールを送信する役目を果たします。</p>
+<p>利便性のため、 <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> には単一のメールを送信するための <code class="docutils literal notranslate"><span class="pre">send()</span></code> メソッドが用意されています。複数のメッセージを送信する必要がある場合は、メールバックエンドAPIが <a class="reference internal" href="#topics-sending-multiple-emails"><span class="std std-ref">別の方法</span></a> を提供しています。</p>
+<section id="s-emailmessage-objects">
+<span id="emailmessage-objects"></span><h3><code class="docutils literal notranslate"><span class="pre">EmailMessage</span></code> オブジェクト<a class="headerlink" href="#emailmessage-objects" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.core.mail.EmailMessage">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EmailMessage</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/mail/message.py#L193"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.mail.EmailMessage" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> クラスは、以下のパラメータで (省略可能な引数が使われた場合、その順番で) 初期化されます。全てのパラメータは省略可能で、<code class="docutils literal notranslate"><span class="pre">send()</span></code> メソッドを呼ぶ前のタイミングでセットされます。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">subject</span></code>: メールの件名の行。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">body</span></code>: 本文のテキスト。プレーンテキストのメッセージでなければなりません。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">from_email</span></code>: 送信者のアドレス。 <code class="docutils literal notranslate"><span class="pre">fred&#64;example.com</span></code> と <code class="docutils literal notranslate"><span class="pre">&quot;Fred&quot;</span> <span class="pre">&lt;fred&#64;example.com&gt;</span></code> のどちらの形式でも構いません。省略された場合は <a class="reference internal" href="../ref/settings.html#std-setting-DEFAULT_FROM_EMAIL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_FROM_EMAIL</span></code></a> の設定が使用されます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">to</span></code>: 受信者のメールアドレスのリストまたはタプル。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bcc</span></code>: メールを送信するときに &quot;Bcc&quot; ヘッダ内で使われるメールアドレスのリストまたはタプル。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">connection</span></code>: <a class="reference internal" href="#topic-email-backends"><span class="std std-ref">メールバックエンド</span></a> のインスタンス。このパラメータは、<code class="docutils literal notranslate"><span class="pre">send()</span></code> を使用して <code class="docutils literal notranslate"><span class="pre">EmailMessage</span></code> を送信する際に、複数のメッセージに同じ接続を使用したい場合に指定します。省略された場合は、<code class="docutils literal notranslate"><span class="pre">send()</span></code> が呼び出されるときに新しい接続が作成されます。このパラメータは、<a class="reference internal" href="#topics-sending-multiple-emails"><span class="std std-ref">send_messages()</span></a> を使用する場合には無視されます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">attachments</span></code>： メッセージに添付する添付ファイルのリスト。 <a class="reference external" href="https://docs.python.org/3/library/email.mime.html#email.mime.base.MIMEBase" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MIMEBase</span></code></a> インスタンスか <code class="docutils literal notranslate"><span class="pre">(filename,</span> <span class="pre">content,</span> <span class="pre">mimetype)</span></code> の3値タプルです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">headers</span></code>: メッセージに追加するヘッダーの辞書。キーはヘッダ名、値はヘッダ値です。メールメッセージに対して適切なヘッダ名と値にするのは、呼び出す側の責任です。対応する属性は <code class="docutils literal notranslate"><span class="pre">extra_headers</span></code> です。</p></li>
+<li><p>メールを送信するときに &quot;Cc&quot; ヘッダ内で使われる、受信者のアドレスのリストまたはタプル。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reply_to</span></code>: メールを送信するときに &quot;Reply-To&quot; ヘッダ内で使われる、受信者のアドレスのリストまたはタプル。</p></li>
+</ul>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmailMessage</span>
+
+<span class="n">email</span> <span class="o">=</span> <span class="n">EmailMessage</span><span class="p">(</span>
+    <span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Body goes here&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;to1@example.com&quot;</span><span class="p">,</span> <span class="s2">&quot;to2@example.com&quot;</span><span class="p">],</span>
+    <span class="p">[</span><span class="s2">&quot;bcc@example.com&quot;</span><span class="p">],</span>
+    <span class="n">reply_to</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;another@example.com&quot;</span><span class="p">],</span>
+    <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Message-ID&quot;</span><span class="p">:</span> <span class="s2">&quot;foo&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>このクラスには以下のメソッドがあります。</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">send(fail_silently=False)</span></code> はメールを送信します。メールの作成時にコネクションが指定されていた場合は、そのコネクションが使用されます。 そうでない場合は、デフォルトのバックエンドのインスタンスがインスタンス化され、使用されます。キーワード引数 <code class="docutils literal notranslate"><span class="pre">fail_silently</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、メッセージの送信中に例外が発生した場合、その例外は処理されます。空の受信者リストは例外を発生させません。メッセージが正常に送信された場合は <code class="docutils literal notranslate"><span class="pre">1</span></code> を返し、そうでない場合は <code class="docutils literal notranslate"><span class="pre">0</span></code> を返します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">message()</span></code> は送信するメッセージを保持する <code class="docutils literal notranslate"><span class="pre">django.core.mail.SafeMIMEText</span></code> オブジェクト (Python の <a class="reference external" href="https://docs.python.org/3/library/email.mime.html#email.mime.text.MIMEText" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MIMEText</span></code></a> クラスのサブクラス) または <code class="docutils literal notranslate"><span class="pre">django.core.mail.SafeMIMEMultipart</span></code> オブジェクトを構築します。もし <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> クラスを拡張する必要がある場合は、おそらくこのメソッドをオーバーライドして MIME オブジェクトに必要な内容を入れることになるでしょう。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">recipients()</span></code> は、<code class="docutils literal notranslate"><span class="pre">to</span></code>、<code class="docutils literal notranslate"><span class="pre">cc</span></code>、<code class="docutils literal notranslate"><span class="pre">bcc</span></code> のいずれかの属性に記録されている、メッセージの全ての受信者のリストを返します。サブクラス化するときには、メッセージの送信時に SMTP サーバが受信者の完全な一覧を必要とするため、このメソッドもオーバーライドする必要があります。クラス内で受信者を指定する別の方法を追加する場合は、このメソッドからも返される必要があります。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">attach()</span></code> は新しい添付ファイルを作成し、メッセージに追加します。<code class="docutils literal notranslate"><span class="pre">attach()</span></code> を呼ぶには2 つの方法があります。</p>
+<ul>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/email.mime.html#email.mime.base.MIMEBase" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">MIMEBase</span></code></a> のインスタンスを引数として渡すことができます。これは生成されるメッセージに直接挿入されます。</p></li>
+<li><p>もしくは、<code class="docutils literal notranslate"><span class="pre">attach()</span></code> の 3 つの引数を引き渡します: <code class="docutils literal notranslate"><span class="pre">filename</span></code>、<code class="docutils literal notranslate"><span class="pre">content</span></code>、<code class="docutils literal notranslate"><span class="pre">mimetype</span></code> です。<code class="docutils literal notranslate"><span class="pre">filename</span></code> は、メール内に表示される添付ファイルの名前です。<code class="docutils literal notranslate"><span class="pre">content</span></code> は、添付ファイル内に含まれるデータです。<code class="docutils literal notranslate"><span class="pre">mimetype</span></code> は添付ファイルに対する MIME タイプで、省略可能です。<code class="docutils literal notranslate"><span class="pre">mimetype</span></code> を省略した場合、MIME コンテンツタイプは添付ファイルのファイル名から推測されます。</p>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">message</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="s2">&quot;design.png&quot;</span><span class="p">,</span> <span class="n">img_data</span><span class="p">,</span> <span class="s2">&quot;image/png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>また <em class="mimetype">message/rfc822</em> の <code class="docutils literal notranslate"><span class="pre">mimetype</span></code> を指定すると、 <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.mail.EmailMessage</span></code></a> や <a class="reference external" href="https://docs.python.org/3/library/email.compat32-message.html#email.message.Message" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">email.message.Message</span></code></a> も受け付けます。</p>
+<p><em class="mimetype">text/</em> で始まる <code class="docutils literal notranslate"><span class="pre">mimetype</span></code> では、コンテンツは文字列であることが期待されます。バイナリデータはUTF-8でデコードされ、それが失敗した場合、MIMEタイプは <em class="mimetype">application/octet-stream</em> に変更され、データは変更されずに添付されます。</p>
+<p>さらに、 <em class="mimetype">message/rfc822</em> の添付ファイルは <span class="target" id="index-2"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc2046.html#section-5.2.1"><strong>RFC 2046 Section 5.2.1</strong></a> に違反して base64 エンコードされることはなくなりました。これは <a class="reference external" href="https://bugzilla.gnome.org/show_bug.cgi?id=651197">Evolution</a> と <a class="reference external" href="https://bugzilla.mozilla.org/show_bug.cgi?id=333880">Thunderbird</a> で添付ファイルを表示する際に問題を引き起こす可能性があります。</p>
+</li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">attach_file()</span></code> はファイルシステム上のファイルを使って新しい添付ファイルを作成します。添付するファイルのパスと、: オプションで添付に使用する MIME タイプを指定して呼び出してください。MIMEタイプが省略された場合は、ファイル名から推測されます。次のように使用します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">message</span><span class="o">.</span><span class="n">attach_file</span><span class="p">(</span><span class="s2">&quot;/images/weather_map.png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><em class="mimetype">text/</em> で始まるMIMEタイプでは、バイナリデータは <code class="docutils literal notranslate"><span class="pre">attach()</span></code> のように扱われます。</p>
+</li>
+</ul>
+</section>
+<section id="s-sending-alternative-content-types">
+<span id="sending-alternative-content-types"></span><h3>代替のコンテンツタイプを送信する<a class="headerlink" href="#sending-alternative-content-types" title="Link to this heading">¶</a></h3>
+<section id="s-sending-multiple-content-versions">
+<span id="sending-multiple-content-versions"></span><h4>複数のバージョンを持つコンテンツを送る<a class="headerlink" href="#sending-multiple-content-versions" title="Link to this heading">¶</a></h4>
+<p>メールに複数のコンテンツバージョンを含めることは便利です。典型的な例として、メッセージのテキスト版とHTML版の両方を送信するケースがあります。Djangoのメールライブラリを使用すると、<a class="reference internal" href="#django.core.mail.EmailMultiAlternatives" title="django.core.mail.EmailMultiAlternatives"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMultiAlternatives</span></code></a> クラスを使ってこれを実現できます。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.core.mail.EmailMultiAlternatives">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">EmailMultiAlternatives</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/mail/message.py#L435"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.mail.EmailMultiAlternatives" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> のサブクラスであり、メールの本文に追加のバージョンを含めるための <code class="docutils literal notranslate"><span class="pre">attach_alternative()</span></code> メソッドを持ちます。他のすべてのメソッド（クラス初期化を含む）は、<a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> からそのまま継承されています。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.core.mail.EmailMultiAlternatives.attach_alternative">
+<span class="sig-name descname"><span class="pre">attach_alternative</span></span>(<em class="sig-param"><span class="n"><span class="pre">content</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mimetype</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/mail/message.py#L476"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.mail.EmailMultiAlternatives.attach_alternative" title="Link to this definition">¶</a></dt>
+<dd><p>メール内にメッセージ本文の別の表現を添付します。</p>
+<p>例えば、テキスト版とHTML版を組み合わせて送信する場合、次のようにします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.mail</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmailMultiAlternatives</span>
+
+<span class="n">subject</span> <span class="o">=</span> <span class="s2">&quot;hello&quot;</span>
+<span class="n">from_email</span> <span class="o">=</span> <span class="s2">&quot;from@example.com&quot;</span>
+<span class="n">to</span> <span class="o">=</span> <span class="s2">&quot;to@example.com&quot;</span>
+<span class="n">text_content</span> <span class="o">=</span> <span class="s2">&quot;This is an important message.&quot;</span>
+<span class="n">html_content</span> <span class="o">=</span> <span class="s2">&quot;&lt;p&gt;This is an &lt;strong&gt;important&lt;/strong&gt; message.&lt;/p&gt;&quot;</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">EmailMultiAlternatives</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">text_content</span><span class="p">,</span> <span class="n">from_email</span><span class="p">,</span> <span class="p">[</span><span class="n">to</span><span class="p">])</span>
+<span class="n">msg</span><span class="o">.</span><span class="n">attach_alternative</span><span class="p">(</span><span class="n">html_content</span><span class="p">,</span> <span class="s2">&quot;text/html&quot;</span><span class="p">)</span>
+<span class="n">msg</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-updating-the-default-content-type">
+<span id="updating-the-default-content-type"></span><h4>デフォルトのコンテンツタイプを変更する<a class="headerlink" href="#updating-the-default-content-type" title="Link to this heading">¶</a></h4>
+<p>デフォルトでは、<a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> 内の <code class="docutils literal notranslate"><span class="pre">body</span></code> パラメータの MIME タイプは <code class="docutils literal notranslate"><span class="pre">&quot;text/plain&quot;</span></code> です。この設定だとメールクライアントにかかわらず全ての受信者がメールを読むことができるので、このままにしておくのが実用的です。しかし、受信者が代替のコンテンツタイプを扱えることが確かな場合には、<a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> の <code class="docutils literal notranslate"><span class="pre">content_subtype</span></code> 属性を使ってメインのコンテンツタイプを変更することもできます。主なタイプは常に <code class="docutils literal notranslate"><span class="pre">&quot;text&quot;</span></code> ですが、サブタイプを変更できます。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">msg</span> <span class="o">=</span> <span class="n">EmailMessage</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">html_content</span><span class="p">,</span> <span class="n">from_email</span><span class="p">,</span> <span class="p">[</span><span class="n">to</span><span class="p">])</span>
+<span class="n">msg</span><span class="o">.</span><span class="n">content_subtype</span> <span class="o">=</span> <span class="s2">&quot;html&quot;</span>  <span class="c1"># Main content is now text/html</span>
+<span class="n">msg</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="s-email-backends">
+<span id="s-topic-email-backends"></span><span id="email-backends"></span><span id="topic-email-backends"></span><h2>メールのバックエンド<a class="headerlink" href="#email-backends" title="Link to this heading">¶</a></h2>
+<p>実際のメール送信は、メールバックエンドによって処理されます。</p>
+<p>メールバックエンドのクラスには以下のメソッドがあります:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">open()</span></code> は、長寿命のメール送信のコネクションをインスタンス化します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">close()</span></code> は、現在のメール送信のコネクションを閉じます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">send_messages(email_messages)</span></code> は <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> オブジェクトのリストを送信します。コネクションがオープンになっていない場合、この呼び出しを行うと暗黙的にコネクションがオープンになり、その後コネクションがクローズされます。コネクションがすでにオープンになっている場合は、メールが送信された後もオープンのままです。</p></li>
+</ul>
+<p>コンテキストマネジャーとしても使うことができ、必要に応じて自動的に <code class="docutils literal notranslate"><span class="pre">open()</span></code> と <code class="docutils literal notranslate"><span class="pre">close()</span></code> 呼びます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">mail</span>
+
+<span class="k">with</span> <span class="n">mail</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span> <span class="k">as</span> <span class="n">connection</span><span class="p">:</span>
+    <span class="n">mail</span><span class="o">.</span><span class="n">EmailMessage</span><span class="p">(</span>
+        <span class="n">subject1</span><span class="p">,</span>
+        <span class="n">body1</span><span class="p">,</span>
+        <span class="n">from1</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">to1</span><span class="p">],</span>
+        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
+    <span class="n">mail</span><span class="o">.</span><span class="n">EmailMessage</span><span class="p">(</span>
+        <span class="n">subject2</span><span class="p">,</span>
+        <span class="n">body2</span><span class="p">,</span>
+        <span class="n">from2</span><span class="p">,</span>
+        <span class="p">[</span><span class="n">to2</span><span class="p">],</span>
+        <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="s-obtaining-an-instance-of-an-email-backend">
+<span id="obtaining-an-instance-of-an-email-backend"></span><h3>メールバックエンドのインスタンスを取得する<a class="headerlink" href="#obtaining-an-instance-of-an-email-backend" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">django.core.mail</span></code> 内の <a class="reference internal" href="#django.core.mail.get_connection" title="django.core.mail.get_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_connection()</span></code></a> 関数は、利用可能なメールバックエンドのインスタンスを返します。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.core.mail.get_connection">
+<span class="sig-name descname"><span class="pre">get_connection</span></span>(<em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_silently</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/core/mail/__init__.py#L43"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.core.mail.get_connection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>デフォルトでは、<code class="docutils literal notranslate"><span class="pre">get_connection()</span></code> を呼び出すと <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_BACKEND"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_BACKEND</span></code></a> 内で指定されたメールバックエンドのインスタンスを返します。<code class="docutils literal notranslate"><span class="pre">backend</span></code> 引数を指定した場合、そのバックエンドがインスタンス化されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">fail_silently</span></code> 引数は、バックエンドがエラーをどのように扱うかをコントロールします。<code class="docutils literal notranslate"><span class="pre">fail_silently</span></code> が True の場合、メール送信プロセスの間に発生した例外は何の通知もされずに無視されます。</p>
+<p>他の全ての引数は、メールバックエンドのコンストラクタに直接引き渡されます。</p>
+<p>Django には複数のメール送信バックエンドを付属しています。SMTP バックエンド (デフォルトです) を除いて、これらのバックエンドはテストと開発のみで役立ちます。特別なメール送信が必要な場合には、<a class="reference internal" href="#topic-custom-email-backend"><span class="std std-ref">独自のメールバックエンドを記述する</span></a> を参照してください。</p>
+<section id="s-smtp-backend">
+<span id="s-topic-email-smtp-backend"></span><span id="smtp-backend"></span><span id="topic-email-smtp-backend"></span><h4>SMTP バックエンド<a class="headerlink" href="#smtp-backend" title="Link to this heading">¶</a></h4>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.core.mail.backends.smtp.EmailBackend">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">backends.smtp.</span></span><span class="sig-name descname"><span class="pre">EmailBackend</span></span>(<em class="sig-param"><span class="n"><span class="pre">host</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">password</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tls</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fail_silently</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ssl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssl_keyfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ssl_certfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.core.mail.backends.smtp.EmailBackend" title="Link to this definition">¶</a></dt>
+<dd><p>デフォルトのバックエンド。メールは SMTP サーバを通して送信されます。</p>
+<p>引数が <code class="docutils literal notranslate"><span class="pre">None</span></code> の場合、各引数に対する値は、以下のそれぞれの設定から取得されます。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">host</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">port</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_PORT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_PORT</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">username</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST_USER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST_USER</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">password</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST_PASSWORD"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST_PASSWORD</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use_tls</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_USE_TLS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_USE_TLS</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">use_ssl</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_USE_SSL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_USE_SSL</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">timeout</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_TIMEOUT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_TIMEOUT</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ssl_keyfile</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_SSL_KEYFILE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_SSL_KEYFILE</span></code></a></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ssl_certfile</span></code>: <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_SSL_CERTFILE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_SSL_CERTFILE</span></code></a></p></li>
+</ul>
+<p>SMTP バックエンドは、Django によって継承されるデフォルトの構成です。明示的に指定したい場合は、設定内で以下の通り記述してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s2">&quot;django.core.mail.backends.smtp.EmailBackend&quot;</span>
+</pre></div>
+</div>
+<p>指定しなかった場合は、デフォルトの <code class="docutils literal notranslate"><span class="pre">timeout</span></code> は <a class="reference external" href="https://docs.python.org/3/library/socket.html#socket.getdefaulttimeout" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">socket.getdefaulttimeout()</span></code></a> によって指定されたものになり、デフォルトは <code class="docutils literal notranslate"><span class="pre">None</span></code> (タイムアウトなし) になります。</p>
+</dd></dl>
+
+</section>
+<section id="s-console-backend">
+<span id="s-topic-email-console-backend"></span><span id="console-backend"></span><span id="topic-email-console-backend"></span><h4>コンソールバックエンド<a class="headerlink" href="#console-backend" title="Link to this heading">¶</a></h4>
+<p>実際のメールを送信する代わりに、コンソールバックエンドは単に標準出力に送信されるメールを書き込みます。 デフォルトでは、コンソールバックエンドは <code class="docutils literal notranslate"><span class="pre">stdout</span></code> に書き込みます。 コネクションを構築するときに <code class="docutils literal notranslate"><span class="pre">stream</span></code> キーワード引数を指定することで、別のストリーム的なオブジェクトを使用できます。</p>
+<p>このバックエンドを指定するには、設定内に以下の通り記述してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s2">&quot;django.core.mail.backends.console.EmailBackend&quot;</span>
+</pre></div>
+</div>
+<p>このバックエンドはプロダクトでの使用を想定していません -- 開発中の利便性のために提供されています。</p>
+</section>
+<section id="s-file-backend">
+<span id="s-topic-email-file-backend"></span><span id="file-backend"></span><span id="topic-email-file-backend"></span><h4>ファイルバックエンド<a class="headerlink" href="#file-backend" title="Link to this heading">¶</a></h4>
+<p>ファイルバックエンドは、メールをファイルに書き込みます。新しいファイルは、このバックエンド上で開いたそれぞれの新しいセッションに対して作成されます。ファイルが書き込まれるディレクトリは、 <a class="reference internal" href="#django.core.mail.get_connection" title="django.core.mail.get_connection"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_connection()</span></code></a> でコネクションを生成したときに <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_FILE_PATH"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_FILE_PATH</span></code></a> 設定または <code class="docutils literal notranslate"><span class="pre">file_path</span></code> キーワードから取得されます。</p>
+<p>このバックエンドを指定するには、設定内に以下の通り記述してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s2">&quot;django.core.mail.backends.filebased.EmailBackend&quot;</span>
+<span class="n">EMAIL_FILE_PATH</span> <span class="o">=</span> <span class="s2">&quot;/tmp/app-messages&quot;</span>  <span class="c1"># change this to a proper location</span>
+</pre></div>
+</div>
+<p>このバックエンドはプロダクトでの使用を想定していません -- 開発中の利便性のために提供されています。</p>
+</section>
+<section id="s-in-memory-backend">
+<span id="s-topic-email-memory-backend"></span><span id="in-memory-backend"></span><span id="topic-email-memory-backend"></span><h4>インメモリーバックエンド<a class="headerlink" href="#in-memory-backend" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">'locmem'</span></code> バックエンドは、 <code class="docutils literal notranslate"><span class="pre">django.core.mail</span></code> モジュールの特別な属性内にメッセージを保持します。<code class="docutils literal notranslate"><span class="pre">outbox</span></code> 属性は最初のメッセージが送信されるときに生成されます。送信される書くメッセージに対する <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> インスタンスのリストです。</p>
+<p>このバックエンドを指定するには、設定内に以下の通り記述してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s2">&quot;django.core.mail.backends.locmem.EmailBackend&quot;</span>
+</pre></div>
+</div>
+<p>このバックエンドはプロダクトでの使用を想定していません -- 開発とテストにおける利便性のために提供されています。</p>
+<p>Django のテストランナーは <a class="reference internal" href="testing/tools.html#topics-testing-email"><span class="std std-ref">自動的にこのバックエンドをテストに使います</span></a> 。</p>
+</section>
+<section id="s-dummy-backend">
+<span id="s-topic-email-dummy-backend"></span><span id="dummy-backend"></span><span id="topic-email-dummy-backend"></span><h4>ダミーバックエンド<a class="headerlink" href="#dummy-backend" title="Link to this heading">¶</a></h4>
+<p>名前が示すように、ダミーバックエンドはメッセージに何もしません。このバックエンドを指定するには、設定内に以下の通り記述してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">EMAIL_BACKEND</span> <span class="o">=</span> <span class="s2">&quot;django.core.mail.backends.dummy.EmailBackend&quot;</span>
+</pre></div>
+</div>
+<p>このバックエンドはプロダクトでの使用を想定していません -- 開発中の利便性のために提供されています。</p>
+</section>
+</section>
+<section id="s-defining-a-custom-email-backend">
+<span id="s-topic-custom-email-backend"></span><span id="defining-a-custom-email-backend"></span><span id="topic-custom-email-backend"></span><h3>独自のメールバックエンドを定義する<a class="headerlink" href="#defining-a-custom-email-backend" title="Link to this heading">¶</a></h3>
+<p>メール送信の方法を変更する必要がある場合、独自のメールバックエンドを記述できます。設定ファイル内の <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_BACKEND"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_BACKEND</span></code></a> 設定が独自のバックエンドのクラスへの Python のインポートパスとなります。</p>
+<p>独自のメールバックエンドは、<code class="docutils literal notranslate"><span class="pre">django.core.mail.backends.base</span></code> にある <code class="docutils literal notranslate"><span class="pre">BaseEmailBackend</span></code> をサブクラス化して作ります。独自のメールバックエンドには <code class="docutils literal notranslate"><span class="pre">send_messages(email_messages)</span></code> メソッドを実装する必要があります。このメソッドは <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> インスタンスのリストを受け取り、送信に成功したメッセージの数を返します。バックエンドに永続的な (persistent) セッションやコネクションの概念がある場合は、<code class="docutils literal notranslate"><span class="pre">open()</span></code> メソッドと <code class="docutils literal notranslate"><span class="pre">close()</span></code> メソッドも実装する必要があります。実装のリファレンスについては <code class="docutils literal notranslate"><span class="pre">smtp.EmailBackend</span></code> を参照してください。</p>
+</section>
+<section id="s-sending-multiple-emails">
+<span id="s-topics-sending-multiple-emails"></span><span id="sending-multiple-emails"></span><span id="topics-sending-multiple-emails"></span><h3>複数のメールを送信する<a class="headerlink" href="#sending-multiple-emails" title="Link to this heading">¶</a></h3>
+<p>SMTP コネクション (またはその他のネットワークコネクション) の確立とクローズは、負荷の高い処理です。 送信するメールがたくさんある場合は、メールを送信するたびにコネクションの生成と破棄を繰り返すのではなく、SMTP コネクションを再利用する方が効率的です。</p>
+<p>メールバックエンドにコネクションを再利用するよう通知するには、2 つの方法があります。</p>
+<p>1つめは、1つの接続のもとで <code class="docutils literal notranslate"><span class="pre">send_messages()</span></code> メソッドを使用する方法です。このメソッドは、 <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> （またはそのサブクラス）のインスタンスのリストを受け取り、それらすべてを1つの接続を使用して送信します。その結果、個々のメッセージに設定された <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">connection</span></code></a> は無視されます。</p>
+<p>例えば、定期的なメール送信を表す <a class="reference internal" href="#django.core.mail.EmailMessage" title="django.core.mail.EmailMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">EmailMessage</span></code></a> オブジェクトのリストを返す <code class="docutils literal notranslate"><span class="pre">get_notification_email()</span></code> と呼ばれる関数がある場合、send_messages を 1度呼び出すだけでこれらのメールを送信できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">mail</span>
+
+<span class="n">connection</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span>  <span class="c1"># Use default email connection</span>
+<span class="n">messages</span> <span class="o">=</span> <span class="n">get_notification_email</span><span class="p">()</span>
+<span class="n">connection</span><span class="o">.</span><span class="n">send_messages</span><span class="p">(</span><span class="n">messages</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この例では、<code class="docutils literal notranslate"><span class="pre">send_messages()</span></code> を呼び出してバックエンドのコネクションを開き、メッセージのリストを送信した後、再びコネクションを閉じています。</p>
+<p>2つ目のアプローチは、メールバックエンドの <code class="docutils literal notranslate"><span class="pre">open()</span></code> メソッドと <code class="docutils literal notranslate"><span class="pre">close()</span></code> メソッドを使って手動でコネクションをコントロールする方法です。<code class="docutils literal notranslate"><span class="pre">send_messages()</span></code> は、すでにコネクションが開いている場合、自動でコネクションを開いたり閉じたりはしません。手動でコネクションを開いた場合、閉じるタイミングを自分でコントロールできます。たとえば、次のように書くことができます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">mail</span>
+
+<span class="n">connection</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">get_connection</span><span class="p">()</span>
+
+<span class="c1"># Manually open the connection</span>
+<span class="n">connection</span><span class="o">.</span><span class="n">open</span><span class="p">()</span>
+
+<span class="c1"># Construct an email message that uses the connection</span>
+<span class="n">email1</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">EmailMessage</span><span class="p">(</span>
+    <span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Body goes here&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;to1@example.com&quot;</span><span class="p">],</span>
+    <span class="n">connection</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">email1</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>  <span class="c1"># Send the email</span>
+
+<span class="c1"># Construct two more messages</span>
+<span class="n">email2</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">EmailMessage</span><span class="p">(</span>
+    <span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Body goes here&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;to2@example.com&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="n">email3</span> <span class="o">=</span> <span class="n">mail</span><span class="o">.</span><span class="n">EmailMessage</span><span class="p">(</span>
+    <span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Body goes here&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;from@example.com&quot;</span><span class="p">,</span>
+    <span class="p">[</span><span class="s2">&quot;to3@example.com&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1"># Send the two emails in a single call -</span>
+<span class="n">connection</span><span class="o">.</span><span class="n">send_messages</span><span class="p">([</span><span class="n">email2</span><span class="p">,</span> <span class="n">email3</span><span class="p">])</span>
+<span class="c1"># The connection was already open so send_messages() doesn&#39;t close it.</span>
+<span class="c1"># We need to manually close the connection.</span>
+<span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-configuring-email-for-development">
+<span id="configuring-email-for-development"></span><h2>開発用にメールを設定する<a class="headerlink" href="#configuring-email-for-development" title="Link to this heading">¶</a></h2>
+<p>Django に電子メールをまったく送信させたくない場合もあるでしょう。たとえば、ウェブサイトの開発中に数千通のメールを送信したくはないでしょう。しかし、適切な条件で適切な人々にメールが送信され、これらのメールが正しい内容を含んでいるか検証したいことがあるかもしれません。</p>
+<p>ローカル開発用にメールを設定する最も簡単な方法は <a class="reference internal" href="#topic-email-console-backend"><span class="std std-ref">console</span></a> メールバックエンドを使うことです。このバックエンドはすべてのメールを <code class="docutils literal notranslate"><span class="pre">stdout</span></code> にリダイレクトし、メールの内容を検査できるようにします。</p>
+<p><a class="reference internal" href="#topic-email-file-backend"><span class="std std-ref">ファイル</span></a> メールバックエンドも開発に役立ちます。このバックエンドは全ての SMTP コネクションをファイルにダンプし、都合の良いときに調べられるようにします。</p>
+<p>もう1つのアプローチは、「ダム」SMTPサーバーを使用することです。このサーバーはメールをローカルで受信し、端末に表示するだけで、実際には何も送信しません。これを実現するには、<a class="extlink-pypi reference external" href="https://pypi.org/project/aiosmtpd/">aiosmtpd</a> パッケージを利用する方法があります。</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>aiosmtpd
+
+python<span class="w"> </span>-m<span class="w"> </span>aiosmtpd<span class="w"> </span>-n<span class="w"> </span>-l<span class="w"> </span>localhost:8025
+</pre></div>
+</div>
+<p>このコマンドは、localhostのポート8025で待ち受ける最小限のSMTPサーバを起動します。このサーバはすべてのメールヘッダとメール本文を標準出力に出力します。あとは <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_HOST</span></code></a> と <a class="reference internal" href="../ref/settings.html#std-setting-EMAIL_PORT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_PORT</span></code></a> を適宜設定するだけです。SMTPサーバのオプションについてのより詳細な議論については、 <a class="reference external" href="https://aiosmtpd.readthedocs.io/en/latest/">aiosmtpd</a> モジュールのドキュメントを参照してください。</p>
+<p>アプリケーションでのメール送信のユニットテストについては、テストのドキュメントの <a class="reference internal" href="testing/tools.html#topics-testing-email"><span class="std std-ref">メールサービス</span></a> セクションを参照してください。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">メールを送信する</a><ul>
+<li><a class="reference internal" href="#quick-examples">簡単な例</a></li>
+<li><a class="reference internal" href="#send-mail"><code class="docutils literal notranslate"><span class="pre">send_mail()</span></code></a></li>
+<li><a class="reference internal" href="#send-mass-mail"><code class="docutils literal notranslate"><span class="pre">send_mass_mail()</span></code></a><ul>
+<li><a class="reference internal" href="#send-mass-mail-vs-send-mail"><code class="docutils literal notranslate"><span class="pre">send_mass_mail()</span></code> と <code class="docutils literal notranslate"><span class="pre">send_mail()</span></code> の比較</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#mail-admins"><code class="docutils literal notranslate"><span class="pre">mail_admins()</span></code></a></li>
+<li><a class="reference internal" href="#mail-managers"><code class="docutils literal notranslate"><span class="pre">mail_managers()</span></code></a></li>
+<li><a class="reference internal" href="#examples">例</a></li>
+<li><a class="reference internal" href="#preventing-header-injection">ヘッダインジェクションを防止する</a></li>
+<li><a class="reference internal" href="#the-emailmessage-class"><code class="docutils literal notranslate"><span class="pre">EmailMessage</span></code> クラス</a><ul>
+<li><a class="reference internal" href="#emailmessage-objects"><code class="docutils literal notranslate"><span class="pre">EmailMessage</span></code> オブジェクト</a></li>
+<li><a class="reference internal" href="#sending-alternative-content-types">代替のコンテンツタイプを送信する</a><ul>
+<li><a class="reference internal" href="#sending-multiple-content-versions">複数のバージョンを持つコンテンツを送る</a></li>
+<li><a class="reference internal" href="#updating-the-default-content-type">デフォルトのコンテンツタイプを変更する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#email-backends">メールのバックエンド</a><ul>
+<li><a class="reference internal" href="#obtaining-an-instance-of-an-email-backend">メールバックエンドのインスタンスを取得する</a><ul>
+<li><a class="reference internal" href="#smtp-backend">SMTP バックエンド</a></li>
+<li><a class="reference internal" href="#console-backend">コンソールバックエンド</a></li>
+<li><a class="reference internal" href="#file-backend">ファイルバックエンド</a></li>
+<li><a class="reference internal" href="#in-memory-backend">インメモリーバックエンド</a></li>
+<li><a class="reference internal" href="#dummy-backend">ダミーバックエンド</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#defining-a-custom-email-backend">独自のメールバックエンドを定義する</a></li>
+<li><a class="reference internal" href="#sending-multiple-emails">複数のメールを送信する</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuring-email-for-development">開発用にメールを設定する</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="signing.html"
+                          title="前の章へ">暗号署名</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="i18n/index.html"
+                          title="次の章へ">国際化とローカライズ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topics/email.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="signing.html" title="暗号署名">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="i18n/index.html" title="国際化とローカライズ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

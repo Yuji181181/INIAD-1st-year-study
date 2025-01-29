@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>テンプレート &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="Django テンプレート言語" href="language.html" />
+    <link rel="prev" title="シグナル" href="../signals.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../signals.html" title="シグナル">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="language.html" title="Django テンプレート言語">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-templates-index">
+            
+  <section id="s-templates">
+<span id="templates"></span><h1>テンプレート<a class="headerlink" href="#templates" title="Link to this heading">¶</a></h1>
+<p>Django のテンプレートエンジンは、アプリケーションのユーザ向けレイヤを定義するための強力なミニ言語を提供し、アプリケーションとプレゼンテーションロジックのきれいな分離を促します。テンプレートは HTML の知識があれば誰でもメンテナンスできます。入門的な内容については <a class="reference internal" href="../../topics/templates.html"><span class="doc">テンプレート</span></a> トピックガイド を参照してください。</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="language.html">Django テンプレート言語</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="language.html#templates">テンプレート</a></li>
+<li class="toctree-l2"><a class="reference internal" href="language.html#variables">変数</a></li>
+<li class="toctree-l2"><a class="reference internal" href="language.html#filters">フィルタ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="language.html#tags">タグ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="language.html#comments">コメント</a></li>
+<li class="toctree-l2"><a class="reference internal" href="language.html#template-inheritance">テンプレートの継承</a></li>
+<li class="toctree-l2"><a class="reference internal" href="language.html#automatic-html-escaping">HTML の自動エスケープ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="language.html#accessing-method-calls">メソッドへのアクセス</a></li>
+<li class="toctree-l2"><a class="reference internal" href="language.html#custom-tag-and-filter-libraries">カスタムタグとカスタムフィルタのライブラリ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="builtins.html">組み込みテンプレートタグとフィルタ</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="builtins.html#built-in-tag-reference">組み込みタグリファレンス</a></li>
+<li class="toctree-l2"><a class="reference internal" href="builtins.html#built-in-filter-reference">組み込みフィルタリファレンス</a></li>
+<li class="toctree-l2"><a class="reference internal" href="builtins.html#internationalization-tags-and-filters">国際化タグとフィルタ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="builtins.html#other-tags-and-filters-libraries">その他のタグとフィルタライブラリ</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Python プログラマーのための Django テンプレート言語</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#overview">概要</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#configuring-an-engine">エンジンを設定する</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#loading-a-template">テンプレートを読み込む</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#rendering-a-context">コンテキストをレンダリングする</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#playing-with-context-objects"><code class="docutils literal notranslate"><span class="pre">Context</span></code> オブジェクトを使って遊ぶ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#loading-templates">テンプレートを読み込む</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#custom-loaders">カスタムローダー</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#template-origin">テンプレート・オリジン</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>独自のカスタムタグとフィルタの書き方については <a class="reference internal" href="../../howto/custom-template-tags.html"><span class="doc">独自のテンプレートタグとフィルタを作る</span></a> を参照してください。</p>
+<p>他の Django アプリケーションでテンプレートをオーバーライドする方法については、 <a class="reference internal" href="../../howto/overriding-templates.html"><span class="doc">テンプレートをオーバーライドする</span></a> を参照してください。</p>
+</div>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="../signals.html"
+                          title="前の章へ">シグナル</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="language.html"
+                          title="次の章へ">Django テンプレート言語</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/templates/index.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../signals.html" title="シグナル">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="language.html" title="Django テンプレート言語">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

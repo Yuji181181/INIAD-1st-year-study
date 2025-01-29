@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>独自のテンプレートタグとフィルタを作る &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="静的ファイル (画像、JavaScript、CSS など) を管理する" href="static-files/index.html" />
+    <link rel="prev" title="テンプレートのバックエンドをカスタマイズする" href="custom-template-backend.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="custom-template-backend.html" title="テンプレートのバックエンドをカスタマイズする">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="static-files/index.html" title="静的ファイル (画像、JavaScript、CSS など) を管理する">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-custom-template-tags">
+            
+  <section id="s-how-to-create-custom-template-tags-and-filters">
+<span id="how-to-create-custom-template-tags-and-filters"></span><h1>独自のテンプレートタグとフィルタを作る<a class="headerlink" href="#how-to-create-custom-template-tags-and-filters" title="Link to this heading">¶</a></h1>
+<p>Django のテンプレート言語は、アプリケーションのプレゼンテーションロジックのニーズに対応するように設計された、多種多様な <a class="reference internal" href="../ref/templates/builtins.html"><span class="doc">埋め込みタグやフィルタ</span></a> を搭載しています。それでもなお、テンプレート構成要素のコア・セットでカバーされていない機能が必要になることもあるでしょう。そのときは Python を使用し、独自のタグやフィルタを定義することによって、テンプレートエンジンを拡張できます。その上で、<a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">%}</span></code></a> タグを使用すると、テンプレートでそれらの機能を利用することができるようになります。</p>
+<section id="s-code-layout">
+<span id="code-layout"></span><h2>コードのレイアウト<a class="headerlink" href="#code-layout" title="Link to this heading">¶</a></h2>
+<p>独自のテンプレートタグやフィルタを指定するための最も一般的な場所は、Django のアプリケーションの内部です。それらが既存のアプリに関連するものである場合は、この場所にバンドルするのが最適です。それ以外の場合は、新しいアプリケーションに追加されてしまいます。Django のアプリケーションが <a class="reference internal" href="../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> に追加されると、以下に記載された従来の場所に定義したタグは、自動的にテンプレート内に読み込むことが可能になります。</p>
+<p>アプリケーションは、&quot;models.py&quot; や &quot;views.py&quot; などと同じレベルに &quot;templatetags&quot; ディレクトリを含むべきです。まだ存在していない場合は、ディレクトリが Python パッケージとして扱われるようにするため、&quot;__init__.py&quot; を忘れないでください。</p>
+<div class="admonition-development-server-won-t-automatically-restart admonition">
+<p class="admonition-title">開発用サーバが自動的にリスタートしない場合</p>
+<p><code class="docutils literal notranslate"><span class="pre">templatetags</span></code> モジュールを追加した後、テンプレートでタグやフィルタを使用する前に、サーバーを再起動する必要があります。</p>
+</div>
+<p>カスタムタグやフィルタは <code class="docutils literal notranslate"><span class="pre">templatetags</span></code> ディレクトリ内のモジュールにあります。モジュールファイルの名前は、あとでタグをロードして使うので、別のアプリでカスタムタグやフィルタと衝突しない名前を選択するように心がけてください。</p>
+<p>例えば、カスタムタグ/フィルタが <code class="docutils literal notranslate"><span class="pre">poll_extras.py</span></code> というファイルにある場合、アプリのレイアウトは次のようになります:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>polls/
+    __init__.py
+    models.py
+    templatetags/
+        __init__.py
+        poll_extras.py
+    views.py
+</pre></div>
+</div>
+<p>そして、テンプレートでは次のように使います:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">poll_extras</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>カスタムタグを含むアプリケーションは、<a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">%}</span></code></a> タグを機能させるために <a class="reference internal" href="../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 内に記述される必要があります。これは、セキュリティ機能です: 毎回の Django のインストールでこれらへのアクセスを有効化することなく、単一のホストマシン上の多数のテンプレートライブラリに対して Python のコードをホストできるようにします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">templatetags</span></code> パッケージに入れられるモジュールの数に制限はありません。ただ、<a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">load</span> <span class="pre">%}</span></code></a> ステートメントは、アプリケーションの名前ではなく、与えられた Python のモジュール名に対してタグ/フィルタをロードすることに注意してください。</p>
+<p>有効なタグライブラリにするため、モジュールは、<code class="docutils literal notranslate"><span class="pre">register</span></code> という名前のモジュールレベルの変数を含む必要があります。これは、すべてのタグとフィルタが登録されている <code class="docutils literal notranslate"><span class="pre">template.Library</span></code> のインスタンスです。そのため、あなたのモジュールの上部に、次のコードを記述してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+
+<span class="n">register</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Library</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>あるいは、テンプレートタグのモジュールは、<a class="reference internal" href="../topics/templates.html#django.template.backends.django.DjangoTemplates" title="django.template.backends.django.DjangoTemplates"><code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoTemplates</span></code></a> への <code class="docutils literal notranslate"><span class="pre">'libraries'</span></code> 引数を通じて登録することもできます。テンプレートタグをロードするときに、テンプレートタグのモジュール名とは異なるラベルを使用したい場合に便利です。また、アプリケーションをインストールせずに、タグを登録できるようになります。</p>
+<div class="admonition-behind-the-scenes admonition">
+<p class="admonition-title">背景</p>
+<p>豊富な例については、 Django のデフォルトのフィルタとタグのソースコードを読んでください。それぞれ <a class="extlink-source reference external" href="https://github.com/django/django/blob/main/django/template/defaultfilters.py">django/template/defaultfilters.py</a> と <a class="extlink-source reference external" href="https://github.com/django/django/blob/main/django/template/defaulttags.py">django/template/defaulttags.py</a> にあります。</p>
+<p><a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-load"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">load</span></code></a> タグの詳細については、ドキュメントを参照してください。</p>
+</div>
+</section>
+<section id="s-writing-custom-template-filters">
+<span id="s-howto-writing-custom-template-filters"></span><span id="writing-custom-template-filters"></span><span id="howto-writing-custom-template-filters"></span><h2>独自のテンプレートフィルタを記述する<a class="headerlink" href="#writing-custom-template-filters" title="Link to this heading">¶</a></h2>
+<p>独自のフィルタは、1つか2つの引数を取るPythonの関数です:</p>
+<ul class="simple">
+<li><p>変数の値 (インプット) -- 文字列とは限りません。</p></li>
+<li><p>引数の値 -- デフォルト値を持つことも、完全に省略することもできます。</p></li>
+</ul>
+<p>例えば、フィルタ <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">var|foo:&quot;bar&quot;</span> <span class="pre">}}</span></code> の中で、フィルタ <code class="docutils literal notranslate"><span class="pre">foo</span></code> は変数 <code class="docutils literal notranslate"><span class="pre">var</span></code> と引数 <code class="docutils literal notranslate"><span class="pre">&quot;bar&quot;</span></code> を渡されます。</p>
+<p>テンプレート言語は例外処理を提供しないので、テンプレートフィルタから生成された例外はすべてサーバーエラーとして公開されます。したがって、フィルタ関数は、返すべき妥当なフォールバック値がある場合には例外を発生させないようにする必要があります。テンプレートの明確なバグを表すインプットの場合、例外を発生させる方が、バグを隠すサイレントな失敗よりも適切でしょう。</p>
+<p>以下はフィルタ定義の例です:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">cut</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Removes all values of arg from the given string&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>そして、以下はフィルタがどのように使われるかの例です:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">somevariable</span><span class="o">|</span><span class="nf">cut</span><span class="s2">:&quot;0&quot;</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>ほとんどのフィルタは引数を取りません。この場合、次のように関数の第2引数を省略してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">lower</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>  <span class="c1"># Only one argument.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Converts a string into all lowercase&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="s-registering-custom-filters">
+<span id="registering-custom-filters"></span><h3>独自のフィルタを登録する<a class="headerlink" href="#registering-custom-filters" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.template.Library.filter">
+<span class="sig-prename descclassname"><span class="pre">django.template.Library.</span></span><span class="sig-name descname"><span class="pre">filter</span></span>()<a class="headerlink" href="#django.template.Library.filter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>フィルタ定義を書き終わったら、Django のテンプレート言語で使用できるようにするため、<code class="docutils literal notranslate"><span class="pre">Library</span></code> のインスタンスに登録する必要があります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;cut&quot;</span><span class="p">,</span> <span class="n">cut</span><span class="p">)</span>
+<span class="n">register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="s2">&quot;lower&quot;</span><span class="p">,</span> <span class="n">lower</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Library.filter()</span></code> メソッドは 2 つの引数を取ります:</p>
+<ol class="arabic simple">
+<li><p>フィルタの名前 -- 文字列です。</p></li>
+<li><p>編集用の関数 -- Python の関数です (文字列としての関数名ではありません)。</p></li>
+</ol>
+<p>代わりに <code class="docutils literal notranslate"><span class="pre">register.filter()</span></code> をデコレータとして使用できます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;cut&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cut</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">arg</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lower</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">name</span></code> 引数を省略した場合、上記の 2 番目の例と同じように、Django はフィルタ名として関数の名前を利用します。</p>
+<p>最後に、<code class="docutils literal notranslate"><span class="pre">register.filter()</span></code> は 3 つのキーワード引数 (<code class="docutils literal notranslate"><span class="pre">is_safe</span></code>、<code class="docutils literal notranslate"><span class="pre">needs_autoescape</span></code>、 <code class="docutils literal notranslate"><span class="pre">expects_localtime</span></code>) を受け入れます。これらの引数は、後述の <a class="reference internal" href="#filters-auto-escaping"><span class="std std-ref">フィルタと自動エスケープ</span></a> と <a class="reference internal" href="#filters-timezones"><span class="std std-ref">フィルタとタイムゾーン</span></a> の中で説明されています。</p>
+</section>
+<section id="s-template-filters-that-expect-strings">
+<span id="template-filters-that-expect-strings"></span><h3>文字列を要するテンプレートフィルタ<a class="headerlink" href="#template-filters-that-expect-strings" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.template.defaultfilters.stringfilter">
+<span class="sig-prename descclassname"><span class="pre">django.template.defaultfilters.</span></span><span class="sig-name descname"><span class="pre">stringfilter</span></span>()<a class="headerlink" href="#django.template.defaultfilters.stringfilter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>第 1 引数として文字数を要求するだけのテンプレートフィルタを記述している場合、デコレータ <code class="docutils literal notranslate"><span class="pre">stringfilter</span></code> を使う必要があります。これは、関数に渡される前にオブジェクトを文字列に変換します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.template.defaultfilters</span><span class="w"> </span><span class="kn">import</span> <span class="n">stringfilter</span>
+
+<span class="n">register</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Library</span><span class="p">()</span>
+
+
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span>
+<span class="nd">@stringfilter</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">lower</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>これにより、このフィルタに整数を渡したとしても <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> は発生しません。(整数は <code class="docutils literal notranslate"><span class="pre">lower()</span></code> メソッドを持ちませんが。)</p>
+</section>
+<section id="s-filters-and-auto-escaping">
+<span id="s-filters-auto-escaping"></span><span id="filters-and-auto-escaping"></span><span id="filters-auto-escaping"></span><h3>フィルタと自動エスケープ<a class="headerlink" href="#filters-and-auto-escaping" title="Link to this heading">¶</a></h3>
+<p>独自のフィルタを作成する場合、フィルタがDjangoの自動エスケープの挙動とどのように関連するか考慮してください。2種類の文字列がテンプレートコードに渡されることに留意してください:</p>
+<ul>
+<li><p><strong>Raw strings</strong> はPythonのネイティブの文字列です。出力時に、自動エスケープが有効な場合はエスケープされ、それ以外の場合は変更されません。</p></li>
+<li><p><strong>Safe strings</strong> は出力時にさらなるエスケープがされないように安全とマークされた文字列です。必要なエスケープはすでに行われています。これらはクライアント側でそのまま解釈されることを目的とした生のHTMLを含む出力によく利用されます。</p>
+<p>内部では、これらの文字列は <a class="reference internal" href="../ref/utils.html#django.utils.safestring.SafeString" title="django.utils.safestring.SafeString"><code class="xref py py-class docutils literal notranslate"><span class="pre">SafeString</span></code></a> 型になります。次のようなコードでこれらの値を検証することができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.safestring</span><span class="w"> </span><span class="kn">import</span> <span class="n">SafeString</span>
+
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">SafeString</span><span class="p">):</span>
+    <span class="c1"># Do something with the &quot;safe&quot; string.</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>テンプレートフィルタのコードは、次の2つの状況のいずれかに当てはまります:</p>
+<ol class="arabic">
+<li><p>フィルタが結果に新たにHTMLで安全でない文字 (<code class="docutils literal notranslate"><span class="pre">&lt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">'</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&amp;</span></code>) を導入しない場合。この場合、Djangoにすべての自動エスケープ処理を任せることができます。フィルタ関数を登録する際に、 <code class="docutils literal notranslate"><span class="pre">is_safe</span></code> フラグを <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定するだけです。次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_safe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">myfilter</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span>
+</pre></div>
+</div>
+<p>このフラグは、&quot;安全&quot;な文字列がフィルタに渡された場合、結果も依然として&quot;安全&quot;であることをDjangoに伝えます。そして、安全でない文字列が渡された場合、必要に応じてDjangoが自動的にエスケープします。</p>
+<p>この場合、&quot;このフィルタは安全である ―― それはどんな非安全なHTMLも導入する可能性はない。&quot; と考えて構いません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">is_safe</span></code> が必要な理由は、 <code class="docutils literal notranslate"><span class="pre">SafeData</span></code> オブジェクトを普通の <code class="docutils literal notranslate"><span class="pre">str</span></code> オブジェクトに変換するような標準的な文字列操作が多数存在し、これら全てを捉えることが非常に難しいため、Djangoではフィルタの処理が完了した後に問題を修正するためです。</p>
+<p>例えば、任意の入力の末尾に文字列 <code class="docutils literal notranslate"><span class="pre">xx</span></code> を追加するフィルタがあるとします。これは結果に危険なHTML文字を導入しません（元々存在していたものを除く）。よって、フィルタを <code class="docutils literal notranslate"><span class="pre">is_safe</span></code> でマークすべきです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">is_safe</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">add_xx</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">xx&quot;</span> <span class="o">%</span> <span class="n">value</span>
+</pre></div>
+</div>
+<p>このフィルタが自動エスケープが有効なテンプレートで使用される場合、入力が既に&quot;安全&quot;としてマークされていない限り、Djangoは出力をエスケープします。</p>
+<p>デフォルトでは <code class="docutils literal notranslate"><span class="pre">is_safe</span></code> は <code class="docutils literal notranslate"><span class="pre">False</span></code> ですが、それが必要でないフィルタでは省略できます。</p>
+<p>フィルタが本当に安全な文字列を安全なまま残すかどうかを判断するときには注意してください。文字を <em>除去</em> している場合、不注意で結果の中に不均衡なHTMLタグやエンティティが残ってしまうかもしれません。例えば、入力から <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> を取り除くと <code class="docutils literal notranslate"><span class="pre">&lt;a&gt;</span></code> が <code class="docutils literal notranslate"><span class="pre">&lt;a</span></code> になってしまうかもしれません。同様に、セミコロン(<code class="docutils literal notranslate"><span class="pre">;</span></code>)を削除すると、<code class="docutils literal notranslate"><span class="pre">&amp;amp;</span></code> が <code class="docutils literal notranslate"><span class="pre">&amp;amp</span></code> に変わります。ほとんどの場合、ここまでトリッキーになることはありませんが、コードをレビューする際はこのような問題がないか注意してください。</p>
+<p>フィルタを <code class="docutils literal notranslate"><span class="pre">is_safe</span></code> としてマークすると、フィルタの戻り値が文字列に強制されます。フィルタがブール値や他の文字列でない値を返すべき場合、 <code class="docutils literal notranslate"><span class="pre">is_safe</span></code> とマークすると意図しない結果になる可能性があります（例えば、ブール値の False を文字列の 'False' に変換するなど）。</p>
+</li>
+<li><p>または、フィルタのコードで必要なエスケープ処理を手動で行うこともできます。これは、結果に新しいHTMLマークアップを導入する場合に必要です。HTMLマークアップがさらにエスケープされないように、出力を安全としてマークしたい場合は、入力を自分で処理する必要があります。</p>
+<p>出力を安全な文字列としてマークするには <a class="reference internal" href="../ref/utils.html#django.utils.safestring.mark_safe" title="django.utils.safestring.mark_safe"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.safestring.mark_safe()</span></code></a> を使います。</p>
+<p>ただし注意が必要です。出力を安全としてマークするだけでは不十分です。本当にそれが <em>安全である</em> ことを確認する必要があり、行うべきことは自動エスケープが有効かどうかによって異なります。テンプレート作成者のために、自動エスケープがオンまたはオフのどちらのテンプレートでも操作できるフィルタを書くことが考えられます。</p>
+<p>フィルタが現在の自動エスケープの状態を知るためには、フィルタ関数を登録する際に <code class="docutils literal notranslate"><span class="pre">needs_autoescape</span></code> フラグを <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定します。(このフラグを指定しない場合、デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です)。このフラグは、追加のキーワード引数 <code class="docutils literal notranslate"><span class="pre">autoescape</span></code> をDjangoに渡すようにフィルタ関数に伝えます。この引数は自動エスケープが有効の場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> 、そうでない場合は <code class="docutils literal notranslate"><span class="pre">False</span></code> となります。 <code class="docutils literal notranslate"><span class="pre">autoescape</span></code> パラメータのデフォルトは <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定しておくことが推奨されます。これにより、Pythonコードから関数を呼び出したときにデフォルトでエスケープが有効になります。</p>
+<p>例えば、文字列の最初の文字を強調するフィルタを書いてみましょう:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.html</span><span class="w"> </span><span class="kn">import</span> <span class="n">conditional_escape</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.safestring</span><span class="w"> </span><span class="kn">import</span> <span class="n">mark_safe</span>
+
+<span class="n">register</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Library</span><span class="p">()</span>
+
+
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">needs_autoescape</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">initial_letter_filter</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">autoescape</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="n">first</span><span class="p">,</span> <span class="n">other</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">text</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">if</span> <span class="n">autoescape</span><span class="p">:</span>
+        <span class="n">esc</span> <span class="o">=</span> <span class="n">conditional_escape</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">esc</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="s2">&quot;&lt;strong&gt;</span><span class="si">%s</span><span class="s2">&lt;/strong&gt;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">esc</span><span class="p">(</span><span class="n">first</span><span class="p">),</span> <span class="n">esc</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">needs_autoescape</span></code> フラグと <code class="docutils literal notranslate"><span class="pre">autoescape</span></code> キーワード引数により、フィルタが呼び出された際に自動エスケープが有効かどうかを関数が知ることができます。 <code class="docutils literal notranslate"><span class="pre">autoescape</span></code> を使用して、入力データを <code class="docutils literal notranslate"><span class="pre">django.utils.html.conditional_escape</span></code> に通す必要があるかどうかを決定します（必要なければ、恒等関数を &quot;escapse&quot; 関数として使用します）。 <code class="docutils literal notranslate"><span class="pre">conditional_escape()</span></code> 関数は <code class="docutils literal notranslate"><span class="pre">escape()</span></code> に似ていますが、 <code class="docutils literal notranslate"><span class="pre">SafeData</span></code> インスタンス <strong>でない</strong> 入力のみをエスケープします。 <code class="docutils literal notranslate"><span class="pre">SafeData</span></code> インスタンスが <code class="docutils literal notranslate"><span class="pre">conditional_escape()</span></code> に渡された場合、データは変更されずにそのまま返されます。</p>
+<p>最後に、上の例では、HTMLがさらにエスケープされることなくテンプレートに直接挿入されるように、結果を安全としてマークすることを忘れないでください。</p>
+<p>この場合、 <code class="docutils literal notranslate"><span class="pre">is_safe</span></code> フラグを気にする必要はありません (フラグを指定しても何も問題はありませんが)。自動エスケープの問題を手動で処理して安全な文字列を返す場合、 <code class="docutils literal notranslate"><span class="pre">is_safe</span></code> フラグを指定しても何も変わりません。</p>
+</li>
+</ol>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>組み込みのフィルタを再利用するときに XSS 脆弱性を回避する</p>
+<p>Django に組み込みのフィルタは、適切な自動エスケープを行い、クロスサイトスクリプティング（XSS）の脆弱性を回避するために、デフォルトで <code class="docutils literal notranslate"><span class="pre">autoescape=True</span></code> となっています。</p>
+<p>古いバージョンの Django では、 <code class="docutils literal notranslate"><span class="pre">autoescape</span></code> のデフォルトは <code class="docutils literal notranslate"><span class="pre">None</span></code> ですので、 Django の組み込みのフィルタを再利用する際には注意してください。オートエスケープを有効にするには <code class="docutils literal notranslate"><span class="pre">autoescape=True</span></code> を渡す必要があります。</p>
+<p>例えば、 <a class="reference internal" href="../ref/templates/builtins.html#std-templatefilter-urlize"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">urlize</span></code></a> フィルタと <a class="reference internal" href="../ref/templates/builtins.html#std-templatefilter-linebreaksbr"><code class="xref std std-tfilter docutils literal notranslate"><span class="pre">linebreaksbr</span></code></a> フィルタを組み合わせた <code class="docutils literal notranslate"><span class="pre">urlize_and_linebreaks</span></code> というカスタムフィルタを書きたい場合、フィルタは次のようになります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.template.defaultfilters</span><span class="w"> </span><span class="kn">import</span> <span class="n">linebreaksbr</span><span class="p">,</span> <span class="n">urlize</span>
+
+
+<span class="nd">@register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">needs_autoescape</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">urlize_and_linebreaks</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">autoescape</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">linebreaksbr</span><span class="p">(</span><span class="n">urlize</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">autoescape</span><span class="o">=</span><span class="n">autoescape</span><span class="p">),</span> <span class="n">autoescape</span><span class="o">=</span><span class="n">autoescape</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>次のように使います:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">comment</span><span class="o">|</span><span class="nf">urlize_and_linebreaks</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>これは以下と同等です:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">comment</span><span class="o">|</span><span class="nf">urlize</span><span class="o">|</span><span class="nf">linebreaksbr</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="s-filters-and-time-zones">
+<span id="s-filters-timezones"></span><span id="filters-and-time-zones"></span><span id="filters-timezones"></span><h3>フィルタとタイムゾーン<a class="headerlink" href="#filters-and-time-zones" title="Link to this heading">¶</a></h3>
+<p><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> オブジェクトを操作するカスタムフィルタを書く場合、通常は <code class="docutils literal notranslate"><span class="pre">expects_localtime</span></code> フラグを <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定して登録します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">expects_localtime</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">businesshours</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">9</span> <span class="o">&lt;=</span> <span class="n">value</span><span class="o">.</span><span class="n">hour</span> <span class="o">&lt;</span> <span class="mi">17</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+<p>このフラグがセットされていると、フィルタの最初の引数がタイムゾーンを意識した datetime である場合、Django は <a class="reference internal" href="../topics/i18n/timezones.html#time-zones-in-templates"><span class="std std-ref">テンプレートにおけるタイムゾーン変換ルール</span></a> に従って、フィルタに渡す前に現在のタイムゾーンに変換します。</p>
+</section>
+</section>
+<section id="s-writing-custom-template-tags">
+<span id="s-howto-writing-custom-template-tags"></span><span id="writing-custom-template-tags"></span><span id="howto-writing-custom-template-tags"></span><h2>独自のテンプレートタグを記述する<a class="headerlink" href="#writing-custom-template-tags" title="Link to this heading">¶</a></h2>
+<p>タグはあらゆることができるため、フィルタより複雑です。Django は、ほとんどのタイプのタグを簡単に書けるように、多数のショートカットを提供しています。まず最初にこうしたショートカットを見てから、ショートカットでは機能が不足している場合にゼロからタグを書く方法を説明します。</p>
+<section id="s-simple-tags">
+<span id="s-howto-custom-template-tags-simple-tags"></span><span id="simple-tags"></span><span id="howto-custom-template-tags-simple-tags"></span><h3>シンプルなタグ<a class="headerlink" href="#simple-tags" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.template.Library.simple_tag">
+<span class="sig-prename descclassname"><span class="pre">django.template.Library.</span></span><span class="sig-name descname"><span class="pre">simple_tag</span></span>()<a class="headerlink" href="#django.template.Library.simple_tag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>多くのテンプレートタグは、文字列やテンプレート変数などの引数を取り、入力引数と外部情報のみに基づいて処理を行った後、結果を返します。 たとえば、<code class="docutils literal notranslate"><span class="pre">current_time</span></code> タグはフォーマット文字列を受け取り、その時刻を適切な文字列フォーマットとして返します。</p>
+<p>これらのタイプのタグの作成を容易にするため、Django はヘルパー関数 <code class="docutils literal notranslate"><span class="pre">simple_tag</span></code> を提供しています。 この関数は <code class="docutils literal notranslate"><span class="pre">django.template.Library</span></code> のメソッドで、任意の数の引数を受け取る関数を取り、それを <code class="docutils literal notranslate"><span class="pre">render</span></code> 関数と上記で説明した他の必要なビットにラップし、そしてテンプレートシステムに登録します。</p>
+<p>私たちの <code class="docutils literal notranslate"><span class="pre">current_time</span></code> 関数は、以下のように書くことができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+
+<span class="n">register</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Library</span><span class="p">()</span>
+
+
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">current_time</span><span class="p">(</span><span class="n">format_string</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">format_string</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">simple_tag</span></code> ヘルパー関数について、注意すべきことがいくつかあります:</p>
+<ul class="simple">
+<li><p>必須の引数の数などのチェックは、すでにこの関数が呼ばれる時点までに完了しているため、自分でチェックをする必要はありません。</p></li>
+<li><p>引数を囲む引用符（もしあれば）はすでに取り除かれているので、プレーンな文字列を受け取ります。</p></li>
+<li><p>もし引数がテンプレート変数だった場合、テンプレート中でタグが呼ばれた時点の値が渡されます。テンプレート変数そのものが渡されるわけではありません。</p></li>
+</ul>
+<p>他のタグユーティリティとは異なり、 <code class="docutils literal notranslate"><span class="pre">simple_tag</span></code> は、テンプレートコンテキストが自動エスケープモードの場合、 <a class="reference internal" href="../ref/utils.html#django.utils.html.conditional_escape" title="django.utils.html.conditional_escape"><code class="xref py py-func docutils literal notranslate"><span class="pre">conditional_escape()</span></code></a> を通して出力を渡します。</p>
+<p>追加のエスケープが不要な場合、コードに XSS 脆弱性が絶対にないと確信できるのであれば、 <a class="reference internal" href="../ref/utils.html#django.utils.safestring.mark_safe" title="django.utils.safestring.mark_safe"><code class="xref py py-func docutils literal notranslate"><span class="pre">mark_safe()</span></code></a> を使う必要があります。小さな HTML コードを作成する場合は、 <code class="docutils literal notranslate"><span class="pre">mark_safe()</span></code> の代わりに <a class="reference internal" href="../ref/utils.html#django.utils.html.format_html" title="django.utils.html.format_html"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_html()</span></code></a> を使うことを強く推奨します。</p>
+<p>テンプレートタグの中からコンテキストにアクセスしたい場合、タグを登録する際に <code class="docutils literal notranslate"><span class="pre">takes_context</span></code> 引数を使うことでできるようになります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span><span class="p">(</span><span class="n">takes_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">current_time</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">format_string</span><span class="p">):</span>
+    <span class="n">timezone</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;timezone&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">your_get_current_time_method</span><span class="p">(</span><span class="n">timezone</span><span class="p">,</span> <span class="n">format_string</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>最初の引数は <code class="docutils literal notranslate"><span class="pre">context</span></code> に <em>しなければならない</em> ことに注意してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">takes_context</span></code> オプションがどのように動くかについて、詳しくは <a class="reference internal" href="#howto-custom-template-tags-inclusion-tags"><span class="std std-ref">inclusion tag</span></a> を参照してください。</p>
+<p>タグの名前を変更する必要がある場合は、カスタム名を指定できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">register</span><span class="o">.</span><span class="n">simple_tag</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;minusone&quot;</span><span class="p">)</span>
+
+
+<span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;minustwo&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">some_function</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">value</span> <span class="o">-</span> <span class="mi">2</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">simple_tag</span></code> 関数は任意の数の位置引数またはキーワード引数を受け取ることができます。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">simple_tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_tag</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">warning</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;warning&quot;</span><span class="p">]</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>このようにすることで、テンプレートからはスペースで区切られた変数をいくつでもテンプレートタグに渡すことができます。Pythonの文法と同じように、キーワード引数の値は等号（&quot;<code class="docutils literal notranslate"><span class="pre">=</span></code>&quot;）を用いて位置引数の後に記述します。たとえば：</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">my_tag</span> <span class="m">123</span> <span class="s2">&quot;abcd&quot;</span> <span class="nv">book.title</span> <span class="nv">warning</span><span class="o">=</span><span class="nv">message</span><span class="o">|</span><span class="nf">lower</span> <span class="nv">profile</span><span class="o">=</span><span class="nv">user.profile</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>タグの処理結果を直接出力することのほかに、テンプレート変数に格納することも可能です。これは <code class="docutils literal notranslate"><span class="pre">as</span></code> に続けて変数名を書くことで実現可能です。これによって、タグの処理結果を好きなように出力することができるようになります。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">current_time</span> <span class="s2">&quot;%Y-%m-%d %I:%M %p&quot;</span> <span class="k">as</span> <span class="nv">the_time</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The time is <span class="cp">{{</span> <span class="nv">the_time</span> <span class="cp">}}</span>.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="s-inclusion-tags">
+<span id="s-howto-custom-template-tags-inclusion-tags"></span><span id="inclusion-tags"></span><span id="howto-custom-template-tags-inclusion-tags"></span><h3>Inclusion tag (インクルージョン・タグ)<a class="headerlink" href="#inclusion-tags" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.template.Library.inclusion_tag">
+<span class="sig-prename descclassname"><span class="pre">django.template.Library.</span></span><span class="sig-name descname"><span class="pre">inclusion_tag</span></span>()<a class="headerlink" href="#django.template.Library.inclusion_tag" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>テンプレートタグのもう一つの一般的なタイプは、 <em>別の</em> テンプレートをレンダリングしてデータを表示するものです。例えば、 Django の admin インタフェースでは、カスタムテンプレートタグを使って、&quot;add/change&quot; フォームページの下にあるボタンを表示しています。これらのボタンはいつも同じように見えますが、編集中のオブジェクトによってリンク先が変わります -- なので、現在のオブジェクトの詳細で埋められた小さなテンプレートを使うのに最適なケースです。(admin の場合、これは <code class="docutils literal notranslate"><span class="pre">submit_row</span></code> タグです)。</p>
+<p>この種のタグは &quot;inclusion tag&quot; と呼ばれます。</p>
+<p>Inclusion tag の書き方は例で示すのが一番わかりやすいでしょう。 <a class="reference internal" href="../intro/tutorial02.html#creating-models"><span class="std std-ref">チュートリアル</span></a> で作成したような、与えられた <code class="docutils literal notranslate"><span class="pre">Poll</span></code> オブジェクトの選択肢のリストを出力するタグを書いてみましょう。タグはこのように使います:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">show_results</span> <span class="nv">poll</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>...そして出力は次のようになります:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>First choice<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Second choice<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span>Third choice<span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>まず、引数を受け取り、結果のデータの辞書を生成する関数を定義します。ここで重要なのは、辞書を返すだけでよく、それ以上複雑なものは必要ないということです。これは、テンプレートの断片のテンプレート・コンテキストとして使用されます。例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">show_results</span><span class="p">(</span><span class="n">poll</span><span class="p">):</span>
+    <span class="n">choices</span> <span class="o">=</span> <span class="n">poll</span><span class="o">.</span><span class="n">choice_set</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;choices&quot;</span><span class="p">:</span> <span class="n">choices</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>次に、タグの出力をレンダリングするためのテンプレートを作成します。このテンプレートはタグの固定機能であり、テンプレート設計者ではなく、タグ作成者が指定します。この例では、テンプレートはとても短いです:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">ul</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">for</span> <span class="nv">choice</span> <span class="k">in</span> <span class="nv">choices</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">li</span><span class="p">&gt;</span> <span class="cp">{{</span> <span class="nv">choice</span> <span class="cp">}}</span> <span class="p">&lt;/</span><span class="nt">li</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+<span class="p">&lt;/</span><span class="nt">ul</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>次に、 <code class="docutils literal notranslate"><span class="pre">Library</span></code> オブジェクトの <code class="docutils literal notranslate"><span class="pre">inclusion_tag()</span></code> メソッドを呼び出して、 inclusion tag を作成し、登録します。例に従って、上記のテンプレートがテンプレートローダーによって検索されるディレクトリの <code class="docutils literal notranslate"><span class="pre">results.html</span></code> というファイルにある場合、次のようにタグを登録します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Here, register is a django.template.Library instance, as before</span>
+<span class="nd">@register</span><span class="o">.</span><span class="n">inclusion_tag</span><span class="p">(</span><span class="s2">&quot;results.html&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">show_results</span><span class="p">(</span><span class="n">poll</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>あるいは、 <a class="reference internal" href="../ref/templates/api.html#django.template.Template" title="django.template.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.Template</span></code></a> インスタンスを使って inclusion tag を登録することもできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.template.loader</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_template</span>
+
+<span class="n">t</span> <span class="o">=</span> <span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;results.html&quot;</span><span class="p">)</span>
+<span class="n">register</span><span class="o">.</span><span class="n">inclusion_tag</span><span class="p">(</span><span class="n">t</span><span class="p">)(</span><span class="n">show_results</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>…これは、関数を最初に作成する際に行います。</p>
+<p>時に、 inclusion tag は多くの引数を要求することがあり、テンプレート作者が全ての引数を渡したり、引数の順番を覚えたりするのは面倒です。これを解決するために、 Django は inclusion tag に <code class="docutils literal notranslate"><span class="pre">takes_context</span></code> オプションを用意しています。テンプレートタグを作成する際に <code class="docutils literal notranslate"><span class="pre">takes_context</span></code> を指定すると、タグには必要な引数がなくなり、 Python 関数の引数は 1 つになります――タグが呼び出された時点のテンプレートコンテキストです。</p>
+<p>例えば、メインページを指す <code class="docutils literal notranslate"><span class="pre">home_link</span></code> と <code class="docutils literal notranslate"><span class="pre">home_title</span></code> 変数を含むコンテキストの中で常に使用される inclusion tag を書くとします。Python の関数は次のようになります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">inclusion_tag</span><span class="p">(</span><span class="s2">&quot;link.html&quot;</span><span class="p">,</span> <span class="n">takes_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">jump_link</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;link&quot;</span><span class="p">:</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;home_link&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;home_title&quot;</span><span class="p">],</span>
+    <span class="p">}</span>
+</pre></div>
+</div>
+<p>最初の引数は <code class="docutils literal notranslate"><span class="pre">context</span></code> に <em>しなければならない</em> ことに注意してください。</p>
+<p>この <code class="docutils literal notranslate"><span class="pre">register.inclusion_tag()</span></code> の行では、 <code class="docutils literal notranslate"><span class="pre">takes_context=True</span></code> と、テンプレートの名前を指定しています。テンプレート <code class="docutils literal notranslate"><span class="pre">link.html</span></code> は以下のようになるでしょう:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>Jump directly to <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{{</span> <span class="nv">link</span> <span class="cp">}}</span><span class="s">&quot;</span><span class="p">&gt;</span><span class="cp">{{</span> <span class="nv">title</span> <span class="cp">}}</span><span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>.
+</pre></div>
+</div>
+<p>そして、そのカスタムタグを使いたいときはいつでも、そのライブラリをロードして、引数なしで次のように呼び出します:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">jump_link</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">takes_context=True</span></code> を使用している場合、テンプレートタグに引数を渡す必要がないことに注意してください。自動的に context にアクセスします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">takes_context</span></code> パラメータのデフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> です。これを <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定すると、この例のようにタグに context オブジェクトが渡されます。これが先ほどの <code class="docutils literal notranslate"><span class="pre">inclusion_tag</span></code> の例との唯一の違いです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">inclusion_tag</span></code> 関数は任意の数の位置引数またはキーワード引数を受け取ることができます。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">inclusion_tag</span><span class="p">(</span><span class="s2">&quot;my_template.html&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_tag</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">warning</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;warning&quot;</span><span class="p">]</span>
+    <span class="n">profile</span> <span class="o">=</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;profile&quot;</span><span class="p">]</span>
+    <span class="o">...</span>
+    <span class="k">return</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>このようにすることで、テンプレートからはスペースで区切られた変数をいくつでもテンプレートタグに渡すことができます。Pythonの文法と同じように、キーワード引数の値は等号（&quot;<code class="docutils literal notranslate"><span class="pre">=</span></code>&quot;）を用いて位置引数の後に記述します。たとえば：</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">my_tag</span> <span class="m">123</span> <span class="s2">&quot;abcd&quot;</span> <span class="nv">book.title</span> <span class="nv">warning</span><span class="o">=</span><span class="nv">message</span><span class="o">|</span><span class="nf">lower</span> <span class="nv">profile</span><span class="o">=</span><span class="nv">user.profile</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+</section>
+<section id="s-advanced-custom-template-tags">
+<span id="advanced-custom-template-tags"></span><h3>高度なカスタムテンプレートタグ<a class="headerlink" href="#advanced-custom-template-tags" title="Link to this heading">¶</a></h3>
+<p>カスタムテンプレートタグを作成するための基本的な機能だけでは不十分な場合があります。ご心配なく、 Django はテンプレートタグを一から構築するのに必要な内部機能への完全なアクセスを提供します。</p>
+</section>
+<section id="s-a-quick-overview">
+<span id="a-quick-overview"></span><h3>簡単な概要<a class="headerlink" href="#a-quick-overview" title="Link to this heading">¶</a></h3>
+<p>テンプレート・システムは、コンパイルとレンダリングの 2 段階のプロセスで動作します。カスタムテンプレートタグを定義するには、コンパイルの仕組みとレンダリングの仕組みを指定します。</p>
+<p>Django はテンプレートをコンパイルするとき、生のテンプレートテキストを &quot;ノード&quot; に分割します。各ノードは <code class="docutils literal notranslate"><span class="pre">django.template.Node</span></code> のインスタンスで、 <code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドを持っています。コンパイルされたテンプレートは <code class="docutils literal notranslate"><span class="pre">Node</span></code> オブジェクトのリストです。コンパイルされたテンプレートオブジェクトに対して <code class="docutils literal notranslate"><span class="pre">render()</span></code> を呼び出すと、テンプレートは与えられたコンテキストで、ノードリスト内の各 <code class="docutils literal notranslate"><span class="pre">Node</span></code> に対して <code class="docutils literal notranslate"><span class="pre">render()</span></code> を呼び出します。 その結果はすべて連結され、テンプレートの出力となります。</p>
+<p>このように、カスタムテンプレートタグを定義するには、生のテンプレートタグを <code class="docutils literal notranslate"><span class="pre">Node</span></code> に変換する方法（コンパイル関数）と、ノードの <code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドの動作を指定します。</p>
+</section>
+<section id="s-writing-the-compilation-function">
+<span id="writing-the-compilation-function"></span><h3>コンパイル関数の書き方<a class="headerlink" href="#writing-the-compilation-function" title="Link to this heading">¶</a></h3>
+<p>テンプレートパーサーが見つけたそれぞれのテンプレートタグに対して、タグの内容とパーサーオブジェクト自身を使って Python 関数を呼び出します。この関数はタグの内容に基づいて <code class="docutils literal notranslate"><span class="pre">Node</span></code> インスタンスを返す役割を担います。</p>
+<p>例えば、テンプレートタグの完全な実装である <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">current_time</span> <span class="pre">%}</span></code> を書いてみましょう。このタグは <a class="reference external" href="https://docs.python.org/3/library/time.html#time.strftime" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">strftime()</span></code></a> という構文で、タグで与えられたパラメータに従ってフォーマットされた現在の日時を表示します。何よりも先にタグの構文を決めるのは良いアイデアです。この場合、タグは次のように使用します:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The time is <span class="cp">{%</span> <span class="k">current_time</span> <span class="s2">&quot;%Y-%m-%d %I:%M %p&quot;</span> <span class="cp">%}</span>.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>この関数のパーサは、パラメータを取得して <code class="docutils literal notranslate"><span class="pre">Node</span></code> オブジェクトを作成する必要があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">do_current_time</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># split_contents() knows not to split quoted strings.</span>
+        <span class="n">tag_name</span><span class="p">,</span> <span class="n">format_string</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">split_contents</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">template</span><span class="o">.</span><span class="n">TemplateSyntaxError</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> tag requires a single argument&quot;</span> <span class="o">%</span> <span class="n">token</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">format_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">format_string</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">format_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">template</span><span class="o">.</span><span class="n">TemplateSyntaxError</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> tag&#39;s argument should be in quotes&quot;</span> <span class="o">%</span> <span class="n">tag_name</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">CurrentTimeNode</span><span class="p">(</span><span class="n">format_string</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>メモ:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">parser</span></code> はテンプレートパーサーオブジェクトです。この例では不要です。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">token.contents</span></code> はタグの生の内容を表す文字列です。この例では <code class="docutils literal notranslate"><span class="pre">'current_time</span> <span class="pre">&quot;%Y-%m-%d</span> <span class="pre">%I:%M</span> <span class="pre">%p&quot;'</span></code> です。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">token.split_contents()</span></code> メソッドは、引用符で囲まれた文字列はそのままに、引数をスペースで分割します。より単純な <code class="docutils literal notranslate"><span class="pre">token.contents.split()</span></code> を使用すると、引用符で囲まれた文字列内を含む <em>すべての</em> スペースで単純に分割してしまうため、それほど堅牢ではありません。常に <code class="docutils literal notranslate"><span class="pre">token.split_contents()</span></code> を使用することをお勧めします。</p></li>
+<li><p>この関数は構文エラーに対して <code class="docutils literal notranslate"><span class="pre">django.template.TemplateSyntaxError</span></code> を親切なメッセージとともに発生させます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TemplateSyntaxError</span></code> 例外は <code class="docutils literal notranslate"><span class="pre">tag_name</span></code> 変数を使用します。エラーメッセージにタグの名前をハードコーディングしないでください。 <code class="docutils literal notranslate"><span class="pre">token.contents.split()[0]</span></code> は&quot;常に&quot;タグの名前になります――タグに引数がない場合でもです。</p></li>
+<li><p>この関数は、ノードがこのタグについて知る必要があるすべての情報を含む <code class="docutils literal notranslate"><span class="pre">CurrentTimeNode</span></code> を返します。この場合、引数 <code class="docutils literal notranslate"><span class="pre">&quot;%Y-%m-%d</span> <span class="pre">%I:%M</span> <span class="pre">%p&quot;</span></code> を渡します。 <code class="docutils literal notranslate"><span class="pre">format_string[1:-1]</span></code> では、テンプレートタグの先頭と末尾の引用符が取り除かれます。</p></li>
+<li><p>構文解析は非常に低レベルです。Django の開発者は、 EBNF 文法などのテクニックを使って、この構文解析システムの上に小さなフレームワークを書く実験をしましたが、 その実験ではテンプレートエンジンが遅すぎました。 低レベルなのは、それが最速だからです。</p></li>
+</ul>
+</section>
+<section id="s-writing-the-renderer">
+<span id="writing-the-renderer"></span><h3>レンダラーの書き方<a class="headerlink" href="#writing-the-renderer" title="Link to this heading">¶</a></h3>
+<p>カスタムタグを書く2つ目のステップは、 <code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドを持つ <code class="docutils literal notranslate"><span class="pre">Node</span></code> サブクラスを定義することです。</p>
+<p>上記の例の続きで、 <code class="docutils literal notranslate"><span class="pre">CurrentTimeNode</span></code> を定義する必要があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CurrentTimeNode</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_string</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_string</span> <span class="o">=</span> <span class="n">format_string</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_string</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>メモ:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">__init__()</span></code> は <code class="docutils literal notranslate"><span class="pre">do_current_time()</span></code> から <code class="docutils literal notranslate"><span class="pre">format_string</span></code> を取得します。オプションやパラメータ、引数は常に <code class="docutils literal notranslate"><span class="pre">Node</span></code> の <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> から渡します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドは、実際に処理が行われる場所です。</p></li>
+<li><p>特に実運用環境では、 <code class="docutils literal notranslate"><span class="pre">render()</span></code> は通常は静かに失敗するべきです。しかし、場合によっては、特に <code class="docutils literal notranslate"><span class="pre">context.template.engine.debug</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、このメソッドはデバッグを容易にするために例外を発生させることがあります。例えば、いくつかのコアタグは、引数の数や型を間違えると <code class="docutils literal notranslate"><span class="pre">django.template.TemplateSyntaxError</span></code> を発生させます。</p></li>
+</ul>
+<p>最終的に、コンパイルとレンダリングを切り離すことで、効率的なテンプレートシステムが実現します。なぜなら、テンプレートは何度もパースされることなく、複数のコンテキストをレンダリングできるからです。</p>
+</section>
+<section id="s-auto-escaping-considerations">
+<span id="s-tags-auto-escaping"></span><span id="auto-escaping-considerations"></span><span id="tags-auto-escaping"></span><h3>自動エスケープに関する注意点<a class="headerlink" href="#auto-escaping-considerations" title="Link to this heading">¶</a></h3>
+<p>テンプレートタグからの出力は自動エスケープフィルタに自動的に通されることは <strong>ありません</strong> (上で説明した <a class="reference internal" href="#django.template.Library.simple_tag" title="django.template.Library.simple_tag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simple_tag()</span></code></a> は例外です)。しかし、テンプレートタグを書く際に注意すべき点がいくつかあります。</p>
+<p>テンプレートタグの <code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッドが(結果を文字列で返すのではなく)コンテキスト変数に結果を格納する場合、適切であれば <code class="docutils literal notranslate"><span class="pre">mark_safe()</span></code> を呼び出すように注意しなければなりません。変数が最終的にレンダリングされるとき、その時点で有効な自動エスケープ設定の影響を受けます、そのため、さらなるエスケープから安全であるべきコンテンツは、そのようにマークされる必要があります。</p>
+<p>また、テンプレートタグがサブレンダリングを行うために新しいコンテキストを作成する場合、auto-escape 属性に現在のコンテキストの値を指定します。 <code class="docutils literal notranslate"><span class="pre">Context</span></code> クラスの <code class="docutils literal notranslate"><span class="pre">__init__</span></code> メソッドはこの目的で使用できる <code class="docutils literal notranslate"><span class="pre">autoescape</span></code> というパラメータを受け取ります。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.template</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="n">new_context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">({</span><span class="s2">&quot;var&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="p">},</span> <span class="n">autoescape</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">autoescape</span><span class="p">)</span>
+    <span class="c1"># ... Do something with new_context ...</span>
+</pre></div>
+</div>
+<p>これはあまり一般的な状況ではありませんが、テンプレートを自分でレンダリングする場合に便利です。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">template</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">get_template</span><span class="p">(</span><span class="s2">&quot;small_fragment.html&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">Context</span><span class="p">({</span><span class="s2">&quot;var&quot;</span><span class="p">:</span> <span class="n">obj</span><span class="p">},</span> <span class="n">autoescape</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">autoescape</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>もしこの例で、現在の <code class="docutils literal notranslate"><span class="pre">context.autoescape</span></code> の値を新しい <code class="docutils literal notranslate"><span class="pre">Context</span></code> に渡すのを怠っていたら、結果は <em>常に</em> 自動的にエスケープされていたでしょう。これは、テンプレートタグが <a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-autoescape"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">autoescape</span> <span class="pre">off</span> <span class="pre">%}</span></code></a> ブロックの中で使用されている場合、望ましい動作ではないかもしれません。</p>
+</section>
+<section id="s-thread-safety-considerations">
+<span id="s-template-tag-thread-safety"></span><span id="thread-safety-considerations"></span><span id="template-tag-thread-safety"></span><h3>スレッド安全性の考慮<a class="headerlink" href="#thread-safety-considerations" title="Link to this heading">¶</a></h3>
+<p>ノードがパースされると、その <code class="docutils literal notranslate"><span class="pre">render</span></code> メソッドは何度でも呼び出されます。Django はマルチスレッド環境で実行されることがあるので、1つのノードが2つのリクエストに応答して、異なるコンテキストで同時にレンダリングされることがあります。したがって、テンプレートタグをスレッドセーフにすることが重要です。</p>
+<p>テンプレートタグを常にスレッドセーフに保つため、ノード自体に状態情報を保存してはいけません。例えば、 Django にはレンダリングされる度に与えられた文字列のリストを循環させる <a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-cycle"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">cycle</span></code></a> テンプレートタグが用意されています:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">o</span> <span class="k">in</span> <span class="nv">some_list</span> <span class="cp">%}</span>
+    <span class="p">&lt;</span><span class="nt">tr</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{%</span> <span class="k">cycle</span> <span class="s1">&#39;row1&#39;</span> <span class="s1">&#39;row2&#39;</span> <span class="cp">%}</span><span class="s">&quot;</span><span class="p">&gt;</span>
+        ...
+    <span class="p">&lt;/</span><span class="nt">tr</span><span class="p">&gt;</span>
+<span class="cp">{%</span> <span class="k">endfor</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>ナイーブな <code class="docutils literal notranslate"><span class="pre">CycleNode</span></code> の実装は次のようになります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CycleNode</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cyclevars</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cycle_iter</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="n">cyclevars</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cycle_iter</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>しかし、上のテンプレートコードを同時にレンダリングする2つのテンプレートがあるとします:</p>
+<ol class="arabic simple">
+<li><p>スレッド1が最初のループを実行し、 <code class="docutils literal notranslate"><span class="pre">CycleNode.render()</span></code> は 'row1' を返します。</p></li>
+<li><p>スレッド2が最初のループを実行し、 <code class="docutils literal notranslate"><span class="pre">CycleNode.render()</span></code> は 'row2' を返します。</p></li>
+<li><p>スレッド1が2回目のループを実行し、 <code class="docutils literal notranslate"><span class="pre">CycleNode.render()</span></code> は 'row1' を返します。</p></li>
+<li><p>スレッド2が2回目のループを実行し、 <code class="docutils literal notranslate"><span class="pre">CycleNode.render()</span></code> は 'row2' を返します。</p></li>
+</ol>
+<p>CycleNodeは反復していますが、グローバルに反復しています。スレッド1とスレッド2に関しては、常に同じ値を返しています。これは私たちが望んでいることではありません！</p>
+<p>この問題に対処するために、 Django は <code class="docutils literal notranslate"><span class="pre">render_context</span></code> を提供します。この <code class="docutils literal notranslate"><span class="pre">render_context</span></code> は、現在レンダリング中のテンプレートの <code class="docutils literal notranslate"><span class="pre">context</span></code> に関連付けられます。この <code class="docutils literal notranslate"><span class="pre">render_context</span></code> は Python の辞書のように動作し、 <code class="docutils literal notranslate"><span class="pre">render</span></code> メソッドを呼び出す間の <code class="docutils literal notranslate"><span class="pre">Node</span></code> の状態を保存するために使う必要があります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">CycleNode</span></code> の実装を <code class="docutils literal notranslate"><span class="pre">render_context</span></code> を使うようにリファクタリングしましょう:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">CycleNode</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cyclevars</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cyclevars</span> <span class="o">=</span> <span class="n">cyclevars</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">render_context</span><span class="p">:</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">render_context</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">cycle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cyclevars</span><span class="p">)</span>
+        <span class="n">cycle_iter</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">render_context</span><span class="p">[</span><span class="bp">self</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="n">cycle_iter</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Node</span></code> のライフサイクルを通して変化しないグローバルな情報を属性として保存することは完全に安全であることに注意してください。 <code class="docutils literal notranslate"><span class="pre">CycleNode</span></code> の場合、 <code class="docutils literal notranslate"><span class="pre">Node</span></code> がインスタンス化された後も <code class="docutils literal notranslate"><span class="pre">cyclevars</span></code> 引数は変化しないので、 <code class="docutils literal notranslate"><span class="pre">render_context</span></code> に格納する必要はありません。しかし、 <code class="docutils literal notranslate"><span class="pre">CycleNode</span></code> の現在の繰り返し処理のように、現在レンダリングされているテンプレートに固有の状態情報は <code class="docutils literal notranslate"><span class="pre">render_context</span></code> に格納する必要があります。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">self</span></code> を使用して <code class="docutils literal notranslate"><span class="pre">render_context</span></code> 内の <code class="docutils literal notranslate"><span class="pre">CycleNode</span></code> 固有の情報をスコープしていることに注意してください。 テンプレート内には複数の <code class="docutils literal notranslate"><span class="pre">CycleNode</span></code> が存在する可能性があるので、他のノードの状態情報を取得しないように注意する必要があります。最も簡単な方法は、常に <code class="docutils literal notranslate"><span class="pre">render_context</span></code> のキーとして <code class="docutils literal notranslate"><span class="pre">self</span></code> を使用することです。複数の状態変数を管理している場合は、 <code class="docutils literal notranslate"><span class="pre">render_context[self]</span></code> を辞書にします。</p>
+</div>
+</section>
+<section id="s-registering-the-tag">
+<span id="registering-the-tag"></span><h3>タグを登録する<a class="headerlink" href="#registering-the-tag" title="Link to this heading">¶</a></h3>
+<p>最後に、上記の <a class="reference internal" href="#howto-writing-custom-template-tags"><span class="std std-ref">カスタムテンプレートタグを書く</span></a> で説明したように、タグをモジュールの <code class="docutils literal notranslate"><span class="pre">Library</span></code> インスタンスに登録します。次に例を示します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">register</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="s2">&quot;current_time&quot;</span><span class="p">,</span> <span class="n">do_current_time</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">tag()</span></code> メソッドは次の2つの引数を取ります。</p>
+<ol class="arabic simple">
+<li><p>テンプレート タグの名前の文字列。これを省略した場合は、コンパイル関数の名前が使用されます。</p></li>
+<li><p>編集用の関数 -- Python の関数です (文字列としての関数名ではありません)。</p></li>
+</ol>
+<p>フィルタ登録と同様に、これをデコレータとして使うこともできます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="nd">@register</span><span class="o">.</span><span class="n">tag</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;current_time&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">do_current_time</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span> <span class="o">...</span>
+
+
+<span class="nd">@register</span><span class="o">.</span><span class="n">tag</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">shout</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">name</span></code> 引数を省略した場合、上記の2番目の例と同じように、Django はタグ名として関数の名前を利用します。</p>
+</section>
+<section id="s-passing-template-variables-to-the-tag">
+<span id="passing-template-variables-to-the-tag"></span><h3>テンプレート変数をタグに渡す<a class="headerlink" href="#passing-template-variables-to-the-tag" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">token.split_contents()</span></code> を使用するテンプレート タグには任意の個数の引数を渡せますが、引数はすべて文字列リテラルとしてアンパックされます。動的なコンテンツ (テンプレート変数) をテンプレートタグに引数として渡すためには、少し追加の作業が必要になります。</p>
+<p>前の例では現在時刻を文字列にフォーマットして文字列として返しましたが、オブジェクトから <a class="reference internal" href="../ref/models/fields.html#django.db.models.DateTimeField" title="django.db.models.DateTimeField"><code class="xref py py-class docutils literal notranslate"><span class="pre">DateTimeField</span></code></a> を渡したくて、テンプレートタグがその値を date-time とフォーマットとするとすると、次のように書けます。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>This post was last updated at <span class="cp">{%</span> <span class="k">format_time</span> <span class="nv">blog_entry.date_updated</span> <span class="s2">&quot;%Y-%m-%d %I:%M %p&quot;</span> <span class="cp">%}</span>.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>最初に、<code class="docutils literal notranslate"><span class="pre">token.split_contents()</span></code> が3つの値を返します。</p>
+<ol class="arabic simple">
+<li><p>タグ名 <code class="docutils literal notranslate"><span class="pre">format_time</span></code>。</p></li>
+<li><p>文字列 <code class="docutils literal notranslate"><span class="pre">'blog_entry.date_updated'</span></code> (両側のクオートは含まない)</p></li>
+<li><p>フォーマット文字列 <code class="docutils literal notranslate"><span class="pre">'&quot;%Y-%m-%d</span> <span class="pre">%I:%M</span> <span class="pre">%p&quot;'</span></code>。<code class="docutils literal notranslate"><span class="pre">split_contents()</span></code> からの返り値は、このように文字列リテラルの前後にクオートを含みます。</p></li>
+</ol>
+<p>これで、タグは次のようになります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">do_format_time</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># split_contents() knows not to split quoted strings.</span>
+        <span class="n">tag_name</span><span class="p">,</span> <span class="n">date_to_be_formatted</span><span class="p">,</span> <span class="n">format_string</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">split_contents</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">template</span><span class="o">.</span><span class="n">TemplateSyntaxError</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> tag requires exactly two arguments&quot;</span> <span class="o">%</span> <span class="n">token</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">format_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">format_string</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">format_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">template</span><span class="o">.</span><span class="n">TemplateSyntaxError</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> tag&#39;s argument should be in quotes&quot;</span> <span class="o">%</span> <span class="n">tag_name</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">FormatTimeNode</span><span class="p">(</span><span class="n">date_to_be_formatted</span><span class="p">,</span> <span class="n">format_string</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">blog_entry</span></code> オブジェクトの <code class="docutils literal notranslate"><span class="pre">date_updated</span></code> プロパティの実際のコンテンツを取得するレンダラを変更する必要があります。これは <code class="docutils literal notranslate"><span class="pre">django.template</span></code> で <code class="docutils literal notranslate"><span class="pre">Variable()</span></code> クラスを使用することで実現できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Variable</span></code> クラスを使うには、クラスを解決されるべき変数名でインスタンス化した後に、<code class="docutils literal notranslate"><span class="pre">variable.resolve(context)</span></code> を呼びます。したがって、たとえば次のようになります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">FormatTimeNode</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date_to_be_formatted</span><span class="p">,</span> <span class="n">format_string</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">date_to_be_formatted</span> <span class="o">=</span> <span class="n">template</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">date_to_be_formatted</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_string</span> <span class="o">=</span> <span class="n">format_string</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">actual_date</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">date_to_be_formatted</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">actual_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_string</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">template</span><span class="o">.</span><span class="n">VariableDoesNotExist</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+<p>ページの現在のコンテキスト内で渡された文字列が解決できない場合、変数を解決しようとすると <code class="docutils literal notranslate"><span class="pre">VariableDoesNotExist</span></code> 例外が発生します。</p>
+</section>
+<section id="s-setting-a-variable-in-the-context">
+<span id="setting-a-variable-in-the-context"></span><h3>コンテキスト内で変数を設定する<a class="headerlink" href="#setting-a-variable-in-the-context" title="Link to this heading">¶</a></h3>
+<p>上記の例は値を出力します。一般に、テンプレートタグは値を出力する代わりに、テンプレート変数を設定するほうがより柔軟です。それにより、テンプレートの作者はテンプレートタグが作成した値を再利用できるようになります。</p>
+<p>コンテキスト内に変数を設定するには、<code class="docutils literal notranslate"><span class="pre">render()</span></code> メソッド内で、コンテキスト オブジェクト上のディクショナリ代入を使います。以下は、出力する代わりにテンプレート変数 <code class="docutils literal notranslate"><span class="pre">current_time</span></code> を設定する、更新されたバージョンの <code class="docutils literal notranslate"><span class="pre">CurrentTimeNode</span></code> です。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django</span><span class="w"> </span><span class="kn">import</span> <span class="n">template</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CurrentTimeNode2</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_string</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_string</span> <span class="o">=</span> <span class="n">format_string</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_time&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_string</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">render()</span></code> は空の文字列を返すことに注意してください。<code class="docutils literal notranslate"><span class="pre">render()</span></code> はつねに文字列の出力を返します。すべてのテンプレートタグが変数の設定だけを行う場合、<code class="docutils literal notranslate"><span class="pre">render()</span></code> は空の文字列を返す必要があります。</p>
+<p>この新しいバージョンのタグの使い方はこちらです。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">current_time</span> <span class="s2">&quot;%Y-%m-%d %I:%M %p&quot;</span> <span class="cp">%}</span><span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The time is <span class="cp">{{</span> <span class="nv">current_time</span> <span class="cp">}}</span>.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<div class="admonition-variable-scope-in-context admonition">
+<p class="admonition-title">コンテキスト内の変数のスコープ</p>
+<p>コンテキストに設定された変数は、その変数が割り当てられたテンプレートの同じ <code class="docutils literal notranslate"><span class="pre">block</span></code> でのみ使用できます。 この動作は意図的なもので、他のブロックのコンテキストと衝突しないように、変数にスコープを提供します。</p>
+</div>
+<p>しかし、 <code class="docutils literal notranslate"><span class="pre">CurrentTimeNode2</span></code> には問題があります: 変数名 <code class="docutils literal notranslate"><span class="pre">current_time</span></code> がハードコーディングされています。つまり、テンプレートが <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">current_time</span> <span class="pre">}}</span></code> を他の場所で使用していないことを確認する必要があります。なぜなら、 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">current_time</span> <span class="pre">%}</span></code> はその変数の値を盲目的に上書きしてしまうからです。よりクリアな解決策は、次のようにテンプレートタグで出力変数の名前を指定することです:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">current_time</span> <span class="s2">&quot;%Y-%m-%d %I:%M %p&quot;</span> <span class="k">as</span> <span class="nv">my_current_time</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>The current time is <span class="cp">{{</span> <span class="nv">my_current_time</span> <span class="cp">}}</span>.<span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>そのためには、コンパイル関数と <code class="docutils literal notranslate"><span class="pre">Node</span></code> クラスの両方を次のようにリファクタリングする必要があります:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CurrentTimeNode3</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">format_string</span><span class="p">,</span> <span class="n">var_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">format_string</span> <span class="o">=</span> <span class="n">format_string</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">var_name</span> <span class="o">=</span> <span class="n">var_name</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">var_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">format_string</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">do_current_time</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+    <span class="c1"># This version uses a regular expression to parse tag contents.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Splitting by None == splitting by spaces.</span>
+        <span class="n">tag_name</span><span class="p">,</span> <span class="n">arg</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">template</span><span class="o">.</span><span class="n">TemplateSyntaxError</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> tag requires arguments&quot;</span> <span class="o">%</span> <span class="n">token</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(.*?) as (\w+)&quot;</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">template</span><span class="o">.</span><span class="n">TemplateSyntaxError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> tag had invalid arguments&quot;</span> <span class="o">%</span> <span class="n">tag_name</span><span class="p">)</span>
+    <span class="n">format_string</span><span class="p">,</span> <span class="n">var_name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">groups</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">format_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">format_string</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">and</span> <span class="n">format_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="n">template</span><span class="o">.</span><span class="n">TemplateSyntaxError</span><span class="p">(</span>
+            <span class="s2">&quot;</span><span class="si">%r</span><span class="s2"> tag&#39;s argument should be in quotes&quot;</span> <span class="o">%</span> <span class="n">tag_name</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">CurrentTimeNode3</span><span class="p">(</span><span class="n">format_string</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">var_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>ここでの違いは、 <code class="docutils literal notranslate"><span class="pre">do_current_time()</span></code> がフォーマット文字列と変数名を取得し、その両方を <code class="docutils literal notranslate"><span class="pre">CurrentTimeNode3</span></code> に渡していることです。</p>
+<p>最後に、コンテキストを更新するカスタムテンプレートタグの簡単な構文が必要なだけなら、 <a class="reference internal" href="#django.template.Library.simple_tag" title="django.template.Library.simple_tag"><code class="xref py py-meth docutils literal notranslate"><span class="pre">simple_tag()</span></code></a> ショートカットを使うことを検討してください 。 このショートカットは、タグの結果をテンプレート変数に代入することをサポートしています。</p>
+</section>
+<section id="s-parsing-until-another-block-tag">
+<span id="parsing-until-another-block-tag"></span><h3>他のブロックタグまでパースする<a class="headerlink" href="#parsing-until-another-block-tag" title="Link to this heading">¶</a></h3>
+<p>テンプレートタグは連動して動作します。例えば、標準の <a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-comment"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code></a> タグは <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endcomment</span> <span class="pre">%}</span></code> まですべてを隠蔽します。このようなテンプレートタグを作成するには、コンパイル関数の中で <code class="docutils literal notranslate"><span class="pre">parser.parse()</span></code> を使います。</p>
+<p>以下は <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code> タグをシンプル化したものです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">do_comment</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+    <span class="n">nodelist</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">((</span><span class="s2">&quot;endcomment&quot;</span><span class="p">,))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">delete_first_token</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">CommentNode</span><span class="p">()</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CommentNode</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>実際の <a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-comment"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code></a> の実装は少し異なり、 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code> と <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endcomment</span> <span class="pre">%}</span></code> の間に壊れたテンプレートタグを表示することを許可します。これは <code class="docutils literal notranslate"><span class="pre">parser.parse(('endcomment',))</span></code> の代わりに <code class="docutils literal notranslate"><span class="pre">parser.skip_past('endcomment')</span></code> を呼び出し、その後に <code class="docutils literal notranslate"><span class="pre">parser.delete_first_token()</span></code> を実行することで、ノードリストの生成を回避しています。</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">parser.parse()</span></code> はブロックタグの名前のタプルを受け取ります。これは <code class="docutils literal notranslate"><span class="pre">django.template.NodeList</span></code> のインスタンスを返します。 これはパーサがタプルで指定されたタグに遭遇する''前に''遭遇した全ての <code class="docutils literal notranslate"><span class="pre">Node</span></code> オブジェクトのリストです。</p>
+<p>上の例 <code class="docutils literal notranslate"><span class="pre">&quot;nodelist</span> <span class="pre">=</span> <span class="pre">parser.parse(('endcomment',))&quot;</span></code> において、 <code class="docutils literal notranslate"><span class="pre">nodelist</span></code> は <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code> と <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endcomment</span> <span class="pre">%}</span></code> の間にある全てのノードのリストであり、 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code> と <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endcomment</span> <span class="pre">%}</span></code> 自体は含まれません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">parser.parse()</span></code> が呼ばれた後、パーサはまだ <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endcomment</span> <span class="pre">%}</span></code> タグを &quot;消費&quot; していないので、コードは明示的に <code class="docutils literal notranslate"><span class="pre">parser.delete_first_token()</span></code> を呼び出す必要があります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">CommentNode.render()</span></code> は空の文字列を返します。 <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code> と <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endcomment</span> <span class="pre">%}</span></code> の間はすべて無視されます。</p>
+</section>
+<section id="s-parsing-until-another-block-tag-and-saving-contents">
+<span id="parsing-until-another-block-tag-and-saving-contents"></span><h3>別のブロックタグまでのパースと内容の保存<a class="headerlink" href="#parsing-until-another-block-tag-and-saving-contents" title="Link to this heading">¶</a></h3>
+<p>先ほどの例では、 <code class="docutils literal notranslate"><span class="pre">do_comment()</span></code> は <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">comment</span> <span class="pre">%}</span></code> と <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endcomment</span> <span class="pre">%}</span></code> の間をすべて破棄していました。その代わりに、ブロックタグの間のコードで好きなことができます。</p>
+<p>例えば、これはカスタムテンプレートタグ <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">upper</span> <span class="pre">%}</span></code> で、それ自身と <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">endupper</span> <span class="pre">%}</span></code> の間をすべて大文字にします。</p>
+<p>使い方:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">upper</span> <span class="cp">%}</span>This will appear in uppercase, <span class="cp">{{</span> <span class="nv">your_name</span> <span class="cp">}}</span>.<span class="cp">{%</span> <span class="k">endupper</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>上の例と同様に <code class="docutils literal notranslate"><span class="pre">parser.parse()</span></code> を使いますが、今回は次のように、結果の <code class="docutils literal notranslate"><span class="pre">nodelist</span></code> を <code class="docutils literal notranslate"><span class="pre">Node</span></code> に渡します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">do_upper</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">token</span><span class="p">):</span>
+    <span class="n">nodelist</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse</span><span class="p">((</span><span class="s2">&quot;endupper&quot;</span><span class="p">,))</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">delete_first_token</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">UpperNode</span><span class="p">(</span><span class="n">nodelist</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">UpperNode</span><span class="p">(</span><span class="n">template</span><span class="o">.</span><span class="n">Node</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodelist</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span> <span class="o">=</span> <span class="n">nodelist</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">render</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodelist</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>ここで唯一の新しい概念は、<code class="docutils literal notranslate"><span class="pre">UpperNode.render()</span></code> 内の <code class="docutils literal notranslate"><span class="pre">self.nodelist.render(context)</span></code> だけです。</p>
+<p>複雑なレンダリングの追加の例としては、<a class="extlink-source reference external" href="https://github.com/django/django/blob/main/django/template/defaulttags.py">django/template/defaulttags.py</a> 内の <a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-for"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">for</span> <span class="pre">%}</span></code></a> や <a class="extlink-source reference external" href="https://github.com/django/django/blob/main/django/template/smartif.py">django/template/smartif.py</a> 内の <a class="reference internal" href="../ref/templates/builtins.html#std-templatetag-if"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">{%</span> <span class="pre">if</span> <span class="pre">%}</span></code></a> のソースコードを見てください。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">独自のテンプレートタグとフィルタを作る</a><ul>
+<li><a class="reference internal" href="#code-layout">コードのレイアウト</a></li>
+<li><a class="reference internal" href="#writing-custom-template-filters">独自のテンプレートフィルタを記述する</a><ul>
+<li><a class="reference internal" href="#registering-custom-filters">独自のフィルタを登録する</a></li>
+<li><a class="reference internal" href="#template-filters-that-expect-strings">文字列を要するテンプレートフィルタ</a></li>
+<li><a class="reference internal" href="#filters-and-auto-escaping">フィルタと自動エスケープ</a></li>
+<li><a class="reference internal" href="#filters-and-time-zones">フィルタとタイムゾーン</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#writing-custom-template-tags">独自のテンプレートタグを記述する</a><ul>
+<li><a class="reference internal" href="#simple-tags">シンプルなタグ</a></li>
+<li><a class="reference internal" href="#inclusion-tags">Inclusion tag (インクルージョン・タグ)</a></li>
+<li><a class="reference internal" href="#advanced-custom-template-tags">高度なカスタムテンプレートタグ</a></li>
+<li><a class="reference internal" href="#a-quick-overview">簡単な概要</a></li>
+<li><a class="reference internal" href="#writing-the-compilation-function">コンパイル関数の書き方</a></li>
+<li><a class="reference internal" href="#writing-the-renderer">レンダラーの書き方</a></li>
+<li><a class="reference internal" href="#auto-escaping-considerations">自動エスケープに関する注意点</a></li>
+<li><a class="reference internal" href="#thread-safety-considerations">スレッド安全性の考慮</a></li>
+<li><a class="reference internal" href="#registering-the-tag">タグを登録する</a></li>
+<li><a class="reference internal" href="#passing-template-variables-to-the-tag">テンプレート変数をタグに渡す</a></li>
+<li><a class="reference internal" href="#setting-a-variable-in-the-context">コンテキスト内で変数を設定する</a></li>
+<li><a class="reference internal" href="#parsing-until-another-block-tag">他のブロックタグまでパースする</a></li>
+<li><a class="reference internal" href="#parsing-until-another-block-tag-and-saving-contents">別のブロックタグまでのパースと内容の保存</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="custom-template-backend.html"
+                          title="前の章へ">テンプレートのバックエンドをカスタマイズする</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="static-files/index.html"
+                          title="次の章へ">静的ファイル (画像、JavaScript、CSS など) を管理する</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/custom-template-tags.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="custom-template-backend.html" title="テンプレートのバックエンドをカスタマイズする">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="static-files/index.html" title="静的ファイル (画像、JavaScript、CSS など) を管理する">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>シグナル &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="テンプレート" href="templates/index.html" />
+    <link rel="prev" title="設定" href="settings.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="settings.html" title="設定">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="templates/index.html" title="テンプレート">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-signals">
+            
+  <section id="s-signals">
+<span id="signals"></span><h1>シグナル<a class="headerlink" href="#signals" title="Link to this heading">¶</a></h1>
+<p>Djangoが送信する全てのシグナルのリストです。全ての組み込みシグナルは <a class="reference internal" href="../topics/signals.html#django.dispatch.Signal.send" title="django.dispatch.Signal.send"><code class="xref py py-meth docutils literal notranslate"><span class="pre">send()</span></code></a> メソッドを使用して送信されます。</p>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<p>シグナルの登録方法と受信方法に関する情報については、<a class="reference internal" href="../topics/signals.html"><span class="doc">シグナルディスパッチャ</span></a> のドキュメントを参照してください。</p>
+<p><a class="reference internal" href="../topics/auth/index.html"><span class="doc">認証フレームワーク</span></a> は、ユーザーがログイン / ログアウトしたときに <a class="reference internal" href="contrib/auth.html#topics-auth-signals"><span class="std std-ref">シグナルを送信します</span></a> 。</p>
+</div>
+<section id="s-module-django.db.models.signals">
+<span id="s-model-signals"></span><span id="module-django.db.models.signals"></span><span id="model-signals"></span><h2>モデルのシグナル<a class="headerlink" href="#module-django.db.models.signals" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="#module-django.db.models.signals" title="django.db.models.signals: Signals sent by the model system."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.db.models.signals</span></code></a> モジュールは、モデルシステムによって送信される一連のシグナルを定義しています。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>シグナルはコードの保守を難しくする可能性があります。モデルを更新し、追加ロジックを実行するために、 <a class="reference internal" href="../topics/db/managers.html#custom-managers"><span class="std std-ref">カスタムマネージャ</span></a> にヘルパーメソッドを実装するか、あるいはモデルのシグナルを使用する前に <a class="reference internal" href="../topics/db/models.html#overriding-model-methods"><span class="std std-ref">モデルメソッドをオーバーライド</span></a> することを検討してください。</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>これらのシグナルの多くは、 <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> や <a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a> のような、自分のコードでオーバーライドできる様々なモデルメソッドによって送信されます。</p>
+<p>これらのメソッドをモデルでオーバーライドする場合、これらのシグナルが送信されるように、親クラスのメソッドを呼び出さなければなりません。</p>
+<p>Django はシグナルハンドラをデフォルトで弱参照として保存するため、ハンドラがローカル関数の場合、ガベージコレクションによって回収される可能性があります。これを防ぐために、シグナルの <a class="reference internal" href="../topics/signals.html#django.dispatch.Signal.connect" title="django.dispatch.Signal.connect"><code class="xref py py-meth docutils literal notranslate"><span class="pre">connect()</span></code></a> を呼び出す際に <code class="docutils literal notranslate"><span class="pre">weak=False</span></code> を渡してください。</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>モデルシグナルの <code class="docutils literal notranslate"><span class="pre">sender</span></code> モデルは、レシーバを接続する際にその完全なアプリケーションラベルを指定することで、遅延参照ができます。例えば、 <code class="docutils literal notranslate"><span class="pre">polls</span></code> アプリケーションで定義された <code class="docutils literal notranslate"><span class="pre">Question</span></code> モデルは、<code class="docutils literal notranslate"><span class="pre">'polls.Question'</span></code> として参照できます。この種の参照は、循環インポートの依存関係や交換可能なモデルを扱う際に非常に便利です。</p>
+</div>
+<section id="s-pre-init">
+<span id="pre-init"></span><h3><code class="docutils literal notranslate"><span class="pre">pre_init</span></code><a class="headerlink" href="#pre-init" title="Link to this heading">¶</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.db.models.signals.pre_init">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">pre_init</span></span><a class="headerlink" href="#django.db.models.signals.pre_init" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Django モデルをインスタンス化するたびに、このシグナルはモデルの <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> メソッドの開始時に送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>たった今インスタンスが作成されたモデルクラス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">args</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">__init__()</span></code> に渡される位置引数のリストです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">kwargs</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">__init__()</span></code> に渡されるキーワード引数の辞書。</p>
+</dd>
+</dl>
+<p>例えば、 <a class="reference internal" href="../intro/tutorial02.html"><span class="doc">チュートリアル</span></a> にはこのような行があります：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">q</span> <span class="o">=</span> <span class="n">Question</span><span class="p">(</span><span class="n">question_text</span><span class="o">=</span><span class="s2">&quot;What&#39;s new?&quot;</span><span class="p">,</span> <span class="n">pub_date</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">now</span><span class="p">())</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#django.db.models.signals.pre_init" title="django.db.models.signals.pre_init"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_init</span></code></a> ハンドラーに送信される引数は次の通りです：</p>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>引数</p></th>
+<th class="head"><p>値</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sender</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Question</span></code> （クラスそのもの）</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">args</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[]</span></code> （位置引数が <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> に渡されなかったため、空のリスト）</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kwargs</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{'question_text':</span> <span class="pre">&quot;What's</span> <span class="pre">new?&quot;,</span></code>
+<code class="docutils literal notranslate"><span class="pre">'pub_date':</span> <span class="pre">datetime.datetime(2012,</span> <span class="pre">2,</span> <span class="pre">26,</span> <span class="pre">13,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">775217,</span> <span class="pre">tzinfo=datetime.timezone.utc)}</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="s-post-init">
+<span id="post-init"></span><h3><code class="docutils literal notranslate"><span class="pre">post_init</span></code><a class="headerlink" href="#post-init" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.post_init">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">post_init</span></span><a class="headerlink" href="#django.db.models.signals.post_init" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>pre_init と似ていますが、このイベントは <code class="docutils literal notranslate"><span class="pre">__init__()</span></code> メソッドが終了した時に送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>上記の通り: たった今インスタンスが作成されたモデルクラス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">instance</span></code></dt><dd><p>たった今作成されたモデルの実際のインスタンス。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="models/instances.html#django.db.models.Model._state" title="django.db.models.Model._state"><code class="xref py py-attr docutils literal notranslate"><span class="pre">instance._state</span></code></a> は、<code class="docutils literal notranslate"><span class="pre">post_init</span></code> シグナルを送信する前に設定されていないため、<code class="docutils literal notranslate"><span class="pre">_state</span></code> 属性は常にそのデフォルト値を持ちます。例えば、<code class="docutils literal notranslate"><span class="pre">_state.db</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> です。</p>
+</div>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>パフォーマンス上の理由から、 <code class="docutils literal notranslate"><span class="pre">pre_init</span></code> または <code class="docutils literal notranslate"><span class="pre">post_init</span></code> シグナルのレシーバでクエリを実行するべきではありません。なぜなら、クエリセットのイテレート中に返される各インスタンスに対して実行されるからです。</p>
+</div>
+</section>
+<section id="s-pre-save">
+<span id="pre-save"></span><h3><code class="docutils literal notranslate"><span class="pre">pre_save</span></code><a class="headerlink" href="#pre-save" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.pre_save">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">pre_save</span></span><a class="headerlink" href="#django.db.models.signals.pre_save" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>これは、モデルの <a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a> メソッドの始まりに送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>モデルクラス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">instance</span></code></dt><dd><p>保存される実際のインスタンス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">raw</span></code></dt><dd><p>真偽値です。モデルがそのままの形 (例えば <a class="reference internal" href="../topics/db/fixtures.html#fixtures-explanation"><span class="std std-ref">フィクスチャ</span></a> を読み込む時) で保存されている場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> となります。データベースがまだ一貫した状態にない可能性があるため、他のレコードをクエリしたり変更したりするべきではありません。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>使用されているデータベースのエイリアス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">update_fields</span></code></dt><dd><p><a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Model.save()</span></code></a> に渡された更新するフィールドのセット、もしくは <code class="docutils literal notranslate"><span class="pre">update_fields</span></code> が <code class="docutils literal notranslate"><span class="pre">save()</span></code> に渡されなかった場合は <code class="docutils literal notranslate"><span class="pre">None</span></code>  。</p>
+</dd>
+</dl>
+</section>
+<section id="s-post-save">
+<span id="post-save"></span><h3><code class="docutils literal notranslate"><span class="pre">post_save</span></code><a class="headerlink" href="#post-save" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.post_save">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">post_save</span></span><a class="headerlink" href="#django.db.models.signals.post_save" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="#django.db.models.signals.pre_save" title="django.db.models.signals.pre_save"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_save</span></code></a> に似ていますが、 <a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code></a> メソッドの最後に送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>モデルクラス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">instance</span></code></dt><dd><p>保存される実際のインスタンス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">created</span></code></dt><dd><p>ブール値。レコードが作成された場合に <code class="docutils literal notranslate"><span class="pre">True</span></code> を返す。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">raw</span></code></dt><dd><p>真偽値です。モデルがそのままの形 (例えば <a class="reference internal" href="../topics/db/fixtures.html#fixtures-explanation"><span class="std std-ref">フィクスチャ</span></a> を読み込む時) で保存されている場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> となります。データベースがまだ一貫した状態にない可能性があるため、他のレコードをクエリしたり変更したりするべきではありません。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>使用されているデータベースのエイリアス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">update_fields</span></code></dt><dd><p><a class="reference internal" href="models/instances.html#django.db.models.Model.save" title="django.db.models.Model.save"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Model.save()</span></code></a> に渡された更新するフィールドのセット、もしくは <code class="docutils literal notranslate"><span class="pre">update_fields</span></code> が <code class="docutils literal notranslate"><span class="pre">save()</span></code> に渡されなかった場合は <code class="docutils literal notranslate"><span class="pre">None</span></code>  。</p>
+</dd>
+</dl>
+</section>
+<section id="s-pre-delete">
+<span id="pre-delete"></span><h3><code class="docutils literal notranslate"><span class="pre">pre_delete</span></code><a class="headerlink" href="#pre-delete" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.pre_delete">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">pre_delete</span></span><a class="headerlink" href="#django.db.models.signals.pre_delete" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルの <a class="reference internal" href="models/instances.html#django.db.models.Model.delete" title="django.db.models.Model.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete()</span></code></a> メソッドとクエリセットの <a class="reference internal" href="models/querysets.html#django.db.models.query.QuerySet.delete" title="django.db.models.query.QuerySet.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete()</span></code></a> メソッドの開始時に送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>モデルクラス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">instance</span></code></dt><dd><p>実際に削除されるインスタンス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>使用されているデータベースのエイリアス。</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">origin</span></code></p>
+<blockquote>
+<div><p>削除の起点は、<code class="docutils literal notranslate"><span class="pre">Model</span></code> または <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> クラスのインスタンスです。</p>
+</div></blockquote>
+</section>
+<section id="s-post-delete">
+<span id="post-delete"></span><h3><code class="docutils literal notranslate"><span class="pre">post_delete</span></code><a class="headerlink" href="#post-delete" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.post_delete">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">post_delete</span></span><a class="headerlink" href="#django.db.models.signals.post_delete" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="#django.db.models.signals.pre_delete" title="django.db.models.signals.pre_delete"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_delete</span></code></a> のようですが、モデルの <a class="reference internal" href="models/instances.html#django.db.models.Model.delete" title="django.db.models.Model.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete()</span></code></a> メソッドとクエリセットの <a class="reference internal" href="models/querysets.html#django.db.models.query.QuerySet.delete" title="django.db.models.query.QuerySet.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete()</span></code></a> メソッドの終わりに送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>モデルクラス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">instance</span></code></dt><dd><p>実際に削除されるインスタンス。</p>
+<p>このオブジェクトはデータベース内に存在しなくなるため、このインスタンスをどのように扱うか非常に注意してください。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>使用されているデータベースのエイリアス。</p>
+</dd>
+</dl>
+<p><code class="docutils literal notranslate"><span class="pre">origin</span></code></p>
+<blockquote>
+<div><p>削除の起点は、<code class="docutils literal notranslate"><span class="pre">Model</span></code> または <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> クラスのインスタンスです。</p>
+</div></blockquote>
+</section>
+<section id="s-m2m-changed">
+<span id="m2m-changed"></span><h3><code class="docutils literal notranslate"><span class="pre">m2m_changed</span></code><a class="headerlink" href="#m2m-changed" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.m2m_changed">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">m2m_changed</span></span><a class="headerlink" href="#django.db.models.signals.m2m_changed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルインスタンス上の <a class="reference internal" href="models/fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> が変更されたときに送信されます。厳密には、これはモデルシグナルではありません。なぜなら、これは <a class="reference internal" href="models/fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> によって送信されるためです。しかし、モデルへの変更を追跡する際に、 <a class="reference internal" href="#django.db.models.signals.pre_save" title="django.db.models.signals.pre_save"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_save</span></code></a>/<a class="reference internal" href="#django.db.models.signals.post_save" title="django.db.models.signals.post_save"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_save</span></code></a> および <a class="reference internal" href="#django.db.models.signals.pre_delete" title="django.db.models.signals.pre_delete"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_delete</span></code></a>/<a class="reference internal" href="#django.db.models.signals.post_delete" title="django.db.models.signals.post_delete"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_delete</span></code></a> を補完するものであるため、ここに含まれています。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p><a class="reference internal" href="models/fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> を記述する中間モデルクラスです。多対多フィールドが定義されたときに自動的に作成されます。多対多フィールドの <code class="docutils literal notranslate"><span class="pre">through</span></code> 属性を使用してアクセスできます。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">instance</span></code></dt><dd><p>多対多のリレーションが更新されたインスタンス。これは <code class="docutils literal notranslate"><span class="pre">sender</span></code> のインスタンス、または <a class="reference internal" href="models/fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> が関連づけられているクラスのインスタンスのいずれかです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">action</span></code></dt><dd><p>リレーションに対して行われた更新の種類を表す文字列です。次のいずれかの値を取ります。</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;pre_add&quot;</span></code></dt><dd><p>リレーションにオブジェクトが1つ以上追加される <em>前</em> に送信されます。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;post_add&quot;</span></code></dt><dd><p>リレーションに1つ以上のオブジェクトが追加された <em>後</em> に送信されます。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;pre_remove&quot;</span></code></dt><dd><p>リレーションから 1 つ以上のオブジェクトが削除される <em>前</em> に送信されます。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;post_remove&quot;</span></code></dt><dd><p>リレーションから1つ以上のオブジェクトが削除された <em>後に</em> 送信されます。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;pre_clear&quot;</span></code></dt><dd><p>リレーションがクリアされる <em>前に</em> 送信されます。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;post_clear&quot;</span></code></dt><dd><p>リレーションがクリアされた <em>後</em> に送信されます。</p>
+</dd>
+</dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">reverse</span></code></dt><dd><p>リレーションのどちらの側が更新されているかを示します (つまり、更新されているのが順方向のリレーションか、逆方向のリレーションかを表します)。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">model</span></code></dt><dd><p>リレーションに追加、削除、またはクリアされるオブジェクトのクラス。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">pk_set</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">pre_add</span></code> と <code class="docutils literal notranslate"><span class="pre">post_add</span></code> アクションの場合、これはリレーションに追加される、または追加されたプライマリキー値のセットです。既存の値をフィルタリングしてデータベースの <code class="docutils literal notranslate"><span class="pre">IntegrityError</span></code> を避ける必要があるため、追加されることが提出された値のサブセットである可能性があります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">pre_remove</span></code> と <code class="docutils literal notranslate"><span class="pre">post_remove</span></code> アクションにおいて、これはリレーションから削除されることが提案されたプライマリキーの値のセットです。これは、値が実際に削除されるか、または削除されたかどうかに依存しません。特に、存在しない値が提出されることもあり、<code class="docutils literal notranslate"><span class="pre">pk_set</span></code> に表示されますが、データベースには影響を与えません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">pre_clear</span></code> と <code class="docutils literal notranslate"><span class="pre">post_clear</span></code> アクションの場合、これは <code class="docutils literal notranslate"><span class="pre">None</span></code> です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>使用されているデータベースのエイリアス。</p>
+</dd>
+</dl>
+<p>たとえば、<code class="docutils literal notranslate"><span class="pre">Pizza</span></code> が複数の <code class="docutils literal notranslate"><span class="pre">Topping</span></code> オブジェクトを持てるとしたら、次のようにモデル化されます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">Topping</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Pizza</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="c1"># ...</span>
+    <span class="n">toppings</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ManyToManyField</span><span class="p">(</span><span class="n">Topping</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このようにハンドラーを接続した場合：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">m2m_changed</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">toppings_changed</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># Do something</span>
+    <span class="k">pass</span>
+
+
+<span class="n">m2m_changed</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">toppings_changed</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="n">Pizza</span><span class="o">.</span><span class="n">toppings</span><span class="o">.</span><span class="n">through</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>そして、次のようにした場合:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">p</span> <span class="o">=</span> <span class="n">Pizza</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">t</span> <span class="o">=</span> <span class="n">Topping</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p</span><span class="o">.</span><span class="n">toppings</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#django.db.models.signals.m2m_changed" title="django.db.models.signals.m2m_changed"><code class="xref py py-data docutils literal notranslate"><span class="pre">m2m_changed</span></code></a> ハンドラ (上記の例では <code class="docutils literal notranslate"><span class="pre">toppings_changed</span></code>) に送信された引数は、次の通りです:</p>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>引数</p></th>
+<th class="head"><p>値</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sender</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings.through</span></code> (中間の m2m クラス)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">instance</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">p</span></code> (変更されている <code class="docutils literal notranslate"><span class="pre">Pizza</span></code> インスタンス)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">action</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;pre_add&quot;</span></code> (その後に別のシグナルで <code class="docutils literal notranslate"><span class="pre">&quot;post_add&quot;</span></code> が続く)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reverse</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">False</span></code> (<code class="docutils literal notranslate"><span class="pre">Pizza</span></code> には <a class="reference internal" href="models/fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> が含まれているため、この呼び出しは順方向のリレーションを変更します)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Topping</span></code> ( <code class="docutils literal notranslate"><span class="pre">Pizza</span></code> に追加されるオブジェクトのクラス)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pk_set</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{t.id}``（リレーションには</span> <span class="pre">``Topping</span> <span class="pre">t</span></code> だけが追加されたため）</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">using</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> (デフォルトルーターが書き込みをここに送るため)</p></td>
+</tr>
+</tbody>
+</table>
+<p>そして、次のようなことをした場合：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">t</span><span class="o">.</span><span class="n">pizza_set</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#django.db.models.signals.m2m_changed" title="django.db.models.signals.m2m_changed"><code class="xref py py-data docutils literal notranslate"><span class="pre">m2m_changed</span></code></a> ハンドラに送信される引数は以下の通りです:</p>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>引数</p></th>
+<th class="head"><p>値</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sender</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Pizza.toppings.through</span></code> (中間の m2m クラス)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">instance</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">t</span></code> (変更されている <code class="docutils literal notranslate"><span class="pre">Topping</span></code> インスタンス)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">action</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;pre_remove&quot;</span></code> (その後に別のシグナルとして <code class="docutils literal notranslate"><span class="pre">&quot;post_remove&quot;</span></code> が続きます)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reverse</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code> (<code class="docutils literal notranslate"><span class="pre">Pizza</span></code> は <a class="reference internal" href="models/fields.html#django.db.models.ManyToManyField" title="django.db.models.ManyToManyField"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManyToManyField</span></code></a> を含んでいるため、この呼び出しは逆方向のリレーションを変更します)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">model</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Pizza</span></code> (<code class="docutils literal notranslate"><span class="pre">Topping</span></code> から取り除かれたオブジェクトのクラス)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">pk_set</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">{p.id}</span></code> (リレーションから <code class="docutils literal notranslate"><span class="pre">Pizza</span> <span class="pre">p</span></code> のみが削除されたため)</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">using</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> (デフォルトルーターが書き込みをここに送るため)</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="s-class-prepared">
+<span id="class-prepared"></span><h3><code class="docutils literal notranslate"><span class="pre">class_prepared</span></code><a class="headerlink" href="#class-prepared" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.class_prepared">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">class_prepared</span></span><a class="headerlink" href="#django.db.models.signals.class_prepared" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>モデルクラスが「準備完了」したとき――つまり、モデルが定義され、Djangoのモデルシステムに登録された後に送信されます。Djangoはこのシグナルを内部的に使用しています。通常、サードパーティのアプリケーションで使用されることはありません。</p>
+<p>このシグナルはアプリ登録プロセス中に送信されます。そして <a class="reference internal" href="applications.html#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">AppConfig.ready()</span></code></a> はアプリ登録が完全に終了した後に実行されますので、レシーバーをそのメソッド内で接続することはできません。一つの可能性としては、 <code class="docutils literal notranslate"><span class="pre">AppConfig.__init__()</span></code> の中でそれらを接続することですが、モデルをインポートしたり、アプリ登録への呼び出しを触発しないよう注意が必要です。</p>
+<p>このシグナルで送信される引数：</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>たった今準備されたモデルクラス。</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="s-management-signals">
+<span id="management-signals"></span><h2>管理シグナル<a class="headerlink" href="#management-signals" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="django-admin.html"><span class="doc">django-admin</span></a> によって送信されるシグナル。</p>
+<section id="s-pre-migrate">
+<span id="pre-migrate"></span><h3><code class="docutils literal notranslate"><span class="pre">pre_migrate</span></code><a class="headerlink" href="#pre-migrate" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.pre_migrate">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">pre_migrate</span></span><a class="headerlink" href="#django.db.models.signals.pre_migrate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="django-admin.html#django-admin-migrate"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">migrate</span></code></a> コマンドによって、アプリケーションのインストールを開始する前に送信されます。<code class="docutils literal notranslate"><span class="pre">models</span></code> モジュールがないアプリケーションには発行されません。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>マイグレーションまたは同期される予定のアプリケーションのための <a class="reference internal" href="applications.html#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> インスタンスです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">app_config</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">sender</span></code> と同じ。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">verbosity</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">manage.py</span></code> が画面上にどれだけ情報を表示しているかを示します。詳細については <a class="reference internal" href="django-admin.html#cmdoption-verbosity"><code class="xref std std-option docutils literal notranslate"><span class="pre">--verbosity</span></code></a> フラグを参照してください。</p>
+<p><a class="reference internal" href="#django.db.models.signals.pre_migrate" title="django.db.models.signals.pre_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">pre_migrate</span></code></a> のためにリスナーとなる関数は、この引数の値に基づいて画面出力を調整するべきです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">interactive</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">interactive</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、コマンドラインでユーザーに入力を求めるのは安全です。 <code class="docutils literal notranslate"><span class="pre">interactive</span></code> が <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合、このシグナルを待ち受ける関数は何も求めてはいけません。</p>
+<p>たとえば、<a class="reference internal" href="../topics/auth/index.html#module-django.contrib.auth" title="django.contrib.auth: Django's authentication framework."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.auth</span></code></a> アプリは、<code class="docutils literal notranslate"><span class="pre">interactive</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> のときのみスーパーユーザーの作成を促します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stdout</span></code></dt><dd><p>冗長な出力をリダイレクトすべきストリームのようなオブジェクト。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>コマンドが操作を行うデータベースのエイリアスです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">plan</span></code></dt><dd><p>マイグレーション実行に使用されるマイグレーションプランです。プランはパブリックAPIではありませんが、プランを知る必要がある稀なケースに対応します。プランは2値タプルのリストで、最初の項目はマイグレーションクラスのインスタンスであり、2番目の項目はマイグレーションがロールバックされた (<code class="docutils literal notranslate"><span class="pre">True</span></code>) か適用された (<code class="docutils literal notranslate"><span class="pre">False</span></code>) かを示します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">apps</span></code></dt><dd><p>マイグレーションを実行する前のプロジェクトの状態を含む <a class="reference internal" href="applications.html#module-django.apps" title="django.apps"><code class="xref py py-data docutils literal notranslate"><span class="pre">Apps</span></code></a> のインスタンスです。操作を行いたいモデルを取得するために、グローバルな <a class="reference internal" href="applications.html#django.apps.apps" title="django.apps.apps"><code class="xref py py-attr docutils literal notranslate"><span class="pre">apps</span></code></a> レジストリの代わりに使用すべきです。</p>
+</dd>
+</dl>
+</section>
+<section id="s-post-migrate">
+<span id="post-migrate"></span><h3><code class="docutils literal notranslate"><span class="pre">post_migrate</span></code><a class="headerlink" href="#post-migrate" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.models.signals.post_migrate">
+<span class="sig-prename descclassname"><span class="pre">django.db.models.signals.</span></span><span class="sig-name descname"><span class="pre">post_migrate</span></span><a class="headerlink" href="#django.db.models.signals.post_migrate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="django-admin.html#django-admin-migrate"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">migrate</span></code></a> コマンドの終わりに (マイグレーションが行われなくても)、そして <a class="reference internal" href="django-admin.html#django-admin-flush"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">flush</span></code></a> コマンドの後に送信されます。<code class="docutils literal notranslate"><span class="pre">models</span></code> モジュールがないアプリケーションには発行されません。</p>
+<p>このシグナルのハンドラは、データベーススキーマの変更を行ってはなりません。なぜなら、そのような変更を行うと、<a class="reference internal" href="django-admin.html#django-admin-migrate"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">migrate</span></code></a> コマンド実行中に <a class="reference internal" href="django-admin.html#django-admin-flush"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">flush</span></code></a> コマンドが失敗する可能性があるからです。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>インストールされたばかりのアプリケーション用の <a class="reference internal" href="applications.html#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> インスタンスです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">app_config</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">sender</span></code> と同じ。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">verbosity</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">manage.py</span></code> が画面上にどれだけ情報を表示しているかを示します。詳細については <a class="reference internal" href="django-admin.html#cmdoption-verbosity"><code class="xref std std-option docutils literal notranslate"><span class="pre">--verbosity</span></code></a> フラグを参照してください。</p>
+<p><a class="reference internal" href="#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_migrate</span></code></a> を待ち受ける関数は、この引数の値に基づいて画面に出力する内容を調整する必要があります。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">interactive</span></code></dt><dd><p><code class="docutils literal notranslate"><span class="pre">interactive</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、コマンドラインでユーザーに入力を求めるのは安全です。 <code class="docutils literal notranslate"><span class="pre">interactive</span></code> が <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合、このシグナルを待ち受ける関数は何も求めてはいけません。</p>
+<p>たとえば、<a class="reference internal" href="../topics/auth/index.html#module-django.contrib.auth" title="django.contrib.auth: Django's authentication framework."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.auth</span></code></a> アプリは、<code class="docutils literal notranslate"><span class="pre">interactive</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> のときのみスーパーユーザーの作成を促します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">stdout</span></code></dt><dd><p>冗長な出力をリダイレクトすべきストリームのようなオブジェクト。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">using</span></code></dt><dd><p>同期に使用されるデータベースエイリアスです。デフォルトは <code class="docutils literal notranslate"><span class="pre">default</span></code> データベースです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">plan</span></code></dt><dd><p>マイグレーション実行に使用されたマイグレーションプラン。プランはパブリックAPIではありませんが、プランを知る必要がある稀な場合に対応します。プランは2値タプルのリストで、最初の項目はマイグレーションクラスのインスタンスであり、2番目の項目はマイグレーションがロールバックされたか（<code class="docutils literal notranslate"><span class="pre">True</span></code>）適用されたか（<code class="docutils literal notranslate"><span class="pre">False</span></code>）を示します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">apps</span></code></dt><dd><p>マイグレーション実行後のプロジェクトの状態を保持する <a class="reference internal" href="applications.html#django.apps.apps" title="django.apps.apps"><code class="xref py py-data docutils literal notranslate"><span class="pre">Apps</span></code></a> のインスタンスです。グローバルな <a class="reference internal" href="applications.html#django.apps.apps" title="django.apps.apps"><code class="xref py py-attr docutils literal notranslate"><span class="pre">apps</span></code></a> レジストリの代わりに、操作を行いたいモデルを取得するために使用するべきです。</p>
+</dd>
+</dl>
+<p>たとえば、次のように <a class="reference internal" href="applications.html#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> にコールバックを登録できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">AppConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.db.models.signals</span><span class="w"> </span><span class="kn">import</span> <span class="n">post_migrate</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_callback</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># Your specific logic here</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyAppConfig</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">):</span>
+    <span class="o">...</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ready</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">post_migrate</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">my_callback</span><span class="p">,</span> <span class="n">sender</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="applications.html#django.apps.AppConfig" title="django.apps.AppConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AppConfig</span></code></a> インスタンスを sender 引数として提供する場合は、シグナルが <a class="reference internal" href="applications.html#django.apps.AppConfig.ready" title="django.apps.AppConfig.ready"><code class="xref py py-meth docutils literal notranslate"><span class="pre">ready()</span></code></a> で登録されていることを確認してください。 <code class="docutils literal notranslate"><span class="pre">AppConfig</span></code> は、 <a class="reference internal" href="settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> の変更されたセットで実行されるテストのために再作成されます（例えば設定が上書きされた場合など）し、そのようなシグナルは新しい <code class="docutils literal notranslate"><span class="pre">AppConfig</span></code> インスタンスごとに接続されるべきです。</p>
+</div>
+</section>
+</section>
+<section id="s-module-django.core.signals">
+<span id="s-request-response-signals"></span><span id="module-django.core.signals"></span><span id="request-response-signals"></span><h2>リクエスト/レスポンス シグナル<a class="headerlink" href="#module-django.core.signals" title="Link to this heading">¶</a></h2>
+<p>リクエストを処理する際にコアフレームワークによって送信されるシグナル。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>シグナルはコードのメンテナンスを難しくする可能性があります。リクエスト/レスポンスシグナルを使用する前に、 <a class="reference internal" href="../topics/http/middleware.html"><span class="doc">ミドルウェアを使用する</span></a> ことを検討してください。</p>
+</div>
+<section id="s-request-started">
+<span id="request-started"></span><h3><code class="docutils literal notranslate"><span class="pre">request_started</span></code><a class="headerlink" href="#request-started" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.core.signals.request_started">
+<span class="sig-prename descclassname"><span class="pre">django.core.signals.</span></span><span class="sig-name descname"><span class="pre">request_started</span></span><a class="headerlink" href="#django.core.signals.request_started" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Django が HTTP リクエストの処理を開始したときに送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>リクエストを処理したハンドラクラス。例えば <code class="docutils literal notranslate"><span class="pre">django.core.handlers.wsgi.WsgiHandler</span></code> が該当します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">environ</span></code></dt><dd><p>リクエストに提供される <code class="docutils literal notranslate"><span class="pre">environ</span></code> 辞書。</p>
+</dd>
+</dl>
+</section>
+<section id="s-request-finished">
+<span id="request-finished"></span><h3><code class="docutils literal notranslate"><span class="pre">request_finished</span></code><a class="headerlink" href="#request-finished" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.core.signals.request_finished">
+<span class="sig-prename descclassname"><span class="pre">django.core.signals.</span></span><span class="sig-name descname"><span class="pre">request_finished</span></span><a class="headerlink" href="#django.core.signals.request_finished" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>クライアントへの HTTP レスポンスの配信が完了したときに送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>上述のようなハンドラークラスです。</p>
+</dd>
+</dl>
+</section>
+<section id="s-got-request-exception">
+<span id="got-request-exception"></span><h3><code class="docutils literal notranslate"><span class="pre">got_request_exception</span></code><a class="headerlink" href="#got-request-exception" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.core.signals.got_request_exception">
+<span class="sig-prename descclassname"><span class="pre">django.core.signals.</span></span><span class="sig-name descname"><span class="pre">got_request_exception</span></span><a class="headerlink" href="#django.core.signals.got_request_exception" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>このシグナルは、Djangoが受信HTTPリクエストの処理中に例外に遭遇したときにいつでも送信されます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>使用されません (常に <code class="docutils literal notranslate"><span class="pre">None</span></code>)。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">request</span></code></dt><dd><p><a class="reference internal" href="request-response.html#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> オブジェクト。</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="s-module-django.test.signals">
+<span id="s-test-signals"></span><span id="module-django.test.signals"></span><span id="test-signals"></span><h2>テストシグナル<a class="headerlink" href="#module-django.test.signals" title="Link to this heading">¶</a></h2>
+<p>テストを <a class="reference internal" href="../topics/testing/overview.html#running-tests"><span class="std std-ref">実行しているとき</span></a> のみ送信されるシグナル。</p>
+<section id="s-setting-changed">
+<span id="setting-changed"></span><h3><code class="docutils literal notranslate"><span class="pre">setting_changed</span></code><a class="headerlink" href="#setting-changed" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.test.signals.setting_changed">
+<span class="sig-prename descclassname"><span class="pre">django.test.signals.</span></span><span class="sig-name descname"><span class="pre">setting_changed</span></span><a class="headerlink" href="#django.test.signals.setting_changed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>このシグナルは、 <code class="docutils literal notranslate"><span class="pre">django.test.TestCase.settings()</span></code> コンテキストマネージャや <a class="reference internal" href="../topics/testing/tools.html#django.test.override_settings" title="django.test.override_settings"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.test.override_settings()</span></code></a> デコレータ/コンテキストマネージャを通じて設定の値が変更されたときに送信されます。</p>
+<p>実際には2回送信されます。新しい値が適用されたとき（&quot;setup&quot;）と、元の値が復元されたとき（&quot;teardown&quot;）。2つを区別するには、<code class="docutils literal notranslate"><span class="pre">enter</span></code> 引数を使用してください。</p>
+<p>このシグナルは <code class="docutils literal notranslate"><span class="pre">django.core.signals</span></code> からインポートすることもできます。これにより、テスト以外の状況で <code class="docutils literal notranslate"><span class="pre">django.test</span></code> からインポートすることを避けられます。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>設定ハンドラ。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">setting</span></code></dt><dd><p>設定の名前。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">value</span></code></dt><dd><p>設定変更後の設定値です。初めに存在しない設定の場合、 &quot;teardown&quot; フェーズでは <code class="docutils literal notranslate"><span class="pre">value</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">enter</span></code></dt><dd><p>真偽値。設定が適用されている場合は <code class="docutils literal notranslate"><span class="pre">True</span></code>、復元された場合は <code class="docutils literal notranslate"><span class="pre">False</span></code>。</p>
+</dd>
+</dl>
+</section>
+<section id="s-template-rendered">
+<span id="template-rendered"></span><h3><code class="docutils literal notranslate"><span class="pre">template_rendered</span></code><a class="headerlink" href="#template-rendered" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.test.signals.template_rendered">
+<span class="sig-prename descclassname"><span class="pre">django.test.signals.</span></span><span class="sig-name descname"><span class="pre">template_rendered</span></span><a class="headerlink" href="#django.test.signals.template_rendered" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>テストシステムがテンプレートをレンダリングするときに送信されます。このシグナルは、Djangoサーバーの通常の操作中には発生しません。テスト中にのみ利用可能です。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>レンダリングされた <a class="reference internal" href="templates/api.html#django.template.Template" title="django.template.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">Template</span></code></a> オブジェクト。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">template</span></code></dt><dd><p>送信者と同じ</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">context</span></code></dt><dd><p>テンプレートがレンダリングされた際の <a class="reference internal" href="templates/api.html#django.template.Context" title="django.template.Context"><code class="xref py py-class docutils literal notranslate"><span class="pre">Context</span></code></a> 。</p>
+</dd>
+</dl>
+</section>
+</section>
+<section id="s-module-django.db.backends">
+<span id="s-database-wrappers"></span><span id="module-django.db.backends"></span><span id="database-wrappers"></span><h2>データベースラッパー<a class="headerlink" href="#module-django.db.backends" title="Link to this heading">¶</a></h2>
+<p>データベース接続が開始されたときに、データベースラッパーによって送信されるシグナル。</p>
+<section id="s-connection-created">
+<span id="connection-created"></span><h3><code class="docutils literal notranslate"><span class="pre">connection_created</span></code><a class="headerlink" href="#connection-created" title="Link to this heading">¶</a></h3>
+<dl class="py data">
+<dt class="sig sig-object py" id="django.db.backends.signals.connection_created">
+<span class="sig-prename descclassname"><span class="pre">django.db.backends.signals.</span></span><span class="sig-name descname"><span class="pre">connection_created</span></span><a class="headerlink" href="#django.db.backends.signals.connection_created" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>データベースラッパーがデータベースに最初の接続を行ったときに送信されます。これは、SQLバックエンドに接続後のコマンドを送信したい場合に特に便利です。</p>
+<p>このシグナルとともに送信される引数は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">sender</span></code></dt><dd><p>データベースラッパークラス ― つまり、 <code class="docutils literal notranslate"><span class="pre">django.db.backends.postgresql.DatabaseWrapper</span></code> や <code class="docutils literal notranslate"><span class="pre">django.db.backends.mysql.DatabaseWrapper</span></code> などです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">connection</span></code></dt><dd><p>オープンされたデータベース接続です。これは、複数のデータベース設定を使用する際に、異なるデータベースからの接続シグナルを区別するために使用されます。</p>
+</dd>
+</dl>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">シグナル</a><ul>
+<li><a class="reference internal" href="#module-django.db.models.signals">モデルのシグナル</a><ul>
+<li><a class="reference internal" href="#pre-init"><code class="docutils literal notranslate"><span class="pre">pre_init</span></code></a></li>
+<li><a class="reference internal" href="#post-init"><code class="docutils literal notranslate"><span class="pre">post_init</span></code></a></li>
+<li><a class="reference internal" href="#pre-save"><code class="docutils literal notranslate"><span class="pre">pre_save</span></code></a></li>
+<li><a class="reference internal" href="#post-save"><code class="docutils literal notranslate"><span class="pre">post_save</span></code></a></li>
+<li><a class="reference internal" href="#pre-delete"><code class="docutils literal notranslate"><span class="pre">pre_delete</span></code></a></li>
+<li><a class="reference internal" href="#post-delete"><code class="docutils literal notranslate"><span class="pre">post_delete</span></code></a></li>
+<li><a class="reference internal" href="#m2m-changed"><code class="docutils literal notranslate"><span class="pre">m2m_changed</span></code></a></li>
+<li><a class="reference internal" href="#class-prepared"><code class="docutils literal notranslate"><span class="pre">class_prepared</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#management-signals">管理シグナル</a><ul>
+<li><a class="reference internal" href="#pre-migrate"><code class="docutils literal notranslate"><span class="pre">pre_migrate</span></code></a></li>
+<li><a class="reference internal" href="#post-migrate"><code class="docutils literal notranslate"><span class="pre">post_migrate</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.core.signals">リクエスト/レスポンス シグナル</a><ul>
+<li><a class="reference internal" href="#request-started"><code class="docutils literal notranslate"><span class="pre">request_started</span></code></a></li>
+<li><a class="reference internal" href="#request-finished"><code class="docutils literal notranslate"><span class="pre">request_finished</span></code></a></li>
+<li><a class="reference internal" href="#got-request-exception"><code class="docutils literal notranslate"><span class="pre">got_request_exception</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.test.signals">テストシグナル</a><ul>
+<li><a class="reference internal" href="#setting-changed"><code class="docutils literal notranslate"><span class="pre">setting_changed</span></code></a></li>
+<li><a class="reference internal" href="#template-rendered"><code class="docutils literal notranslate"><span class="pre">template_rendered</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.db.backends">データベースラッパー</a><ul>
+<li><a class="reference internal" href="#connection-created"><code class="docutils literal notranslate"><span class="pre">connection_created</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="settings.html"
+                          title="前の章へ">設定</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="templates/index.html"
+                          title="次の章へ">テンプレート</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/signals.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="settings.html" title="設定">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="templates/index.html" title="テンプレート">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>クロスサイトリクエストフォージェリ (CSRF) 対策 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="データベース" href="databases.html" />
+    <link rel="prev" title="配信 (syndication) フィード フレームワーク" href="contrib/syndication.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="contrib/syndication.html" title="配信 (syndication) フィード フレームワーク">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="databases.html" title="データベース">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-csrf">
+            
+  <section id="s-module-django.middleware.csrf">
+<span id="s-cross-site-request-forgery-protection"></span><span id="module-django.middleware.csrf"></span><span id="cross-site-request-forgery-protection"></span><h1>クロスサイトリクエストフォージェリ (CSRF) 対策<a class="headerlink" href="#module-django.middleware.csrf" title="Link to this heading">¶</a></h1>
+<p>CSRF ミドルウェアとテンプレートタグは、簡単に扱える <a class="reference external" href="https://owasp.org/www-community/attacks/csrf#overview">Cross Site Request Forgeries</a> 対策を提供しています。このタイプの攻撃は、訪問者のログイン情報を悪用してあなたのサイトに何らかの操作を行うことを目的とした、リンクやフォームボタン、 JavaScript を設置した悪意のあるウェブサイトによって行われます。また、関連する攻撃として、ユーザーを騙して別のユーザー権限でログインさせる 'ログイン CSRF' と呼ばれる攻撃もありますが、これも対策に含まれます。</p>
+<p>CSRF 攻撃に対する第一の防御は、 GET リクエスト (および <span class="target" id="index-6"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-9.2.1"><strong>RFC 9110 Section 9.2.1</strong></a> で定義された ‘安全な’ メソッド) から副作用を取り除くというものです。そして、 POST、PUT、DELETE のような、’安全でない’ メソッドによるリクエストについては、 <a class="reference internal" href="../howto/csrf.html#using-csrf"><span class="std std-ref">Django の CSRF 保護を利用する</span></a> で説明されている手順で保護できます。</p>
+<section id="s-how-it-works">
+<span id="s-how-csrf-works"></span><span id="how-it-works"></span><span id="how-csrf-works"></span><h2>しくみ<a class="headerlink" href="#how-it-works" title="Link to this heading">¶</a></h2>
+<p>CSRF対策は以下のようなことを基本としています:</p>
+<ol class="arabic">
+<li><p>他のサイトがアクセスできないランダムな秘密の値である CSRF クッキー。</p>
+<p><code class="docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code> は <code class="docutils literal notranslate"><span class="pre">django.middleware.csrf.get_token()</span></code> が呼び出されると、常にこのクッキーをレスポンスと一緒に送信します。その他の場合にも送信できます。セキュリティ上の理由から、secret の値はユーザがログインするたびに変更されます。</p>
+</li>
+<li><p>&quot;csrfmiddlewaretoken&quot; と名付けられた、すべての送信 POST フォームに存在する隠しフォームフィールド。</p>
+<p><a class="reference external" href="https://www.breachattack.com/">BREACH</a> 攻撃から守るために、このフィールドの値は単なる秘密ではありません。マスクを使って、レスポンスごとに異なるスクランブルをかけます。マスクは <code class="docutils literal notranslate"><span class="pre">get_token()</span></code> を呼び出すたびにランダムに生成されるので、フォームフィールドの値は毎回異なります。</p>
+<p>この部分は、<a class="reference internal" href="templates/builtins.html#std-templatetag-csrf_token"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">csrf_token</span></code></a> テンプレートタグによって行われます。</p>
+</li>
+<li><p>HTTP GET、HEAD、OPTIONS、または TRACE を使用していないすべての受信リクエストについて、CSRF クッキーが存在し、&quot;csrfmiddlewaretoken&quot; フィールドが正しく存在する必要があります。存在しない場合、ユーザは 403 エラーを受け取ります。</p>
+<p>&quot;csrfmiddlewaretoken&quot; フィールドの値を検証するとき、完全なトークンではなくシークレットだけがクッキー値のシークレットと比較されます。これにより、常に変化するトークンを使うことができます。各リクエストは固有のトークンを使うかもしれませんが、シークレットはすべてのリクエストに共通のままです。</p>
+<p>このチェックは <code class="docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code> によって行われます。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code> はブラウザから提供された場合、現在のホストと <a class="reference internal" href="settings.html#std-setting-CSRF_TRUSTED_ORIGINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_TRUSTED_ORIGINS</span></code></a> 設定に対して <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Origin">Origin header</a> を検証します。これにより、クロスサブドメイン攻撃から保護されます。</p></li>
+<li><p>さらに、HTTPS リクエストの場合、<code class="docutils literal notranslate"><span class="pre">Origin</span></code> ヘッダーが提供されない場合には、<code class="docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code> は厳密なリファラチェックを実行します。これは、サブドメインがあなたのドメインに対してクッキーを設定または変更できるとしても、そのリクエストがあなた自身の正確なドメインから来ない限り、ユーザーがあなたのアプリケーションに対して投稿を強制することはできないことを意味します。</p>
+<p>これはまた、セッションに依存しない秘密を使用するときに HTTPS で可能な中間者攻撃 (man-in-the-middle attack) に対処するためでもあります。 HTTP の <code class="docutils literal notranslate"><span class="pre">Set-Cookie</span></code> ヘッダは (残念ながら) クライアントが HTTPS でサイトと通信しているときでも受け付けられます。 (<code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダーの存在が HTTP 下では十分に信頼できないため、HTTP リクエストに対してはリファラチェックは行われません。)</p>
+<p>もし <a class="reference internal" href="settings.html#std-setting-CSRF_COOKIE_DOMAIN"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_DOMAIN</span></code></a> 設定が設定されていれば、リファラはその設定と比較されます。先頭のドットを指定することで、クロスサブドメインリクエストを許可できます。たとえば、<code class="docutils literal notranslate"><span class="pre">CSRF_COOKIE_DOMAIN</span> <span class="pre">=</span> <span class="pre">'.example.com'</span></code> は <code class="docutils literal notranslate"><span class="pre">www.example.com</span></code> と <code class="docutils literal notranslate"><span class="pre">api.example.com</span></code> からの POST リクエストを許可します。この設定が設定されていない場合、referer は HTTP の <code class="docutils literal notranslate"><span class="pre">Host</span></code> ヘッダと一致しなければなりません。</p>
+<p><a class="reference internal" href="settings.html#std-setting-CSRF_TRUSTED_ORIGINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_TRUSTED_ORIGINS</span></code></a> 設定により、現在のホストやクッキーのドメインを超えてリファラを拡張できます。</p>
+</li>
+</ol>
+<p>これにより、信頼できるドメインから送信されたフォームだけが、データを POST するために使用できるようになります。</p>
+<p>GET リクエスト（および <span class="target" id="index-7"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-9.2.1"><strong>RFC 9110 Section 9.2.1</strong></a> によって「安全」と定義されている他のリクエスト）を意図的に無視します。これらのリクエストは決して潜在的に危険な副作用を持つべきではなく、したがって GET リクエストを使用した CSRF 攻撃は無害であるべきです。 <span class="target" id="index-8"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-9.2.1"><strong>RFC 9110 Section 9.2.1</strong></a> は POST、PUT、DELETE を「安全でない」と定義し、最大限の保護のためには、他のすべてのメソッドも安全でないとみなされます。</p>
+<p>CSRF保護は中間者攻撃に対して保護することはできませんので、<a class="reference internal" href="../topics/security.html#security-recommendation-ssl"><span class="std std-ref">HTTPS</span></a> を <a class="reference internal" href="middleware.html#http-strict-transport-security"><span class="std std-ref">HTTP Strict Transport Security</span></a> と共に使用してください。また、<a class="reference internal" href="../topics/security.html#host-headers-virtual-hosting"><span class="std std-ref">HOSTヘッダーの検証</span></a> が行われていること、およびサイト上に <a class="reference internal" href="../topics/security.html#cross-site-scripting"><span class="std std-ref">クロスサイトスクリプティングの脆弱性</span></a> が存在しないことを前提としています（なぜなら、XSSの脆弱性は既に攻撃者がCSRFの脆弱性を利用して行えること、そしてそれ以上のことを可能にするからです）。</p>
+<div class="admonition-removing-the-referer-header admonition">
+<p class="admonition-title">リファラヘッダーの削除</p>
+<p>サードパーティのサイトにリファラURLを公開しないようにするには、自分のサイトの <code class="docutils literal notranslate"><span class="pre">&lt;a&gt;</span></code> タグでリファラを無効にするとよいでしょう ( <a class="reference external" href="https://www.w3.org/TR/referrer-policy/#referrer-policy-delivery">disable the referer</a> ) 。たとえば、 <code class="docutils literal notranslate"><span class="pre">&lt;meta</span> <span class="pre">name=&quot;referrer&quot;</span> <span class="pre">content=&quot;no-referrer&quot;&gt;</span></code> タグを使うか、 <code class="docutils literal notranslate"><span class="pre">Referrer-Policy:</span> <span class="pre">no-referrer</span></code> ヘッダを含めます。CSRF による HTTPS リクエストの厳格な参照元チェックにより、これらのテクニックは「安全でない」メソッドを含むリクエストで CSRF 失敗の原因となります。代わりに、サードパーティのサイトへのリンクには <code class="docutils literal notranslate"><span class="pre">&lt;a</span> <span class="pre">rel=&quot;noreferrer&quot;</span> <span class="pre">...&gt;&quot;</span></code> のような代替手段を使用してください。</p>
+</div>
+</section>
+<section id="s-limitations">
+<span id="s-csrf-limitations"></span><span id="limitations"></span><span id="csrf-limitations"></span><h2>制限事項<a class="headerlink" href="#limitations" title="Link to this heading">¶</a></h2>
+<p>サイト内のサブドメインは、ドメイン全体のクライアントにクッキーを設定できます。クッキーを設定し、対応するトークンを使うことで、サブドメインは CSRF 防御を回避できます。これを避ける唯一の方法は、サブドメインが信頼されたユーザによって管理される（あるいは、少なくともクッキーを設定できない）ようにすることです。CSRF がなくても、セッションの固定化など、サブドメインを信頼できない相手に与えることを悪用する脆弱性は他にもあり、これらの脆弱性は現在のブラウザでは簡単に修正できないことに注意してください。</p>
+</section>
+<section id="s-module-django.views.decorators.csrf">
+<span id="s-utilities"></span><span id="module-django.views.decorators.csrf"></span><span id="utilities"></span><h2>ユーティリティ<a class="headerlink" href="#module-django.views.decorators.csrf" title="Link to this heading">¶</a></h2>
+<p>以下の例では、関数ベースのビューを使っていることを想定しています。クラスベースのビューを使っている場合は、<a class="reference internal" href="../topics/class-based-views/intro.html#id1"><span class="std std-ref">Decorating class-based views</span></a> を参照してください。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.decorators.csrf.csrf_exempt">
+<span class="sig-name descname"><span class="pre">csrf_exempt</span></span>(<em class="sig-param"><span class="n"><span class="pre">view</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/views/decorators/csrf.py#L51"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.views.decorators.csrf.csrf_exempt" title="Link to this definition">¶</a></dt>
+<dd><p>このデコレータは、ビューがミドルウェアによる保護の対象外であることを示します。例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.csrf</span><span class="w"> </span><span class="kn">import</span> <span class="n">csrf_exempt</span>
+
+
+<span class="nd">@csrf_exempt</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Hello world&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>非同期ビュー関数のラップをサポートしました。</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.decorators.csrf.csrf_protect">
+<span class="sig-name descname"><span class="pre">csrf_protect</span></span>(<em class="sig-param"><span class="n"><span class="pre">view</span></span></em>)<a class="headerlink" href="#django.views.decorators.csrf.csrf_protect" title="Link to this definition">¶</a></dt>
+<dd><p>ビューに対する <code class="docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code> の保護を提供するデコレータです。</p>
+<p>使い方は以下の通りです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.csrf</span><span class="w"> </span><span class="kn">import</span> <span class="n">csrf_protect</span>
+
+
+<span class="nd">@csrf_protect</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># ...</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;a_template.html&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>非同期ビュー関数のラップをサポートしました。</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.decorators.csrf.requires_csrf_token">
+<span class="sig-name descname"><span class="pre">requires_csrf_token</span></span>(<em class="sig-param"><span class="n"><span class="pre">view</span></span></em>)<a class="headerlink" href="#django.views.decorators.csrf.requires_csrf_token" title="Link to this definition">¶</a></dt>
+<dd><p>通常 <a class="reference internal" href="templates/builtins.html#std-templatetag-csrf_token"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">csrf_token</span></code></a> テンプレートタグは <code class="docutils literal notranslate"><span class="pre">CsrfViewMiddleware.process_view</span></code> または <code class="docutils literal notranslate"><span class="pre">csrf_protect</span></code> のような等価なものが実行されていないと動作しません。ビューデコレータ <code class="docutils literal notranslate"><span class="pre">requires_csrf_token</span></code> を使用すると、テンプレートタグを確実に動作させることができます。このデコレータは <code class="docutils literal notranslate"><span class="pre">csrf_protect</span></code> と同様に動作しますが、リクエストを拒否することはありません。</p>
+<p>実装例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.shortcuts</span><span class="w"> </span><span class="kn">import</span> <span class="n">render</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.csrf</span><span class="w"> </span><span class="kn">import</span> <span class="n">requires_csrf_token</span>
+
+
+<span class="nd">@requires_csrf_token</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># ...</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;a_template.html&quot;</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>非同期ビュー関数のラップをサポートしました。</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.views.decorators.csrf.ensure_csrf_cookie">
+<span class="sig-name descname"><span class="pre">ensure_csrf_cookie</span></span>(<em class="sig-param"><span class="n"><span class="pre">view</span></span></em>)<a class="headerlink" href="#django.views.decorators.csrf.ensure_csrf_cookie" title="Link to this definition">¶</a></dt>
+<dd><p>このデコレータはビューに強制的に CSRF クッキーを送信させます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.0:</span> <p>非同期ビュー関数のラップをサポートしました。</p>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-settings">
+<span id="settings"></span><h2>設定<a class="headerlink" href="#settings" title="Link to this heading">¶</a></h2>
+<p>Django の CSRF 動作を制御するための、多くの設定があります:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_COOKIE_AGE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_AGE</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_COOKIE_DOMAIN"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_DOMAIN</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_COOKIE_HTTPONLY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_HTTPONLY</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_COOKIE_NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_NAME</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_COOKIE_PATH"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_PATH</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_COOKIE_SAMESITE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_SAMESITE</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_COOKIE_SECURE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_SECURE</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_FAILURE_VIEW"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_FAILURE_VIEW</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_HEADER_NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_HEADER_NAME</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_TRUSTED_ORIGINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_TRUSTED_ORIGINS</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-CSRF_USE_SESSIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_USE_SESSIONS</span></code></a></p></li>
+</ul>
+</section>
+<section id="s-frequently-asked-questions">
+<span id="frequently-asked-questions"></span><h2>よくある質問<a class="headerlink" href="#frequently-asked-questions" title="Link to this heading">¶</a></h2>
+<section id="s-is-posting-an-arbitrary-csrf-token-pair-cookie-and-post-data-a-vulnerability">
+<span id="is-posting-an-arbitrary-csrf-token-pair-cookie-and-post-data-a-vulnerability"></span><h3>任意の CSRF トークンのペア(クッキーと POST データ)を投稿するのは脆弱性ではないですか?<a class="headerlink" href="#is-posting-an-arbitrary-csrf-token-pair-cookie-and-post-data-a-vulnerability" title="Link to this heading">¶</a></h3>
+<p>いいえ、これは設計によるものです。中間者攻撃がなければ、攻撃者が CSRF トークン・クッキーを被害者のブラウザに送信する方法はありません。したがって、攻撃を成功させるには、XSS などによって被害者のブラウザのクッキーを取得する必要がありますが、その場合、攻撃者は通常 CSRF 攻撃を必要としません。</p>
+<p>セキュリティ監査ツールの中には、これを問題視するものもありますが、前述のように、攻撃者はユーザのブラウザの CSRF クッキーを盗むことはできません。FirebugやChromeの開発ツールなどを使って <em>自分自身</em> のトークンを「盗んだり」修正したりすることは脆弱性ではありません。</p>
+</section>
+<section id="s-is-it-a-problem-that-django-s-csrf-protection-isn-t-linked-to-a-session-by-default">
+<span id="is-it-a-problem-that-django-s-csrf-protection-isn-t-linked-to-a-session-by-default"></span><h3>Django の CSRF 防御がデフォルトでセッションにリンクされていないのは問題ではないですか？<a class="headerlink" href="#is-it-a-problem-that-django-s-csrf-protection-isn-t-linked-to-a-session-by-default" title="Link to this heading">¶</a></h3>
+<p>いいえ、これは設計によるものです。CSRF 防御をセッションにリンクしないことで、 <em>pastebin</em> のような、セッションを持たない匿名ユーザからの投稿を許可するサイトで保護を使用できます。</p>
+<p>CSRF トークンをユーザのセッションに保存したい場合は、 <a class="reference internal" href="settings.html#std-setting-CSRF_USE_SESSIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_USE_SESSIONS</span></code></a> 設定を使用します。</p>
+</section>
+<section id="s-why-might-a-user-encounter-a-csrf-validation-failure-after-logging-in">
+<span id="why-might-a-user-encounter-a-csrf-validation-failure-after-logging-in"></span><h3>ログイン後に CSRF 検証に失敗するのはなぜですか？<a class="headerlink" href="#why-might-a-user-encounter-a-csrf-validation-failure-after-logging-in" title="Link to this heading">¶</a></h3>
+<p>セキュリティ上の理由から、CSRF トークンはユーザがログインするたびにローテーションされます。ログイン前にフォームが生成されたページは、古くて無効な CSRF トークンを持つことになり、再読み込みが必要になります。これは、ユーザがログイン後に戻るボタンを使用した場合や、別のブラウザのタブでログインした場合に発生することがあります。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">クロスサイトリクエストフォージェリ (CSRF) 対策</a><ul>
+<li><a class="reference internal" href="#how-it-works">しくみ</a></li>
+<li><a class="reference internal" href="#limitations">制限事項</a></li>
+<li><a class="reference internal" href="#module-django.views.decorators.csrf">ユーティリティ</a></li>
+<li><a class="reference internal" href="#settings">設定</a></li>
+<li><a class="reference internal" href="#frequently-asked-questions">よくある質問</a><ul>
+<li><a class="reference internal" href="#is-posting-an-arbitrary-csrf-token-pair-cookie-and-post-data-a-vulnerability">任意の CSRF トークンのペア(クッキーと POST データ)を投稿するのは脆弱性ではないですか?</a></li>
+<li><a class="reference internal" href="#is-it-a-problem-that-django-s-csrf-protection-isn-t-linked-to-a-session-by-default">Django の CSRF 防御がデフォルトでセッションにリンクされていないのは問題ではないですか？</a></li>
+<li><a class="reference internal" href="#why-might-a-user-encounter-a-csrf-validation-failure-after-logging-in">ログイン後に CSRF 検証に失敗するのはなぜですか？</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="contrib/syndication.html"
+                          title="前の章へ">配信 (syndication) フィード フレームワーク</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="databases.html"
+                          title="次の章へ">データベース</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/csrf.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="contrib/syndication.html" title="配信 (syndication) フィード フレームワーク">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="databases.html" title="データベース">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

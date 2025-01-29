@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>デプロイチェックリスト &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="静的ファイルをデプロイする" href="../static-files/deployment.html" />
+    <link rel="prev" title="Django を Uvicorn とともに使う" href="asgi/uvicorn.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="asgi/uvicorn.html" title="Django を Uvicorn とともに使う">previous</a>
+     |
+    <a href="../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="../static-files/deployment.html" title="静的ファイルをデプロイする">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-deployment-checklist">
+            
+  <section id="s-deployment-checklist">
+<span id="deployment-checklist"></span><h1>デプロイチェックリスト<a class="headerlink" href="#deployment-checklist" title="Link to this heading">¶</a></h1>
+<p>インターネットは敵対的な環境です。Django プロジェクトをデプロイする前に、セキュリティ、パフォーマンス、運用を念頭に置いて、時間をかけて設定を見直すべきです。</p>
+<p>Django には多くの <a class="reference internal" href="../../topics/security.html"><span class="doc">セキュリティ機能</span></a> があります。いくつかはビルトインで、常に有効です。その他は任意となっており、これは常に適切とは限らなかったり、開発に対しては不便だったりするためです。たとえば、HTTPS を強制することは、すべてのウェブサイトに対して適切とは言えず、またローカル開発では実践的ではありません。</p>
+<p>パフォーマンスの最適化は、利便性とのトレードオフとなるもう 1 つの要素です。たとえば、キャッシュは本番環境では役立ちますが、ローカル開発では役立ちません。同様に、エラーレポートの必要性にも大きな違いがあります。</p>
+<p>以下のチェックリストは、次の設定項目を含みます:</p>
+<ul class="simple">
+<li><p>Django が想定するレベルのセキュリティを提供するために適切に設定する必要があるもの;</p></li>
+<li><p>環境によって異なると思われるもの;</p></li>
+<li><p>オプションのセキュリティ機能を有効にするもの;</p></li>
+<li><p>パフォーマンスの最適化を有効にするもの;</p></li>
+<li><p>エラーレポートを提供するもの;</p></li>
+</ul>
+<p>これらの設定の多くは機密性が高く、機密情報として扱うべきです。プロジェクトのソースコードを公開する場合、開発用の適切な設定を公開し、本番用にはプライベートな設定モジュールを使用するのが一般的な慣習です。</p>
+<section id="s-run-manage-py-check-deploy">
+<span id="run-manage-py-check-deploy"></span><h2><code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">check</span> <span class="pre">--deploy</span></code> を実施しよう<a class="headerlink" href="#run-manage-py-check-deploy" title="Link to this heading">¶</a></h2>
+<p>以下で説明しているチェックのいくつかは、<a class="reference internal" href="../../ref/django-admin.html#cmdoption-check-deploy"><code class="xref std std-option docutils literal notranslate"><span class="pre">check</span> <span class="pre">--deploy</span></code></a> オプションを使用して自動化できます。オプションのドキュメントで説明しているとおり、本番環境の設定に対してこのチェックを実施してください。</p>
+</section>
+<section id="s-switch-away-from-manage-py-runserver">
+<span id="switch-away-from-manage-py-runserver"></span><h2><code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">runserver</span></code> から切り替える<a class="headerlink" href="#switch-away-from-manage-py-runserver" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../../ref/django-admin.html#django-admin-runserver"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">runserver</span></code></a> コマンドは本番環境向けには設計されていません。本番環境では、適切なWSGIまたはASGIサーバーに切り替えてください。一般的な選択肢については、<a class="reference internal" href="wsgi/index.html"><span class="doc">WSGIサーバー</span></a> または <a class="reference internal" href="asgi/index.html"><span class="doc">ASGIサーバー</span></a> を参照してください。</p>
+</section>
+<section id="s-critical-settings">
+<span id="critical-settings"></span><h2>最重要な設定<a class="headerlink" href="#critical-settings" title="Link to this heading">¶</a></h2>
+<section id="s-secret-key">
+<span id="secret-key"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-SECRET_KEY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a><a class="headerlink" href="#secret-key" title="Link to this heading">¶</a></h3>
+<p><strong>シークレットキーは、長いランダム文字列で、秘匿される必要があります。</strong></p>
+<p>本番環境で使われるキーは、他の場所で使われておらず、ソースコントロール中に記述してしまわないよう十分注意してください。これにより、攻撃者がキーを取得してしまう恐れを軽減できます。</p>
+<p>設定モジュールにシークレットキーを直接書き込む代わりに、環境変数から読み込む方法を検討してください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SECRET_KEY&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>もしくはファイルから読み込みます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;/etc/secret_key.txt&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>シークレットキーをローテーションする場合は、 <a class="reference internal" href="../../ref/settings.html#std-setting-SECRET_KEY_FALLBACKS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY_FALLBACKS</span></code></a>: が使用できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CURRENT_SECRET_KEY&quot;</span><span class="p">]</span>
+<span class="n">SECRET_KEY_FALLBACKS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OLD_SECRET_KEY&quot;</span><span class="p">],</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>古いシークレットキーが <code class="docutils literal notranslate"><span class="pre">SECRET_KEY_FALLBACKS</span></code> から適時に削除されていることを確認してください。</p>
+</section>
+<section id="s-debug">
+<span id="debug"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a><a class="headerlink" href="#debug" title="Link to this heading">¶</a></h3>
+<p><strong>デバッグは、本番環境では決して有効化してはいけません。</strong></p>
+<p>プロジェクトの開発中は <a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">True</span></code></a> だったはずですが、これはブラウザ内の全トレースバックといった便利な機能を使えるようにするためです。</p>
+<p>しかし、本番環境に対してはこれはまったく不適切です。なぜなら、プロジェクトに関する多くの情報を公にしてしまうからです: ソースコードからの引用、ローカル変数、設定、使われているライブラリ、等。</p>
+</section>
+</section>
+<section id="s-environment-specific-settings">
+<span id="environment-specific-settings"></span><h2>環境に合わせた設定<a class="headerlink" href="#environment-specific-settings" title="Link to this heading">¶</a></h2>
+<section id="s-allowed-hosts">
+<span id="allowed-hosts"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a><a class="headerlink" href="#allowed-hosts" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">False</span></code></a> のとき、<a class="reference internal" href="../../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> が適切に設定されない限り Django は一切動作しません。</p>
+<p>この設定は、いくつかの CSRF 攻撃からあなたのサイトを保護するために必要です。もしワイルドカードを使用した場合、<code class="docutils literal notranslate"><span class="pre">Host</span></code> HTTP のバリデーションを自分自身で行う必要があります。さもなければ、この種の攻撃に脆弱なサイトとなってしまいます。</p>
+<p>加えて、Django の手前にいるウェブサーバーにも、ホストを検証するよう設定をする必要があります。これにより、不適切なホストに対して、Django にリクエストを転送する代わりに、エラーページを表示したりリクエストを無視するようにできます。そして、Django のログ内で誤ったエラーが起きる (もしくは設定しだいでは E メールが送信される) のを防ぎます。たとえば、nginx では認識されないホストに対してデフォルトサーバーが &quot;444 No Response&quot; を返します:</p>
+<div class="highlight-nginx notranslate"><div class="highlight"><pre><span></span><span class="k">server</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kn">listen</span><span class="w"> </span><span class="mi">80</span><span class="w"> </span><span class="s">default_server</span><span class="p">;</span>
+<span class="w">    </span><span class="kn">return</span><span class="w"> </span><span class="mi">444</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="s-caches">
+<span id="caches"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-CACHES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CACHES</span></code></a><a class="headerlink" href="#caches" title="Link to this heading">¶</a></h3>
+<p>もしキャッシュを使うなら、開発環境と本番環境とでコネクションパラメータは異なるでしょう。そうでない場合、デフォルトは <a class="reference internal" href="../../topics/cache.html#local-memory-caching"><span class="std std-ref">ローカルメモリのキャッシュ</span></a> に設定されています。</p>
+<p>キャッシュサーバーは認証に弱点を持っています。あなたのアプリケーションからのコネクションだけを受け入れるようにしてください。</p>
+</section>
+<section id="s-databases">
+<span id="databases"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a><a class="headerlink" href="#databases" title="Link to this heading">¶</a></h3>
+<p>データベースの接続パラメータは、開発環境と本番環境でおそらく異なります。</p>
+<p>データベースパスワードは非常に機密的なものです。<a class="reference internal" href="../../ref/settings.html#std-setting-SECRET_KEY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a> と同様の方法で保護してください。</p>
+<p>セキュリティを最大限に確保するためには、データベースサーバーがアプリケーションサーバーからの接続のみを許可するようにしてください。</p>
+<p>もしデータベースのバックアップの設定をしていなければ、今すぐに行ってください！</p>
+</section>
+<section id="s-email-backend-and-related-settings">
+<span id="email-backend-and-related-settings"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-EMAIL_BACKEND"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_BACKEND</span></code></a> と関連する設定<a class="headerlink" href="#email-backend-and-related-settings" title="Link to this heading">¶</a></h3>
+<p>あなたのサイトが E メールを送信する場合、設定値が正しくセットされている必要があります。</p>
+<p>デフォルトでは、Django は <a class="reference external" href="mailto:webmaster&#37;&#52;&#48;localhost">webmaster<span>&#64;</span>localhost</a> と <a class="reference external" href="mailto:root&#37;&#52;&#48;localhost">root<span>&#64;</span>localhost</a> から E メールを送信します。しかし、いくつかのメールプロバイダはこれらのアドレスを拒否します。異なる送信者アドレスを使用するには、<a class="reference internal" href="../../ref/settings.html#std-setting-DEFAULT_FROM_EMAIL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_FROM_EMAIL</span></code></a> と <a class="reference internal" href="../../ref/settings.html#std-setting-SERVER_EMAIL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SERVER_EMAIL</span></code></a> 設定を修正してください。</p>
+</section>
+<section id="s-static-root-and-static-url">
+<span id="static-root-and-static-url"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_ROOT</span></code></a> と <a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_URL</span></code></a><a class="headerlink" href="#static-root-and-static-url" title="Link to this heading">¶</a></h3>
+<p>静的ファイルは、開発用サーバーでは自動的に提供されます。本番環境では、<a class="reference internal" href="../../ref/contrib/staticfiles.html#django-admin-collectstatic"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">collectstatic</span></code></a> が静的ファイルをコピーする <a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_ROOT</span></code></a> ディレクトリを設定する必要があります。</p>
+<p>より詳しくは <a class="reference internal" href="../static-files/index.html"><span class="doc">静的ファイル (画像、JavaScript、CSS など) を管理する</span></a> を参照してください。</p>
+</section>
+<section id="s-media-root-and-media-url">
+<span id="media-root-and-media-url"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-MEDIA_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code></a> と <a class="reference internal" href="../../ref/settings.html#std-setting-MEDIA_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_URL</span></code></a><a class="headerlink" href="#media-root-and-media-url" title="Link to this heading">¶</a></h3>
+<p>メディアファイルは、あなたのユーザーによってアップロードされます。彼らは信用なりません！ ウェブサーバーが決してこれらを解読しようとしないようにしてください。たとえば、ユーザーが <code class="docutils literal notranslate"><span class="pre">.php</span></code> ファイルをアップロードしたとき、ウェブサーバーはその内容を実行するべきではありません。</p>
+<p>この機会に、こうしたファイルに対するバックアップ戦略をチェックしておきましょう。</p>
+</section>
+</section>
+<section id="s-https">
+<span id="https"></span><h2>HTTPS<a class="headerlink" href="#https" title="Link to this heading">¶</a></h2>
+<p>ユーザーにログインさせるあらゆるウェブサイトは、アクセストークンを平文で送信するのを防ぐため、サイト全体の HTTPS を強制するべきです。Django では、アクセストークンはログインとパスワード、セッションクッキー、パスワードリセットトークンを含みます。(パスワードリセットトークンを E メール送信する場合、それほど保護されてはいません。)</p>
+<p>ユーザーアカウントや admin などの機密性の高いエリアを保護するだけでは不十分です。なぜなら、HTTP と HTTPS で同じセッションクッキーが使用されるためです。Web サーバーは、すべての HTTP トラフィックを HTTPS にリダイレクトし、HTTPS リクエストのみを Django に送信する必要があります。</p>
+<p>一度 HTTPS をセットアップしたら、以下の設定項目が有効になります。</p>
+<section id="s-csrf-cookie-secure">
+<span id="csrf-cookie-secure"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-CSRF_COOKIE_SECURE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_SECURE</span></code></a><a class="headerlink" href="#csrf-cookie-secure" title="Link to this heading">¶</a></h3>
+<p>誤って HTTP によって CSRF クッキーを送信してしまうのを防ぐには、<code class="docutils literal notranslate"><span class="pre">True</span></code> をセットしてください。</p>
+</section>
+<section id="s-session-cookie-secure">
+<span id="session-cookie-secure"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-SESSION_COOKIE_SECURE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE</span></code></a><a class="headerlink" href="#session-cookie-secure" title="Link to this heading">¶</a></h3>
+<p>誤って HTTP によってセッションクッキーを送信してしまうのを防ぐには、<code class="docutils literal notranslate"><span class="pre">True</span></code> をセットしてください。</p>
+</section>
+</section>
+<section id="s-performance-optimizations">
+<span id="performance-optimizations"></span><h2>パフォーマンスの最適化<a class="headerlink" href="#performance-optimizations" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">False</span></code></a> をセットすることで、複数の開発向けの機能が無効化されます。さらに、以下の設定を調整できます。</p>
+<section id="s-sessions">
+<span id="sessions"></span><h3>セッション<a class="headerlink" href="#sessions" title="Link to this heading">¶</a></h3>
+<p>パフォーマンスを向上させるために <a class="reference internal" href="../../topics/http/sessions.html#cached-sessions-backend"><span class="std std-ref">キャッシュを使ったセッション</span></a> の使用を検討してください。</p>
+<p>データベースバックアップセッションを使用している場合は、不要なデータを保存しないように <a class="reference internal" href="../../topics/http/sessions.html#clearing-the-session-store"><span class="std std-ref">セッションストアのクリア</span></a> を定期的に行ってください。</p>
+</section>
+<section id="s-conn-max-age">
+<span id="conn-max-age"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-CONN_MAX_AGE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CONN_MAX_AGE</span></code></a><a class="headerlink" href="#conn-max-age" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../../ref/databases.html#persistent-database-connections"><span class="std std-ref">永続的なデータベース接続</span></a> を有効化すると、リクエストのプロセス時間の多くの部分に対するデータベースアカウントへの接続において、高速になります。</p>
+<p>限られたネットワーク性能の仮想化ホストにおいて、とても効果的です。</p>
+</section>
+<section id="s-templates">
+<span id="templates"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a><a class="headerlink" href="#templates" title="Link to this heading">¶</a></h3>
+<p>キャッシュされたテンプレートローダーを有効にすると、レンダリングが必要になるたびに各テンプレートをコンパイルする必要がなくなるので、パフォーマンスが劇的に向上します。 <a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">False</span></code></a> の場合、キャッシュテンプレートローダーは自動的に有効になります。詳しくは <a class="reference internal" href="../../ref/templates/api.html#django.template.loaders.cached.Loader" title="django.template.loaders.cached.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.template.loaders.cached.Loader</span></code></a> を参照してください。</p>
+</section>
+</section>
+<section id="s-error-reporting">
+<span id="error-reporting"></span><h2>エラーのレポート<a class="headerlink" href="#error-reporting" title="Link to this heading">¶</a></h2>
+<p>あなたの書いたコードを本番環境に送信するまでは、頑強であることが望まれますが、予期しないエラーを除外することはできません。ありがたいことに、Django はエラーをキャッチして適切にお知らせします。</p>
+<section id="s-logging">
+<span id="logging"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-LOGGING"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING</span></code></a><a class="headerlink" href="#logging" title="Link to this heading">¶</a></h3>
+<p>本番環境に置く前に、ロギング設定を見直しましょう。また、トラフィックを受け取ったらすぐにそれらが想定通り動作していることを確認してください。</p>
+<p>ロギングに関する詳細は <a class="reference internal" href="../../topics/logging.html"><span class="doc">ロギング</span></a> を参照してください。</p>
+</section>
+<section id="s-admins-and-managers">
+<span id="admins-and-managers"></span><h3><a class="reference internal" href="../../ref/settings.html#std-setting-ADMINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ADMINS</span></code></a> と <a class="reference internal" href="../../ref/settings.html#std-setting-MANAGERS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MANAGERS</span></code></a><a class="headerlink" href="#admins-and-managers" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-ADMINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ADMINS</span></code></a> は、500 エラーの通知を E メールで受け取ります。</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-MANAGERS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MANAGERS</span></code></a> は、404 エラーの通知を受け取ります。<a class="reference internal" href="../../ref/settings.html#std-setting-IGNORABLE_404_URLS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">IGNORABLE_404_URLS</span></code></a> により不要なレポートをフィルタリングできます。</p>
+<p>E メールによるエラーレポートの詳細は、<a class="reference internal" href="../error-reporting.html"><span class="doc">エラーレポートの管理</span></a> を参照してください。</p>
+<div class="admonition-error-reporting-by-email-doesn-t-scale-very-well admonition">
+<p class="admonition-title">E メールによるエラーレポートはスケールしない</p>
+<p>あなたの受信箱がレポートであふれかえる前に、<a class="reference external" href="https://docs.sentry.io/">Sentry</a> などのエラーモニタリングツールの導入を検討してください。Sentry もログを集計することができます。</p>
+</div>
+</section>
+<section id="s-customize-the-default-error-views">
+<span id="customize-the-default-error-views"></span><h3>デフォルトのエラービューをカスタムする<a class="headerlink" href="#customize-the-default-error-views" title="Link to this heading">¶</a></h3>
+<p>Django には、いくつかの HTTP に対して、デフォルトのビューとテンプレートが用意してあります。ルートのテンプレートディレクトリに以下のテンプレートを作成することで、独自のテンプレートに置き換えることができます: <code class="docutils literal notranslate"><span class="pre">404.html</span></code>, <code class="docutils literal notranslate"><span class="pre">500.html</span></code>, <code class="docutils literal notranslate"><span class="pre">403.html</span></code>, and <code class="docutils literal notranslate"><span class="pre">400.html</span></code> 。99％のWebアプリケーションは、これらのテンプレートを使用した <a class="reference internal" href="../../ref/views.html#error-views"><span class="std std-ref">デフォルトのエラービュー</span></a> で事足りるはずですが、 <a class="reference internal" href="../../topics/http/views.html#customizing-error-views"><span class="std std-ref">これらをカスタマイズする</span></a> こともできます。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">デプロイチェックリスト</a><ul>
+<li><a class="reference internal" href="#run-manage-py-check-deploy"><code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">check</span> <span class="pre">--deploy</span></code> を実施しよう</a></li>
+<li><a class="reference internal" href="#switch-away-from-manage-py-runserver"><code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">runserver</span></code> から切り替える</a></li>
+<li><a class="reference internal" href="#critical-settings">最重要な設定</a><ul>
+<li><a class="reference internal" href="#secret-key"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECRET_KEY</span></code></a></li>
+<li><a class="reference internal" href="#debug"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#environment-specific-settings">環境に合わせた設定</a><ul>
+<li><a class="reference internal" href="#allowed-hosts"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a></li>
+<li><a class="reference internal" href="#caches"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CACHES</span></code></a></li>
+<li><a class="reference internal" href="#databases"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a></li>
+<li><a class="reference internal" href="#email-backend-and-related-settings"><code class="xref std std-setting docutils literal notranslate"><span class="pre">EMAIL_BACKEND</span></code> と関連する設定</a></li>
+<li><a class="reference internal" href="#static-root-and-static-url"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_ROOT</span></code> と <code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_URL</span></code></a></li>
+<li><a class="reference internal" href="#media-root-and-media-url"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code> と <code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_URL</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#https">HTTPS</a><ul>
+<li><a class="reference internal" href="#csrf-cookie-secure"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_COOKIE_SECURE</span></code></a></li>
+<li><a class="reference internal" href="#session-cookie-secure"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SESSION_COOKIE_SECURE</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performance-optimizations">パフォーマンスの最適化</a><ul>
+<li><a class="reference internal" href="#sessions">セッション</a></li>
+<li><a class="reference internal" href="#conn-max-age"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CONN_MAX_AGE</span></code></a></li>
+<li><a class="reference internal" href="#templates"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#error-reporting">エラーのレポート</a><ul>
+<li><a class="reference internal" href="#logging"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING</span></code></a></li>
+<li><a class="reference internal" href="#admins-and-managers"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ADMINS</span></code> と <code class="xref std std-setting docutils literal notranslate"><span class="pre">MANAGERS</span></code></a></li>
+<li><a class="reference internal" href="#customize-the-default-error-views">デフォルトのエラービューをカスタムする</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="asgi/uvicorn.html"
+                          title="前の章へ">Django を Uvicorn とともに使う</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="../static-files/deployment.html"
+                          title="次の章へ">静的ファイルをデプロイする</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/howto/deployment/checklist.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="asgi/uvicorn.html" title="Django を Uvicorn とともに使う">previous</a>
+     |
+    <a href="../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="../static-files/deployment.html" title="静的ファイルをデプロイする">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

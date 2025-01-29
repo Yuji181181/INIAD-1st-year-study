@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>パフォーマンスと最適化 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="Django オブジェクトのシリアライズ" href="serialization.html" />
+    <link rel="prev" title="Django におけるセキュリティ" href="security.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="security.html" title="Django におけるセキュリティ">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="serialization.html" title="Django オブジェクトのシリアライズ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-performance">
+            
+  <section id="s-performance-and-optimization">
+<span id="performance-and-optimization"></span><h1>パフォーマンスと最適化<a class="headerlink" href="#performance-and-optimization" title="Link to this heading">¶</a></h1>
+<p>このドキュメントでは、Django コードをより効率よく、早く、より少ないリソースで実行するためのテクニックとツールについて、その概要を説明します。</p>
+<section id="s-introduction">
+<span id="introduction"></span><h2>はじめに<a class="headerlink" href="#introduction" title="Link to this heading">¶</a></h2>
+<p>一般に、最も関心があるのは、コードが正しく <em>動作する</em>、つまり、書かれたコードのロジックがが期待通りの出力を生成することです。しかし、それだけでは、期待通りに <em>効率よく</em> 動作しているとは言えません。</p>
+<p>この場合、必要なのは、コードの振る舞いに影響を与えることなく、あるいは影響を最小限に保ちつつ、そのパフォーマンスを向上させる実用的な方法です。</p>
+</section>
+<section id="s-general-approaches">
+<span id="general-approaches"></span><h2>一般的なアプローチ<a class="headerlink" href="#general-approaches" title="Link to this heading">¶</a></h2>
+<section id="s-what-are-you-optimizing-for">
+<span id="what-are-you-optimizing-for"></span><h3><em>何のために</em> 最適化をしようとしているのか？<a class="headerlink" href="#what-are-you-optimizing-for" title="Link to this heading">¶</a></h3>
+<p>最適化する「パフォーマンス」という言葉で何を意味しているのか、はっきりと考えておくことが大切です。パフォーマンスを測る指標は1つではないからです。</p>
+<p>高速化というものがプログラムのために最も明らかな目的かもしれません。しかし、他の観点からパフォーマンスを向上することもできます。たとえば、メモリー消費量を少なくするとか、データベースやネットワークのアクセス量を削減するといったことが考えられます。</p>
+<p>1つの領域を改善すると、別の領域の性能も向上することがよくありますが、常にそうとは限らず、一方が他方を犠牲にすることさえあります。たとえば、プログラムの速度の改善がメモリ使用量の増加を引き起こすかもしれません。さらに悪いことに、それが自滅的になるかもしれません。もし速度の改善がメモリを大幅に消費してしまったら、システム上のメモリが足りなくなり、結果的に利益よりも害を与えることになってしまうでしょう。</p>
+<p>他にも気に留めておく必要があるトレードオフがあります。あなた自身の時間が CPU 時間以上に貴重なリソースだということです。一部の改善は実装する価値がないほど難しすぎるかもしれず、ポータビリティやコードメンテナンスに影響を与えてしまうかもしれません。すべての性能改善に努力する価値があるわけではないのです。</p>
+<p>そのため、何を目的としたパフォーマンスの改善なのかを知っておくべき必要があります。また、その目的とした方針に相応の理由があるかを知っておく必要もあります。</p>
+</section>
+<section id="s-performance-benchmarking">
+<span id="performance-benchmarking"></span><h3>パフォーマンスのベンチマーク<a class="headerlink" href="#performance-benchmarking" title="Link to this heading">¶</a></h3>
+<p>コード中で効率の悪い部分を、単に想像したり当て推量したりするというのは、あまり良い考えではありません。</p>
+<section id="s-django-tools">
+<span id="django-tools"></span><h4>Django のツール<a class="headerlink" href="#django-tools" title="Link to this heading">¶</a></h4>
+<p><a class="extlink-pypi reference external" href="https://pypi.org/project/django-debug-toolbar/">django-debug-toolbar</a> は非常に便利なツールで、コードが何をしているか、どのくらいの時間を費やしているかを把握するのに役立ちます。特に、ページが生成しているすべてのSQLクエリと、それぞれのクエリにかかった時間を表示することができます。</p>
+<p>サードパーティ製のパネルをツールバーに追加することも可能です。それにより、たとえば、キャッシュのパフォーマンスや、テンプレートのレンダリング時間を測定できます。</p>
+</section>
+<section id="s-third-party-services">
+<span id="third-party-services"></span><h4>サードパーティのサービス<a class="headerlink" href="#third-party-services" title="Link to this heading">¶</a></h4>
+<p>サイト上のページのパフォーマンスを分析・レポートしてくれる無料のサービスが数多く存在します。これらのサービスでは、実際のユーザーエクスペリエンスをリモートの HTTP クライアントの観点からシミュレートしてくれます。</p>
+<p>These can't report on the internals of your code, but can provide a useful
+insight into your site's overall performance, including aspects that can't be
+adequately measured from within Django environment.</p>
+<p>同様の分析を実施する有料サービスもいくつかあり、一部は Django を認識するため、コードベースと統合して性能のプロファイルをより包括的に得られます。</p>
+</section>
+</section>
+<section id="s-get-things-right-from-the-start">
+<span id="get-things-right-from-the-start"></span><h3>最初から物事を正しく行う<a class="headerlink" href="#get-things-right-from-the-start" title="Link to this heading">¶</a></h3>
+<p>最適化には、パフォーマンスの悪い部分を改善する作業も含まれますが、パフォーマンスの向上を考える前に取り入れるべき点として、どんな場合でも作業に採用できる良い習慣があります。</p>
+<p>この点においてPython は優れた言語であり、エレガントに見え、正しいと感じる解決策が通常、最も性能が良いものです。ほとんどのスキルと同様に、「正しいと見える」ものを学ぶには実践が必要ですが、最も有用なガイドラインの一つはこれです:</p>
+<section id="s-work-at-the-appropriate-level">
+<span id="work-at-the-appropriate-level"></span><h4>適切なレベルで作業する<a class="headerlink" href="#work-at-the-appropriate-level" title="Link to this heading">¶</a></h4>
+<p>Django は様々なアプローチ方法を提供しますが、ある方法で何かができるからといって、それが最も適切な方法であるとは限りません。例えば、同じこと (コレクション内のアイテムの数など) を <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> で、 Python で、あるいはテンプレートで計算できるかもしれません。</p>
+<p>しかし、この作業を高いレベルよりも低いレベルで行う方が、ほとんどの場合、速くなります。高いレベルでは、システムは複数の抽象化レベルとマシンの層を通じてオブジェクトを扱わなければなりません。</p>
+<p>つまり、データベースは通常、Pythonよりも速く処理ができ、Pythonはテンプレート言語よりも速く処理ができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># QuerySet operation on the database</span>
+<span class="c1"># fast, because that&#39;s what databases are good at</span>
+<span class="n">my_bicycles</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+<span class="c1"># counting Python objects</span>
+<span class="c1"># slower, because it requires a database query anyway, and processing</span>
+<span class="c1"># of the Python objects</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">my_bicycles</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cm">&lt;!--</span>
+<span class="cm">Django template filter</span>
+<span class="cm">slower still, because it will have to count them in Python anyway,</span>
+<span class="cm">and because of template language overheads</span>
+<span class="cm">--&gt;</span>
+<span class="cp">{{</span> <span class="nv">my_bicycles</span><span class="o">|</span><span class="nf">length</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>通常、その仕事に最も適したレベルは、コードを書くのに快適な最も低いレベルのものです。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>上記の例は単なる例示に過ぎません</p>
+<p>実際のケースでは、まず数をカウントする前後で何が起こっているかを考慮し、 <em>その文脈において</em> 最適な方法を見つける必要があります。データベース最適化に関するドキュメントでは、 <a class="reference internal" href="db/optimization.html#overuse-of-count-and-exists"><span class="std std-ref">テンプレート内でカウントを行った方が良い場合</span></a> について記載されています。</p>
+<p>次に、他の選択肢も考慮すべきです。実際のケースでは、テンプレートから直接 <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> の <code class="docutils literal notranslate"><span class="pre">count()</span></code> メソッドを呼び出す <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">my_bicycles.count</span> <span class="pre">}}</span></code> が最も適切な選択かもしれません。</p>
+</div>
+</section>
+</section>
+</section>
+<section id="s-caching">
+<span id="caching"></span><h2>キャッシュ<a class="headerlink" href="#caching" title="Link to this heading">¶</a></h2>
+<p>値の計算は高コストになる（つまり、リソースを多く消費し、遅い）ことが多いので、その値をすぐにアクセス可能なキャッシュに保存しておくことで、次に必要になる時のための大きなメリットになります。</p>
+<p>これは十分に重要で強力な技術なため、Djangoには包括的なキャッシュフレームワークと他の小さなキャッシュ機能の部品が含まれています。</p>
+<section id="s-the-caching-framework">
+<span id="the-caching-framework"></span><h3><a class="reference internal" href="cache.html"><span class="doc">キャッシュフレームワーク</span></a><a class="headerlink" href="#the-caching-framework" title="Link to this heading">¶</a></h3>
+<p>Django の <a class="reference internal" href="cache.html"><span class="doc">キャッシュフレームワーク</span></a> は、動的なコンテンツを保存して、リクエストごとに再計算しないで済むようにすることで、パフォーマンスを向上するための非常に大きな可能性を提供します。</p>
+<p>利便性のため、Django は様々なレベルのキャッシュの粒度を提供しています。特定のビューの出力をキャッシュしたり、生成するのに時間のかかるパーツだけをキャッシュしたり、あるいは、サイト全体をキャッシュすることでさえ可能です。</p>
+<p>キャッシュの実装は、書き方が良くないことが原因でパフォーマンスが悪いコードを改善する手段として考えるべきではありません。キャッシュは、パフォーマンスの良いコードを生み出すための最終段階の一つであり、近道ではありません。</p>
+</section>
+<section id="s-cached-property">
+<span id="cached-property"></span><h3><a class="reference internal" href="../ref/utils.html#django.utils.functional.cached_property" title="django.utils.functional.cached_property"><code class="xref py py-class docutils literal notranslate"><span class="pre">cached_property</span></code></a><a class="headerlink" href="#cached-property" title="Link to this heading">¶</a></h3>
+<p>クラスのインスタンスのメソッドを複数回呼ぶ必要があるというのはよくあることです。その関数の実行が高コストである場合、複数回の呼び出しは無駄が多いです。</p>
+<p><a class="reference internal" href="../ref/utils.html#django.utils.functional.cached_property" title="django.utils.functional.cached_property"><code class="xref py py-class docutils literal notranslate"><span class="pre">cached_property</span></code></a> デコレータを使うことで、プロパティが返す値を保存して、次回同じインスタンスで関数が呼ばれた時、その値を再計算する代わりに、保存しておいた値を返すようにすることができます。ただし、このデコレータが機能するのは、メソッドが引数として <code class="docutils literal notranslate"><span class="pre">self</span></code> のみを取り、メソッドをプロパティーに変えられる場合のみなので、注意してください。</p>
+<p>特定の Django コンポーネントは、独自のキャッシュ機能を実装しています。以下のそれらのコンポーネントに関係するセクションで解説します。</p>
+</section>
+</section>
+<section id="s-understanding-laziness">
+<span id="understanding-laziness"></span><h2>遅延について理解する<a class="headerlink" href="#understanding-laziness" title="Link to this heading">¶</a></h2>
+<p><em>遅延 (laziness)</em> とは、キャッシュ機能を補完するもう1つの戦略です。キャッシュは結果を保存することで再計算を防ぎますが、遅延は実際に値が必要になるまで、計算の実行を遅らせます。</p>
+<p>遅延によりインスタンス化される前に、またはインスタンス化が可能になる以前であっても参照できるようになります。これにはさまざまな用途があります。</p>
+<p>たとえば、<a class="reference internal" href="i18n/translation.html#lazy-translations"><span class="std std-ref">遅延翻訳</span></a> は対象となる言語自体が判別される前に使用できます。翻訳後の文字列がレンダリングされたテンプレートなどで実際に必要になるまで使用されなくなるためです。</p>
+<p>そもそも怠惰（Laziness）とは、仕事を避けることで労力を節約することでもあります。つまり、怠け癖の一面は、やらなければならないことがあるまで何もしないことです。そのため、怠け癖はパフォーマンスにも影響し、高価な仕事であればあるほど、怠け癖によって得られるものは大きくなります。</p>
+<p>Python は特に <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator" title="(in Python v3.13)"><span class="xref std std-term">generator</span></a> と <a class="reference external" href="https://docs.python.org/3/glossary.html#term-generator-expression" title="(in Python v3.13)"><span class="xref std std-term">generator expression</span></a> を使って、遅延評価のための多くのツールを提供します。あなたのコードで遅延パターンを利用する機会を見つけるために、Pythonの遅延（Laziness）について読む価値があります。</p>
+<section id="s-laziness-in-django">
+<span id="laziness-in-django"></span><h3>Django における遅延<a class="headerlink" href="#laziness-in-django" title="Link to this heading">¶</a></h3>
+<p>Django は遅延をうまく使います。このよい例として、<code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> の評価が挙げられます。<a class="reference internal" href="db/queries.html#querysets-are-lazy"><span class="std std-ref">QuerySet は遅延評価されます</span></a>。そのため、<code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> は作成後、記述したアイテムを取得するためにデータベースへのアクセスを一切行うことなく、さまざまな場所に渡したり、他の <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> と組み合わせることができます。渡されるのは <code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> オブジェクトであって、最終的にはデータベースから取得されるアイテムのコレクションではないのです。</p>
+<p>他方で、<a class="reference internal" href="../ref/models/querysets.html#when-querysets-are-evaluated"><span class="std std-ref">特定の操作は QuerySet の評価を強制します</span></a>。<code class="docutils literal notranslate"><span class="pre">QuerySet</span></code> の時期尚早な評価を回避することで、高コストで不必要なデータベースへのアクセスを節約できます。</p>
+<p>Django には <a class="reference internal" href="../ref/utils.html#django.utils.functional.keep_lazy" title="django.utils.functional.keep_lazy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">keep_lazy()</span></code></a> デコレータもあります。これにより、遅延引数で呼び出された関数は、必要なときだけ評価されるようになります。このため、遅延引数 (高コストな引数である可能性もあります) は、必要なときだけ評価されるようになります。</p>
+</section>
+</section>
+<section id="s-databases">
+<span id="databases"></span><h2>データベース<a class="headerlink" href="#databases" title="Link to this heading">¶</a></h2>
+<section id="s-database-optimization">
+<span id="database-optimization"></span><h3>データベースの最適化<a class="headerlink" href="#database-optimization" title="Link to this heading">¶</a></h3>
+<p>Djangoのデータベース層は、開発者がデータベースを最大限活用できるように、さまざまな方法を提供しています。 <a class="reference internal" href="db/optimization.html"><span class="doc">データベースアクセスの最適化ドキュメント</span></a> では、データベースの利用を最適化する際にとるべき手順を、大まかにいくつかの見出しとしてまとめています。それぞれの見出しの下に、関連するドキュメントへのリンクを集約した上で、さまざまなヒントを追加しています。</p>
+</section>
+<section id="s-other-database-related-tips">
+<span id="other-database-related-tips"></span><h3>その他のデータベース関連の tips<a class="headerlink" href="#other-database-related-tips" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../ref/databases.html#persistent-database-connections"><span class="std std-ref">持続的 (persistent) な接続</span></a> を有効化すると、リクエストの処理時間のかなりの部分を占めるデータベースへのコネクションが高速化できます。</p>
+<p>これは、たとえばネットワーク性能が限定された仮想化ホストにおいて、とても効果的です。</p>
+</section>
+</section>
+<section id="s-http-performance">
+<span id="http-performance"></span><h2>HTTP のパフォーマンス<a class="headerlink" href="#http-performance" title="Link to this heading">¶</a></h2>
+<section id="s-middleware">
+<span id="middleware"></span><h3>ミドルウェア (Middleware)<a class="headerlink" href="#middleware" title="Link to this heading">¶</a></h3>
+<p>Django は、サイトのパフォーマンス改善に役立ついくつかの <a class="reference internal" href="../ref/middleware.html"><span class="doc">ミドルウェア</span></a> を用意しています。以下のようなものがあります。</p>
+<section id="s-conditionalgetmiddleware">
+<span id="conditionalgetmiddleware"></span><h4><a class="reference internal" href="../ref/middleware.html#django.middleware.http.ConditionalGetMiddleware" title="django.middleware.http.ConditionalGetMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConditionalGetMiddleware</span></code></a><a class="headerlink" href="#conditionalgetmiddleware" title="Link to this heading">¶</a></h4>
+<p>モダンなブラウザが <code class="docutils literal notranslate"><span class="pre">ETag</span></code> と <code class="docutils literal notranslate"><span class="pre">Last-Modified</span></code> ヘッダを元に条件的にレスポンスを GET するためのサポートを追加します。</p>
+</section>
+<section id="s-gzipmiddleware">
+<span id="gzipmiddleware"></span><h4><a class="reference internal" href="../ref/middleware.html#django.middleware.gzip.GZipMiddleware" title="django.middleware.gzip.GZipMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">GZipMiddleware</span></code></a><a class="headerlink" href="#gzipmiddleware" title="Link to this heading">¶</a></h4>
+<p>すべてのモダンブラウザのレスポンスを圧縮し、帯域幅と転送時間を節約します。ただし、GZipMiddleware は現在セキュリティリスクと見なされており、TLS/SSL によって提供される保護を無効にする攻撃に対して脆弱です。詳細については、 <a class="reference internal" href="../ref/middleware.html#django.middleware.gzip.GZipMiddleware" title="django.middleware.gzip.GZipMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">GZipMiddleware</span></code></a> の警告を参照してください。</p>
+</section>
+</section>
+<section id="s-sessions">
+<span id="sessions"></span><h3>セッション<a class="headerlink" href="#sessions" title="Link to this heading">¶</a></h3>
+<section id="s-using-cached-sessions">
+<span id="using-cached-sessions"></span><h4>キャッシュを使ったセッション<a class="headerlink" href="#using-cached-sessions" title="Link to this heading">¶</a></h4>
+<p><a class="reference internal" href="http/sessions.html#cached-sessions-backend"><span class="std std-ref">キャッシュされたセッションの使用</span></a> は、データベースのような遅いストレージソースからセッションデータを読み込む必要をなくし、頻繁に使用されるセッションデータをメモリ内に保存することで、パフォーマンスを向上させるかもしれません。</p>
+</section>
+</section>
+<section id="s-static-files">
+<span id="static-files"></span><h3>静的ファイル<a class="headerlink" href="#static-files" title="Link to this heading">¶</a></h3>
+<p>静的ファイル (定義により、動的に生成されないファイル) は、最適化を施すのに格好のターゲットです。</p>
+<section id="s-manifeststaticfilesstorage">
+<span id="manifeststaticfilesstorage"></span><h4><a class="reference internal" href="../ref/contrib/staticfiles.html#django.contrib.staticfiles.storage.ManifestStaticFilesStorage" title="django.contrib.staticfiles.storage.ManifestStaticFilesStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestStaticFilesStorage</span></code></a><a class="headerlink" href="#manifeststaticfilesstorage" title="Link to this heading">¶</a></h4>
+<p>ウェブブラウザのキャッシュ機能を利用することで、あるファイルを最初にダウンロードした後のネットワークヒットを完全に無くすことができます。</p>
+<p><a class="reference internal" href="../ref/contrib/staticfiles.html#django.contrib.staticfiles.storage.ManifestStaticFilesStorage" title="django.contrib.staticfiles.storage.ManifestStaticFilesStorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestStaticFilesStorage</span></code></a> は、ブラウザが将来の変更を見逃すことなく長期間にわたって安全にキャッシュできるように、 <a class="reference internal" href="../ref/contrib/staticfiles.html"><span class="doc">静的ファイル</span></a> のファイル名に内容依存のタグを追加します。ファイルが変更されるとタグも変更されるため、ブラウザは自動的にアセットをリロードします。</p>
+</section>
+<section id="s-minification">
+<span id="minification"></span><h4>&quot;Minification&quot;<a class="headerlink" href="#minification" title="Link to this heading">¶</a></h4>
+<p>いくつかのサードパーティ製の Django ツールやパッケージは、HTML、CSS、そして JavaScript を最小化する (&quot;minify&quot;) 機能を提供します。これらは不要なホワイトスペースや改行、コメントを取り除き、変数名を短縮することで、サイトが公開するドキュメントのサイズを削減してくれます。</p>
+</section>
+</section>
+</section>
+<section id="s-template-performance">
+<span id="template-performance"></span><h2>テンプレートのパフォーマンス<a class="headerlink" href="#template-performance" title="Link to this heading">¶</a></h2>
+<p>注意:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">block</span> <span class="pre">%}</span></code> の使用は <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">include</span> <span class="pre">%}</span></code> より高速です。</p></li>
+<li><p>多数の分割されたテンプレートパーツからページを生成すると、パフォーマンスに影響することがあります。</p></li>
+</ul>
+<section id="s-the-cached-template-loader">
+<span id="the-cached-template-loader"></span><h3>キャッシュテンプレートローダー<a class="headerlink" href="#the-cached-template-loader" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../ref/templates/api.html#django.template.loaders.cached.Loader" title="django.template.loaders.cached.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">cached</span> <span class="pre">template</span> <span class="pre">loader</span></code></a> を有効にすると、パフォーマンスが劇的に改善する場合が多いです。このローダーを使用することで、テンプレートのレンダリングが必要になった場合に、各テンプレートを毎回コンパイルせずに済むようになるためです。</p>
+</section>
+</section>
+<section id="s-using-different-versions-of-available-software">
+<span id="using-different-versions-of-available-software"></span><h2>利用可能なソフトウェアの異なるバージョンを使う<a class="headerlink" href="#using-different-versions-of-available-software" title="Link to this heading">¶</a></h2>
+<p>現在使用しているソフトウェアの、より性能の高い別バージョンが利用可能かどうかを確認する価値がある場合もあります。</p>
+<p>これらのテクニックは、すでに最適化された Django サイトのパフォーマンスの限界に挑戦したい上級ユーザーを対象としています。</p>
+<p>しかし、これらはパフォーマンス問題に対する魔法のような解決策ではありませんし、より基本的なことをすでに正しい方法で行っていないサイトに、わずかな利益以上のものをもたらす可能性は低いでしょう。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>繰り返しになりますが <strong>すでに使用しているソフトウェアの代替を探すことは、パフォーマンス問題に対する最初の答えでは決してありません</strong> 。このレベルの最適化に達すると、正式なベンチマーク・ソリューションが必要になります。</p>
+</div>
+<section id="s-newer-is-often-but-not-always-better">
+<span id="newer-is-often-but-not-always-better"></span><h3>新しいものは (常にとはいえないけれども) より良いものである<a class="headerlink" href="#newer-is-often-but-not-always-better" title="Link to this heading">¶</a></h3>
+<p>よくメンテナンスされたソフトウェアの新しいリリースの動作が遅くなることはかなり稀ですが、メンテナーはすべてのユースケースを予測することはできません。そのため、新しいバージョンは性能が向上する可能性が高いことを認識しつつも、常にそうであると仮定するべきではありません。</p>
+<p>これは Django 自体にも当てはまります。リリースを重ねるごとに、システム全体にわたって多くの改良が施されていますが、アプリケーションの実際のパフォーマンスを確認するべきです。なぜなら、場合によっては変更によってパフォーマンスが向上するどころか悪化する可能性もあるからです。</p>
+<p>Pythonの新しいバージョンや、Pythonパッケージの新しいバージョンも、しばしばパフォーマンスが向上しますが、推測するのではなく、実際に測定してください。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>特定のバージョンで異常なパフォーマンスの問題に遭遇しない限り、通常新しいリリースはより優れた機能、信頼性、セキュリティ性能を持ち、これらの利点は、あなたが得るか失うかもしれないパフォーマンスよりもはるかに重要です。</p>
+</div>
+</section>
+<section id="s-alternatives-to-django-s-template-language">
+<span id="alternatives-to-django-s-template-language"></span><h3>Django テンプレート言語の代替<a class="headerlink" href="#alternatives-to-django-s-template-language" title="Link to this heading">¶</a></h3>
+<p>ほとんど全ての場合において、Django の組み込みテンプレート言語は十分です。しかし、もしあなたの Django プロジェクトのボトルネックがテンプレートシステムにあると見られ、それを改善するための他の機会を使い果たしたのなら、サードパーティ製の代替手段が解決策になるかもしれません。</p>
+<p><a class="reference external" href="https://jinja.palletsprojects.com/">Jinja2</a> を使うと、パフォーマンス、特に速度の向上が得られる可能性があります。</p>
+<p>代替テンプレートシステムは、Django のテンプレート言語をどの程度共有するかによって異なります。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>テンプレートでパフォーマンスの問題が発生した場合、最初に行うべきことは、その理由を正確に理解することです。代替のテンプレートシステムを使用することで速度が向上するかもしれませんが、その手間をかけずに同じ利益を得ることも可能です。たとえば、テンプレート内の高コストな処理やロジックは、ビュー内でより効率的に行うことができます。</p>
+</div>
+</section>
+<section id="s-alternative-software-implementations">
+<span id="alternative-software-implementations"></span><h3>代替のソフトウェア実装<a class="headerlink" href="#alternative-software-implementations" title="Link to this heading">¶</a></h3>
+<p>あなたが使っているPythonソフトウェアが、同じコードをより速く実行できる別の実装で提供されていないか確認する価値があるかもしれません。</p>
+<p>しかし、適切に書かれた Django サイトのほとんどのパフォーマンス問題は、Python の実行レベルではなく、非効率なデータベースクエリ、キャッシュ、およびテンプレートにあります。もし、不適切に書かれた Python コードに依存している場合、それがより速く実行されるようになっても、パフォーマンス問題が解決されることはありません。</p>
+<p>別の実装を使用すると、互換性、デプロイメント、移植性、メンテナンスの問題が発生する可能性があります。非標準の実装を採用する前に、それが潜在的なリスクを上回る十分なパフォーマンスをアプリケーションにもたらすことを確認する必要があることは言うまでもありません。</p>
+<p>これらの注意事項を念頭に置いた上で、次の項を読んでください:</p>
+<section id="s-id1">
+<span id="id1"></span><h4><a class="reference external" href="https://www.pypy.org/">PyPy</a><a class="headerlink" href="#id1" title="Link to this heading">¶</a></h4>
+<p><a class="reference external" href="https://www.pypy.org/">PyPy</a> は Python 自身で書かれた Python 実装です ('標準の' Python 実装は C で書かれています)。heavyweight なアプリケーションの場合、PyPy を使用するとパフォーマンスが大幅に向上する可能性があります。</p>
+<p>PyPy プロジェクトの主目的の1つは、既存の Python API とライブラリとの <a class="reference external" href="https://www.pypy.org/compat.html">互換性</a> です。Django は互換性がありますが、他の依存ライブラリの互換性については確認が必要です。</p>
+</section>
+<section id="s-c-implementations-of-python-libraries">
+<span id="c-implementations-of-python-libraries"></span><h4>Python ライブラリの C 実装<a class="headerlink" href="#c-implementations-of-python-libraries" title="Link to this heading">¶</a></h4>
+<p>一部の Python ライブラリは C 言語で実装されており、はるかに高速です。これらは同じ API を提供することを目指しています。互換性の問題や振る舞いの違いが存在することが知られています（そして、それらは常にすぐには明らかにならないこともあります）。</p>
+</section>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">パフォーマンスと最適化</a><ul>
+<li><a class="reference internal" href="#introduction">はじめに</a></li>
+<li><a class="reference internal" href="#general-approaches">一般的なアプローチ</a><ul>
+<li><a class="reference internal" href="#what-are-you-optimizing-for"><em>何のために</em> 最適化をしようとしているのか？</a></li>
+<li><a class="reference internal" href="#performance-benchmarking">パフォーマンスのベンチマーク</a><ul>
+<li><a class="reference internal" href="#django-tools">Django のツール</a></li>
+<li><a class="reference internal" href="#third-party-services">サードパーティのサービス</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#get-things-right-from-the-start">最初から物事を正しく行う</a><ul>
+<li><a class="reference internal" href="#work-at-the-appropriate-level">適切なレベルで作業する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#caching">キャッシュ</a><ul>
+<li><a class="reference internal" href="#the-caching-framework"><span class="xref std std-doc">キャッシュフレームワーク</span></a></li>
+<li><a class="reference internal" href="#cached-property"><code class="xref py py-class docutils literal notranslate"><span class="pre">cached_property</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#understanding-laziness">遅延について理解する</a><ul>
+<li><a class="reference internal" href="#laziness-in-django">Django における遅延</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#databases">データベース</a><ul>
+<li><a class="reference internal" href="#database-optimization">データベースの最適化</a></li>
+<li><a class="reference internal" href="#other-database-related-tips">その他のデータベース関連の tips</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#http-performance">HTTP のパフォーマンス</a><ul>
+<li><a class="reference internal" href="#middleware">ミドルウェア (Middleware)</a><ul>
+<li><a class="reference internal" href="#conditionalgetmiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConditionalGetMiddleware</span></code></a></li>
+<li><a class="reference internal" href="#gzipmiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">GZipMiddleware</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#sessions">セッション</a><ul>
+<li><a class="reference internal" href="#using-cached-sessions">キャッシュを使ったセッション</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#static-files">静的ファイル</a><ul>
+<li><a class="reference internal" href="#manifeststaticfilesstorage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ManifestStaticFilesStorage</span></code></a></li>
+<li><a class="reference internal" href="#minification">&quot;Minification&quot;</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#template-performance">テンプレートのパフォーマンス</a><ul>
+<li><a class="reference internal" href="#the-cached-template-loader">キャッシュテンプレートローダー</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#using-different-versions-of-available-software">利用可能なソフトウェアの異なるバージョンを使う</a><ul>
+<li><a class="reference internal" href="#newer-is-often-but-not-always-better">新しいものは (常にとはいえないけれども) より良いものである</a></li>
+<li><a class="reference internal" href="#alternatives-to-django-s-template-language">Django テンプレート言語の代替</a></li>
+<li><a class="reference internal" href="#alternative-software-implementations">代替のソフトウェア実装</a><ul>
+<li><a class="reference internal" href="#id1">PyPy</a></li>
+<li><a class="reference internal" href="#c-implementations-of-python-libraries">Python ライブラリの C 実装</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="security.html"
+                          title="前の章へ">Django におけるセキュリティ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="serialization.html"
+                          title="次の章へ">Django オブジェクトのシリアライズ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/topics/performance.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="security.html" title="Django におけるセキュリティ">previous</a>
+     |
+    <a href="index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="serialization.html" title="Django オブジェクトのシリアライズ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>地理情報データベース関数 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/default.css?v=bf4d74af" />
+    <script src="../../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../../genindex.html" />
+    <link rel="search" title="検索" href="../../../search.html" />
+    <link rel="next" title="測定オブジェクト" href="measure.html" />
+    <link rel="prev" title="GIS QuerySet API リファレンス" href="geoquerysets.html" />
+
+
+
+ 
+<script src="../../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="geoquerysets.html" title="GIS QuerySet API リファレンス">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="measure.html" title="測定オブジェクト">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-gis-functions">
+            
+  <section id="s-module-django.contrib.gis.db.models.functions">
+<span id="s-geographic-database-functions"></span><span id="module-django.contrib.gis.db.models.functions"></span><span id="geographic-database-functions"></span><h1>地理情報データベース関数<a class="headerlink" href="#module-django.contrib.gis.db.models.functions" title="Link to this heading">¶</a></h1>
+<p>このページで説明する関数を使えば、Django のアノテーションや集約、フィルタで使う地理情報データベース関数にアクセスできます。</p>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.db.models.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Length</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Track</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">length</span><span class="o">=</span><span class="n">Length</span><span class="p">(</span><span class="s2">&quot;line&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">length__gt</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>すべてのバックエンドがすべての関数をサポートしているわけではないので、それぞれの関数のドキュメントを参照して、使用したい関数をサポートしているかどうかを確認してください。サポートしていないバックエンドで地理情報関数を呼び出すと、 <code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> 例外が発生します。</p>
+<p>関数の概要:</p>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>測定</p></th>
+<th class="head"><p>リレーション</p></th>
+<th class="head"><p>操作</p></th>
+<th class="head"><p>編集</p></th>
+<th class="head"><p>入力フォーマット</p></th>
+<th class="head"><p>出力フォーマット</p></th>
+<th class="head"><p>その他</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Area" title="django.contrib.gis.db.models.functions.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">Area</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Azimuth" title="django.contrib.gis.db.models.functions.Azimuth"><code class="xref py py-class docutils literal notranslate"><span class="pre">Azimuth</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Difference" title="django.contrib.gis.db.models.functions.Difference"><code class="xref py py-class docutils literal notranslate"><span class="pre">Difference</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.ForcePolygonCW" title="django.contrib.gis.db.models.functions.ForcePolygonCW"><code class="xref py py-class docutils literal notranslate"><span class="pre">ForcePolygonCW</span></code></a></p></td>
+<td></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.AsGeoJSON" title="django.contrib.gis.db.models.functions.AsGeoJSON"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsGeoJSON</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.IsEmpty" title="django.contrib.gis.db.models.functions.IsEmpty"><code class="xref py py-class docutils literal notranslate"><span class="pre">IsEmpty</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Distance" title="django.contrib.gis.db.models.functions.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.BoundingCircle" title="django.contrib.gis.db.models.functions.BoundingCircle"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundingCircle</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Intersection" title="django.contrib.gis.db.models.functions.Intersection"><code class="xref py py-class docutils literal notranslate"><span class="pre">Intersection</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.MakeValid" title="django.contrib.gis.db.models.functions.MakeValid"><code class="xref py py-class docutils literal notranslate"><span class="pre">MakeValid</span></code></a></p></td>
+<td></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.AsGML" title="django.contrib.gis.db.models.functions.AsGML"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsGML</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.IsValid" title="django.contrib.gis.db.models.functions.IsValid"><code class="xref py py-class docutils literal notranslate"><span class="pre">IsValid</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.GeometryDistance" title="django.contrib.gis.db.models.functions.GeometryDistance"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeometryDistance</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Centroid" title="django.contrib.gis.db.models.functions.Centroid"><code class="xref py py-class docutils literal notranslate"><span class="pre">Centroid</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.SymDifference" title="django.contrib.gis.db.models.functions.SymDifference"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymDifference</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Reverse" title="django.contrib.gis.db.models.functions.Reverse"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reverse</span></code></a></p></td>
+<td></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.AsKML" title="django.contrib.gis.db.models.functions.AsKML"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsKML</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.MemSize" title="django.contrib.gis.db.models.functions.MemSize"><code class="xref py py-class docutils literal notranslate"><span class="pre">MemSize</span></code></a></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Length" title="django.contrib.gis.db.models.functions.Length"><code class="xref py py-class docutils literal notranslate"><span class="pre">Length</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.ClosestPoint" title="django.contrib.gis.db.models.functions.ClosestPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClosestPoint</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Union" title="django.contrib.gis.db.models.functions.Union"><code class="xref py py-class docutils literal notranslate"><span class="pre">Union</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Scale" title="django.contrib.gis.db.models.functions.Scale"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scale</span></code></a></p></td>
+<td></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.AsSVG" title="django.contrib.gis.db.models.functions.AsSVG"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsSVG</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.NumGeometries" title="django.contrib.gis.db.models.functions.NumGeometries"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumGeometries</span></code></a></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Perimeter" title="django.contrib.gis.db.models.functions.Perimeter"><code class="xref py py-class docutils literal notranslate"><span class="pre">Perimeter</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.Envelope" title="django.contrib.gis.db.models.functions.Envelope"><code class="xref py py-class docutils literal notranslate"><span class="pre">Envelope</span></code></a>
+<a class="reference internal" href="#django.contrib.gis.db.models.functions.LineLocatePoint" title="django.contrib.gis.db.models.functions.LineLocatePoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">LineLocatePoint</span></code></a>
+<a class="reference internal" href="#django.contrib.gis.db.models.functions.PointOnSurface" title="django.contrib.gis.db.models.functions.PointOnSurface"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointOnSurface</span></code></a></p></td>
+<td></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.SnapToGrid" title="django.contrib.gis.db.models.functions.SnapToGrid"><code class="xref py py-class docutils literal notranslate"><span class="pre">SnapToGrid</span></code></a>
+<a class="reference internal" href="#django.contrib.gis.db.models.functions.Transform" title="django.contrib.gis.db.models.functions.Transform"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transform</span></code></a>
+<a class="reference internal" href="#django.contrib.gis.db.models.functions.Translate" title="django.contrib.gis.db.models.functions.Translate"><code class="xref py py-class docutils literal notranslate"><span class="pre">Translate</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.FromWKB" title="django.contrib.gis.db.models.functions.FromWKB"><code class="xref py py-class docutils literal notranslate"><span class="pre">FromWKB</span></code></a>
+<a class="reference internal" href="#django.contrib.gis.db.models.functions.FromWKT" title="django.contrib.gis.db.models.functions.FromWKT"><code class="xref py py-class docutils literal notranslate"><span class="pre">FromWKT</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.AsWKB" title="django.contrib.gis.db.models.functions.AsWKB"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsWKB</span></code></a>
+<a class="reference internal" href="#django.contrib.gis.db.models.functions.AsWKT" title="django.contrib.gis.db.models.functions.AsWKT"><code class="xref py py-class docutils literal notranslate"><span class="pre">AsWKT</span></code></a>
+<a class="reference internal" href="#django.contrib.gis.db.models.functions.GeoHash" title="django.contrib.gis.db.models.functions.GeoHash"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeoHash</span></code></a></p></td>
+<td><p><a class="reference internal" href="#django.contrib.gis.db.models.functions.NumPoints" title="django.contrib.gis.db.models.functions.NumPoints"><code class="xref py py-class docutils literal notranslate"><span class="pre">NumPoints</span></code></a></p></td>
+</tr>
+</tbody>
+</table>
+<section id="s-area">
+<span id="area"></span><h2><code class="docutils literal notranslate"><span class="pre">Area</span></code><a class="headerlink" href="#area" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Area">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Area</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L157"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Area" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB、<a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-area">MySQL</a>、Oracle、<a class="reference external" href="https://postgis.net/docs/ST_Area.html">PostGIS</a>、SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、そのフィールドの面積を <a class="reference internal" href="measure.html#django.contrib.gis.measure.Area" title="django.contrib.gis.measure.Area"><code class="xref py py-class docutils literal notranslate"><span class="pre">Area</span></code></a> 測定値として返します。</p>
+<p>LWGEOM/RTTOPOを使用しないMySQLとSpatiaLiteは、地理SRSの面積計算をサポートしていません。</p>
+</section>
+<section id="s-asgeojson">
+<span id="asgeojson"></span><h2><code class="docutils literal notranslate"><span class="pre">AsGeoJSON</span></code><a class="headerlink" href="#asgeojson" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.AsGeoJSON">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AsGeoJSON</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bbox</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L186"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.AsGeoJSON" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/spatial-geojson-functions.html#function_st-asgeojson">MySQL</a>, Oracle, <a class="reference external" href="https://postgis.net/docs/ST_AsGeoJSON.html">PostGIS</a>, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、地理情報の <a class="reference external" href="https://geojson.org/">GeoJSON</a> 表現を返す。結果は完全な GeoJSON 構造体ではなく、GeoJSON 構造体のキーコンテンツ <code class="docutils literal notranslate"><span class="pre">geometry</span></code> だけであることに注意してください。 <a class="reference internal" href="serializers.html"><span class="doc">GeoJSON シリアライザ</span></a> も参照。</p>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">City</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">json</span><span class="o">=</span><span class="n">AsGeoJSON</span><span class="p">(</span><span class="s2">&quot;point&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Chicago&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">json</span>
+<span class="go">{&quot;type&quot;:&quot;Point&quot;,&quot;coordinates&quot;:[-87.65018,41.85039]}</span>
+</pre></div>
+</div>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>キーワード引数</p></th>
+<th class="head"><p>説明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">bbox</span></code></p></td>
+<td><p>返される GeoJSON にバウンディングボックスを含めたい場合は、これを <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定します。Oracle では無視される。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">crs</span></code></p></td>
+<td><p>返される GeoJSON に座標参照系を含めたい場合は、これを <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定してください。MySQLとOracleでは無視されます。</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">precision</span></code></p></td>
+<td><p>GeoJSON 表現での座標の有効数字の桁数を指定します。デフォルト値は8です。Oracleでは無視されます。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="s-asgml">
+<span id="asgml"></span><h2><code class="docutils literal notranslate"><span class="pre">AsGML</span></code><a class="headerlink" href="#asgml" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.AsGML">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AsGML</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L210"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.AsGML" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: Oracle, <a class="reference external" href="https://postgis.net/docs/ST_AsGML.html">PostGIS</a>, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、そのジオメトリの <a class="reference external" href="https://en.wikipedia.org/wiki/Geography_Markup_Language">Geographic Markup Language (GML)</a> 表現を返します。</p>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span> <span class="o">=</span> <span class="n">Zipcode</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">gml</span><span class="o">=</span><span class="n">AsGML</span><span class="p">(</span><span class="s2">&quot;poly&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">qs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">gml</span><span class="p">)</span>
+<span class="go">&lt;gml:Polygon srsName=&quot;EPSG:4326&quot;&gt;&lt;gml:OuterBoundaryIs&gt;-147.78711,70.245363 ...</span>
+<span class="go">-147.78711,70.245363&lt;/gml:OuterBoundaryIs&gt;&lt;/gml:Polygon&gt;</span>
+</pre></div>
+</div>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>キーワード引数</p></th>
+<th class="head"><p>説明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">precision</span></code></p></td>
+<td><p>GML 表現における座標の有効桁数を指定します (デフォルト値は 8)。Oracle では無視されます。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">version</span></code></p></td>
+<td><p>使用するGMLバージョンを指定します: 2 (デフォルト) または 3。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="s-askml">
+<span id="askml"></span><h2><code class="docutils literal notranslate"><span class="pre">AsKML</span></code><a class="headerlink" href="#askml" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.AsKML">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AsKML</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L233"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.AsKML" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_AsKML.html">PostGIS</a>、SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、地理情報の <a class="reference external" href="https://developers.google.com/kml/documentation/">Keyhole Markup Language (KML)</a> 表現を返す。</p>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">qs</span> <span class="o">=</span> <span class="n">Zipcode</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">kml</span><span class="o">=</span><span class="n">AsKML</span><span class="p">(</span><span class="s2">&quot;poly&quot;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">qs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">kml</span><span class="p">)</span>
+<span class="go">&lt;Polygon&gt;&lt;outerBoundaryIs&gt;&lt;LinearRing&gt;&lt;coordinates&gt;-103.04135,36.217596,0 ...</span>
+<span class="go">-103.04135,36.217596,0&lt;/coordinates&gt;&lt;/LinearRing&gt;&lt;/outerBoundaryIs&gt;&lt;/Polygon&gt;</span>
+</pre></div>
+</div>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>キーワード引数</p></th>
+<th class="head"><p>説明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">precision</span></code></p></td>
+<td><p>このキーワードは、KML表現で座標の有効桁数を指定するために使用できます。デフォルト値は8です。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="s-assvg">
+<span id="assvg"></span><h2><code class="docutils literal notranslate"><span class="pre">AsSVG</span></code><a class="headerlink" href="#assvg" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.AsSVG">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AsSVG</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L243"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.AsSVG" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_AsSVG.html">PostGIS</a>, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、そのジオメトリの <a class="reference external" href="https://www.w3.org/Graphics/SVG/">Scalable Vector Graphics (SVG)</a> 表現を返します。</p>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>キーワード引数</p></th>
+<th class="head"><p>説明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">relative</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">True</span></code> に設定すると、経路データは相対移動として実装されます。デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code> で、代わりに絶対移動が使用されます。</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">precision</span></code></p></td>
+<td><p>このキーワードは、SVG 表現内の座標の有効桁数を指定するために使用できます。デフォルト値は 8 です。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="s-aswkb">
+<span id="aswkb"></span><h2><code class="docutils literal notranslate"><span class="pre">AsWKB</span></code><a class="headerlink" href="#aswkb" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.AsWKB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AsWKB</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L258"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.AsWKB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-asbinary">MySQL</a>, Oracle, <a class="reference external" href="https://postgis.net/docs/ST_AsBinary.html">PostGIS</a>, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、そのジオメトリの <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary">Well-known binary (WKB)</a> 表現を返します。</p>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">bytes</span><span class="p">(</span><span class="n">City</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">wkb</span><span class="o">=</span><span class="n">AsWKB</span><span class="p">(</span><span class="s2">&quot;point&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Chelyabinsk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">wkb</span><span class="p">)</span>
+<span class="go">b&#39;\x01\x01\x00\x00\x00]3\xf9f\x9b\x91K@\x00X\x1d9\xd2\xb9N@&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="s-aswkt">
+<span id="aswkt"></span><h2><code class="docutils literal notranslate"><span class="pre">AsWKT</span></code><a class="headerlink" href="#aswkt" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.AsWKT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AsWKT</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L263"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.AsWKT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-format-conversion-functions.html#function_st-astext">MySQL</a>, Oracle, <a class="reference external" href="https://postgis.net/docs/ST_AsText.html">PostGIS</a>, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、ジオメトリの <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">Well-known text (WKT)</a> 表現を返します。</p>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">City</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">wkt</span><span class="o">=</span><span class="n">AsWKT</span><span class="p">(</span><span class="s2">&quot;point&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Chelyabinsk&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">wkt</span>
+<span class="go">&#39;POINT (55.137555 61.451728)&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="s-azimuth">
+<span id="azimuth"></span><h2><code class="docutils literal notranslate"><span class="pre">Azimuth</span></code><a class="headerlink" href="#azimuth" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Azimuth">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Azimuth</span></span>(<em class="sig-param"><span class="n"><span class="pre">point_a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point_b</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L180"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Azimuth" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_Azimuth.html">PostGIS</a>, SpatiaLite (LWGEOM/RTTOPO)</p>
+<p>与えられた点のジオメトリで定義されるセグメントの方位をラジアンで返します。2つの点が重なっている場合は <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します。方位は北を基準とした角度で、時計回りが正です: 北 = <code class="docutils literal notranslate"><span class="pre">0</span></code>; 東 = <code class="docutils literal notranslate"><span class="pre">π/2</span></code>; 南 = <code class="docutils literal notranslate"><span class="pre">π</span></code>; 西 = <code class="docutils literal notranslate"><span class="pre">3π/2</span></code> 。</p>
+</section>
+<section id="s-boundingcircle">
+<span id="boundingcircle"></span><h2><code class="docutils literal notranslate"><span class="pre">BoundingCircle</span></code><a class="headerlink" href="#boundingcircle" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.BoundingCircle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BoundingCircle</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_seg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">48</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L268"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.BoundingCircle" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>互換性</em>: <a class="reference external" href="https://postgis.net/docs/ST_MinimumBoundingCircle.html">PostGIS</a>, <a class="reference external" href="https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/SDO_GEOM-reference.html#GUID-82A61626-BB64-4793-B53D-A0DBEC91831A">Oracle</a>, SpatiaLite 5.1以降</p>
+<p>単一の地理情報フィールドまたは式を受け取り、そのジオメトリを完全に含むことができる最小の円ポリゴンを返します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">num_seg</span></code> パラメータは PostGIS 上でのみ使用されます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.1:</span> <p>SpatiaLite 5.1以降のサポートが追加されました。</p>
+</div>
+</section>
+<section id="s-centroid">
+<span id="centroid"></span><h2><code class="docutils literal notranslate"><span class="pre">Centroid</span></code><a class="headerlink" href="#centroid" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Centroid">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Centroid</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L287"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Centroid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-polygon-property-functions.html#function_st-centroid">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_Centroid.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、ジオメトリの <code class="docutils literal notranslate"><span class="pre">centroid</span></code> 値を返す。</p>
+</section>
+<section id="s-closestpoint">
+<span id="closestpoint"></span><h2><code class="docutils literal notranslate"><span class="pre">ClosestPoint</span></code><a class="headerlink" href="#closestpoint" title="Link to this heading">¶</a></h2>
+<div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.ClosestPoint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ClosestPoint</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L291"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.ClosestPoint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_ClosestPoint.html">PostGIS</a>, SpatiaLite</p>
+<p>2つの地理情報フィールドまたは式を受け取り、地理情報 A 上で地理情報 B に最も近い 2次元ポイントを返します。</p>
+</section>
+<section id="s-difference">
+<span id="difference"></span><h2><code class="docutils literal notranslate"><span class="pre">Difference</span></code><a class="headerlink" href="#difference" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Difference">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Difference</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L296"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Difference" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-difference">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_Difference.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>2つの地理情報フィールドまたは式を受け取り、幾何学的な差、つまり地理情報Aのうち地理情報Bと重ならない部分を返す。</p>
+</section>
+<section id="s-distance">
+<span id="distance"></span><h2><code class="docutils literal notranslate"><span class="pre">Distance</span></code><a class="headerlink" href="#distance" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Distance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Distance</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spheroid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L310"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Distance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/spatial-relation-functions-object-shapes.html#function_st-distance">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_Distance.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>2つの地理情報フィールドまたは式を受け取り、それらの間の距離を <a class="reference internal" href="measure.html#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> オブジェクトとして返します。MySQL では、座標が測地系の場合、生の float 値が返されます。</p>
+<p>測地座標での距離計算をサポートするバックエンドでは、ジオメトリの SRID 値に応じて適切なバックエンド関数が自動的に選択されます (例: PostGIS の <a class="reference external" href="https://postgis.net/docs/ST_DistanceSphere.html">ST_DistanceSphere</a>)。</p>
+<p>デフォルトのWGS84 (4326) SRIDのように測地 (角度) 座標で距離を計算する場合、 <code class="docutils literal notranslate"><span class="pre">spheroid</span></code> キーワード引数を設定することで、単純な球体 (精度が低く、リソースをあまり必要としない) か球体 (精度が高く、リソースを多く必要とする) のどちらに基づいて計算するかを決めることができます。</p>
+<p>以下の例では、Hobart 市から <code class="docutils literal notranslate"><span class="pre">AustraliaCity</span></code> クエリセット内の他の <a class="reference internal" href="model-api.html#django.contrib.gis.db.models.PointField" title="django.contrib.gis.db.models.PointField"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointField</span></code></a> までの距離を計算しています:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.gis.db.models.functions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Distance</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pnt</span> <span class="o">=</span> <span class="n">AustraliaCity</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Hobart&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">point</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">AustraliaCity</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">distance</span><span class="o">=</span><span class="n">Distance</span><span class="p">(</span><span class="s2">&quot;point&quot;</span><span class="p">,</span> <span class="n">pnt</span><span class="p">)):</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="n">city</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">city</span><span class="o">.</span><span class="n">distance</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">Wollongong 990071.220408 m</span>
+<span class="go">Shellharbour 972804.613941 m</span>
+<span class="go">Thirroul 1002334.36351 m</span>
+<span class="go">...</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">distance</span></code> 属性は <a class="reference internal" href="measure.html#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> オブジェクトなので、簡単に任意の単位で値を表現できます。例えば、 <code class="docutils literal notranslate"><span class="pre">city.distance.mi</span></code> はマイル単位の距離値であり、 <code class="docutils literal notranslate"><span class="pre">city.distance.km</span></code> はキロメートル単位の距離値です。使用方法の詳細や <a class="reference internal" href="measure.html#supported-units"><span class="std std-ref">サポートされる単位</span></a> のリストについては、 <a class="reference internal" href="measure.html"><span class="doc">測定オブジェクト</span></a> を参照してください。</p>
+</div>
+</section>
+<section id="s-envelope">
+<span id="envelope"></span><h2><code class="docutils literal notranslate"><span class="pre">Envelope</span></code><a class="headerlink" href="#envelope" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Envelope">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Envelope</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L361"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Envelope" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-general-property-functions.html#function_st-envelope">MySQL</a>, <a class="reference external" href="https://docs.oracle.com/en/database/oracle/oracle-database/21/spatl/spatial-operators-reference.html#GUID-ACED800F-3435-44AA-9606-D40934A23ED0">Oracle</a>, <a class="reference external" href="https://postgis.net/docs/ST_Envelope.html">PostGIS</a>, SpatiaLite</p>
+<p>1つの地理情報フィールドまたは式を受け取り、ジオメトリのバウンディングボックスを表すジオメトリを返します。</p>
+</section>
+<section id="s-forcepolygoncw">
+<span id="forcepolygoncw"></span><h2><code class="docutils literal notranslate"><span class="pre">ForcePolygonCW</span></code><a class="headerlink" href="#forcepolygoncw" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.ForcePolygonCW">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ForcePolygonCW</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L365"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.ForcePolygonCW" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_ForcePolygonCW.html">PostGIS</a>, SpatiaLite</p>
+<p>1つの地理情報フィールドまたは式を受け取り、すべての外側のリングが時計回り、すべての内側のリングが反時計回りであるポリゴン/マルチポリゴンの修正版を返します。多角形以外のジオメトリは変更されずに返されます。</p>
+</section>
+<section id="s-fromwkb">
+<span id="fromwkb"></span><h2><code class="docutils literal notranslate"><span class="pre">FromWKB</span></code><a class="headerlink" href="#fromwkb" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.FromWKB">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FromWKB</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L369"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.FromWKB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-wkb-functions.html#function_st-geomfromwkb">MySQL</a>, Oracle, <a class="reference external" href="https://postgis.net/docs/ST_GeomFromWKB.html">PostGIS</a>, SpatiaLite</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry#Well-known_binary">Well-known binary (WKB)</a> 表現からジオメトリを作成します。オプションの <code class="docutils literal notranslate"><span class="pre">srid</span></code> 引数を使用すると、結果として得られるジオメトリのSRIDを指定できます。<code class="docutils literal notranslate"><span class="pre">srid</span></code> はOracleでは無視されます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.1:</span> <p><code class="docutils literal notranslate"><span class="pre">srid</span></code> 引数が追加されました。</p>
+</div>
+</section>
+<section id="s-fromwkt">
+<span id="fromwkt"></span><h2><code class="docutils literal notranslate"><span class="pre">FromWKT</span></code><a class="headerlink" href="#fromwkt" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.FromWKT">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FromWKT</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L390"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.FromWKT" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-wkt-functions.html#function_st-geomfromtext">MySQL</a>, Oracle, <a class="reference external" href="https://postgis.net/docs/ST_GeomFromText.html">PostGIS</a>, SpatiaLite</p>
+<p><a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">Well-known text (WKT)</a> 表現からジオメトリを作成します。オプションの <code class="docutils literal notranslate"><span class="pre">srid</span></code> 引数を使用すると、結果として得られるジオメトリのSRIDを指定できます。<code class="docutils literal notranslate"><span class="pre">srid</span></code> はOracleでは無視されます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.1:</span> <p><code class="docutils literal notranslate"><span class="pre">srid</span></code> 引数が追加されました。</p>
+</div>
+</section>
+<section id="s-geohash">
+<span id="geohash"></span><h2><code class="docutils literal notranslate"><span class="pre">GeoHash</span></code><a class="headerlink" href="#geohash" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.GeoHash">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GeoHash</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L394"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.GeoHash" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://dev.mysql.com/doc/refman/en/spatial-geohash-functions.html#function_st-geohash">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_GeoHash.html">PostGIS</a>, SpatiaLite (LWGEOM/RTTOPO)</p>
+<p>単一の地理情報フィールドまたは式を受け取り、ジオメトリの <a class="reference external" href="https://en.wikipedia.org/wiki/Geohash">GeoHash</a> 表現を返します。</p>
+<p>キーワード引数 <code class="docutils literal notranslate"><span class="pre">precision</span></code> は結果の文字数をコントロールします。</p>
+</section>
+<section id="s-geometrydistance">
+<span id="geometrydistance"></span><h2><code class="docutils literal notranslate"><span class="pre">GeometryDistance</span></code><a class="headerlink" href="#geometrydistance" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.GeometryDistance">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GeometryDistance</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L411"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.GeometryDistance" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/geometry_distance_knn.html">PostGIS</a></p>
+<p>2つの地理情報フィールドまたは式を受け取り、それらの間の距離を返します。 <a class="reference internal" href="../../models/querysets.html#django.db.models.query.QuerySet.order_by" title="django.db.models.query.QuerySet.order_by"><code class="xref py py-meth docutils literal notranslate"><span class="pre">order_by()</span></code></a> 節で使用すると、インデックスアシストされた最近傍の結果セットを提供します。</p>
+</section>
+<section id="s-intersection">
+<span id="intersection"></span><h2><code class="docutils literal notranslate"><span class="pre">Intersection</span></code><a class="headerlink" href="#intersection" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Intersection">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Intersection</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L419"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Intersection" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-intersection">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_Intersection.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>2 つの地理情報フィールドや式を受け取り、それらの間の幾何学的な交点を返します。</p>
+</section>
+<section id="s-isempty">
+<span id="isempty"></span><h2><code class="docutils literal notranslate"><span class="pre">IsEmpty</span></code><a class="headerlink" href="#isempty" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.IsEmpty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IsEmpty</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L425"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.IsEmpty" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_IsEmpty.html">PostGIS</a></p>
+<p>地理情報フィールドまたは式を受け取り、その値が空のジオメトリであるかどうかをテストします。値が空の場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> を返し、そうでない場合は <code class="docutils literal notranslate"><span class="pre">False</span></code> を返します。</p>
+</section>
+<section id="s-isvalid">
+<span id="isvalid"></span><h2><code class="docutils literal notranslate"><span class="pre">IsValid</span></code><a class="headerlink" href="#isvalid" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.IsValid">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">IsValid</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L431"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.IsValid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://dev.mysql.com/doc/refman/en/spatial-convenience-functions.html#function_st-isvalid">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_IsValid.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>地理情報フィールドまたは式を受け取り、その値が整形されているかどうかをテストします。値が有効なジオメトリであれば <code class="docutils literal notranslate"><span class="pre">True</span></code> を返し、そうでなければ <code class="docutils literal notranslate"><span class="pre">False</span></code> を返します。</p>
+</section>
+<section id="s-length">
+<span id="length"></span><h2><code class="docutils literal notranslate"><span class="pre">Length</span></code><a class="headerlink" href="#length" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Length">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Length</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spheroid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L440"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Length" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-length">MySQL</a>, Oracle, <a class="reference external" href="https://postgis.net/docs/ST_Length.html">PostGIS</a>, SpatiaLite</p>
+<p>単一の地理的な linestring または multilinestring フィールドまたは式を受け取り、その長さを <a class="reference internal" href="measure.html#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> メジャーとして返します。</p>
+<p>PostGISとSpatiaLiteでは、座標が測地系 (角度) である場合、単純な球 (精度が低く、リソースの消費量が少ない) か、球体 (精度が高く、リソースの消費量が多い) かを <code class="docutils literal notranslate"><span class="pre">spheroid</span></code> キーワード引数で指定できます。</p>
+<p>MySQLは地理空間SRSにおける長さの計算をサポートしていません。</p>
+</section>
+<section id="s-linelocatepoint">
+<span id="linelocatepoint"></span><h2><code class="docutils literal notranslate"><span class="pre">LineLocatePoint</span></code><a class="headerlink" href="#linelocatepoint" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.LineLocatePoint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LineLocatePoint</span></span>(<em class="sig-param"><span class="n"><span class="pre">linestring</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">point</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L479"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.LineLocatePoint" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_LineLocatePoint.html">PostGIS</a>, SpatiaLite</p>
+<p>与えられた <code class="docutils literal notranslate"><span class="pre">point</span></code> に最も近い <code class="docutils literal notranslate"><span class="pre">linestring</span></code> 上の点の位置を 0 から 1 までの float で表し、2D 線の長さに対する割合で返す。</p>
+</section>
+<section id="s-makevalid">
+<span id="makevalid"></span><h2><code class="docutils literal notranslate"><span class="pre">MakeValid</span></code><a class="headerlink" href="#makevalid" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.MakeValid">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MakeValid</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L485"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.MakeValid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_MakeValid.html">PostGIS</a>, SpatiaLite (LWGEOM/RTTOPO)</p>
+<p>地理情報フィールドまたは式を受け取り、入力頂点を失うことなくその値を有効なジオメトリに変換しようとします。すでに有効なジオメトリは変更されずに返されます。単純なポリゴンはマルチポリゴンになる可能性があり、結果は入力よりも低次元になる可能性があります。</p>
+</section>
+<section id="s-memsize">
+<span id="memsize"></span><h2><code class="docutils literal notranslate"><span class="pre">MemSize</span></code><a class="headerlink" href="#memsize" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.MemSize">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MemSize</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L489"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.MemSize" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_MemSize.html">PostGIS</a></p>
+<p>1つの地理情報フィールドまたは式を受け取り、その地理情報フィールドが必要とするメモリサイズ (バイト数) を返します。</p>
+</section>
+<section id="s-numgeometries">
+<span id="numgeometries"></span><h2><code class="docutils literal notranslate"><span class="pre">NumGeometries</span></code><a class="headerlink" href="#numgeometries" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.NumGeometries">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NumGeometries</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L494"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.NumGeometries" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-geometrycollection-property-functions.html#function_st-numgeometries">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_NumGeometries.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、地理情報フィールドがコレクション (たとえば <code class="docutils literal notranslate"><span class="pre">GEOMETRYCOLLECTION</span></code> または <code class="docutils literal notranslate"><span class="pre">MULTI*</span></code> フィールド) の場合は、ジオメトリ数を返します。単一のジオメトリの場合は 1 を返します。</p>
+<p>MySQL では、単一のジオメトリに対して <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します。</p>
+</section>
+<section id="s-numpoints">
+<span id="numpoints"></span><h2><code class="docutils literal notranslate"><span class="pre">NumPoints</span></code><a class="headerlink" href="#numpoints" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.NumPoints">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NumPoints</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L499"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.NumPoints" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/gis-linestring-property-functions.html#function_st-numpoints">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_NPoints.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、ジオメトリ内のポイント数を返します。</p>
+<p>MySQL では、<code class="docutils literal notranslate"><span class="pre">LINESTRING</span></code> でないジオメトリに対しては <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します。</p>
+</section>
+<section id="s-perimeter">
+<span id="perimeter"></span><h2><code class="docutils literal notranslate"><span class="pre">Perimeter</span></code><a class="headerlink" href="#perimeter" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Perimeter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Perimeter</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L504"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Perimeter" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_Perimeter.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、ジオメトリフィールドの周長を <a class="reference internal" href="measure.html#django.contrib.gis.measure.Distance" title="django.contrib.gis.measure.Distance"><code class="xref py py-class docutils literal notranslate"><span class="pre">Distance</span></code></a> オブジェクトとして返します。</p>
+</section>
+<section id="s-pointonsurface">
+<span id="pointonsurface"></span><h2><code class="docutils literal notranslate"><span class="pre">PointOnSurface</span></code><a class="headerlink" href="#pointonsurface" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.PointOnSurface">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PointOnSurface</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L524"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.PointOnSurface" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_PointOnSurface.html">PostGIS</a>, MariaDB, Oracle, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け入れ、そのフィールドの表面上にあることが保証された <code class="docutils literal notranslate"><span class="pre">Point</span></code> ジオメトリを返します。そのような値がない場合は <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します。</p>
+</section>
+<section id="s-reverse">
+<span id="reverse"></span><h2><code class="docutils literal notranslate"><span class="pre">Reverse</span></code><a class="headerlink" href="#reverse" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Reverse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Reverse</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L528"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Reverse" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_Reverse.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、座標を反転したジオメトリを返します。</p>
+</section>
+<section id="s-scale">
+<span id="scale"></span><h2><code class="docutils literal notranslate"><span class="pre">Scale</span></code><a class="headerlink" href="#scale" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Scale">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Scale</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L532"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Scale" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_Scale.html">PostGIS</a>, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、それらを <code class="docutils literal notranslate"><span class="pre">x</span></code>、<code class="docutils literal notranslate"><span class="pre">y</span></code>、任意で <code class="docutils literal notranslate"><span class="pre">z</span></code> パラメータで乗算してスケーリングした座標を持つジオメトリを返します。</p>
+</section>
+<section id="s-snaptogrid">
+<span id="snaptogrid"></span><h2><code class="docutils literal notranslate"><span class="pre">SnapToGrid</span></code><a class="headerlink" href="#snaptogrid" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.SnapToGrid">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SnapToGrid</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L544"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.SnapToGrid" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_SnapToGrid.html">PostGIS</a>, SpatiaLite</p>
+<p>1 つの地理情報フィールドまたは式を受け取り、すべての点が指定されたグリッドにスナップされたジオメトリを返します。ジオメトリがグリッドにスナップされる方法は、与えられた数値 (float、integer、long のいずれか) の数によって異なります。</p>
+<table class="docutils">
+<thead>
+<tr class="row-odd"><th class="head"><p>引数の数</p></th>
+<th class="head"><p>説明</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1</p></td>
+<td><p>XグリッドとYグリッドの両方をスナップする単一のサイズ。</p></td>
+</tr>
+<tr class="row-odd"><td><p>2</p></td>
+<td><p>グリッドをスナップさせるXとYのサイズ。</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>X、Yのサイズと、対応するX、Yの原点。</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="s-symdifference">
+<span id="symdifference"></span><h2><code class="docutils literal notranslate"><span class="pre">SymDifference</span></code><a class="headerlink" href="#symdifference" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.SymDifference">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SymDifference</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L563"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.SymDifference" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-symdifference">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_SymDifference.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>2つの地理情報フィールドまたは式を受け取り、与えられたパラメータ間の幾何学的対称差 (交差を除いた和) を返します。</p>
+</section>
+<section id="s-transform">
+<span id="transform"></span><h2><code class="docutils literal notranslate"><span class="pre">Transform</span></code><a class="headerlink" href="#transform" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Transform">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Transform</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">srid</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L568"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Transform" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_Transform.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>地理情報フィールドまたは式と SRID 整数コードを受け取り、<code class="docutils literal notranslate"><span class="pre">srid</span></code> パラメータで指定された空間参照系に変換されたジオメトリを返します。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>整数のSRIDがどの空間参照系に対応するかは、使用する空間データベースによって異なります。つまり、Oracleで使用されるSRID番号は、必ずしもPostGISで使用されるSRID番号と同じではありません。</p>
+</div>
+</section>
+<section id="s-translate">
+<span id="translate"></span><h2><code class="docutils literal notranslate"><span class="pre">Translate</span></code><a class="headerlink" href="#translate" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Translate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Translate</span></span>(<em class="sig-param"><span class="n"><span class="pre">expression</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L579"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Translate" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: <a class="reference external" href="https://postgis.net/docs/ST_Translate.html">PostGIS</a>, SpatiaLite</p>
+<p>単一の地理情報フィールドまたは式を受け取り、その座標を <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, オプションで <code class="docutils literal notranslate"><span class="pre">z</span></code> の数値パラメータでオフセットしたジオメトリを返します。</p>
+</section>
+<section id="s-union">
+<span id="union"></span><h2><code class="docutils literal notranslate"><span class="pre">Union</span></code><a class="headerlink" href="#union" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.gis.db.models.functions.Union">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Union</span></span>(<em class="sig-param"><span class="n"><span class="pre">expr1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expr2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/gis/db/models/functions.py#L588"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.gis.db.models.functions.Union" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><em>利用可能なDB</em>: MariaDB, <a class="reference external" href="https://dev.mysql.com/doc/refman/en/spatial-operator-functions.html#function_st-union">MySQL</a>, <a class="reference external" href="https://postgis.net/docs/ST_Union.html">PostGIS</a>, Oracle, SpatiaLite</p>
+<p>2 つの地理情報フィールドまたは式を受け取り、それらの両方のジオメトリの和集合を返します。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">地理情報データベース関数</a><ul>
+<li><a class="reference internal" href="#area"><code class="docutils literal notranslate"><span class="pre">Area</span></code></a></li>
+<li><a class="reference internal" href="#asgeojson"><code class="docutils literal notranslate"><span class="pre">AsGeoJSON</span></code></a></li>
+<li><a class="reference internal" href="#asgml"><code class="docutils literal notranslate"><span class="pre">AsGML</span></code></a></li>
+<li><a class="reference internal" href="#askml"><code class="docutils literal notranslate"><span class="pre">AsKML</span></code></a></li>
+<li><a class="reference internal" href="#assvg"><code class="docutils literal notranslate"><span class="pre">AsSVG</span></code></a></li>
+<li><a class="reference internal" href="#aswkb"><code class="docutils literal notranslate"><span class="pre">AsWKB</span></code></a></li>
+<li><a class="reference internal" href="#aswkt"><code class="docutils literal notranslate"><span class="pre">AsWKT</span></code></a></li>
+<li><a class="reference internal" href="#azimuth"><code class="docutils literal notranslate"><span class="pre">Azimuth</span></code></a></li>
+<li><a class="reference internal" href="#boundingcircle"><code class="docutils literal notranslate"><span class="pre">BoundingCircle</span></code></a></li>
+<li><a class="reference internal" href="#centroid"><code class="docutils literal notranslate"><span class="pre">Centroid</span></code></a></li>
+<li><a class="reference internal" href="#closestpoint"><code class="docutils literal notranslate"><span class="pre">ClosestPoint</span></code></a></li>
+<li><a class="reference internal" href="#difference"><code class="docutils literal notranslate"><span class="pre">Difference</span></code></a></li>
+<li><a class="reference internal" href="#distance"><code class="docutils literal notranslate"><span class="pre">Distance</span></code></a></li>
+<li><a class="reference internal" href="#envelope"><code class="docutils literal notranslate"><span class="pre">Envelope</span></code></a></li>
+<li><a class="reference internal" href="#forcepolygoncw"><code class="docutils literal notranslate"><span class="pre">ForcePolygonCW</span></code></a></li>
+<li><a class="reference internal" href="#fromwkb"><code class="docutils literal notranslate"><span class="pre">FromWKB</span></code></a></li>
+<li><a class="reference internal" href="#fromwkt"><code class="docutils literal notranslate"><span class="pre">FromWKT</span></code></a></li>
+<li><a class="reference internal" href="#geohash"><code class="docutils literal notranslate"><span class="pre">GeoHash</span></code></a></li>
+<li><a class="reference internal" href="#geometrydistance"><code class="docutils literal notranslate"><span class="pre">GeometryDistance</span></code></a></li>
+<li><a class="reference internal" href="#intersection"><code class="docutils literal notranslate"><span class="pre">Intersection</span></code></a></li>
+<li><a class="reference internal" href="#isempty"><code class="docutils literal notranslate"><span class="pre">IsEmpty</span></code></a></li>
+<li><a class="reference internal" href="#isvalid"><code class="docutils literal notranslate"><span class="pre">IsValid</span></code></a></li>
+<li><a class="reference internal" href="#length"><code class="docutils literal notranslate"><span class="pre">Length</span></code></a></li>
+<li><a class="reference internal" href="#linelocatepoint"><code class="docutils literal notranslate"><span class="pre">LineLocatePoint</span></code></a></li>
+<li><a class="reference internal" href="#makevalid"><code class="docutils literal notranslate"><span class="pre">MakeValid</span></code></a></li>
+<li><a class="reference internal" href="#memsize"><code class="docutils literal notranslate"><span class="pre">MemSize</span></code></a></li>
+<li><a class="reference internal" href="#numgeometries"><code class="docutils literal notranslate"><span class="pre">NumGeometries</span></code></a></li>
+<li><a class="reference internal" href="#numpoints"><code class="docutils literal notranslate"><span class="pre">NumPoints</span></code></a></li>
+<li><a class="reference internal" href="#perimeter"><code class="docutils literal notranslate"><span class="pre">Perimeter</span></code></a></li>
+<li><a class="reference internal" href="#pointonsurface"><code class="docutils literal notranslate"><span class="pre">PointOnSurface</span></code></a></li>
+<li><a class="reference internal" href="#reverse"><code class="docutils literal notranslate"><span class="pre">Reverse</span></code></a></li>
+<li><a class="reference internal" href="#scale"><code class="docutils literal notranslate"><span class="pre">Scale</span></code></a></li>
+<li><a class="reference internal" href="#snaptogrid"><code class="docutils literal notranslate"><span class="pre">SnapToGrid</span></code></a></li>
+<li><a class="reference internal" href="#symdifference"><code class="docutils literal notranslate"><span class="pre">SymDifference</span></code></a></li>
+<li><a class="reference internal" href="#transform"><code class="docutils literal notranslate"><span class="pre">Transform</span></code></a></li>
+<li><a class="reference internal" href="#translate"><code class="docutils literal notranslate"><span class="pre">Translate</span></code></a></li>
+<li><a class="reference internal" href="#union"><code class="docutils literal notranslate"><span class="pre">Union</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="geoquerysets.html"
+                          title="前の章へ">GIS QuerySet API リファレンス</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="measure.html"
+                          title="次の章へ">測定オブジェクト</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../../_sources/ref/contrib/gis/functions.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="geoquerysets.html" title="GIS QuerySet API リファレンス">previous</a>
+     |
+    <a href="../../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="measure.html" title="測定オブジェクト">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>静的ファイル (画像、JavaScript、CSS など) を管理する &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="ロギングの設定と利用" href="../logging.html" />
+    <link rel="prev" title="独自のテンプレートタグとフィルタを作る" href="../custom-template-tags.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="../custom-template-tags.html" title="独自のテンプレートタグとフィルタを作る">previous</a>
+     |
+    <a href="../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="../logging.html" title="ロギングの設定と利用">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-static-files-index">
+            
+  <section id="s-how-to-manage-static-files-e-g-images-javascript-css">
+<span id="how-to-manage-static-files-e-g-images-javascript-css"></span><h1>静的ファイル (画像、JavaScript、CSS など) を管理する<a class="headerlink" href="#how-to-manage-static-files-e-g-images-javascript-css" title="Link to this heading">¶</a></h1>
+<p>ウェブサイトではふつう、画像や JavaScript、CSS などの追加のファイルを配信する必要があります。Django では、こうしたファイルのことを「静的ファイル (static files)」と呼んでいます。静的ファイルの管理を簡単にするために、Django は <a class="reference internal" href="../../ref/contrib/staticfiles.html#module-django.contrib.staticfiles" title="django.contrib.staticfiles: An app for handling static files."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code></a> を提供しています。</p>
+<p>このページでは、こうした静的ファイルの配信の仕方について説明します。</p>
+<section id="s-configuring-static-files">
+<span id="configuring-static-files"></span><h2>静的ファイルの設定<a class="headerlink" href="#configuring-static-files" title="Link to this heading">¶</a></h2>
+<ol class="arabic">
+<li><p><code class="docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code> が設定ファイルの <a class="reference internal" href="../../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> に含まれていることを確認してください。</p></li>
+<li><p>設定ファイルの中で、<a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_URL</span></code></a> を設定します。たとえば、次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">STATIC_URL</span> <span class="o">=</span> <span class="s2">&quot;static/&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p>テンプレート内では、 <a class="reference internal" href="../../ref/templates/builtins.html#std-templatetag-static"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">static</span></code></a> テンプレートタグを使用して、<code class="docutils literal notranslate"><span class="pre">staticfiles</span></code> <a class="reference internal" href="../../ref/settings.html#std-setting-STORAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STORAGES</span></code></a> で設定したエイリアスで相対パスの URL を生成できます。</p>
+<div class="highlight-html+django notranslate" id="staticfiles-in-templates"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">load</span> <span class="nv">static</span> <span class="cp">%}</span>
+<span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;</span><span class="cp">{%</span> <span class="k">static</span> <span class="s1">&#39;my_app/example.jpg&#39;</span> <span class="cp">%}</span><span class="s">&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;My image&quot;</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</li>
+<li><p>アプリ内に <code class="docutils literal notranslate"><span class="pre">static</span></code> というフォルダを作成って静的ファイルを保存してください。例: <code class="docutils literal notranslate"><span class="pre">my_app/static/my_app/example.jpg</span></code>。</p></li>
+</ol>
+<div class="admonition-serving-the-files admonition">
+<p class="admonition-title">ファイルを配信する</p>
+<p>これらの設定の手順に加えて、実際に静的ファイルを配信する必要があります。</p>
+<p>開発中に <a class="reference internal" href="../../ref/contrib/staticfiles.html#module-django.contrib.staticfiles" title="django.contrib.staticfiles: An app for handling static files."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code></a> を使用する場合には、<a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> を <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定して <a class="reference internal" href="../../ref/django-admin.html#django-admin-runserver"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">runserver</span></code></a> を実行すれば、自動的に設定が行われます。(詳しくは、<a class="reference internal" href="../../ref/contrib/staticfiles.html#django.contrib.staticfiles.views.serve" title="django.contrib.staticfiles.views.serve"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.contrib.staticfiles.views.serve()</span></code></a> を参照)</p>
+<p>ただし、この方法は <strong>極めて非効率</strong> であり、<strong>セキュリティ上の問題がある</strong> 可能性が高いため、<strong>本番環境で使うべきではありません</strong>。</p>
+<p>本番環境で静的ファイルを配信するための適切な戦略については、<a class="reference internal" href="deployment.html"><span class="doc">静的ファイルをデプロイする</span></a> を読んでください。</p>
+</div>
+<p>プロジェクトには、特定のアプリケーションに紐付けられていない 静的な assets があることがあります。その場合には、アプリケーション内の <code class="docutils literal notranslate"><span class="pre">static/</span></code> ディレクトリの他に、設定ファイルでディレクトリのリスト (<a class="reference internal" href="../../ref/settings.html#std-setting-STATICFILES_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATICFILES_DIRS</span></code></a>) を定義して、Django が静的ファイルを検索できるようにすることができます。たとえば、次のように設定します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">STATICFILES_DIRS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">BASE_DIR</span> <span class="o">/</span> <span class="s2">&quot;static&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/var/www/static/&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">staticfiles</span></code> がファイルを探索する方法について詳しくは、 <a class="reference internal" href="../../ref/settings.html#std-setting-STATICFILES_FINDERS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATICFILES_FINDERS</span></code></a> のドキュメントを参照してください。</p>
+<div class="admonition-static-file-namespacing admonition">
+<p class="admonition-title">静的ファイルの名前空間</p>
+<p>静的ファイルを（別の <code class="docutils literal notranslate"><span class="pre">my_app</span></code> サブディレクトリを作成するのではなく）直接 <code class="docutils literal notranslate"><span class="pre">my_app/static/</span></code> に配置することも <em>可能</em> ですが、実際にはそれは良くない考えです。Djangoは、名前が一致する最初の静的ファイルを使用します。もし <em>異なる</em> アプリケーションに同じ名前の静的ファイルがあった場合、Djangoはそれらを区別できません。正しいファイルをDjangoに指定する必要があります。これを保証する最善の方法は、それらを <em>名前空間化</em> することです。つまり、アプリケーション自体の名前で命名された <em>別の</em> ディレクトリ内に静的ファイルを配置することです。</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-STATICFILES_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATICFILES_DIRS</span></code></a> で <a class="reference internal" href="../../ref/settings.html#staticfiles-dirs-prefixes"><span class="std std-ref">プレフィックス</span></a> を指定することで、静的アセットの名前空間を指定できます。</p>
+</div>
+</section>
+<section id="s-serving-static-files-during-development">
+<span id="s-serving-static-files-in-development"></span><span id="serving-static-files-during-development"></span><span id="serving-static-files-in-development"></span><h2>開発時の静的ファイルの取扱い<a class="headerlink" href="#serving-static-files-during-development" title="Link to this heading">¶</a></h2>
+<p>上で述べたたように <a class="reference internal" href="../../ref/contrib/staticfiles.html#module-django.contrib.staticfiles" title="django.contrib.staticfiles: An app for handling static files."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code></a> を利用する場合、 <a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> であれば <a class="reference internal" href="../../ref/django-admin.html#django-admin-runserver"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">runserver</span></code></a> は自動的にこの処理を行います。もし <a class="reference internal" href="../../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 内に <code class="docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code> が存在しない場合は、手動で <a class="reference internal" href="../../ref/views.html#django.views.static.serve" title="django.views.static.serve"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.views.static.serve()</span></code></a> ビューを用いて静的ファイルを取り扱わなければなりません。</p>
+<p>この機能は本番環境で利用するのに適していません！ 一般的なデプロイ方法に関しては <a class="reference internal" href="deployment.html"><span class="doc">静的ファイルをデプロイする</span></a> を参照ください。</p>
+<p>例えば、 <a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_URL</span></code></a> が <code class="docutils literal notranslate"><span class="pre">static/</span></code> として定義されている場合、これを行うには <code class="docutils literal notranslate"><span class="pre">urls.py</span></code> に以下のコードを追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf.urls.static</span><span class="w"> </span><span class="kn">import</span> <span class="n">static</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ... the rest of your URLconf goes here ...</span>
+<span class="p">]</span> <span class="o">+</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">STATIC_URL</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">STATIC_ROOT</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>このヘルパー関数はデバッグモードでのみ動作し、与えられた接頭辞が URL (<code class="docutils literal notranslate"><span class="pre">http://static.example.com/</span></code> など) ではなくローカル (<code class="docutils literal notranslate"><span class="pre">static/</span></code> など) の場合にのみ動作します。</p>
+<p>またこのヘルパー関数は <a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_ROOT</span></code></a> のフォルダのみを利用します; <a class="reference internal" href="../../ref/contrib/staticfiles.html#module-django.contrib.staticfiles" title="django.contrib.staticfiles: An app for handling static files."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code></a> のように静的ファイルの探索は行いません。</p>
+<p>最後に、静的ファイルはWSGIアプリケーション層のラッパーを介して提供されます。結果として、静的ファイルのリクエストは通常の <a class="reference internal" href="../../topics/http/middleware.html"><span class="doc">ミドルウェアチェイン</span></a> を通りません。</p>
+</div>
+</section>
+<section id="s-serving-files-uploaded-by-a-user-during-development">
+<span id="s-serving-uploaded-files-in-development"></span><span id="serving-files-uploaded-by-a-user-during-development"></span><span id="serving-uploaded-files-in-development"></span><h2>開発時における、ユーザーがアップロードするファイルの取扱い<a class="headerlink" href="#serving-files-uploaded-by-a-user-during-development" title="Link to this heading">¶</a></h2>
+<p>開発中は、ユーザーによってアップロードされたメディアファイルを <a class="reference internal" href="../../ref/views.html#django.views.static.serve" title="django.views.static.serve"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.views.static.serve()</span></code></a> ビューを利用している <a class="reference internal" href="../../ref/settings.html#std-setting-MEDIA_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_ROOT</span></code></a> から利用できます。</p>
+<p>この機能は本番環境で利用するのに適していません！ 一般的なデプロイ方法に関しては <a class="reference internal" href="deployment.html"><span class="doc">静的ファイルをデプロイする</span></a> を参照ください。</p>
+<p>例えば、 <a class="reference internal" href="../../ref/settings.html#std-setting-MEDIA_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_URL</span></code></a> が <code class="docutils literal notranslate"><span class="pre">media/</span></code> として定義されている場合、これを行うには <a class="reference internal" href="../../ref/settings.html#std-setting-ROOT_URLCONF"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ROOT_URLCONF</span></code></a> に以下のコードを追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf.urls.static</span><span class="w"> </span><span class="kn">import</span> <span class="n">static</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ... the rest of your URLconf goes here ...</span>
+<span class="p">]</span> <span class="o">+</span> <span class="n">static</span><span class="p">(</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_URL</span><span class="p">,</span> <span class="n">document_root</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">MEDIA_ROOT</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>このヘルパー関数はデバッグモードでのみ動作し、与えられたプレフィックスがURL (<code class="docutils literal notranslate"><span class="pre">http://media.example.com/</span></code> など) ではなくローカル (<code class="docutils literal notranslate"><span class="pre">media/</span></code> など) の場合にのみ動作します。</p>
+</div>
+</section>
+<section id="s-testing">
+<span id="s-staticfiles-testing-support"></span><span id="testing"></span><span id="staticfiles-testing-support"></span><h2>テスト<a class="headerlink" href="#testing" title="Link to this heading">¶</a></h2>
+<p>ビルトインのテストクライアント (たとえば、ビルトインの <a class="reference internal" href="../../topics/testing/tools.html#django.test.LiveServerTestCase" title="django.test.LiveServerTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">LiveServerTestCase</span></code></a>) ではなく実際の HTTP リクエストを使用してテストを実行している場合、テスト環境が現実の環境をできるだけ忠実に再現できるように、他のコンテンツと同じように静的アセットも配信する必要があります。しかし、<code class="docutils literal notranslate"><span class="pre">LiveServerTestCase</span></code> はとても基本的な静的ファイル配信機能しかないため、<code class="docutils literal notranslate"><span class="pre">staticfiles</span></code> アプリケーションの探索機能はなく、すでに静的コンテンツは <a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_ROOT</span></code></a> に集められていることを前提にしています。</p>
+<p>このため、 <code class="docutils literal notranslate"><span class="pre">staticfiles</span></code> は独自の <a class="reference internal" href="../../ref/contrib/staticfiles.html#django.contrib.staticfiles.testing.StaticLiveServerTestCase" title="django.contrib.staticfiles.testing.StaticLiveServerTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.staticfiles.testing.StaticLiveServerTestCase</span></code></a> を同梱しています。これは組み込みのサブクラスで、開発時に <code class="docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">True</span></code> を指定した場合と非常によく似た方法で、つまり <a class="reference internal" href="../../ref/contrib/staticfiles.html#django-admin-collectstatic"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">collectstatic</span></code></a> を使って最初にアセットを収集することなく、テストの実行中にすべてのアセットを透過的に提供する機能を持っています。</p>
+</section>
+<section id="s-deployment">
+<span id="deployment"></span><h2>デプロイ<a class="headerlink" href="#deployment" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../../ref/contrib/staticfiles.html#module-django.contrib.staticfiles" title="django.contrib.staticfiles: An app for handling static files."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code></a> には、静的ファイルを単一のディレクトリに集約するための便利な管理コマンドがあり、静的ファイルを簡単に配信できます。</p>
+<ol class="arabic">
+<li><p><a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_ROOT</span></code></a> 設定で、どのディレクトリから静的ファイルを配信するかを指定します。たとえば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">STATIC_ROOT</span> <span class="o">=</span> <span class="s2">&quot;/var/www/example.com/static/&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p><a class="reference internal" href="../../ref/contrib/staticfiles.html#django-admin-collectstatic"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">collectstatic</span></code></a> 管理コマンドを実行します</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>$<span class="w"> </span>python<span class="w"> </span>manage.py<span class="w"> </span>collectstatic
+</pre></div>
+</div>
+<p>これにより、各 static フォルダから <a class="reference internal" href="../../ref/settings.html#std-setting-STATIC_ROOT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">STATIC_ROOT</span></code></a> のディレクトリにファイルがコピーされます。</p>
+</li>
+<li><p>お好みのWebサーバーを使用してファイルを配信してください。<a class="reference internal" href="deployment.html"><span class="doc">静的ファイルをデプロイする</span></a> では、静的ファイルの一般的なデプロイ戦略をいくつか紹介しています。</p></li>
+</ol>
+</section>
+<section id="s-learn-more">
+<span id="learn-more"></span><h2>さらに学ぶ<a class="headerlink" href="#learn-more" title="Link to this heading">¶</a></h2>
+<p>このドキュメントでは、基本および一般的な利用パターンを紹介しました。<a class="reference internal" href="../../ref/contrib/staticfiles.html#module-django.contrib.staticfiles" title="django.contrib.staticfiles: An app for handling static files."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.staticfiles</span></code></a> に含まれるすべての設定、コマンド、テンプレートタグ、およびその他の事項に関する網羅的な詳細は、<a class="reference internal" href="../../ref/contrib/staticfiles.html"><span class="doc">staticfiles のリファレンス</span></a> を参照してください。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">静的ファイル (画像、JavaScript、CSS など) を管理する</a><ul>
+<li><a class="reference internal" href="#configuring-static-files">静的ファイルの設定</a></li>
+<li><a class="reference internal" href="#serving-static-files-during-development">開発時の静的ファイルの取扱い</a></li>
+<li><a class="reference internal" href="#serving-files-uploaded-by-a-user-during-development">開発時における、ユーザーがアップロードするファイルの取扱い</a></li>
+<li><a class="reference internal" href="#testing">テスト</a></li>
+<li><a class="reference internal" href="#deployment">デプロイ</a></li>
+<li><a class="reference internal" href="#learn-more">さらに学ぶ</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="../custom-template-tags.html"
+                          title="前の章へ">独自のテンプレートタグとフィルタを作る</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="../logging.html"
+                          title="次の章へ">ロギングの設定と利用</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/howto/static-files/index.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="../custom-template-tags.html" title="独自のテンプレートタグとフィルタを作る">previous</a>
+     |
+    <a href="../index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="../logging.html" title="ロギングの設定と利用">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

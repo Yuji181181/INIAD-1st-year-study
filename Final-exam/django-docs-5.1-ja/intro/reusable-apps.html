@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>高度なチュートリアル: 再利用可能アプリの書き方 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="次のステップへ" href="whatsnext.html" />
+    <link rel="prev" title="はじめての Django アプリ作成、その 8" href="tutorial08.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="tutorial08.html" title="はじめての Django アプリ作成、その 8">previous</a>
+     |
+    <a href="index.html" title="さぁ始めましょう" accesskey="U">up</a>
+   |
+    <a href="whatsnext.html" title="次のステップへ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="intro-reusable-apps">
+            
+  <section id="s-advanced-tutorial-how-to-write-reusable-apps">
+<span id="advanced-tutorial-how-to-write-reusable-apps"></span><h1>高度なチュートリアル: 再利用可能アプリの書き方<a class="headerlink" href="#advanced-tutorial-how-to-write-reusable-apps" title="Link to this heading">¶</a></h1>
+<p>この高度なチュートリアルは、<a class="reference internal" href="tutorial08.html"><span class="doc">チュートリアル その8</span></a> が終わったところから始まります。Web投票アプリケーションを、新しいプロジェクトで再利用でき、他の人に共有できる独立した Python のパッケージへと変えていきましょう。</p>
+<p>最近、チュートリアル 1〜8 を完了したのではない場合は、以下に記載されている内容と一致するように、例題プロジェクトを見直すことをお勧めします。</p>
+<section id="s-reusability-matters">
+<span id="reusability-matters"></span><h2>再利用性の問題<a class="headerlink" href="#reusability-matters" title="Link to this heading">¶</a></h2>
+<p>Web アプリケーションの設計、開発、テスト、そしてメンテナンスには多大な労力が必要です。そして多くの Python プロジェクト、 Django プロジェクトは共通の問題を抱えています。この繰り返し作業を減らせたら良いと思いませんか？</p>
+<p>再利用可能性はPythonの生き様とも言えるものです。<a class="reference external" href="https://pypi.org/">Python Package Index (PyPI)</a> にはあなたの Pythonプログラムに使用できる非常に幅広いパッケージが揃っています。あなたのプロジェクトに組み込むことのできる再利用可能なアプリについては、<a class="reference external" href="https://djangopackages.org">Django Packages</a> を見てみてください。Django そのものも、普通のPython パッケージのひとつです。あなたは既存のPythonパッケージや Django アプリを選んで、自分の Web プロジェクトに組み込むことができます。つまり、あなたは自分のプロジェクトに特有の部分にだけ取り組めば良いのです。</p>
+<p>例えば、投票アプリケーション（ちょうど今まで作ってきたものと似たようなもの）を必要とするプロジェクトを新しく開始したとしましょう。どうやって投票アプリケーションを再利用可能にしますか？運のいいことに、その方法はすでに会得済みです。 <a class="reference internal" href="tutorial01.html"><span class="doc">チュートリアル1</span></a> では、 <code class="docutils literal notranslate"><span class="pre">include</span></code> を使ってプロジェクトレベルの URLconf から投票アプリを分離する方法を学びました。このチュートリアルでは、アプリケーションを新規のプロジェクトで使いやすいようにし、いつでも別の場所でインストール/利用できるようにします。</p>
+<div class="admonition-package-app admonition">
+<p class="admonition-title">パッケージ？アプリ？</p>
+<p>Python の <a class="reference external" href="https://docs.python.org/3/glossary.html#term-package" title="(in Python v3.13)"><span class="xref std std-term">package</span></a> を使うと、関連する Python コードをまとめて再利用しやすいようにできます。パッケージは、 Python コードのファイル ( 通称 &quot;モジュール&quot; ) を１つ以上含みます。</p>
+<p>パッケージは <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">foo.bar</span></code> または <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">foo</span> <span class="pre">import</span> <span class="pre">bar</span></code> でインポートできます。パッケージ内のディレクトリ (例えば <code class="docutils literal notranslate"><span class="pre">polls</span></code>) は <code class="docutils literal notranslate"><span class="pre">__init__.py</span></code> という特殊なファイルを、空のファイルでもいいので含む必要があります。</p>
+<p>Django <em>アプリケーション</em> は単なる Python パッケージで、 Django プロジェクトで使うことのみを意図したものです。アプリは一般的な Django の慣例に則っているでしょう。例えば <code class="docutils literal notranslate"><span class="pre">models</span></code> 、 <code class="docutils literal notranslate"><span class="pre">tests</span></code> 、 <code class="docutils literal notranslate"><span class="pre">urls</span></code> 、 <code class="docutils literal notranslate"><span class="pre">views</span></code> のサブモジュールがあること、などです。</p>
+<p>後に <em>パッケージング</em> という言葉を、他の人がインストールしやすいように Python パッケージを作るプロセスを表すのに用います。少し混乱するかもしれませんね。</p>
+</div>
+</section>
+<section id="s-your-project-and-your-reusable-app">
+<span id="your-project-and-your-reusable-app"></span><h2>プロジェクトと再利用可能アプリ<a class="headerlink" href="#your-project-and-your-reusable-app" title="Link to this heading">¶</a></h2>
+<p>前のチュートリアルを終えると、プロジェクトはこのようになっているはずです:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>djangotutorial/
+    manage.py
+    mysite/
+        __init__.py
+        settings.py
+        urls.py
+        asgi.py
+        wsgi.py
+    polls/
+        __init__.py
+        admin.py
+        apps.py
+        migrations/
+            __init__.py
+            0001_initial.py
+        models.py
+        static/
+            polls/
+                images/
+                    background.png
+                style.css
+        templates/
+            polls/
+                detail.html
+                index.html
+                results.html
+        tests.py
+        urls.py
+        views.py
+    templates/
+        admin/
+            base_site.html
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">djangotutorial/templates</span></code> は <a class="reference internal" href="tutorial07.html"><span class="doc">チュートリアル7</span></a> で作成し、<code class="docutils literal notranslate"><span class="pre">polls/templates</span></code> は <a class="reference internal" href="tutorial03.html"><span class="doc">チュートリアル3</span></a> で作成しました。今は、なぜプロジェクトとアプリケーションに別々のテンプレートディレクトリを設けることにしたのかが、より明確になったかもしれません。pollsアプリケーションに関連するすべてのものは <code class="docutils literal notranslate"><span class="pre">polls</span></code> フォルダ内にあります。これにより、アプリケーションは自己完結型となり、新しいプロジェクトに簡単に組み込むことができます。</p>
+<p>今、 <code class="docutils literal notranslate"><span class="pre">polls</span></code> ディレクトリは新規の Django プロジェクトにコピーでき、すぐに再利用できる状態です。しかし公開するための準備が完璧というわけではありません。そのために、アプリをパッケージにして別の場所でインストールしやすいようにする必要があります。</p>
+</section>
+<section id="s-installing-some-prerequisites">
+<span id="s-installing-reusable-apps-prerequisites"></span><span id="installing-some-prerequisites"></span><span id="installing-reusable-apps-prerequisites"></span><h2>事前に必要な物をインストールする<a class="headerlink" href="#installing-some-prerequisites" title="Link to this heading">¶</a></h2>
+<p>Python のパッケージングの現状は、複数のツールがあることで少しややこしいです。このチュートリアルでは <a class="extlink-pypi reference external" href="https://pypi.org/project/setuptools/">setuptools</a> をパッケージに使用します。これはおすすめのパッケージングツールです( forkされていた <code class="docutils literal notranslate"><span class="pre">distribute</span></code> はマージされました)。終わった後にアンインストールするために <a class="extlink-pypi reference external" href="https://pypi.org/project/pip/">pip</a> も使います。今はこの 2 つのパッケージをインストールしておいてください。分からなければ <a class="reference internal" href="../topics/install.html#installing-official-release"><span class="std std-ref">Django をpip でインストールする</span></a>. を参照してください。 <code class="docutils literal notranslate"><span class="pre">setuptools</span></code> も同じ方法でインストールできます。</p>
+</section>
+<section id="s-packaging-your-app">
+<span id="packaging-your-app"></span><h2>アプリケーションをパッケージングする<a class="headerlink" href="#packaging-your-app" title="Link to this heading">¶</a></h2>
+<p>Python において <em>パッケージング</em> とは、特定のフォーマットでアプリを作っておくことです。このフォーマットは簡単にインストールして使えます。 Django 自体もこのようにパッケージ化されています。投票アプリのような小さなものでは、このプロセスはそれほど難しいものではありません。</p>
+<ol class="arabic">
+<li><p>まず、Django プロジェクトの外に、パッケージのための親ディレクトリを作成します。以降、このディレクトリを <code class="docutils literal notranslate"><span class="pre">django-polls</span></code> と呼びます。</p>
+<div class="admonition-choosing-a-name-for-your-app admonition">
+<p class="admonition-title">アプリケーションの名前を決める</p>
+<p>パッケージ名を決める際には、既存のパッケージとの名前の衝突を避けるために PyPI をチェックしてください。パッケージ名には Django 固有のパッケージであることを示すために <code class="docutils literal notranslate"><span class="pre">django-</span></code> という接頭辞をつけ、モジュール名にはそれに対応する <code class="docutils literal notranslate"><span class="pre">django_</span></code> という接頭辞を付けることを推奨します。例えば、 <code class="docutils literal notranslate"><span class="pre">django-ratelimit</span></code> パッケージは <code class="docutils literal notranslate"><span class="pre">django_ratelimit</span></code> モジュールを含んでいます。</p>
+<p>アプリケーションラベル (すなわち、アプリケーションパッケージへのパス（ドット区切り）の最後の部分) は <a class="reference internal" href="../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> の中で <em>必ず</em> ユニークでなければなりません。 <code class="docutils literal notranslate"><span class="pre">auth</span></code> 、 <code class="docutils literal notranslate"><span class="pre">admin</span></code> 、 <code class="docutils literal notranslate"><span class="pre">messages</span></code> のようなDjango <a class="reference internal" href="../ref/contrib/index.html"><span class="doc">contrib packages</span></a> と同じラベルを使うことは避けてください。</p>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">polls</span></code> ディレクトリを <code class="docutils literal notranslate"><span class="pre">django-polls</span></code> ディレクトリに移動し、名前を <code class="docutils literal notranslate"><span class="pre">django_polls</span></code> に変更します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">django_polls/apps.py</span></code> を編集して <a class="reference internal" href="../ref/applications.html#django.apps.AppConfig.name" title="django.apps.AppConfig.name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code></a> が新しいモジュール名を指すようにし、 <a class="reference internal" href="../ref/applications.html#django.apps.AppConfig.label" title="django.apps.AppConfig.label"><code class="xref py py-attr docutils literal notranslate"><span class="pre">label</span></code></a> を追加してアプリの短い名前を付けます:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">django-polls/django_polls/apps.py</span></code></span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">AppConfig</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">PollsConfig</span><span class="p">(</span><span class="n">AppConfig</span><span class="p">):</span>
+    <span class="n">default_auto_field</span> <span class="o">=</span> <span class="s2">&quot;django.db.models.BigAutoField&quot;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;django_polls&quot;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="s2">&quot;polls&quot;</span>
+</pre></div>
+</div>
+</div>
+</li>
+<li><p>以下の内容の <code class="docutils literal notranslate"><span class="pre">django-polls/README.rst</span></code> という名前のファイルを作成します:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">django-polls/README.rst</span></code></span><a class="headerlink" href="#id2" title="Link to this code">¶</a></div>
+<div class="highlight-rst notranslate"><div class="highlight"><pre><span></span><span class="gh">============</span>
+<span class="gh">django-polls</span>
+<span class="gh">============</span>
+
+django-polls is a Django app to conduct web-based polls. For each
+question, visitors can choose between a fixed number of answers.
+
+Detailed documentation is in the &quot;docs&quot; directory.
+
+<span class="gh">Quick start</span>
+<span class="gh">-----------</span>
+
+<span class="m">1.</span> Add &quot;polls&quot; to your INSTALLED_APPS setting like this::
+
+    INSTALLED_APPS = [
+<span class="c">        ...,</span>
+<span class="c">        &quot;django_polls&quot;,</span>
+<span class="c">    ]</span>
+
+<span class="m">2.</span> Include the polls URLconf in your project urls.py like this::
+
+    path(&quot;polls/&quot;, include(&quot;django_polls.urls&quot;)),
+
+<span class="m">3.</span> Run <span class="s">``python manage.py migrate``</span> to create the models.
+
+<span class="m">4.</span> Start the development server and visit the admin to create a poll.
+
+<span class="m">5.</span> Visit the <span class="s">``/polls/``</span> URL to participate in the poll.
+</pre></div>
+</div>
+</div>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">django-polls/LICENSE</span></code> ファイルを作成します。ライセンスの選択はこのチュートリアルの範疇を超えていますが、ライセンスなしで公にリリースされたコードは <em>役立たず</em> であると言えば十分です。 Django と多くの Django 互換アプリケーションはBSDライセンスの元に配布されます。でもどのライセンスを選択するかは自由です。ライセンスの選択は、誰がコードを使え得るかに影響すると注意してください。</p></li>
+<li><p>次に、アプリケーションのビルドおよびインストール方法を詳細に記述した <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> ファイルを作成します。このファイルの詳細な説明は本チュートリアルの範囲を超えますが、<a class="reference external" href="https://packaging.python.org/ja/latest/guides/writing-pyproject-toml/">Pythonパッケージユーザーガイド</a> に良い説明があります。以下の内容で <code class="docutils literal notranslate"><span class="pre">django-polls/pyproject.toml</span></code> ファイルを作成してください。</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">django-polls/pyproject.toml</span></code></span><a class="headerlink" href="#id3" title="Link to this code">¶</a></div>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[build-system]</span>
+<span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;setuptools&gt;=61.0&quot;</span><span class="p">]</span>
+<span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;setuptools.build_meta&quot;</span>
+
+<span class="k">[project]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;django-polls&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.1&quot;</span>
+<span class="n">dependencies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;django&gt;=X.Y&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># Replace &quot;X.Y&quot; as appropriate</span>
+<span class="p">]</span>
+<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;A Django app to conduct web-based polls.&quot;</span>
+<span class="n">readme</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;README.rst&quot;</span>
+<span class="n">requires-python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;= 3.10&quot;</span>
+<span class="n">authors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="n">name</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;Your Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="p">=</span><span class="w"> </span><span class="s2">&quot;yourname@example.com&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+<span class="n">classifiers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="s2">&quot;Environment :: Web Environment&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Framework :: Django&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Framework :: Django :: X.Y&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># Replace &quot;X.Y&quot; as appropriate</span>
+<span class="w">    </span><span class="s2">&quot;Intended Audience :: Developers&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;License :: OSI Approved :: BSD License&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Operating System :: OS Independent&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Programming Language :: Python&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Programming Language :: Python :: 3&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Programming Language :: Python :: 3 :: Only&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Programming Language :: Python :: 3.10&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Programming Language :: Python :: 3.11&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Programming Language :: Python :: 3.12&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Programming Language :: Python :: 3.13&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Topic :: Internet :: WWW/HTTP&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="s2">&quot;Topic :: Internet :: WWW/HTTP :: Dynamic Content&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="k">[project.urls]</span>
+<span class="n">Homepage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;https://www.example.com/&quot;</span>
+</pre></div>
+</div>
+</div>
+</li>
+<li><p>多くの一般的なファイルやPythonモジュール、パッケージは、デフォルトでパッケージに含まれています。追加のファイルを含めるには、<code class="docutils literal notranslate"><span class="pre">MANIFEST.in</span></code> ファイルを作成する必要があります。テンプレートや静的ファイルを含めるために、以下の内容で <code class="docutils literal notranslate"><span class="pre">django-polls/MANIFEST.in</span></code> ファイルを作成してください。</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">django-polls/MANIFEST.in</span></code></span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>recursive-include django_polls/static *
+recursive-include django_polls/templates *
+</pre></div>
+</div>
+</div>
+</li>
+<li><p>これは必須ではありませんが、アプリケーションには詳細なドキュメントを含めることが推奨されます。将来のドキュメント用に、空のディレクトリ <code class="docutils literal notranslate"><span class="pre">django-polls/docs</span></code> を作成してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">MANIFEST.in</span></code> に対象のファイルを追加しないと <code class="docutils literal notranslate"><span class="pre">docs</span></code> ディレクトリがパッケージに含まれないことに注意してください。多くの Django アプリではドキュメントを <a class="reference external" href="https://readthedocs.org">readthedocs.org</a> のようなサイトを通して提供しています。</p>
+</li>
+<li><p><a class="extlink-pypi reference external" href="https://pypi.org/project/build/">build</a> パッケージがインストールされていることを確認してください（<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">build</span></code>）。その後、<code class="docutils literal notranslate"><span class="pre">django-polls</span></code> フォルダ内で <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">build</span></code> を実行してパッケージのビルドを試みます。これにより、<code class="docutils literal notranslate"><span class="pre">dist</span></code> というディレクトリが作成され、新しいパッケージがソース形式およびバイナリ形式でビルドされ、<code class="docutils literal notranslate"><span class="pre">django-polls-0.1.tar.gz</span></code> と <code class="docutils literal notranslate"><span class="pre">django_polls-0.1-py3-none-any.whl</span></code> が作成されます。</p></li>
+</ol>
+<p>パッケージングに関するより豊富な情報は <a class="reference external" href="https://packaging.python.org/tutorials/packaging-projects/">プロジェクトのパッケージ化と配布に関するチュートリアル</a> にあります。</p>
+</section>
+<section id="s-using-your-own-package">
+<span id="using-your-own-package"></span><h2>自分のパッケージを使ってみる<a class="headerlink" href="#using-your-own-package" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">polls</span></code> ディレクトリはプロジェクト外に移動したので、これはもう動きません。代わりにできたての <code class="docutils literal notranslate"><span class="pre">django-polls</span></code> パッケージを使ってみましょう。</p>
+<div class="admonition-installing-as-a-user-library admonition">
+<p class="admonition-title">ユーザーライブラリとしてインストールする</p>
+<p>以下のステップは <code class="docutils literal notranslate"><span class="pre">django-polls</span></code> をユーザーライブラリとしてインストールするものです。ユーザー単位でのインストールはシステム全体でのインストールよりも多くの利点があります。管理者アクセス権を持っていないシステム上で使用可能というだけでなく、パッケージがシステムサービスやマシン上の他ユーザーに影響を与えるのを防げます。</p>
+<p>ユーザーごとのインストールは、そのユーザーとして実行されるシステムツールの動作に影響を与える可能性があるため、仮想環境を使用する方がより堅牢なソリューションであることに注意してください（以下を参照）。</p>
+</div>
+<ol class="arabic">
+<li><p>パッケージをインストールするためには、pip を利用してください (すでに  <a class="reference internal" href="#installing-reusable-apps-prerequisites"><span class="std std-ref">インストール</span></a> していますよね?):</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>django-polls/dist/django-polls-0.1.tar.gz
+</pre></div>
+</div>
+</li>
+<li><p>新しいモジュール名を指すように <code class="docutils literal notranslate"><span class="pre">mysite/settings.py</span></code> を更新します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;django_polls.apps.PollsConfig&quot;</span><span class="p">,</span>
+    <span class="o">...</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>新しいモジュール名を指すように <code class="docutils literal notranslate"><span class="pre">mysite/urls.py</span></code> を更新します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;polls/&quot;</span><span class="p">,</span> <span class="n">include</span><span class="p">(</span><span class="s2">&quot;django_polls.urls&quot;</span><span class="p">)),</span>
+    <span class="o">...</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</li>
+<li><p>開発サーバーを実行して、プロジェクトが引き続き動作することを確認します。</p></li>
+</ol>
+</section>
+<section id="s-publishing-your-app">
+<span id="publishing-your-app"></span><h2>アプリを公開する<a class="headerlink" href="#publishing-your-app" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">django-polls</span></code> のパッケージを作り、テストしました。世界に共有するときです！これが単なる例でなければこうします:</p>
+<ul class="simple">
+<li><p>パッケージを友人にメールで送る</p></li>
+<li><p>自身の Web サイトにアップロードする</p></li>
+<li><p>公開されているリポジトリに投稿する。例えば <a class="reference internal" href="#the-python-package-index-pypi">the Python Package Index (PyPI)</a>. <a class="reference external" href="https://packaging.python.org">packaging.python.org</a> には <a class="reference external" href="https://packaging.python.org/tutorials/packaging-projects/#uploading-the-distribution-archives">よくできたチュートリアル</a> があります。</p></li>
+</ul>
+</section>
+<section id="s-installing-python-packages-with-a-virtual-environment">
+<span id="installing-python-packages-with-a-virtual-environment"></span><h2>仮想環境でのPythonパッケージのインストール<a class="headerlink" href="#installing-python-packages-with-a-virtual-environment" title="Link to this heading">¶</a></h2>
+<p>先ほど、 <code class="docutils literal notranslate"><span class="pre">django-polls</span></code> をユーザライブラリとしてインストールしました。これにはいくつかの欠点があります:</p>
+<ul class="simple">
+<li><p>ユーザーライブラリの変更はシステム上の他の Python ソフトウェアに影響を与えるおそれがあります</p></li>
+<li><p>このパッケージの複数バージョン (もしくは同じ名前の別のもの) を実行できません</p></li>
+</ul>
+<p>通常、このような状況は複数の Django プロジェクトを管理している場合にのみ発生します。このような場合、最良の解決策は <a class="reference external" href="https://docs.python.org/3/tutorial/venv.html" title="(in Python v3.13)"><span class="xref std std-doc">venv</span></a> を使うことです。このツールを使うと、複数の分離されたPython環境を管理することができ、それぞれが独自のライブラリとパッケージの名前空間のコピーを持っています。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">高度なチュートリアル: 再利用可能アプリの書き方</a><ul>
+<li><a class="reference internal" href="#reusability-matters">再利用性の問題</a></li>
+<li><a class="reference internal" href="#your-project-and-your-reusable-app">プロジェクトと再利用可能アプリ</a></li>
+<li><a class="reference internal" href="#installing-some-prerequisites">事前に必要な物をインストールする</a></li>
+<li><a class="reference internal" href="#packaging-your-app">アプリケーションをパッケージングする</a></li>
+<li><a class="reference internal" href="#using-your-own-package">自分のパッケージを使ってみる</a></li>
+<li><a class="reference internal" href="#publishing-your-app">アプリを公開する</a></li>
+<li><a class="reference internal" href="#installing-python-packages-with-a-virtual-environment">仮想環境でのPythonパッケージのインストール</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="tutorial08.html"
+                          title="前の章へ">はじめての Django アプリ作成、その 8</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="whatsnext.html"
+                          title="次の章へ">次のステップへ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/intro/reusable-apps.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="tutorial08.html" title="はじめての Django アプリ作成、その 8">previous</a>
+     |
+    <a href="index.html" title="さぁ始めましょう" accesskey="U">up</a>
+   |
+    <a href="whatsnext.html" title="次のステップへ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

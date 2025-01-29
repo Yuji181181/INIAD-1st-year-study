@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>テストに関する高度なトピック &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="Django でのユーザー認証" href="../auth/index.html" />
+    <link rel="prev" title="テストツール" href="tools.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="tools.html" title="テストツール">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="../auth/index.html" title="Django でのユーザー認証">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="topics-testing-advanced">
+            
+  <section id="s-advanced-testing-topics">
+<span id="advanced-testing-topics"></span><h1>テストに関する高度なトピック<a class="headerlink" href="#advanced-testing-topics" title="Link to this heading">¶</a></h1>
+<section id="s-the-request-factory">
+<span id="the-request-factory"></span><h2>RequestFactory（リクエスト ファクトリ）<a class="headerlink" href="#the-request-factory" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.test.RequestFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RequestFactory</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/client.py#L370"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.RequestFactory" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="#django.test.RequestFactory" title="django.test.RequestFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestFactory</span></code></a> はテストクライアントと同じ API を共有しています。しかし、ブラウザのように動作するのではなく、 RequestFactory は任意のビューの最初の引数として使用できるリクエストインスタンスを生成する方法を提供します。つまり、ビュー関数を他の関数をテストするのと同じ方法で テストできます。入力が完全にわかっているブラックボックスとして、特定の出力をテストできます。</p>
+<p><a class="reference internal" href="#django.test.RequestFactory" title="django.test.RequestFactory"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestFactory</span></code></a> の API は、テストクライアント API の少し制限されたサブセットです:</p>
+<ul class="simple">
+<li><p>RequestFactoryは、HTTPメソッドの <a class="reference internal" href="tools.html#django.test.Client.get" title="django.test.Client.get"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get()</span></code></a>, <a class="reference internal" href="tools.html#django.test.Client.post" title="django.test.Client.post"><code class="xref py py-meth docutils literal notranslate"><span class="pre">post()</span></code></a>, <a class="reference internal" href="tools.html#django.test.Client.put" title="django.test.Client.put"><code class="xref py py-meth docutils literal notranslate"><span class="pre">put()</span></code></a>, <a class="reference internal" href="tools.html#django.test.Client.delete" title="django.test.Client.delete"><code class="xref py py-meth docutils literal notranslate"><span class="pre">delete()</span></code></a>, <a class="reference internal" href="tools.html#django.test.Client.head" title="django.test.Client.head"><code class="xref py py-meth docutils literal notranslate"><span class="pre">head()</span></code></a>, <a class="reference internal" href="tools.html#django.test.Client.options" title="django.test.Client.options"><code class="xref py py-meth docutils literal notranslate"><span class="pre">options()</span></code></a>, <a class="reference internal" href="tools.html#django.test.Client.trace" title="django.test.Client.trace"><code class="xref py py-meth docutils literal notranslate"><span class="pre">trace()</span></code></a> にだけアクセスできます。</p></li>
+<li><p>これらのメソッドは <code class="docutils literal notranslate"><span class="pre">follow</span></code> <em>以外</em> はすべて同じ引数を受け取ります。これはリクエストを生成するための単なるファクトリ（工場）なので、 レスポンスの処理はあなた次第です。</p></li>
+<li><p>ミドルウェアはサポートしていません。セッション属性と認証属性は、ビューが正しく機能するために必要であれば、テスト自身が持たなければなりません。</p></li>
+</ul>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.1:</span> <p><code class="docutils literal notranslate"><span class="pre">query_params</span></code> パラメータが追加されました。</p>
+</div>
+<section id="s-example">
+<span id="example"></span><h3>カスタマイズ例<a class="headerlink" href="#example" title="Link to this heading">¶</a></h3>
+<p>以下はリクエスト・ファクトリを使ったユニットテストです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AnonymousUser</span><span class="p">,</span> <span class="n">User</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">RequestFactory</span><span class="p">,</span> <span class="n">TestCase</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyView</span><span class="p">,</span> <span class="n">my_view</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SimpleTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Every test needs access to the request factory.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">factory</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="s2">&quot;jacob&quot;</span><span class="p">,</span> <span class="n">email</span><span class="o">=</span><span class="s2">&quot;jacob@…&quot;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s2">&quot;top_secret&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_details</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Create an instance of a GET request.</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">factory</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/customer/details&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Recall that middleware are not supported. You can simulate a</span>
+        <span class="c1"># logged-in user by setting request.user manually.</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span>
+
+        <span class="c1"># Or you can simulate an anonymous user by setting request.user to</span>
+        <span class="c1"># an AnonymousUser instance.</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">AnonymousUser</span><span class="p">()</span>
+
+        <span class="c1"># Test my_view() as if it were deployed at /customer/details</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="c1"># Use this syntax for class-based views.</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">MyView</span><span class="o">.</span><span class="n">as_view</span><span class="p">()(</span><span class="n">request</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="s-asyncrequestfactory">
+<span id="asyncrequestfactory"></span><h3>AsyncRequestFactory<a class="headerlink" href="#asyncrequestfactory" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.test.AsyncRequestFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AsyncRequestFactory</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/client.py#L679"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.AsyncRequestFactory" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">RequestFactory</span></code> は WSGI ライクなリクエストを作成します。正しい ASGI <code class="docutils literal notranslate"><span class="pre">scope</span></code> を持つなど、ASGI ライクなリクエストを作成したい場合は、代わりに <code class="docutils literal notranslate"><span class="pre">django.test.AsyncRequestFactory</span></code> が使用できます。</p>
+<p>このクラスは <code class="docutils literal notranslate"><span class="pre">RequestFactory</span></code> と直接 API 互換ですが、唯一の違いは <code class="docutils literal notranslate"><span class="pre">WSGIRequest</span></code> インスタンスではなく <code class="docutils literal notranslate"><span class="pre">ASGIRequest</span></code> インスタンスを返すことです。そのメソッドはすべて同期呼び出し可能オブジェクトのままです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">defaults</span></code> 内の任意のキーワード引数は直接ASGIスコープに追加されます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 5.1:</span> <p><code class="docutils literal notranslate"><span class="pre">query_params</span></code> パラメータが追加されました。</p>
+</div>
+</section>
+</section>
+<section id="s-testing-class-based-views">
+<span id="testing-class-based-views"></span><h2>クラスベースのビューをテストする<a class="headerlink" href="#testing-class-based-views" title="Link to this heading">¶</a></h2>
+<p>リクエスト/レスポンスサイクルの外でクラスベースのビューをテストするには、インスタンス化後に <a class="reference internal" href="../../ref/class-based-views/base.html#django.views.generic.base.View.setup" title="django.views.generic.base.View.setup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup()</span></code></a> を呼び出して、正しく設定されていることを確認する必要があります。</p>
+<p>たとえば、以下のようなクラスベースのビューを想定します:</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">views.py</span></code></span><a class="headerlink" href="#id1" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">TemplateView</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HomeView</span><span class="p">(</span><span class="n">TemplateView</span><span class="p">):</span>
+    <span class="n">template_name</span> <span class="o">=</span> <span class="s2">&quot;myapp/home.html&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;environment&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Production&quot;</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">get_context_data()</span></code> メソッドを直接テストするには、まずビューをインスタンス化して <code class="docutils literal notranslate"><span class="pre">setup()</span></code> に <code class="docutils literal notranslate"><span class="pre">request</span></code> を渡します:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">tests.py</span></code></span><a class="headerlink" href="#id2" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">RequestFactory</span><span class="p">,</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">HomeView</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HomePageTest</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_environment_set_in_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">request</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="p">()</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="n">view</span> <span class="o">=</span> <span class="n">HomeView</span><span class="p">()</span>
+        <span class="n">view</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="n">context</span> <span class="o">=</span> <span class="n">view</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertIn</span><span class="p">(</span><span class="s2">&quot;environment&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="s-tests-and-multiple-host-names">
+<span id="s-topics-testing-advanced-multiple-hosts"></span><span id="tests-and-multiple-host-names"></span><span id="topics-testing-advanced-multiple-hosts"></span><h2>テストとマルチホスト名<a class="headerlink" href="#tests-and-multiple-host-names" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> 設定はテストを実行する際に検証されます。これによりテストクライアントが内部 URL と外部 URL を区別できるようになります。</p>
+<p>マルチテナントをサポートするプロジェクトや、リクエストのホストに基づいてビジネスロジックを変更するプロジェクトで、カスタムホスト名をテストで使用する場合は、それらのホストを <a class="reference internal" href="../../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> に含める必要があります。</p>
+<p>そのための最初の選択肢は、hosts を設定ファイルに追加することです。例えば、docs.djangoproject.com のテストスイートには以下が含まれています:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SearchFormTestCase</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_empty_get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;/en/dev/search/&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;host&quot;</span><span class="p">:</span> <span class="s2">&quot;docs.djangoproject.dev:8000&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>そして設定ファイルには、プロジェクトがサポートするドメインのリストが含まれています:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ALLOWED_HOSTS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;www.djangoproject.dev&quot;</span><span class="p">,</span> <span class="s2">&quot;docs.djangoproject.dev&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>2つめの選択肢は、 <a class="reference internal" href="tools.html#django.test.override_settings" title="django.test.override_settings"><code class="xref py py-meth docutils literal notranslate"><span class="pre">override_settings()</span></code></a> や <a class="reference internal" href="tools.html#django.test.SimpleTestCase.modify_settings" title="django.test.SimpleTestCase.modify_settings"><code class="xref py py-attr docutils literal notranslate"><span class="pre">modify_settings()</span></code></a> を使って、 <a class="reference internal" href="../../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> に必要なホストを追加する方法です。この方法は、独自の設定ファイルをパッケージ化できないスタンドアロンアプリや、ドメインのリストが静的でないプロジェクト (例えば、マルチテナンシー用のサブドメイン) には適しているかもしれません。たとえば、ドメイン <code class="docutils literal notranslate"><span class="pre">http://otherserver/</span></code> に対して次のようなテストを書くことができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span><span class="p">,</span> <span class="n">override_settings</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MultiDomainTestCase</span><span class="p">(</span><span class="n">TestCase</span><span class="p">):</span>
+    <span class="nd">@override_settings</span><span class="p">(</span><span class="n">ALLOWED_HOSTS</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;otherserver&quot;</span><span class="p">])</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_other_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;http://otherserver/foo/bar/&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>テストの実行時に <a class="reference internal" href="../../ref/settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> チェック (<code class="docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span> <span class="pre">=</span> <span class="pre">['*']</span></code>) を無効にすると、外部 URL へのリダイレクトを辿ったときにテストクライアントが役立つエラーメッセージを表示しないようになります。</p>
+</section>
+<section id="s-tests-and-multiple-databases">
+<span id="s-topics-testing-advanced-multidb"></span><span id="tests-and-multiple-databases"></span><span id="topics-testing-advanced-multidb"></span><h2>テストと複数データベース<a class="headerlink" href="#tests-and-multiple-databases" title="Link to this heading">¶</a></h2>
+<section id="s-testing-primary-replica-configurations">
+<span id="s-topics-testing-primaryreplica"></span><span id="testing-primary-replica-configurations"></span><span id="topics-testing-primaryreplica"></span><h3>プライマリ/レプリカ構成のテスト<a class="headerlink" href="#testing-primary-replica-configurations" title="Link to this heading">¶</a></h3>
+<p>プライマリ/レプリカ（データベースによってはマスタ/スレーブとも呼ばれる）レプリケーションを使用した複数データベース構成をテストする場合、テスト用データベースを作成するこの方法には問題があります。テスト用データベースを作成すると、レプリケーションが行われなくなり、その結果、プライマリで作成されたデータがレプリカで見られなくなります。</p>
+<p>これを補うために、 Django ではデータベースを <em>テストミラー</em> と定義できます。以下の (単純化した) データベース設定例を見てください:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ENGINE&quot;</span><span class="p">:</span> <span class="s2">&quot;django.db.backends.mysql&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;myproject&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;HOST&quot;</span><span class="p">:</span> <span class="s2">&quot;dbprimary&quot;</span><span class="p">,</span>
+        <span class="c1"># ... plus some other settings</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;replica&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;ENGINE&quot;</span><span class="p">:</span> <span class="s2">&quot;django.db.backends.mysql&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NAME&quot;</span><span class="p">:</span> <span class="s2">&quot;myproject&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;HOST&quot;</span><span class="p">:</span> <span class="s2">&quot;dbreplica&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TEST&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;MIRROR&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="c1"># ... plus some other settings</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>この設定では、2つのデータベースサーバーがあります。 <code class="docutils literal notranslate"><span class="pre">dbprimary</span></code> はデータベースのエイリアス <code class="docutils literal notranslate"><span class="pre">default</span></code> で、 <code class="docutils literal notranslate"><span class="pre">dbreplica</span></code> はエイリアス <code class="docutils literal notranslate"><span class="pre">replica</span></code> で表します。期待の通り、 <code class="docutils literal notranslate"><span class="pre">dbreplica</span></code> はデータベース管理者によって <code class="docutils literal notranslate"><span class="pre">dbprimary</span></code> の読み込み用レプリカとして設定されているので、通常の操作では <code class="docutils literal notranslate"><span class="pre">default</span></code> への書き込みは <code class="docutils literal notranslate"><span class="pre">replica</span></code> に反映されます。</p>
+<p>Django で2つの独立したテスト用データベースを作成した場合、レプリケーションを期待したテストが壊れてしまいます。しかし、 <code class="docutils literal notranslate"><span class="pre">replica</span></code> データベースはテスト用ミラーとして設定されており (テスト設定 <a class="reference internal" href="../../ref/settings.html#std-setting-TEST_MIRROR"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIRROR</span></code></a> を使っています)、テストでは <code class="docutils literal notranslate"><span class="pre">replica</span></code> は <code class="docutils literal notranslate"><span class="pre">default</span></code> のミラーとして扱われるはずです。</p>
+<p>テスト環境が設定されると、テストバージョンの <code class="docutils literal notranslate"><span class="pre">replica</span></code> は作成されません。代わりに <code class="docutils literal notranslate"><span class="pre">replica</span></code> への接続は <code class="docutils literal notranslate"><span class="pre">default</span></code> を指すようにリダイレクトされます。その結果、<code class="docutils literal notranslate"><span class="pre">default</span></code> への書き込みは <code class="docutils literal notranslate"><span class="pre">replica</span></code> に表示されますが、これは実際には同じデータベースであることが原因であり、2つのデータベース間でデータの複製が行われていることが原因ではありません。これはトランザクションに依存しているので、テストでは <a class="reference internal" href="tools.html#django.test.TestCase" title="django.test.TestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TestCase</span></code></a> ではなく <a class="reference internal" href="tools.html#django.test.TransactionTestCase" title="django.test.TransactionTestCase"><code class="xref py py-class docutils literal notranslate"><span class="pre">TransactionTestCase</span></code></a> を使う必要があります。</p>
+</section>
+<section id="s-controlling-creation-order-for-test-databases">
+<span id="s-topics-testing-creation-dependencies"></span><span id="controlling-creation-order-for-test-databases"></span><span id="topics-testing-creation-dependencies"></span><h3>テストデータベースの作成順をコントロールする<a class="headerlink" href="#controlling-creation-order-for-test-databases" title="Link to this heading">¶</a></h3>
+<p>デフォルトでは、 Django は全てのデータベースが <code class="docutils literal notranslate"><span class="pre">default</span></code> データベースに依存しているとみなすので、常に <code class="docutils literal notranslate"><span class="pre">default</span></code> データベースを最初に作成します。しかし、テストセットアップの他のデータベースの作成順は保証されません。</p>
+<p>データベース構成が特定の作成順序を必要とする場合、<a class="reference internal" href="../../ref/settings.html#std-setting-TEST_DEPENDENCIES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEPENDENCIES</span></code></a> テスト設定を使用して存在する依存関係を指定できます。次の（単純化した）データベース構成の例を考えてみましょう:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">DATABASES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># ... db settings</span>
+        <span class="s2">&quot;TEST&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;DEPENDENCIES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;diamonds&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;diamonds&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># ... db settings</span>
+        <span class="s2">&quot;TEST&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;DEPENDENCIES&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;clubs&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># ... db settings</span>
+        <span class="s2">&quot;TEST&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;DEPENDENCIES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;diamonds&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;spades&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># ... db settings</span>
+        <span class="s2">&quot;TEST&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;DEPENDENCIES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;diamonds&quot;</span><span class="p">,</span> <span class="s2">&quot;hearts&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;hearts&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># ... db settings</span>
+        <span class="s2">&quot;TEST&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;DEPENDENCIES&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;diamonds&quot;</span><span class="p">,</span> <span class="s2">&quot;clubs&quot;</span><span class="p">],</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>この設定では、依存関係のない唯一のエイリアスである <code class="docutils literal notranslate"><span class="pre">diamonds</span></code> データベースが最初に作成されます。次に <code class="docutils literal notranslate"><span class="pre">default</span></code> と <code class="docutils literal notranslate"><span class="pre">clubs</span></code> のエイリアスが作成され（このペアの作成順序は保証されていません）、次に <code class="docutils literal notranslate"><span class="pre">hearts</span></code> が作成され、最後に <code class="docutils literal notranslate"><span class="pre">spades</span></code> が作成されます。</p>
+<p><a class="reference internal" href="../../ref/settings.html#std-setting-TEST_DEPENDENCIES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEPENDENCIES</span></code></a> の定義に循環依存がある場合、 <a class="reference internal" href="../../ref/exceptions.html#django.core.exceptions.ImproperlyConfigured" title="django.core.exceptions.ImproperlyConfigured"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ImproperlyConfigured</span></code></a> 例外が発生します。</p>
+</section>
+</section>
+<section id="s-advanced-features-of-transactiontestcase">
+<span id="advanced-features-of-transactiontestcase"></span><h2><code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> の高度な機能<a class="headerlink" href="#advanced-features-of-transactiontestcase" title="Link to this heading">¶</a></h2>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.test.TransactionTestCase.available_apps">
+<span class="sig-prename descclassname"><span class="pre">TransactionTestCase.</span></span><span class="sig-name descname"><span class="pre">available_apps</span></span><a class="headerlink" href="#django.test.TransactionTestCase.available_apps" title="Link to this definition">¶</a></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>この属性はプライベートAPIです。例えば、アプリケーションの読み込みの変更に対応するために、将来、非推奨期間なしに変更または削除される可能性があります。</p>
+<p>これは Django 自身のテストスイートを最適化するために使われます。このテストスイート には何百ものモデルが含まれますが、異なるアプリケーションのモデル間のリレーションはありません。</p>
+</div>
+<p>デフォルトでは、<code class="docutils literal notranslate"><span class="pre">available_apps</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> に設定されています。各テスト後、Django は <a class="reference internal" href="../../ref/django-admin.html#django-admin-flush"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">flush</span></code></a> を呼び出して、データベースの状態をリセットします。これにより、すべてのテーブルが空になります。そして、<a class="reference internal" href="../../ref/signals.html#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_migrate</span></code></a> シグナルが送信されることにより、各モデルごとに、1つのコンテンツタイプと4つのパーミッションが再生成されます。この操作にかかるコストは、モデル数に比例して増大します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">available_apps</span></code> にアプリケーションのリストを指定すると、 Django はこれらのアプリケーションのモデルだけが利用可能であるかのように動作します。 <code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> の動作は以下のように変わります:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../../ref/signals.html#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_migrate</span></code></a> は、利用可能なアプリケーションの各モデルに対して、存在しない場合にコンテンツタイプやアクセス権を作成するために、各テストの前に起動します。</p></li>
+<li><p>各テストの後、 Django は利用可能なアプリのモデルに対応するテーブルだけを空にします。しかし、データベースレベルでは、切り捨て（truncation）が利用できないアプリのリレーション先モデルにカスケードするかもしれません。さらに、 <a class="reference internal" href="../../ref/signals.html#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_migrate</span></code></a> は起動されません。正しいアプリケーションのセットが選択された後、次の <code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> で起動されます。</p></li>
+</ul>
+<p>データベースは完全には flush されないので、テストが <code class="docutils literal notranslate"><span class="pre">available_apps</span></code> に含まれていないモデルのインスタンスを作成すると、そのインスタンスが漏れて無関係なテストが失敗する可能性があります。セッションを使用するテストには注意してください。デフォルトのセッションエンジンはセッションをデータベースに保存します。</p>
+<p>データベースをフラッシュした後には <a class="reference internal" href="../../ref/signals.html#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_migrate</span></code></a> が発行されないため、<code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> の後の状態は <code class="docutils literal notranslate"><span class="pre">TestCase</span></code> の後の状態と同じではありません。つまり、<a class="reference internal" href="../../ref/signals.html#django.db.models.signals.post_migrate" title="django.db.models.signals.post_migrate"><code class="xref py py-data docutils literal notranslate"><span class="pre">post_migrate</span></code></a> のリスナーによって作成された行が欠落しています。テストの実行順序に関する <a class="reference internal" href="overview.html#order-of-tests"><span class="std std-ref">注意事項</span></a> を踏まえると、与えられたテストスイート内のすべての <code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> が <code class="docutils literal notranslate"><span class="pre">available_apps</span></code> を宣言しているか、または一つも宣言していない場合、これは問題ではありません。</p>
+<p><code class="docutils literal notranslate"><span class="pre">available_apps</span></code> は Django 自身のテストスイートでは必須です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.test.TransactionTestCase.reset_sequences">
+<span class="sig-prename descclassname"><span class="pre">TransactionTestCase.</span></span><span class="sig-name descname"><span class="pre">reset_sequences</span></span><a class="headerlink" href="#django.test.TransactionTestCase.reset_sequences" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> で <code class="docutils literal notranslate"><span class="pre">reset_sequences</span> <span class="pre">=</span> <span class="pre">True</span></code> を設定すると、テスト実行前にシーケンスが常にリセットされます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TestsThatDependsOnPrimaryKeySequences</span><span class="p">(</span><span class="n">TransactionTestCase</span><span class="p">):</span>
+    <span class="n">reset_sequences</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_animal_pk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">lion</span> <span class="o">=</span> <span class="n">Animal</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;lion&quot;</span><span class="p">,</span> <span class="n">sound</span><span class="o">=</span><span class="s2">&quot;roar&quot;</span><span class="p">)</span>
+        <span class="c1"># lion.pk is guaranteed to always be 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">lion</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>プライマリキーのシーケンス番号を明示的にテストするのでなければ、 プライマリキーの値をハードコーディングしないことを推奨します。</p>
+<p>プライマリキーのリセットは比較的高コストなデータベース操作なので、 <code class="docutils literal notranslate"><span class="pre">reset_sequences</span> <span class="pre">=</span> <span class="pre">True</span></code> を使用するとテストが遅くなります。</p>
+</dd></dl>
+
+</section>
+<section id="s-enforce-running-test-classes-sequentially">
+<span id="s-topics-testing-enforce-run-sequentially"></span><span id="enforce-running-test-classes-sequentially"></span><span id="topics-testing-enforce-run-sequentially"></span><h2>テストクラスを強制的に逐次実行する<a class="headerlink" href="#enforce-running-test-classes-sequentially" title="Link to this heading">¶</a></h2>
+<p>並列に実行できないテストクラスがある場合 (共通のリソースを共有している場合など)、 <code class="docutils literal notranslate"><span class="pre">django.test.testcases.SerializeMixin</span></code> を使って逐次実行できます。このミックスインはファイルシステムの <code class="docutils literal notranslate"><span class="pre">lockfile</span></code> を使用します。</p>
+<p>たとえば、 <code class="docutils literal notranslate"><span class="pre">__file__</span></code> を使用すると、同じファイルにある <code class="docutils literal notranslate"><span class="pre">SerializeMixin</span></code> を継承したすべてのテストクラスが順番に実行されるようにすることができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test</span><span class="w"> </span><span class="kn">import</span> <span class="n">TestCase</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test.testcases</span><span class="w"> </span><span class="kn">import</span> <span class="n">SerializeMixin</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageTestCaseMixin</span><span class="p">(</span><span class="n">SerializeMixin</span><span class="p">):</span>
+    <span class="n">lockfile</span> <span class="o">=</span> <span class="vm">__file__</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">setUp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_storage_dir</span><span class="p">,</span> <span class="s2">&quot;my_file.png&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">create_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RemoveImageTests</span><span class="p">(</span><span class="n">ImageTestCaseMixin</span><span class="p">,</span> <span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_remove_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertFalse</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">))</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ResizeImageTests</span><span class="p">(</span><span class="n">ImageTestCaseMixin</span><span class="p">,</span> <span class="n">TestCase</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_resize_image</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">resize_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">48</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assertEqual</span><span class="p">(</span><span class="n">get_image_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">),</span> <span class="p">(</span><span class="mi">48</span><span class="p">,</span> <span class="mi">48</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="s-using-the-django-test-runner-to-test-reusable-applications">
+<span id="s-testing-reusable-applications"></span><span id="using-the-django-test-runner-to-test-reusable-applications"></span><span id="testing-reusable-applications"></span><h2>Django テストランナーを使って再利用可能なアプリケーションをテストする<a class="headerlink" href="#using-the-django-test-runner-to-test-reusable-applications" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../../intro/reusable-apps.html"><span class="doc">再利用可能なアプリケーション</span></a> を書いているのなら、 Django テストランナーを使って独自のテストスイートを実行し、Django のテスト基盤の恩恵を受けたいと思うかもしれません。</p>
+<p>一般的な慣習は、アプリケーションコードの隣に <em>tests</em> ディレクトリを置き、以下のような構成にすることです:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>runtests.py
+polls/
+    __init__.py
+    models.py
+    ...
+tests/
+    __init__.py
+    models.py
+    test_settings.py
+    tests.py
+</pre></div>
+</div>
+<p>いくつかのファイルの中身を見てみましょう:</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">runtests.py</span></code></span><a class="headerlink" href="#id3" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">django</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.test.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_runner</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;DJANGO_SETTINGS_MODULE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;tests.test_settings&quot;</span>
+    <span class="n">django</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+    <span class="n">TestRunner</span> <span class="o">=</span> <span class="n">get_runner</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+    <span class="n">test_runner</span> <span class="o">=</span> <span class="n">TestRunner</span><span class="p">()</span>
+    <span class="n">failures</span> <span class="o">=</span> <span class="n">test_runner</span><span class="o">.</span><span class="n">run_tests</span><span class="p">([</span><span class="s2">&quot;tests&quot;</span><span class="p">])</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="nb">bool</span><span class="p">(</span><span class="n">failures</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<p>これはテストスイートを実行するために呼び出すスクリプトです。Django 環境をセットアップし、テストデータベースを作成し、テストを実行します。</p>
+<p>わかりやすくするために、この例では Django テストランナーを使うために必要な最低限のものだけを含んでいます。冗長性を制御したり、実行する特定のテストラベルを渡したりするためのコマンドラインオプションを追加しても構いません。</p>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text"><code class="docutils literal notranslate"><span class="pre">tests/test_settings.py</span></code></span><a class="headerlink" href="#id4" title="Link to this code">¶</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s2">&quot;fake-key&quot;</span>
+<span class="n">INSTALLED_APPS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;tests&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>このファイルには、アプリのテストを実行するために必要な <a class="reference internal" href="../settings.html"><span class="doc">Django の設定</span></a> が含まれています。</p>
+<p>繰り返しますが、これは最小限の例です。テストを実行するには、さらに別の設定が必要になるかもしれません。</p>
+<p><em>tests</em> パッケージはテストを実行する際に <a class="reference internal" href="../../ref/settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> に含まれるので、その <code class="docutils literal notranslate"><span class="pre">models.py</span></code> ファイルにテスト専用のモデルを定義することもできます。</p>
+</section>
+<section id="s-using-different-testing-frameworks">
+<span id="s-other-testing-frameworks"></span><span id="using-different-testing-frameworks"></span><span id="other-testing-frameworks"></span><h2>ほかのテストフレームワークを使う<a class="headerlink" href="#using-different-testing-frameworks" title="Link to this heading">¶</a></h2>
+<p>明らかに、<a class="reference external" href="https://docs.python.org/3/library/unittest.html#module-unittest" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">unittest</span></code></a> は唯一のPythonテストフレームワークではありません。Djangoは代替フレームワークに対する明示的なサポートを提供していませんが、代替フレームワーク向けに構築されたテストを通常のDjangoテストのように呼び出す方法に対応しています。</p>
+<p><code class="docutils literal notranslate"><span class="pre">./manage.py</span> <span class="pre">test</span></code> を実行するとき、Django は <a class="reference internal" href="../../ref/settings.html#std-setting-TEST_RUNNER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEST_RUNNER</span></code></a> 設定を見て、何をするかを決定します。デフォルトでは、 <a class="reference internal" href="../../ref/settings.html#std-setting-TEST_RUNNER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEST_RUNNER</span></code></a> は <code class="docutils literal notranslate"><span class="pre">'django.test.runner.DiscoverRunner'</span></code> を指します。このクラスは Django のデフォルトのテスト動作を定義します。この動作には下記が含まれます:</p>
+<ol class="arabic simple">
+<li><p>テスト前のグローバルなセットアップの実行。</p></li>
+<li><p>現在のディレクトリ以下のファイルの中から、名前が <code class="docutils literal notranslate"><span class="pre">test*.py</span></code> と一致するテストを探す。</p></li>
+<li><p>テストデータベースの作成。</p></li>
+<li><p>テストデータベースにモデルと初期データをインストールするために <code class="docutils literal notranslate"><span class="pre">migrate</span></code> を実行する。</p></li>
+<li><p><a class="reference internal" href="../checks.html"><span class="doc">システムチェック</span></a> の実行。</p></li>
+<li><p>見つかったテストを実行する。</p></li>
+<li><p>テストデータベースの破棄。</p></li>
+<li><p>テスト後のグローバルな後処理の実行。</p></li>
+</ol>
+<p>独自のテストランナークラスを定義し、 <a class="reference internal" href="../../ref/settings.html#std-setting-TEST_RUNNER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEST_RUNNER</span></code></a> をそのクラスに向けると、 Django は常に <code class="docutils literal notranslate"><span class="pre">./manage.py</span> <span class="pre">test</span></code> を実行するときに、あなたのテストランナを実行します。この方法なら、 Python コードから実行できるテストフレームワークを使ったり、 Django のテスト実行プロセスを変更して、どんなテスト要件でも満たすことができます。</p>
+<section id="s-defining-a-test-runner">
+<span id="s-topics-testing-test-runner"></span><span id="defining-a-test-runner"></span><span id="topics-testing-test-runner"></span><h3>テストランナーを定義する<a class="headerlink" href="#defining-a-test-runner" title="Link to this heading">¶</a></h3>
+<p>テストランナーは <code class="docutils literal notranslate"><span class="pre">run_tests()</span></code> メソッドを定義したクラスです。Django には、デフォルトの Django のテスト動作を定義する <code class="docutils literal notranslate"><span class="pre">DiscoverRunner</span></code> クラスが同梱されています。このクラスは <code class="docutils literal notranslate"><span class="pre">run_tests()</span></code> のエントリーポイントを定義し、さらに <code class="docutils literal notranslate"><span class="pre">run_tests()</span></code> がテストスイートのセットアップ、実行、終了に使用する他のメソッドも定義します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DiscoverRunner</span></span>(<em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'test*.py'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failfast</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exclude_tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_name_patterns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">buffer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_faulthandler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shuffle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">durations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L637"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DiscoverRunner</span></code> は <code class="docutils literal notranslate"><span class="pre">pattern</span></code> にマッチするファイル内のテストを検索します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">top_level</span></code> を使うと、トップレベルの Python モジュールを含むディレクトリを指定できます。通常、 Django はこれを自動的に判別するので、このオプションを指定する必要はありません。もし指定するなら、通常は <code class="docutils literal notranslate"><span class="pre">manage.py</span></code> ファイルがあるディレクトリを指定します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">verbosity</span></code> はコンソールに出力される通知とデバッグ情報の量を決定します。 <code class="docutils literal notranslate"><span class="pre">0</span></code> は出力なし、 <code class="docutils literal notranslate"><span class="pre">1</span></code> は通常の出力、 <code class="docutils literal notranslate"><span class="pre">2</span></code> は冗長 (verbose) な出力です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">interactive</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、テストスイートが実行されるときにユーザーに指示を求める権限があります。この動作の例は、既存のテストデータベースを削除する許可を求めるようなものです。もし <code class="docutils literal notranslate"><span class="pre">interactive</span></code> が <code class="docutils literal notranslate"><span class="pre">False</span></code> なら、テストスイートは手動で操作しなくても実行できる必要があります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">failfast</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、テストスイートは最初のテストの失敗を検出した後に実行を停止します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">keepdb</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、テストスイートは既存のデータベースを使用します。 <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合は、新しいデータベースを作成し、既存のデータベースを削除するようユーザに促します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">reverse</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、テストケースは逆の順番で実行されます。これは適切に分離されておらず、副作用があるテストをデバッグするのに便利です。 <a class="reference internal" href="overview.html#order-of-tests"><span class="std std-ref">テストクラス</span></a> によるグループ化は、このオプションを使用しても保持されます。このオプションは <code class="docutils literal notranslate"><span class="pre">--shuffle</span></code> と組み合わせて、特定のランダムシードの順序を逆にするために使用できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">debug_mode</span></code> は、テストを実行する前に <a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> 設定を何に設定するべきかを指定します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">parallel</span></code> はプロセス数を指定します。 <code class="docutils literal notranslate"><span class="pre">parallel</span></code> が <code class="docutils literal notranslate"><span class="pre">1</span></code> より大きい場合、テストスイートは <code class="docutils literal notranslate"><span class="pre">parallel</span></code> プロセスで実行されます。指定されたプロセス数よりもテストケースクラスの数が少ない場合、 Django はそれに応じてプロセス数を減らします。各プロセスは独自のデータベースを取得します。このオプションでは、トレースバックを正しく表示するためにサードパーティの <code class="docutils literal notranslate"><span class="pre">tblib</span></code> パッケージが必要です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">tags</span></code> は <a class="reference internal" href="tools.html#topics-tagging-tests"><span class="std std-ref">テストをフィルタリングするタグ</span></a> に使用できます。 <code class="docutils literal notranslate"><span class="pre">exclude_tags</span></code> と併用できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">exclude_tags</span></code> は、テストを除外するための <a class="reference internal" href="tools.html#topics-tagging-tests"><span class="std std-ref">タグのセット</span></a> の指定に使用できます。 <code class="docutils literal notranslate"><span class="pre">tags</span></code> と併用できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">debug_sql</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、失敗したテストケースはトレースバックと同様に <a class="reference internal" href="../../ref/logging.html#django-db-logger"><span class="std std-ref">django.db.backends のロガー</span></a> に記録された SQL クエリを出力します。もし <code class="docutils literal notranslate"><span class="pre">verbosity</span></code> が <code class="docutils literal notranslate"><span class="pre">2</span></code> なら、すべてのテストのクエリが出力されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">test_name_patterns</span></code> を使うと、テストメソッドやクラスを名前でフィルタするためのパターンセットを指定できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">pdb</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、デバッガ (<code class="docutils literal notranslate"><span class="pre">pdb</span></code> または <code class="docutils literal notranslate"><span class="pre">ipdb</span></code>) がテストのエラーや失敗のたびに起動されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">buffer</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、合格したテストの出力は破棄されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">enable_faulthandler</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、 <a class="reference external" href="https://docs.python.org/3/library/faulthandler.html#module-faulthandler" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">faulthandler</span></code></a> が有効になります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">timing</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、データベースのセットアップと総実行時間を含むテスト時間が表示されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">shuffle</span></code> が整数の場合、その整数はランダムシードとして使用され、テストケースが実行前にランダムな順序でシャッフルされます。 <code class="docutils literal notranslate"><span class="pre">shuffle</span></code> が <code class="docutils literal notranslate"><span class="pre">None</span></code> の場合、シードはランダムに生成されます。どちらの場合も、シードはテスト実行前に記録され、 <code class="docutils literal notranslate"><span class="pre">self.shuffle_seed</span></code> に設定されます。このオプションは、適切に分離されていないテストを検出するのに役立つことがあります。このオプションを使用する場合、 <a class="reference internal" href="overview.html#order-of-tests"><span class="std std-ref">テストクラスによるグルーピング</span></a> が保持されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">logger</span></code> は Python <a class="reference external" href="https://docs.python.org/3/library/logging.html#logger" title="(in Python v3.13)"><span class="xref std std-ref">Logger オブジェクト</span></a> を渡すために使用します。指定された場合、ロガーはコンソールに出力する代わりにログメッセージを記録します。ロガーオブジェクトは <code class="docutils literal notranslate"><span class="pre">verbosity</span></code> よりもロギングレベルを優先します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">durations</span></code> を指定すると、最も遅い N 個のテストケースのリストが表示されます。このオプションに <code class="docutils literal notranslate"><span class="pre">0</span></code> を指定すると、すべてのテストの所要時間が表示されます。Python 3.12+ が必要です。</p>
+<p>Django では、新しい引数を追加することで、テストランナーの機能を拡張するこ とがあります。この拡張を可能にするのが <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> 宣言です。もし <code class="docutils literal notranslate"><span class="pre">DiscoverRunner</span></code> をサブクラス化したり、独自のテストランナーを書いたりする場合は、 <code class="docutils literal notranslate"><span class="pre">**kwargs</span></code> を受け付けるようにしてください。</p>
+<p>テストランナーでは、追加のコマンドラインオプションを定義することもできます。 <code class="docutils literal notranslate"><span class="pre">add_arguments(cls,</span> <span class="pre">parser)</span></code> クラスメソッドを作成またはオーバーライドし、そのメソッド内で <code class="docutils literal notranslate"><span class="pre">parser.add_argument()</span></code> を呼び出すときにカスタム引数を追加することで、 <a class="reference internal" href="../../ref/django-admin.html#django-admin-test"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">test</span></code></a> コマンドがそれらの引数を使用できるようになります。</p>
+<div class="versionadded">
+<span class="title">New in Django 5.0:</span> <p><code class="docutils literal notranslate"><span class="pre">durations</span></code> 引数が追加されました。</p>
+</div>
+</dd></dl>
+
+<section id="s-attributes">
+<span id="attributes"></span><h4>属性<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h4>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.test_suite">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">test_suite</span></span><a class="headerlink" href="#django.test.runner.DiscoverRunner.test_suite" title="Link to this definition">¶</a></dt>
+<dd><p>テストスイートのビルドに使用するクラス。デフォルトでは <code class="docutils literal notranslate"><span class="pre">unittest.TestSuite</span></code> に設定されています。テストを収集するために別のロジックを実装したい場合は、これをオーバーライドできます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.test_runner">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">test_runner</span></span><a class="headerlink" href="#django.test.runner.DiscoverRunner.test_runner" title="Link to this definition">¶</a></dt>
+<dd><p>これは低レベルテストランナーのクラスで、個々のテストを実行し、結果をフォーマットするために使用されます。デフォルトでは <code class="docutils literal notranslate"><span class="pre">unittest.TextTestRunner</span></code> に設定されています。似たような名前になっていますが、残念ながらこれは <code class="docutils literal notranslate"><span class="pre">DiscoverRunner</span></code> と同じ種類のクラスではありません。この属性をオーバーライドすることで、テストの実行方法やレポート方法を変更できます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.test_loader">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">test_loader</span></span><a class="headerlink" href="#django.test.runner.DiscoverRunner.test_loader" title="Link to this definition">¶</a></dt>
+<dd><p>これは、TestCases やモジュールなどからテストを読み込んで、ランナーが実行するテストスイートにバンドルするクラスです。デフォルトでは <code class="docutils literal notranslate"><span class="pre">unittest.defaultTestLoader</span></code> に設定されています。通常とは異なる方法でテストを読み込む場合は、この属性をオーバーライドします。</p>
+</dd></dl>
+
+</section>
+<section id="s-methods">
+<span id="methods"></span><h4>メソッド<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h4>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.run_tests">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">run_tests</span></span>(<em class="sig-param"><span class="n"><span class="pre">test_labels</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L1049"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.run_tests" title="Link to this definition">¶</a></dt>
+<dd><p>テストスイートを実行します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">test_labels</span></code> は実行するテストを指定するもので、いくつかのフォーマットをサポートしています (サポートされているフォーマットのリストについては <a class="reference internal" href="#django.test.runner.DiscoverRunner.build_suite" title="django.test.runner.DiscoverRunner.build_suite"><code class="xref py py-meth docutils literal notranslate"><span class="pre">DiscoverRunner.build_suite()</span></code></a> を参照してください)。</p>
+<p>このメソッドは、失敗したテストの数を返す必要があります。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.add_arguments">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">add_arguments</span></span>(<em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L708"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.add_arguments" title="Link to this definition">¶</a></dt>
+<dd><p>このクラスメソッドをオーバーライドして <a class="reference internal" href="../../ref/django-admin.html#django-admin-test"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">test</span></code></a> 管理コマンドが受け付けるカスタム引数を追加できます。パーサへの引数の追加についての詳細は <a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.ArgumentParser.add_argument" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">argparse.ArgumentParser.add_argument()</span></code></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.setup_test_environment">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">setup_test_environment</span></span>(<em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L844"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.setup_test_environment" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.test.utils.setup_test_environment" title="django.test.utils.setup_test_environment"><code class="xref py py-func docutils literal notranslate"><span class="pre">setup_test_environment()</span></code></a> を呼び出して、 <a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> を <code class="docutils literal notranslate"><span class="pre">self.debug_mode</span></code> (デフォルトは <code class="docutils literal notranslate"><span class="pre">False</span></code>) に設定することで、テスト環境をセットアップできます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.build_suite">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">build_suite</span></span>(<em class="sig-param"><span class="n"><span class="pre">test_labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L902"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.build_suite" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたテストラベルにマッチするテストスイートを構築（コンストラクト）します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">test_labels</span></code> は実行するテストを説明する文字列のリストです。テストラベルには下記の 4 つのうち、いずれかの形式が指定できます:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">path.to.test_module.TestCase.test_method</span></code> -- テストケースクラスのテストメソッドを実行します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">path.to.test_module.TestCase</span></code> -- テストケースのすべてのテストメソッドを実行します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">path.to.module</span></code> -- 指定した Python パッケージまたはモジュール内のすべてのテストを検索して実行します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">path/to/directory</span></code> -- 指定したディレクトリ以下のすべてのテストを検索し、実行します。</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">test_labels</span></code> の値が <code class="docutils literal notranslate"><span class="pre">None</span></code> の場合、テストランナーはカレントディレクトリ以下のすべてのファイルの中から、 <code class="docutils literal notranslate"><span class="pre">pattern</span></code> (上記参照) にマッチする名前のテストを探します。</p>
+<p>実行可能な <code class="docutils literal notranslate"><span class="pre">TestSuite</span></code> インスタンスを返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.setup_databases">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">setup_databases</span></span>(<em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L963"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.setup_databases" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.test.utils.setup_databases" title="django.test.utils.setup_databases"><code class="xref py py-func docutils literal notranslate"><span class="pre">setup_databases()</span></code></a> を呼び出して、テスト用データベースを作成します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.run_checks">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">run_checks</span></span>(<em class="sig-param"><span class="n"><span class="pre">databases</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L991"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.run_checks" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../checks.html"><span class="doc">システムチェック</span></a> をテスト用の <code class="docutils literal notranslate"><span class="pre">databases</span></code> に対して実行します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.run_suite">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">run_suite</span></span>(<em class="sig-param"><span class="n"><span class="pre">suite</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L996"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.run_suite" title="Link to this definition">¶</a></dt>
+<dd><p>テストスイートを実行します。</p>
+<p>テストスイートの実行結果を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.get_test_runner_kwargs">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">get_test_runner_kwargs</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L980"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.get_test_runner_kwargs" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">DiscoverRunner.test_runner</span></code> をインスタンス化するためのキーワード引数を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.teardown_databases">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">teardown_databases</span></span>(<em class="sig-param"><span class="n"><span class="pre">old_config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L1006"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.teardown_databases" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.test.utils.teardown_databases" title="django.test.utils.teardown_databases"><code class="xref py py-func docutils literal notranslate"><span class="pre">teardown_databases()</span></code></a> を呼び出すことで、テストデータベースを破棄し、テスト前の状態に戻します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.teardown_test_environment">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">teardown_test_environment</span></span>(<em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L1015"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.teardown_test_environment" title="Link to this definition">¶</a></dt>
+<dd><p>テスト前の環境を復元します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.suite_result">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">suite_result</span></span>(<em class="sig-param"><span class="n"><span class="pre">suite</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">result</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L1019"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.suite_result" title="Link to this definition">¶</a></dt>
+<dd><p>テストスイートを基にリターンコードを計算し、その結果を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.test.runner.DiscoverRunner.log">
+<span class="sig-prename descclassname"><span class="pre">DiscoverRunner.</span></span><span class="sig-name descname"><span class="pre">log</span></span>(<em class="sig-param"><span class="n"><span class="pre">msg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/runner.py#L826"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.runner.DiscoverRunner.log" title="Link to this definition">¶</a></dt>
+<dd><p>もし <code class="docutils literal notranslate"><span class="pre">logger</span></code> が設定されている場合、与えられた整数の <a class="reference external" href="https://docs.python.org/3/library/logging.html#levels">logging level</a> (例えば <code class="docutils literal notranslate"><span class="pre">logging.DEBUG</span></code>, <code class="docutils literal notranslate"><span class="pre">logging.INFO</span></code> または <code class="docutils literal notranslate"><span class="pre">logging.WARNING</span></code>) でメッセージをログに記録します。そうでない場合は、現在の <code class="docutils literal notranslate"><span class="pre">verbosity</span></code> に従ってコンソールにメッセージが出力されます。例えば、 <code class="docutils literal notranslate"><span class="pre">verbosity</span></code> が 0 の場合はメッセージは表示されず、 <code class="docutils literal notranslate"><span class="pre">verbosity</span></code> が 1 以上の場合は <code class="docutils literal notranslate"><span class="pre">INFO</span></code> 以上のメッセージが表示され、2 以上の場合は <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> のメッセージが表示されます。 <code class="docutils literal notranslate"><span class="pre">level</span></code> のデフォルトは <code class="docutils literal notranslate"><span class="pre">logging.INFO</span></code> です。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-testing-utilities">
+<span id="testing-utilities"></span><h3>テスト用ユーティリティ<a class="headerlink" href="#testing-utilities" title="Link to this heading">¶</a></h3>
+<section id="s-module-django.test.utils">
+<span id="s-django-test-utils"></span><span id="module-django.test.utils"></span><span id="django-test-utils"></span><h4><code class="docutils literal notranslate"><span class="pre">django.test.utils</span></code><a class="headerlink" href="#module-django.test.utils" title="Link to this heading">¶</a></h4>
+<p>独自のテストランナーの作成を支援するために、Django は <code class="docutils literal notranslate"><span class="pre">django.test.utils</span></code> モジュールで多くのユーティリティメソッドを提供しています。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.test.utils.setup_test_environment">
+<span class="sig-name descname"><span class="pre">setup_test_environment</span></span>(<em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/utils.py#L121"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.utils.setup_test_environment" title="Link to this definition">¶</a></dt>
+<dd><p>グローバルな前処理テストセットアップを実行します。これには、テンプレートレンダリングシステム用の計測ツールのインストールや、ダミーのメールアウトボックスのセットアップが含まれます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">debug</span></code> が <code class="docutils literal notranslate"><span class="pre">None</span></code> 以外の場合、 <a class="reference internal" href="../../ref/settings.html#std-setting-DEBUG"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEBUG</span></code></a> 設定はその値に更新されます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.test.utils.teardown_test_environment">
+<span class="sig-name descname"><span class="pre">teardown_test_environment</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/utils.py#L157"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.utils.teardown_test_environment" title="Link to this definition">¶</a></dt>
+<dd><p>グローバルな後処理テストのテアダウン（解体）を実行します。これには、テンプレートシステムから計測ツールを削除し、通常のメールサービスを復元することが含まれます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.test.utils.setup_databases">
+<span class="sig-name descname"><span class="pre">setup_databases</span></span>(<em class="sig-param"><span class="n"><span class="pre">verbosity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_keeper</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_sql</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aliases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serialized_aliases</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/utils.py#L173"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.utils.setup_databases" title="Link to this definition">¶</a></dt>
+<dd><p>テスト用データベースを作成します。</p>
+<p>行われた変更を元に戻すのに十分な詳細情報を提供するデータ構造を返します。このデータはテスト終了時に <a class="reference internal" href="#django.test.utils.teardown_databases" title="django.test.utils.teardown_databases"><code class="xref py py-func docutils literal notranslate"><span class="pre">teardown_databases()</span></code></a> 関数に渡されます。</p>
+<p>引数 <code class="docutils literal notranslate"><span class="pre">aliases</span></code> はどの <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> エイリアスにテスト用データベースを設定するかを決定します。省略された場合、デフォルトは <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> の全てのエイリアスです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">serialized_aliases</span></code> 引数は、 <code class="docutils literal notranslate"><span class="pre">aliases</span></code> テストデータベースのどのサブセットがその状態をシリアライズすべきかを特定し、 <a class="reference internal" href="overview.html#test-case-serialized-rollback"><span class="std std-ref">serialized_rollback</span></a> 機能が利用できるようにします。指定しなかった場合、デフォルトは <code class="docutils literal notranslate"><span class="pre">aliases</span></code> になります。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.test.utils.teardown_databases">
+<span class="sig-name descname"><span class="pre">teardown_databases</span></span>(<em class="sig-param"><span class="n"><span class="pre">old_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/test/utils.py#L358"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.test.utils.teardown_databases" title="Link to this definition">¶</a></dt>
+<dd><p>テスト データベースを破棄し、テスト前の状態に戻します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">old_config</span></code> は元に戻すべきデータベース設定の変更を定義したデータ構造です。これは <a class="reference internal" href="#django.test.utils.setup_databases" title="django.test.utils.setup_databases"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setup_databases()</span></code></a> メソッドの戻り値です。</p>
+</dd></dl>
+
+</section>
+<section id="s-django-db-connection-creation">
+<span id="django-db-connection-creation"></span><h4><code class="docutils literal notranslate"><span class="pre">django.db.connection.creation</span></code><a class="headerlink" href="#django-db-connection-creation" title="Link to this heading">¶</a></h4>
+<p>データベースバックエンドの作成モジュールは、テスト中に役立つユーティリティも提供しています。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.db.connection.creation.create_test_db">
+<span class="sig-name descname"><span class="pre">create_test_db</span></span>(<em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autoclobber</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">serialize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="headerlink" href="#django.db.connection.creation.create_test_db" title="Link to this definition">¶</a></dt>
+<dd><p>新しいテストデータベースを作成し、それに対して <code class="docutils literal notranslate"><span class="pre">migrate</span></code> を実行します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">verbosity</span></code> は <code class="docutils literal notranslate"><span class="pre">run_tests()</span></code> と同じ動作です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">autoclobber</span></code> はテストデータベースと同じ名前のデータベースを見つけた場合の動作を表します:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">autoclobber</span></code> が <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合、ユーザは既存のデータベースを破棄することを承認するよう求められます。ユーザーが承認しない場合は <code class="docutils literal notranslate"><span class="pre">sys.exit</span></code> が呼び出されます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">autoclobber</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、ユーザーに通知することなくデータベースを破棄します。</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">serialize</span></code> は、テストを実行する前に、Django がデータベースをメモリ内の JSON 文字列にシリアライズするかどうかを決定します (トランザクションがない場合、テスト間でデータベースの状態を復元するために使います)。これを <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定すると、 <a class="reference internal" href="overview.html#test-case-serialized-rollback"><span class="std std-ref">serialized_rollback=True</span></a> を持つテストクラスがない場合に、作成時間を短縮できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">keepdb</span></code> はテスト実行時に既存のデータベースを使用するか、新しいデータベースを作成するかを決定します。もし <code class="docutils literal notranslate"><span class="pre">True</span></code> なら、既存のデータベースが使用され、存在しない場合は作成されます。もし <code class="docutils literal notranslate"><span class="pre">False</span></code> ならば、新しいデータベースが作成され、既存のデータベースを削除するようにユーザに促します。</p>
+<p>作成したテスト用データベースの名前を返します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">create_test_db()</span></code> は <a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> の <a class="reference internal" href="../../ref/settings.html#std-setting-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> の値をテストデータベースの名前と一致するように変更するという副作用があります。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.db.connection.creation.destroy_test_db">
+<span class="sig-name descname"><span class="pre">destroy_test_db</span></span>(<em class="sig-param"><span class="n"><span class="pre">old_database_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbosity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keepdb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="headerlink" href="#django.db.connection.creation.destroy_test_db" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../../ref/settings.html#std-setting-DATABASES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DATABASES</span></code></a> の <a class="reference internal" href="../../ref/settings.html#std-setting-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> の値を名前とするデータベースを破棄し、 <a class="reference internal" href="../../ref/settings.html#std-setting-NAME"><code class="xref std std-setting docutils literal notranslate"><span class="pre">NAME</span></code></a> に <code class="docutils literal notranslate"><span class="pre">old_database_name</span></code> の値をセットします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">verbosity</span></code> 引数は <a class="reference internal" href="#django.test.runner.DiscoverRunner" title="django.test.runner.DiscoverRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">DiscoverRunner</span></code></a> と同じ動作です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">keepdb</span></code> 引数が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、データベースへの接続は閉じられますが、データベースは破棄されません。</p>
+</dd></dl>
+
+</section>
+</section>
+</section>
+<section id="s-integration-with-coverage-py">
+<span id="s-topics-testing-code-coverage"></span><span id="integration-with-coverage-py"></span><span id="topics-testing-code-coverage"></span><h2><code class="docutils literal notranslate"><span class="pre">coverage.py</span></code> との統合<a class="headerlink" href="#integration-with-coverage-py" title="Link to this heading">¶</a></h2>
+<p>コードカバレッジは、ソースコードがどれだけテストされたかを表します。コードカバレッジは、コードのどの部分がテストで実施され、 どの部分が実施されていないのかを表します。アプリケーションをテストする上で重要な要素なので、テストのカバレッジをチェックすることを強く推奨します。</p>
+<p>Django は Python プログラムのコードカバレッジを測定するツール <a class="reference external" href="https://coverage.readthedocs.io/">coverage.py</a> と簡単に統合できます。まず、 <a class="extlink-pypi reference external" href="https://pypi.org/project/coverage/">coverage</a> をインストールします。次に、 <code class="docutils literal notranslate"><span class="pre">manage.py</span></code> を含むプロジェクトフォルダから以下を実行してください:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>coverage<span class="w"> </span>run<span class="w"> </span>--source<span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="w"> </span>manage.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>myapp
+</pre></div>
+</div>
+<p>これはテストを実行し、プロジェクト内で実行されたファイルのカバレッジデータを収集します。次のコマンドを入力すると、このデータのレポートを見ることができます:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>coverage<span class="w"> </span>report
+</pre></div>
+</div>
+<p>テストの実行中に、いくつかの Django コードが実行されましたが、前のコマンドに <code class="docutils literal notranslate"><span class="pre">source</span></code> フラグが渡されたため、ここには記載されていないことに注意してください。</p>
+<p>テストに失敗した行の詳細を注釈を付けてHTMLに表示するなどのオプションについては、 <a class="reference external" href="https://coverage.readthedocs.io/">coverage.py</a> のドキュメントを参照してください。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">テストに関する高度なトピック</a><ul>
+<li><a class="reference internal" href="#the-request-factory">RequestFactory（リクエスト ファクトリ）</a><ul>
+<li><a class="reference internal" href="#example">カスタマイズ例</a></li>
+<li><a class="reference internal" href="#asyncrequestfactory">AsyncRequestFactory</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing-class-based-views">クラスベースのビューをテストする</a></li>
+<li><a class="reference internal" href="#tests-and-multiple-host-names">テストとマルチホスト名</a></li>
+<li><a class="reference internal" href="#tests-and-multiple-databases">テストと複数データベース</a><ul>
+<li><a class="reference internal" href="#testing-primary-replica-configurations">プライマリ/レプリカ構成のテスト</a></li>
+<li><a class="reference internal" href="#controlling-creation-order-for-test-databases">テストデータベースの作成順をコントロールする</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#advanced-features-of-transactiontestcase"><code class="docutils literal notranslate"><span class="pre">TransactionTestCase</span></code> の高度な機能</a></li>
+<li><a class="reference internal" href="#enforce-running-test-classes-sequentially">テストクラスを強制的に逐次実行する</a></li>
+<li><a class="reference internal" href="#using-the-django-test-runner-to-test-reusable-applications">Django テストランナーを使って再利用可能なアプリケーションをテストする</a></li>
+<li><a class="reference internal" href="#using-different-testing-frameworks">ほかのテストフレームワークを使う</a><ul>
+<li><a class="reference internal" href="#defining-a-test-runner">テストランナーを定義する</a><ul>
+<li><a class="reference internal" href="#attributes">属性</a></li>
+<li><a class="reference internal" href="#methods">メソッド</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing-utilities">テスト用ユーティリティ</a><ul>
+<li><a class="reference internal" href="#module-django.test.utils"><code class="docutils literal notranslate"><span class="pre">django.test.utils</span></code></a></li>
+<li><a class="reference internal" href="#django-db-connection-creation"><code class="docutils literal notranslate"><span class="pre">django.db.connection.creation</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#integration-with-coverage-py"><code class="docutils literal notranslate"><span class="pre">coverage.py</span></code> との統合</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="tools.html"
+                          title="前の章へ">テストツール</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="../auth/index.html"
+                          title="次の章へ">Django でのユーザー認証</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/topics/testing/advanced.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="tools.html" title="テストツール">previous</a>
+     |
+    <a href="../index.html" title="Django を使う" accesskey="U">up</a>
+   |
+    <a href="../auth/index.html" title="Django でのユーザー認証">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

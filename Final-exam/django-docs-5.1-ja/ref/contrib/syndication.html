@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>配信 (syndication) フィード フレームワーク &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="クロスサイトリクエストフォージェリ (CSRF) 対策" href="../csrf.html" />
+    <link rel="prev" title="staticfiles アプリ" href="staticfiles.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="staticfiles.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;staticfiles&lt;/span&gt;&lt;/code&gt; アプリ">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="../csrf.html" title="クロスサイトリクエストフォージェリ (CSRF) 対策">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-syndication">
+            
+  <section id="s-module-django.contrib.syndication">
+<span id="s-the-syndication-feed-framework"></span><span id="module-django.contrib.syndication"></span><span id="the-syndication-feed-framework"></span><h1>配信 (syndication) フィード フレームワーク<a class="headerlink" href="#module-django.contrib.syndication" title="Link to this heading">¶</a></h1>
+<p>Django には、<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Glossary/RSS">RSS</a> と <span class="target" id="index-2"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc4287.html"><strong>Atom</strong></a> フィードを作成するための高レベルな配信 (syndication) フィード生成フレームワークが付属しています。</p>
+<p>任意の配信フィードを作成するには、短い Python クラスを書くだけで済みます。好きなだけフィードを作成できます。</p>
+<p>Djangoには、低レベルのフィード生成APIも付属しています。ウェブコンテキストの外や、他の低レベルな方法でフィードを生成したい場合に使用してください。</p>
+<section id="s-the-high-level-framework">
+<span id="the-high-level-framework"></span><h2>高レベルのフレームワーク<a class="headerlink" href="#the-high-level-framework" title="Link to this heading">¶</a></h2>
+<section id="s-overview">
+<span id="overview"></span><h3>概要<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h3>
+<p>高レベルのフィード生成フレームワークは <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスによって提供されます。フィードを作成するには、 <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスを記述し、 <a class="reference internal" href="../../topics/http/urls.html"><span class="doc">URLconf</span></a> でそのインスタンスを指定します。</p>
+</section>
+<section id="s-feed-classes">
+<span id="feed-classes"></span><h3><code class="docutils literal notranslate"><span class="pre">Feed</span></code> クラス<a class="headerlink" href="#feed-classes" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスは配信フィードを表す Python クラスです。フィードは単純なもの (例えば、&quot;サイトニュース&quot; フィードや、ブログの最新エントリを表示する基本的なフィード) もあれば、より複雑なもの (例えば、特定のカテゴリに属する全てのブログエントリを表示するフィード (カテゴリは可変)) もあります。</p>
+<p>フィードクラスは <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.syndication.views.Feed</span></code></a> のサブクラスです。これらはコードベースのどこにでも置くことができます。</p>
+<p><a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスのインスタンスは、 <a class="reference internal" href="../../topics/http/urls.html"><span class="doc">URLconf</span></a> で使用できるビューです。</p>
+</section>
+<section id="s-a-simple-example">
+<span id="a-simple-example"></span><h3>簡単な例<a class="headerlink" href="#a-simple-example" title="Link to this heading">¶</a></h3>
+<p>この単純な例は、ある警察のニュースサイトから引用したもので、最新の5つのニュースのフィードを記述しています:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.syndication.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">Feed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">policebeat.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">NewsItem</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">LatestEntriesFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Police beat site news&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="s2">&quot;/sitenews/&quot;</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Updates on changes and additions to police beat central.&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NewsItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-pub_date&quot;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">item</span><span class="o">.</span><span class="n">title</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">item</span><span class="o">.</span><span class="n">description</span>
+
+    <span class="c1"># item_link is only needed if NewsItem has no get_absolute_url method.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">reverse</span><span class="p">(</span><span class="s2">&quot;news-item&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="n">item</span><span class="o">.</span><span class="n">pk</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>このフィードにURLを接続するには、 <a class="reference internal" href="../../topics/http/urls.html"><span class="doc">URLconf</span></a> にFeedオブジェクトのインスタンスを配置します。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">myproject.feeds</span><span class="w"> </span><span class="kn">import</span> <span class="n">LatestEntriesFeed</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ...</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;latest/feed/&quot;</span><span class="p">,</span> <span class="n">LatestEntriesFeed</span><span class="p">()),</span>
+    <span class="c1"># ...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>備考:</p>
+<ul class="simple">
+<li><p>Feedクラスは <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.syndication.views.Feed</span></code></a> のサブクラスです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">title</span></code>、<code class="docutils literal notranslate"><span class="pre">link</span></code>、および <code class="docutils literal notranslate"><span class="pre">description</span></code> は、それぞれ標準RSSの <code class="docutils literal notranslate"><span class="pre">&lt;title&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;link&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;description&gt;</span></code> 要素に対応します。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">items()</span></code> は、フィードに含めるべきオブジェクトのリストを返すメソッドです。この例では、Djangoの <a class="reference internal" href="../models/querysets.html"><span class="doc">ORM</span></a> を使用して <code class="docutils literal notranslate"><span class="pre">NewsItem</span></code> オブジェクトを返しますが、 <code class="docutils literal notranslate"><span class="pre">items()</span></code> は必ずモデルインスタンスを返す必要はありません。Django モデルを使用することで、いくつかの機能が「タダ」で提供されますが、 <code class="docutils literal notranslate"><span class="pre">items()</span></code> は任意の種類のオブジェクトを返すことができます。</p></li>
+<li><p>Atom フィードを作成する場合、RSS フィードではなく、<code class="docutils literal notranslate"><span class="pre">description</span></code> 属性の代わりに <code class="docutils literal notranslate"><span class="pre">subtitle</span></code> 属性を設定してください。例については、後述の <a class="reference internal" href="#publishing-atom-and-rss-feeds-in-tandem">Publishing Atom and RSS feeds in tandem</a> を参照してください。</p></li>
+</ul>
+<p>まだやるべきことが一つあります。RSSフィードでは、各 <code class="docutils literal notranslate"><span class="pre">&lt;item&gt;</span></code> には <code class="docutils literal notranslate"><span class="pre">&lt;title&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;link&gt;</span></code>, そして <code class="docutils literal notranslate"><span class="pre">&lt;description&gt;</span></code> が含まれています。これらの要素にどんなデータを入れるべきか、フレームワークに伝える必要があります。</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;title&gt;</span></code> と <code class="docutils literal notranslate"><span class="pre">&lt;description&gt;</span></code> の内容について、Djangoは <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスでメソッド <code class="docutils literal notranslate"><span class="pre">item_title()</span></code> と <code class="docutils literal notranslate"><span class="pre">item_description()</span></code> を呼び出そうとします。これらには、オブジェクト自体を表す単一のパラメータ <code class="docutils literal notranslate"><span class="pre">item</span></code> が渡されます。これらはオプションであり、デフォルトではオブジェクトの文字列表現が両方に使用されます。</p>
+<p>タイトルや説明文に特別な書式を設定したい場合は、 <a class="reference internal" href="../templates/language.html"><span class="doc">Django テンプレート</span></a> を代わりに使用できます。そのパスは <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスの <code class="docutils literal notranslate"><span class="pre">title_template</span></code> と <code class="docutils literal notranslate"><span class="pre">description_template</span></code> 属性で指定できます。テンプレートはアイテムごとにレンダリングされ、2つのテンプレートコンテキスト変数に渡されます:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">obj</span> <span class="pre">}}</span></code> -- 現在のオブジェクト (<code class="docutils literal notranslate"><span class="pre">items()</span></code> で返したオブジェクトのいずれか)。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">site</span> <span class="pre">}}</span></code> ―― 現在のサイトを表す <a class="reference internal" href="sites.html#django.contrib.sites.models.Site" title="django.contrib.sites.models.Site"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.contrib.sites.models.Site</span></code></a> オブジェクト。これは <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">site.domain</span> <span class="pre">}}</span></code> や <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">site.name</span> <span class="pre">}}</span></code> に便利です。Django サイトフレームワークがインストールされていない場合は、これは <a class="reference internal" href="sites.html#django.contrib.sites.requests.RequestSite" title="django.contrib.sites.requests.RequestSite"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestSite</span></code></a> オブジェクトに設定されます。詳細は、サイトフレームワークのドキュメントの <a class="reference internal" href="sites.html#id3"><span class="std std-ref">RequestSite のセクション</span></a> を参照してください。</p></li>
+</ul>
+<p>記述テンプレートを使用した以下の <a class="reference internal" href="#a-complex-example">a complex example</a> を参照してください。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.syndication.Feed.get_context_data">
+<span class="sig-prename descclassname"><span class="pre">Feed.</span></span><span class="sig-name descname"><span class="pre">get_context_data</span></span>(<em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.contrib.syndication.Feed.get_context_data" title="Link to this definition">¶</a></dt>
+<dd><p>必要な変数が2つ以上ある場合、タイトルと説明テンプレートに追加情報を渡す方法もあります。その場合は、<code class="docutils literal notranslate"><span class="pre">Feed</span></code> サブクラス内で <code class="docutils literal notranslate"><span class="pre">get_context_data</span></code> メソッドの実装を提供できます。例えば:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">mysite.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Article</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.syndication.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">Feed</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ArticlesFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;My articles&quot;</span>
+    <span class="n">description_template</span> <span class="o">=</span> <span class="s2">&quot;feeds/articles.html&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-pub_date&quot;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">context</span><span class="p">[</span><span class="s2">&quot;foo&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;bar&quot;</span>
+        <span class="k">return</span> <span class="n">context</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>テンプレートは以下の通りです:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span>Something about <span class="cp">{{</span> <span class="nv">foo</span> <span class="cp">}}</span>: <span class="cp">{{</span> <span class="nv">obj.description</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>このメソッドは、<code class="docutils literal notranslate"><span class="pre">items()</span></code> で返されたリストの各アイテムごとに、次のキーワード引数とともに一度ずつ呼び出されます:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">item</span></code>: 現在のアイテム。後方互換性のため、このコンテキスト変数の名前は <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">obj</span> <span class="pre">}}</span></code> です。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">obj</span></code>: <code class="docutils literal notranslate"><span class="pre">get_object()</span></code> で返されるオブジェクト。デフォルトでは、テンプレートでの混乱を避けるため <code class="docutils literal notranslate"><span class="pre">{{</span> <span class="pre">obj</span> <span class="pre">}}</span></code> (前述) で公開されませんが、 <code class="docutils literal notranslate"><span class="pre">get_context_data()</span></code> の実装で使用できます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">site</span></code>: 上記で説明した現在のサイト。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">request</span></code>: 現在のリクエスト。</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">get_context_data()</span></code> の動作は <a class="reference internal" href="../../topics/class-based-views/generic-display.html#adding-extra-context"><span class="std std-ref">ジェネリックビュー</span></a> と同様です。親クラスからコンテキストデータを取得するために <code class="docutils literal notranslate"><span class="pre">super()</span></code> を呼び出し、自分のデータを追加して、修正された辞書を返すことになっています。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;link&gt;</span></code> の内容を指定するには、2つの選択肢があります。<code class="docutils literal notranslate"><span class="pre">items()</span></code> の各項目に対して、Djangoはまず <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラス上の <code class="docutils literal notranslate"><span class="pre">item_link()</span></code> メソッドを呼び出すことを試みます。タイトルや説明と同様に、これには単一のパラメータ <code class="docutils literal notranslate"><span class="pre">item</span></code> が渡されます。そのメソッドが存在しない場合、Djangoはそのオブジェクト上で <code class="docutils literal notranslate"><span class="pre">get_absolute_url()</span></code> メソッドを実行しようとします。<code class="docutils literal notranslate"><span class="pre">get_absolute_url()</span></code> および <code class="docutils literal notranslate"><span class="pre">item_link()</span></code> は、いずれも項目のURLを通常のPython文字列として返すべきです。<code class="docutils literal notranslate"><span class="pre">get_absolute_url()</span></code> と同様に、<code class="docutils literal notranslate"><span class="pre">item_link()</span></code> の結果はURLに直接含まれるため、メソッド内で必要なURLクォーティングおよびASCIIへの変換をすべて自身で行う責任があります。</p></li>
+</ul>
+</section>
+<section id="s-a-complex-example">
+<span id="a-complex-example"></span><h3>複雑な例<a class="headerlink" href="#a-complex-example" title="Link to this heading">¶</a></h3>
+<p>このフレームワークは、引数を通じて、より複雑なフィードもサポートしています。</p>
+<p>たとえば、あるウェブサイトが、都市内の各警察管轄地域の最近の犯罪についてのRSSフィードを提供しているとします。各警察の管轄地域ごとに <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスを別々に作成するのは愚かなことです。それは <a class="reference internal" href="../../misc/design-philosophies.html#dry"><span class="std std-ref">DRY原則</span></a> に反し、データをプログラミングロジックに結びつけてしまいます。代わりに、配信 (syndication) フレームワークを使用すると、<a class="reference internal" href="../../topics/http/urls.html"><span class="doc">URLconf</span></a> から渡された引数にアクセスできます。そのため、フィードのURL内の情報に基づいてアイテムを出力できます。</p>
+<p>警察の管轄地域のフィードは次のようなURLを介してアクセスできます:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/beats/613/rss/</span></code> ―― 613番担当地域の最近の犯罪情報を返します。</p></li>
+<li><p>&quot;/beats/1424/rss/&quot; ―― 1424番担当地域の最近の犯罪を返します。</p></li>
+</ul>
+<p>これらは、次のような <a class="reference internal" href="../../topics/http/urls.html"><span class="doc">URLconf</span></a> 行とマッチするでしょう:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">path</span><span class="p">(</span><span class="s2">&quot;beats/&lt;int:beat_id&gt;/rss/&quot;</span><span class="p">,</span> <span class="n">BeatFeed</span><span class="p">()),</span>
+</pre></div>
+</div>
+<p>ビューと同様に、URLの引数はリクエストオブジェクトと共に <code class="docutils literal notranslate"><span class="pre">get_object()</span></code> メソッドに渡されます。</p>
+<p>これらの管轄地域に特化したフィードのコードは以下の通りです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.syndication.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">Feed</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">BeatFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="n">description_template</span> <span class="o">=</span> <span class="s2">&quot;feeds/beat_description.html&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">beat_id</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Beat</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">beat_id</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Police beat central: Crimes for beat </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">beat</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">get_absolute_url</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Crimes recently reported in police beat </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">obj</span><span class="o">.</span><span class="n">beat</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Crime</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">beat</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-crime_date&quot;</span><span class="p">)[:</span><span class="mi">30</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>フィードの <code class="docutils literal notranslate"><span class="pre">&lt;title&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;link&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">&lt;description&gt;</span></code> を生成するために、 Django は <code class="docutils literal notranslate"><span class="pre">title()</span></code>, <code class="docutils literal notranslate"><span class="pre">link()</span></code>, <code class="docutils literal notranslate"><span class="pre">description()</span></code> メソッドを使います。前の例では、これらは文字列のクラス属性でしたが、この例では、文字列 <em>または</em> メソッドを指定できます。 <code class="docutils literal notranslate"><span class="pre">title</span></code>、<code class="docutils literal notranslate"><span class="pre">link</span></code>、<code class="docutils literal notranslate"><span class="pre">description</span></code> のそれぞれについて、 Django は以下のアルゴリズムに従います</p>
+<ul class="simple">
+<li><p>まず、 <code class="docutils literal notranslate"><span class="pre">obj</span></code> を引数にして、メソッドを呼び出そうとします。ここで、 <code class="docutils literal notranslate"><span class="pre">obj</span></code> は <code class="docutils literal notranslate"><span class="pre">get_object()</span></code> によって返されたオブジェクトです</p></li>
+<li><p>それが失敗した場合、引数なしでメソッドを呼び出そうとします。</p></li>
+<li><p>それができない場合は、クラス属性を使用します。</p></li>
+</ul>
+<p>また、<code class="docutils literal notranslate"><span class="pre">items()</span></code> も同じアルゴリズムに従います。最初に <code class="docutils literal notranslate"><span class="pre">items(obj)</span></code> を試し、次に <code class="docutils literal notranslate"><span class="pre">items()</span></code>、最後に <code class="docutils literal notranslate"><span class="pre">items</span></code> クラス属性（リストであるべきです）を試します。</p>
+<p>アイテムの説明用にテンプレートを使用しています。これは最小限の例です:</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">obj.description</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+<p>ただし、フォーマットは必要に応じて追加できます。</p>
+<p>以下の <code class="docutils literal notranslate"><span class="pre">ExampleFeed</span></code> クラスは、 <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスのメソッドと属性に関する完全なドキュメントを提供します。</p>
+</section>
+<section id="s-specifying-the-type-of-feed">
+<span id="specifying-the-type-of-feed"></span><h3>フィードの種類を指定する<a class="headerlink" href="#specifying-the-type-of-feed" title="Link to this heading">¶</a></h3>
+<p>デフォルトでは、このフレームワークで作成されたフィードはRSS 2.0を使用します。</p>
+<p>これを変更するには、次のように <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスに <code class="docutils literal notranslate"><span class="pre">feed_type</span></code> 属性を追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.feedgenerator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Atom1Feed</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="n">feed_type</span> <span class="o">=</span> <span class="n">Atom1Feed</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">feed_type</span></code> にはインスタンスではなく、クラスオブジェクトを設定することに注意してください。</p>
+<p>現在利用可能なフィードタイプは以下の通りです:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../utils.html#django.utils.feedgenerator.Rss201rev2Feed" title="django.utils.feedgenerator.Rss201rev2Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.utils.feedgenerator.Rss201rev2Feed</span></code></a> (RSS 2.01。デフォルト。)</p></li>
+<li><p><a class="reference internal" href="../utils.html#django.utils.feedgenerator.RssUserland091Feed" title="django.utils.feedgenerator.RssUserland091Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.utils.feedgenerator.RssUserland091Feed</span></code></a> (RSS 0.91.)</p></li>
+<li><p><a class="reference internal" href="../utils.html#django.utils.feedgenerator.Atom1Feed" title="django.utils.feedgenerator.Atom1Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.utils.feedgenerator.Atom1Feed</span></code></a> (Atom 1.0.)</p></li>
+</ul>
+</section>
+<section id="s-enclosures">
+<span id="enclosures"></span><h3>エンクロージャ (Enclosure)<a class="headerlink" href="#enclosures" title="Link to this heading">¶</a></h3>
+<p>ポッドキャストフィードを作成する際に使用されるエンクロージャ (enclosure) を指定するには、<code class="docutils literal notranslate"><span class="pre">item_enclosures</span></code> フックを使用するか、またはアイテムごとに1つのエンクロージャのみを持つ場合は代わりに <code class="docutils literal notranslate"><span class="pre">item_enclosure_url</span></code>、<code class="docutils literal notranslate"><span class="pre">item_enclosure_length</span></code>、<code class="docutils literal notranslate"><span class="pre">item_enclosure_mime_type</span></code> フックを使用します。使用例については、以下の <code class="docutils literal notranslate"><span class="pre">ExampleFeed</span></code> クラスを参照してください。</p>
+</section>
+<section id="s-language">
+<span id="language"></span><h3>言語<a class="headerlink" href="#language" title="Link to this heading">¶</a></h3>
+<p>配信フレームワークによって作成されたフィードは、自動的に適切な <code class="docutils literal notranslate"><span class="pre">&lt;language&gt;</span></code> タグ (RSS 2.0) または <code class="docutils literal notranslate"><span class="pre">xml:lang</span></code> 属性 (Atom) を含みます。デフォルトでは <a class="reference internal" href="../utils.html#django.utils.translation.get_language" title="django.utils.translation.get_language"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.translation.get_language()</span></code></a> です。 <code class="docutils literal notranslate"><span class="pre">language</span></code> クラス属性を設定することで変更できます。</p>
+</section>
+<section id="s-urls">
+<span id="urls"></span><h3>URL<a class="headerlink" href="#urls" title="Link to this heading">¶</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">link</span></code> メソッド/属性は絶対パス (例: <code class="docutils literal notranslate"><span class="pre">&quot;/blog/&quot;</span></code>) または完全修飾ドメインとプロトコルを含むURL (例：<code class="docutils literal notranslate"><span class="pre">&quot;https://www.example.com/blog/&quot;</span></code>) を返すことができます。もし <code class="docutils literal notranslate"><span class="pre">link</span></code> がドメインを返さない場合、配信フレームワークは <a class="reference internal" href="../settings.html#std-setting-SITE_ID"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SITE_ID</span> <span class="pre">設定</span></code></a> に従って、現在のサイトのドメインを挿入します。</p>
+<p>Atom フィードには、フィードの現在の場所を定義する <code class="docutils literal notranslate"><span class="pre">&lt;link</span> <span class="pre">rel=&quot;self&quot;&gt;</span></code> が必要です。配信フレームワークは、<a class="reference internal" href="../settings.html#std-setting-SITE_ID"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SITE_ID</span></code></a> 設定に従って、現在のサイトのドメインを使用して、これを自動的に設定します。</p>
+</section>
+<section id="s-publishing-atom-and-rss-feeds-in-tandem">
+<span id="publishing-atom-and-rss-feeds-in-tandem"></span><h3>Atom と RSS フィードを同時に公開する<a class="headerlink" href="#publishing-atom-and-rss-feeds-in-tandem" title="Link to this heading">¶</a></h3>
+<p>フィードの Atom 版と RSS 版の <em>両方</em> を利用したい開発者もいるでしょう。そのためには、 <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスのサブクラスを作成し、 <code class="docutils literal notranslate"><span class="pre">feed_type</span></code> を別のものに設定します。それから URLconf を更新して、追加バージョンを追加します。</p>
+<p>すべての例を示します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.syndication.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">Feed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">policebeat.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">NewsItem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.feedgenerator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Atom1Feed</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RssSiteNewsFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;Police beat site news&quot;</span>
+    <span class="n">link</span> <span class="o">=</span> <span class="s2">&quot;/sitenews/&quot;</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Updates on changes and additions to police beat central.&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">NewsItem</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;-pub_date&quot;</span><span class="p">)[:</span><span class="mi">5</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">AtomSiteNewsFeed</span><span class="p">(</span><span class="n">RssSiteNewsFeed</span><span class="p">):</span>
+    <span class="n">feed_type</span> <span class="o">=</span> <span class="n">Atom1Feed</span>
+    <span class="n">subtitle</span> <span class="o">=</span> <span class="n">RssSiteNewsFeed</span><span class="o">.</span><span class="n">description</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>この例では、RSSフィードは <code class="docutils literal notranslate"><span class="pre">description</span></code> を使っていますが、Atomフィードは <code class="docutils literal notranslate"><span class="pre">subtitle</span></code> を使っています。Atomフィードはフィードレベルの &quot;description&quot; を提供しませんが、&quot;subtitle&quot; を提供 <em>する</em> からです。</p>
+<p><a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスに <code class="docutils literal notranslate"><span class="pre">description</span></code> を提供した場合、サブタイトルと説明が必ずしも同じものではないため、Django は自動的にそれを <code class="docutils literal notranslate"><span class="pre">subtitle</span></code> 要素に入れ <em>ません</em> 。代わりに、 <code class="docutils literal notranslate"><span class="pre">subtitle</span></code> 属性を定義するべきです。</p>
+<p>上記の例では、Atomフィードの <code class="docutils literal notranslate"><span class="pre">subtitle</span></code> をRSSフィードの <code class="docutils literal notranslate"><span class="pre">description</span></code> に設定していますが、これは既にかなり短いためです。</p>
+</div>
+<p>そして、それに伴うURLconfは次のとおりです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.urls</span><span class="w"> </span><span class="kn">import</span> <span class="n">path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">myproject.feeds</span><span class="w"> </span><span class="kn">import</span> <span class="n">AtomSiteNewsFeed</span><span class="p">,</span> <span class="n">RssSiteNewsFeed</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># ...</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;sitenews/rss/&quot;</span><span class="p">,</span> <span class="n">RssSiteNewsFeed</span><span class="p">()),</span>
+    <span class="n">path</span><span class="p">(</span><span class="s2">&quot;sitenews/atom/&quot;</span><span class="p">,</span> <span class="n">AtomSiteNewsFeed</span><span class="p">()),</span>
+    <span class="c1"># ...</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="s-feed-class-reference">
+<span id="feed-class-reference"></span><h3><code class="docutils literal notranslate"><span class="pre">Feed</span></code> クラスのリファレンス<a class="headerlink" href="#feed-class-reference" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.syndication.views.Feed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">views.</span></span><span class="sig-name descname"><span class="pre">Feed</span></span><a class="headerlink" href="#django.contrib.syndication.views.Feed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>この例は、 <a class="reference internal" href="#django.contrib.syndication.views.Feed" title="django.contrib.syndication.views.Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">Feed</span></code></a> クラスの可能な全ての属性とメソッドを示しています:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.syndication.views</span><span class="w"> </span><span class="kn">import</span> <span class="n">Feed</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">feedgenerator</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ExampleFeed</span><span class="p">(</span><span class="n">Feed</span><span class="p">):</span>
+    <span class="c1"># FEED TYPE -- Optional. This should be a class that subclasses</span>
+    <span class="c1"># django.utils.feedgenerator.SyndicationFeed. This designates</span>
+    <span class="c1"># which type of feed this should be: RSS 2.0, Atom 1.0, etc. If</span>
+    <span class="c1"># you don&#39;t specify feed_type, your feed will be RSS 2.0. This</span>
+    <span class="c1"># should be a class, not an instance of the class.</span>
+
+    <span class="n">feed_type</span> <span class="o">=</span> <span class="n">feedgenerator</span><span class="o">.</span><span class="n">Rss201rev2Feed</span>
+
+    <span class="c1"># TEMPLATE NAMES -- Optional. These should be strings</span>
+    <span class="c1"># representing names of Django templates that the system should</span>
+    <span class="c1"># use in rendering the title and description of your feed items.</span>
+    <span class="c1"># Both are optional. If a template is not specified, the</span>
+    <span class="c1"># item_title() or item_description() methods are used instead.</span>
+
+    <span class="n">title_template</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">description_template</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># LANGUAGE -- Optional. This should be a string specifying a language</span>
+    <span class="c1"># code. Defaults to django.utils.translation.get_language().</span>
+    <span class="n">language</span> <span class="o">=</span> <span class="s2">&quot;de&quot;</span>
+
+    <span class="c1"># TITLE -- One of the following three is required. The framework</span>
+    <span class="c1"># looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the</span>
+<span class="sd">        feed&#39;s title as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s title as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;foo&quot;</span>  <span class="c1"># Hard-coded title.</span>
+
+    <span class="c1"># LINK -- One of the following three is required. The framework</span>
+    <span class="c1"># looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # Takes the object returned by get_object() and returns the URL</span>
+<span class="sd">        # of the HTML version of the feed as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the URL of the HTML version of the feed as a normal Python</span>
+<span class="sd">        string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">link</span> <span class="o">=</span> <span class="s2">&quot;/blog/&quot;</span>  <span class="c1"># Hard-coded URL.</span>
+
+    <span class="c1"># FEED_URL -- One of the following three is optional. The framework</span>
+    <span class="c1"># looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">feed_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # Takes the object returned by get_object() and returns the feed&#39;s</span>
+<span class="sd">        # own URL as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">feed_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s own URL as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">feed_url</span> <span class="o">=</span> <span class="s2">&quot;/blog/rss/&quot;</span>  <span class="c1"># Hard-coded URL.</span>
+
+    <span class="c1"># GUID -- One of the following three is optional. The framework looks</span>
+    <span class="c1"># for them in this order. This property is only used for Atom feeds</span>
+    <span class="c1"># (where it is the feed-level ID element). If not provided, the feed</span>
+    <span class="c1"># link is used as the ID.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">feed_guid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the globally</span>
+<span class="sd">        unique ID for the feed as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">feed_guid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s globally unique ID as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">feed_guid</span> <span class="o">=</span> <span class="s2">&quot;/foo/bar/1234&quot;</span>  <span class="c1"># Hard-coded guid.</span>
+
+    <span class="c1"># DESCRIPTION -- One of the following three is required. The framework</span>
+    <span class="c1"># looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the feed&#39;s</span>
+<span class="sd">        description as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s description as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">description</span> <span class="o">=</span> <span class="s2">&quot;Foo bar baz.&quot;</span>  <span class="c1"># Hard-coded description.</span>
+
+    <span class="c1"># AUTHOR NAME --One of the following three is optional. The framework</span>
+    <span class="c1"># looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">author_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the feed&#39;s</span>
+<span class="sd">        author&#39;s name as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">author_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s author&#39;s name as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">author_name</span> <span class="o">=</span> <span class="s2">&quot;Sally Smith&quot;</span>  <span class="c1"># Hard-coded author name.</span>
+
+    <span class="c1"># AUTHOR EMAIL --One of the following three is optional. The framework</span>
+    <span class="c1"># looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">author_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the feed&#39;s</span>
+<span class="sd">        author&#39;s email as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">author_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s author&#39;s email as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">author_email</span> <span class="o">=</span> <span class="s2">&quot;test@example.com&quot;</span>  <span class="c1"># Hard-coded author email.</span>
+
+    <span class="c1"># AUTHOR LINK --One of the following three is optional. The framework</span>
+    <span class="c1"># looks for them in this order. In each case, the URL should include</span>
+    <span class="c1"># the scheme (such as &quot;https://&quot;) and domain name.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">author_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the feed&#39;s</span>
+<span class="sd">        author&#39;s URL as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">author_link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s author&#39;s URL as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">author_link</span> <span class="o">=</span> <span class="s2">&quot;https://www.example.com/&quot;</span>  <span class="c1"># Hard-coded author URL.</span>
+
+    <span class="c1"># CATEGORIES -- One of the following three is optional. The framework</span>
+    <span class="c1"># looks for them in this order. In each case, the method/attribute</span>
+    <span class="c1"># should return an iterable object that returns strings.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">categories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the feed&#39;s</span>
+<span class="sd">        categories as iterable over strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">categories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s categories as iterable over strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">categories</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;django&quot;</span><span class="p">]</span>  <span class="c1"># Hard-coded list of categories.</span>
+
+    <span class="c1"># COPYRIGHT NOTICE -- One of the following three is optional. The</span>
+    <span class="c1"># framework looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">feed_copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the feed&#39;s</span>
+<span class="sd">        copyright notice as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">feed_copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s copyright notice as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">feed_copyright</span> <span class="o">=</span> <span class="s2">&quot;Copyright (c) 2007, Sally Smith&quot;</span>  <span class="c1"># Hard-coded copyright notice.</span>
+
+    <span class="c1"># TTL -- One of the following three is optional. The framework looks</span>
+    <span class="c1"># for them in this order. Ignored for Atom feeds.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ttl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns the feed&#39;s</span>
+<span class="sd">        TTL (Time To Live) as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">ttl</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the feed&#39;s TTL as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">ttl</span> <span class="o">=</span> <span class="mi">600</span>  <span class="c1"># Hard-coded Time To Live.</span>
+
+    <span class="c1"># ITEMS -- One of the following three is required. The framework looks</span>
+    <span class="c1"># for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the object returned by get_object() and returns a list of</span>
+<span class="sd">        items to publish in this feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a list of items to publish in this feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Item 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Item 2&quot;</span><span class="p">]</span>  <span class="c1"># Hard-coded items.</span>
+
+    <span class="c1"># GET_OBJECT -- This is required for feeds that publish different data</span>
+    <span class="c1"># for different URL parameters. (See &quot;A complex example&quot; above.)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_object</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes the current request and the arguments from the URL, and</span>
+<span class="sd">        returns an object represented by this feed. Raises</span>
+<span class="sd">        django.core.exceptions.ObjectDoesNotExist on error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># ITEM TITLE AND DESCRIPTION -- If title_template or</span>
+    <span class="c1"># description_template are not defined, these are used instead. Both are</span>
+    <span class="c1"># optional, by default they will use the string representation of the</span>
+    <span class="c1"># item.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_title</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        title as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the title for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_title</span> <span class="o">=</span> <span class="s2">&quot;Breaking News: Nothing Happening&quot;</span>  <span class="c1"># Hard-coded title.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_description</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        description as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_description</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the description for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_description</span> <span class="o">=</span> <span class="s2">&quot;A description of the item.&quot;</span>  <span class="c1"># Hard-coded description.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a dictionary to use as extra context if either</span>
+<span class="sd">        description_template or item_template are used.</span>
+
+<span class="sd">        Default implementation preserves the old behavior</span>
+<span class="sd">        of using {&#39;obj&#39;: item, &#39;site&#39;: current_site} as the context.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># ITEM LINK -- One of these three is required. The framework looks for</span>
+    <span class="c1"># them in this order.</span>
+
+    <span class="c1"># First, the framework tries the two methods below, in</span>
+    <span class="c1"># order. Failing that, it falls back to the get_absolute_url()</span>
+    <span class="c1"># method on each item returned by items().</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the URL for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># ITEM_GUID -- The following method is optional. If not provided, the</span>
+    <span class="c1"># item&#39;s link is used by default.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_guid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as return by items(), and returns the item&#39;s ID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="c1"># ITEM_GUID_IS_PERMALINK -- The following method is optional. If</span>
+    <span class="c1"># provided, it sets the &#39;isPermaLink&#39; attribute of an item&#39;s</span>
+    <span class="c1"># GUID element. This method is used only when &#39;item_guid&#39; is</span>
+    <span class="c1"># specified.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_guid_is_permalink</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns a boolean.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_guid_is_permalink</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Hard coded value</span>
+
+    <span class="c1"># ITEM AUTHOR NAME -- One of the following three is optional. The</span>
+    <span class="c1"># framework looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_author_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        author&#39;s name as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_author_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the author name for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_author_name</span> <span class="o">=</span> <span class="s2">&quot;Sally Smith&quot;</span>  <span class="c1"># Hard-coded author name.</span>
+
+    <span class="c1"># ITEM AUTHOR EMAIL --One of the following three is optional. The</span>
+    <span class="c1"># framework looks for them in this order.</span>
+    <span class="c1">#</span>
+    <span class="c1"># If you specify this, you must specify item_author_name.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_author_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        author&#39;s email as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_author_email</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the author email for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_author_email</span> <span class="o">=</span> <span class="s2">&quot;test@example.com&quot;</span>  <span class="c1"># Hard-coded author email.</span>
+
+    <span class="c1"># ITEM AUTHOR LINK -- One of the following three is optional. The</span>
+    <span class="c1"># framework looks for them in this order. In each case, the URL should</span>
+    <span class="c1"># include the scheme (such as &quot;https://&quot;) and domain name.</span>
+    <span class="c1">#</span>
+    <span class="c1"># If you specify this, you must specify item_author_name.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_author_link</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        author&#39;s URL as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_author_link</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the author URL for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_author_link</span> <span class="o">=</span> <span class="s2">&quot;https://www.example.com/&quot;</span>  <span class="c1"># Hard-coded author URL.</span>
+
+    <span class="c1"># ITEM ENCLOSURES -- One of the following three is optional. The</span>
+    <span class="c1"># framework looks for them in this order. If one of them is defined,</span>
+    <span class="c1"># ``item_enclosure_url``, ``item_enclosure_length``, and</span>
+    <span class="c1"># ``item_enclosure_mime_type`` will have no effect.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_enclosures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns a list of</span>
+<span class="sd">        ``django.utils.feedgenerator.Enclosure`` objects.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_enclosures</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the ``django.utils.feedgenerator.Enclosure`` list for every</span>
+<span class="sd">        item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_enclosures</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Hard-coded enclosure list</span>
+
+    <span class="c1"># ITEM ENCLOSURE URL -- One of these three is required if you&#39;re</span>
+    <span class="c1"># publishing enclosures and you&#39;re not using ``item_enclosures``. The</span>
+    <span class="c1"># framework looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_enclosure_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        enclosure URL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_enclosure_url</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the enclosure URL for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_enclosure_url</span> <span class="o">=</span> <span class="s2">&quot;/foo/bar.mp3&quot;</span>  <span class="c1"># Hard-coded enclosure link.</span>
+
+    <span class="c1"># ITEM ENCLOSURE LENGTH -- One of these three is required if you&#39;re</span>
+    <span class="c1"># publishing enclosures and you&#39;re not using ``item_enclosures``. The</span>
+    <span class="c1"># framework looks for them in this order. In each case, the returned</span>
+    <span class="c1"># value should be either an integer, or a string representation of the</span>
+    <span class="c1"># integer, in bytes.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_enclosure_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        enclosure length.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_enclosure_length</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the enclosure length for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_enclosure_length</span> <span class="o">=</span> <span class="mi">32000</span>  <span class="c1"># Hard-coded enclosure length.</span>
+
+    <span class="c1"># ITEM ENCLOSURE MIME TYPE -- One of these three is required if you&#39;re</span>
+    <span class="c1"># publishing enclosures and you&#39;re not using ``item_enclosures``. The</span>
+    <span class="c1"># framework looks for them in this order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_enclosure_mime_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        enclosure MIME type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_enclosure_mime_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the enclosure MIME type for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_enclosure_mime_type</span> <span class="o">=</span> <span class="s2">&quot;audio/mpeg&quot;</span>  <span class="c1"># Hard-coded enclosure MIME type.</span>
+
+    <span class="c1"># ITEM PUBDATE -- It&#39;s optional to use one of these three. This is a</span>
+    <span class="c1"># hook that specifies how to get the pubdate for a given item.</span>
+    <span class="c1"># In each case, the method/attribute should return a Python</span>
+    <span class="c1"># datetime.datetime object.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_pubdate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        pubdate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_pubdate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the pubdate for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_pubdate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># Hard-coded pubdate.</span>
+
+    <span class="c1"># ITEM UPDATED -- It&#39;s optional to use one of these three. This is a</span>
+    <span class="c1"># hook that specifies how to get the updateddate for a given item.</span>
+    <span class="c1"># In each case, the method/attribute should return a Python</span>
+    <span class="c1"># datetime.datetime object.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_updateddate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        updateddate.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_updateddate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the updateddate for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_updateddate</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2005</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>  <span class="c1"># Hard-coded updateddate.</span>
+
+    <span class="c1"># ITEM CATEGORIES -- It&#39;s optional to use one of these three. This is</span>
+    <span class="c1"># a hook that specifies how to get the list of categories for a given</span>
+    <span class="c1"># item. In each case, the method/attribute should return an iterable</span>
+    <span class="c1"># object that returns strings.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_categories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        categories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_categories</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the categories for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_categories</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="s2">&quot;django&quot;</span><span class="p">]</span>  <span class="c1"># Hard-coded categories.</span>
+
+    <span class="c1"># ITEM COPYRIGHT NOTICE (only applicable to Atom feeds) -- One of the</span>
+    <span class="c1"># following three is optional. The framework looks for them in this</span>
+    <span class="c1"># order.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        copyright notice as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_copyright</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the copyright notice for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_copyright</span> <span class="o">=</span> <span class="s2">&quot;Copyright (c) 2007, Sally Smith&quot;</span>  <span class="c1"># Hard-coded copyright notice.</span>
+
+    <span class="c1"># ITEM COMMENTS URL -- It&#39;s optional to use one of these three. This is</span>
+    <span class="c1"># a hook that specifies how to get the URL of a page for comments for a</span>
+    <span class="c1"># given item.</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes an item, as returned by items(), and returns the item&#39;s</span>
+<span class="sd">        comments URL as a normal Python string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">item_comments</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the comments URL for every item in the feed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="n">item_comments</span> <span class="o">=</span> <span class="s2">&quot;https://www.example.com/comments&quot;</span>  <span class="c1"># Hard-coded comments URL</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="s-the-low-level-framework">
+<span id="the-low-level-framework"></span><h2>低レベルのフレームワーク<a class="headerlink" href="#the-low-level-framework" title="Link to this heading">¶</a></h2>
+<p>舞台裏では、高水準のRSSフレームワークがフィードのXMLを生成するために、より低水準のフレームワークを使用しています。このフレームワークは単一のモジュールに存在します: <a class="extlink-source reference external" href="https://github.com/django/django/blob/main/django/utils/feedgenerator.py">django/utils/feedgenerator.py</a> 。</p>
+<p>このフレームワークを使用して、低レベルのフィードを生成します。独自のフィードジェネレータサブクラスを作成して <code class="docutils literal notranslate"><span class="pre">feed_type</span></code> <code class="docutils literal notranslate"><span class="pre">Feed</span></code> オプションで使用することもできます。</p>
+<section id="s-syndicationfeed-classes">
+<span id="syndicationfeed-classes"></span><h3><code class="docutils literal notranslate"><span class="pre">SyndicationFeed</span></code> クラス<a class="headerlink" href="#syndicationfeed-classes" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="../utils.html#module-django.utils.feedgenerator" title="django.utils.feedgenerator: Syndication feed generation library -- used for generating RSS, etc."><code class="xref py py-mod docutils literal notranslate"><span class="pre">feedgenerator</span></code></a> モジュールには以下の基底クラスが含まれています:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../utils.html#django.utils.feedgenerator.SyndicationFeed" title="django.utils.feedgenerator.SyndicationFeed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.utils.feedgenerator.SyndicationFeed</span></code></a></p></li>
+</ul>
+<p>サブクラスは以下です:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../utils.html#django.utils.feedgenerator.RssUserland091Feed" title="django.utils.feedgenerator.RssUserland091Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.utils.feedgenerator.RssUserland091Feed</span></code></a></p></li>
+<li><p><a class="reference internal" href="../utils.html#django.utils.feedgenerator.Rss201rev2Feed" title="django.utils.feedgenerator.Rss201rev2Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.utils.feedgenerator.Rss201rev2Feed</span></code></a></p></li>
+<li><p><a class="reference internal" href="../utils.html#django.utils.feedgenerator.Atom1Feed" title="django.utils.feedgenerator.Atom1Feed"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.utils.feedgenerator.Atom1Feed</span></code></a></p></li>
+</ul>
+<p>これら3つのクラスは、特定の種類のフィードをXMLとしてレンダリングする方法を知っています。これらはこのインターフェイスを共有しています:</p>
+<dl>
+<dt><a class="reference internal" href="../utils.html#django.utils.feedgenerator.SyndicationFeed.__init__" title="django.utils.feedgenerator.SyndicationFeed.__init__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SyndicationFeed.__init__()</span></code></a></dt><dd><p>与えられたメタデータの辞書でフィードを初期化します。これはフィード全体に適用されます。必須のキーワード引数は以下の通りです:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">title</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">link</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></li>
+</ul>
+<p>他にもいくつかのオプションキーワードがあります:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">language</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">author_email</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">author_name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">author_link</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">subtitle</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">categories</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feed_url</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feed_copyright</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">feed_guid</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ttl</span></code></p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">__init__</span></code> に渡された追加のキーワード引数は、 <a class="reference internal" href="#custom-feed-generators">custom feed generators</a> での使用のために <code class="docutils literal notranslate"><span class="pre">self.feed</span></code> に格納されます。</p>
+<p>すべてのパラメータは文字列であるべきですが、 <code class="docutils literal notranslate"><span class="pre">categories</span></code> のみ文字列のシーケンスであるべきです。XMLドキュメントでは、いくつかの制御文字が <a class="reference external" href="https://www.w3.org/International/questions/qa-controls">許可されていない</a> ことに注意してください。コンテンツにそれらが含まれている場合、フィードを生成する際に <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> に遭遇するかもしれません。</p>
+</dd>
+<dt><a class="reference internal" href="../utils.html#django.utils.feedgenerator.SyndicationFeed.add_item" title="django.utils.feedgenerator.SyndicationFeed.add_item"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SyndicationFeed.add_item()</span></code></a></dt><dd><p>指定されたパラメータを使用してフィードにアイテムを追加します。</p>
+<p>必須キーワード引数は以下の通りです:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">title</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">link</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code></p></li>
+</ul>
+<p>オプションのキーワード引数は次のとおりです:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">author_email</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">author_name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">author_link</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pubdate</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">comments</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">unique_id</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enclosures</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">categories</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">item_copyright</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ttl</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">updateddate</span></code></p></li>
+</ul>
+<p>追加のキーワード引数は <a class="reference internal" href="#custom-feed-generators">custom feed generators</a> 用に保存されます。</p>
+<p>パラメータを指定する場合は、文字列でなければなりません:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pubdate</span></code> は Python の <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> オブジェクトであるべきです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">updateddate</span></code> はPythonの <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> オブジェクトでなければなりません。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">enclosures</span></code> は <a class="reference internal" href="../utils.html#django.utils.feedgenerator.Enclosure" title="django.utils.feedgenerator.Enclosure"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.utils.feedgenerator.Enclosure</span></code></a> インスタンスのリストであるべきです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">categories</span></code> は文字列のシーケンスであるべきです。</p></li>
+</ul>
+</dd>
+<dt><a class="reference internal" href="../utils.html#django.utils.feedgenerator.SyndicationFeed.write" title="django.utils.feedgenerator.SyndicationFeed.write"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SyndicationFeed.write()</span></code></a></dt><dd><p>指定されたエンコーディングでフィードを outfile に出力します。outfile はファイルライクなオブジェクトです。</p>
+</dd>
+<dt><a class="reference internal" href="../utils.html#django.utils.feedgenerator.SyndicationFeed.writeString" title="django.utils.feedgenerator.SyndicationFeed.writeString"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SyndicationFeed.writeString()</span></code></a></dt><dd><p>指定されたエンコーディングでフィードを文字列として返します。</p>
+</dd>
+</dl>
+<p>例えば、Atom 1.0 フィードを作成して標準出力に出力するには、次のようにします:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">feedgenerator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span> <span class="o">=</span> <span class="n">feedgenerator</span><span class="o">.</span><span class="n">Atom1Feed</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;My Blog&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">link</span><span class="o">=</span><span class="s2">&quot;https://www.example.com/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;In which I write about what I ate today.&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">author_name</span><span class="o">=</span><span class="s2">&quot;Myself&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">feed_url</span><span class="o">=</span><span class="s2">&quot;https://example.com/atom.xml&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">f</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Hot dog today&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">link</span><span class="o">=</span><span class="s2">&quot;https://www.example.com/entries/1/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">pubdate</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;&lt;p&gt;Today I had a Vienna Beef hot dog. It was pink, plump and perfect.&lt;/p&gt;&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">writeString</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">))</span>
+<span class="go">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="go">&lt;feed xmlns=&quot;http://www.w3.org/2005/Atom&quot; xml:lang=&quot;en&quot;&gt;</span>
+<span class="go">...</span>
+<span class="go">&lt;/feed&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="s-custom-feed-generators">
+<span id="custom-feed-generators"></span><h3>カスタムフィードジェネレータ<a class="headerlink" href="#custom-feed-generators" title="Link to this heading">¶</a></h3>
+<p>カスタムフィード形式を作成する必要がある場合、いくつかのオプションがあります。</p>
+<p>フィードフォーマットが完全にカスタムである場合は、<code class="docutils literal notranslate"><span class="pre">SyndicationFeed</span></code> をサブクラス化し、<code class="docutils literal notranslate"><span class="pre">write()</span></code> メソッドと <code class="docutils literal notranslate"><span class="pre">writeString()</span></code> メソッドを完全に置き換える必要があります。</p>
+<p>しかし、フィードフォーマットがRSSやAtom（例えば、 <a class="reference external" href="https://georss.org">GeoRSS</a> 、Appleの <a class="reference external" href="https://help.apple.com/itc/podcasts_connect/#/itcb54353390">iTunes podcast format</a> など）の派生形式である場合、より良い選択肢があります。これらのタイプのフィードは、通常、基本となるフォーマットに追加の要素や属性を追加し、 <code class="docutils literal notranslate"><span class="pre">SyndicationFeed</span></code> がこれらの追加属性を取得するために呼び出す一連のメソッドがあります。したがって、適切なフィードジェネレータクラス (<code class="docutils literal notranslate"><span class="pre">Atom1Feed</span></code> または <code class="docutils literal notranslate"><span class="pre">Rss201rev2Feed</span></code>) をサブクラス化し、これらのコールバックを拡張できます。それらは次のとおりです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">SyndicationFeed.root_attributes(self)</span></code></dt><dd><p>ルートフィード要素 (<code class="docutils literal notranslate"><span class="pre">feed</span></code>/<code class="docutils literal notranslate"><span class="pre">channel</span></code>) に追加する属性の <code class="docutils literal notranslate"><span class="pre">dict</span></code> を返します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SyndicationFeed.add_root_elements(self,</span> <span class="pre">handler)</span></code></dt><dd><p>ルートフィード要素 (<code class="docutils literal notranslate"><span class="pre">feed</span></code>/<code class="docutils literal notranslate"><span class="pre">channel</span></code>) 内に要素を追加するためのコールバックです。<code class="docutils literal notranslate"><span class="pre">handler</span></code> はPythonの組み込みSAXライブラリからの <a class="reference external" href="https://docs.python.org/3/library/xml.sax.utils.html#xml.sax.saxutils.XMLGenerator" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">XMLGenerator</span></code></a> です。処理中のXMLドキュメントに追加するには、これに対してメソッドを呼び出します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SyndicationFeed.item_attributes(self,</span> <span class="pre">item)</span></code></dt><dd><p>各アイテム (<code class="docutils literal notranslate"><span class="pre">item</span></code>/<code class="docutils literal notranslate"><span class="pre">entry</span></code>) 要素に追加する属性の <code class="docutils literal notranslate"><span class="pre">dict</span></code> を返します。引数の <code class="docutils literal notranslate"><span class="pre">item</span></code> は、 <code class="docutils literal notranslate"><span class="pre">SyndicationFeed.add_item()</span></code> に渡されるすべてのデータの辞書です。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">SyndicationFeed.add_item_elements(self,</span> <span class="pre">handler,</span> <span class="pre">item)</span></code></dt><dd><p>各アイテム (<code class="docutils literal notranslate"><span class="pre">item</span></code>/<code class="docutils literal notranslate"><span class="pre">entry</span></code>) 要素に要素を追加するためのコールバックです。 <code class="docutils literal notranslate"><span class="pre">handler</span></code> と <code class="docutils literal notranslate"><span class="pre">item</span></code> は上記の通りです。</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>これらのメソッドをオーバーライドする場合は、基底クラスのメソッドを必ず呼び出してください。これらは、それぞれのフィードフォーマットに必要な要素を追加するためです。</p>
+</div>
+<p>たとえば、iTunesのRSSフィードジェネレーターの実装を次のように始めることができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">iTunesFeed</span><span class="p">(</span><span class="n">Rss201rev2Feed</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">root_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">root_attributes</span><span class="p">()</span>
+        <span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;xmlns:itunes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;http://www.itunes.com/dtds/podcast-1.0.dtd&quot;</span>
+        <span class="k">return</span> <span class="n">attrs</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_root_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_root_elements</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+        <span class="n">handler</span><span class="o">.</span><span class="n">addQuickElement</span><span class="p">(</span><span class="s2">&quot;itunes:explicit&quot;</span><span class="p">,</span> <span class="s2">&quot;clean&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>完全なカスタムフィードクラスを作成するには、まだ多くの作業が必要ですが、上記の例で基本的な考え方を示すことができるはずです。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">配信 (syndication) フィード フレームワーク</a><ul>
+<li><a class="reference internal" href="#the-high-level-framework">高レベルのフレームワーク</a><ul>
+<li><a class="reference internal" href="#overview">概要</a></li>
+<li><a class="reference internal" href="#feed-classes"><code class="docutils literal notranslate"><span class="pre">Feed</span></code> クラス</a></li>
+<li><a class="reference internal" href="#a-simple-example">簡単な例</a></li>
+<li><a class="reference internal" href="#a-complex-example">複雑な例</a></li>
+<li><a class="reference internal" href="#specifying-the-type-of-feed">フィードの種類を指定する</a></li>
+<li><a class="reference internal" href="#enclosures">エンクロージャ (Enclosure)</a></li>
+<li><a class="reference internal" href="#language">言語</a></li>
+<li><a class="reference internal" href="#urls">URL</a></li>
+<li><a class="reference internal" href="#publishing-atom-and-rss-feeds-in-tandem">Atom と RSS フィードを同時に公開する</a></li>
+<li><a class="reference internal" href="#feed-class-reference"><code class="docutils literal notranslate"><span class="pre">Feed</span></code> クラスのリファレンス</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-low-level-framework">低レベルのフレームワーク</a><ul>
+<li><a class="reference internal" href="#syndicationfeed-classes"><code class="docutils literal notranslate"><span class="pre">SyndicationFeed</span></code> クラス</a></li>
+<li><a class="reference internal" href="#custom-feed-generators">カスタムフィードジェネレータ</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="staticfiles.html"
+                          title="前の章へ"><code class="docutils literal notranslate"><span class="pre">staticfiles</span></code> アプリ</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="../csrf.html"
+                          title="次の章へ">クロスサイトリクエストフォージェリ (CSRF) 対策</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/contrib/syndication.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="staticfiles.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;staticfiles&lt;/span&gt;&lt;/code&gt; アプリ">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="../csrf.html" title="クロスサイトリクエストフォージェリ (CSRF) 対策">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

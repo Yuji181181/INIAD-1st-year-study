@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ロギングの設定と利用 &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="エラーレポートの管理" href="error-reporting.html" />
+    <link rel="prev" title="静的ファイル (画像、JavaScript、CSS など) を管理する" href="static-files/index.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="static-files/index.html" title="静的ファイル (画像、JavaScript、CSS など) を管理する">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="error-reporting.html" title="エラーレポートの管理">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="howto-logging">
+            
+  <section id="s-how-to-configure-and-use-logging">
+<span id="s-logging-how-to"></span><span id="how-to-configure-and-use-logging"></span><span id="logging-how-to"></span><h1>ロギングの設定と利用<a class="headerlink" href="#how-to-configure-and-use-logging" title="Link to this heading">¶</a></h1>
+<div class="admonition seealso">
+<p class="admonition-title">参考</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../ref/logging.html#logging-ref"><span class="std std-ref">Django のロギング リファレンス</span></a></p></li>
+<li><p><a class="reference internal" href="../topics/logging.html#logging-explanation"><span class="std std-ref">Django のロギングの概要</span></a></p></li>
+</ul>
+</div>
+<p>Django はそのままで動作する <a class="reference internal" href="../ref/logging.html#default-logging-configuration"><span class="std std-ref">デフォルトのロギング設定</span></a> を持っており、すぐに拡張可能です。</p>
+<section id="s-make-a-basic-logging-call">
+<span id="make-a-basic-logging-call"></span><h2>基本的なロギング呼び出しを作成する<a class="headerlink" href="#make-a-basic-logging-call" title="Link to this heading">¶</a></h2>
+<p>ログメッセージをコード内から送信するには、コードにロギングの呼び出しを書く必要があります。</p>
+<div class="admonition-don-t-be-tempted-to-use-logging-calls-in-settings-py admonition">
+<p class="admonition-title"><code class="docutils literal notranslate"><span class="pre">settings.py</span></code> でログ呼び出しを使用しようとしないでください。</p>
+<p>Django のロギングは <code class="docutils literal notranslate"><span class="pre">setup()</span></code> 関数の一部として設定されるため、 <code class="docutils literal notranslate"><span class="pre">settings.py</span></code> でロギングを呼び出しても期待通りに動作しないかもしれません。ロギングを調べるには、以下の例で推奨されているようにビュー関数を使用してください。</p>
+</div>
+<p>まず、Python の logging ライブラリをインポートし、<a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.getLogger" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">logging.getLogger()</span></code></a> でロガーのインスタンスを取得します。<code class="docutils literal notranslate"><span class="pre">getLogger()</span></code> メソッドに、ロガーとロガーが出力するレコードを識別するための名前を指定します。そのための良い方法は <code class="docutils literal notranslate"><span class="pre">__name__</span></code> を使用することです (これについては以下の <a class="reference internal" href="#naming-loggers"><span class="std std-ref">ロガーの名前空間を使う</span></a> を参照してください)。これは、次のように、現在の Python モジュールの名前をドット区切りのパスで返します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>この宣言はモジュール・レベルで行うのがよいとされています。</p>
+<p>そして、ビューなどの関数内で、logger にレコードを送信します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">some_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="o">...</span>
+    <span class="k">if</span> <span class="n">some_risky_state</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Platform is running at risk&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このコードが実行されると、そのメッセージを含む <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LogRecord" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogRecord</span></code></a> が logger に送られます。Django のデフォルトの logging 設定を使っている場合、メッセージはコンソールに表示されます。</p>
+<p>上の例で使われている <code class="docutils literal notranslate"><span class="pre">WARNING</span></code> レベルは、いくつかある <a class="reference internal" href="../topics/logging.html#topic-logging-parts-loggers"><span class="std std-ref">ログの重大度レベル</span></a>: <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code>, <code class="docutils literal notranslate"><span class="pre">INFO</span></code>, <code class="docutils literal notranslate"><span class="pre">WARNING</span></code>, <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>, <code class="docutils literal notranslate"><span class="pre">CRITICAL</span></code> の一つです。したがって、別の例は次のようになります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;Payment system is not responding&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition important">
+<p class="admonition-title">重要</p>
+<p><code class="docutils literal notranslate"><span class="pre">WARNING</span></code> より低いレベルのレコードはデフォルトではコンソールに表示されません。この動作を変更するには追加の設定が必要です。</p>
+</div>
+</section>
+<section id="s-customize-logging-configuration">
+<span id="customize-logging-configuration"></span><h2>ロギングの設定をカスタマイズする<a class="headerlink" href="#customize-logging-configuration" title="Link to this heading">¶</a></h2>
+<p>Djangoのロギング設定は初期状態で動作しますが、追加の設定を行うことで、ログを様々な宛先（ログファイル、外部サービス、メールなど）に送信するのを正確にコントロールできます。</p>
+<p>以下のものを設定できます。</p>
+<ul class="simple">
+<li><p>どのレコードがどのハンドラに送られるかを決定するためのロガーマッピング</p></li>
+<li><p>受け取ったレコードをどう処理するかを決めるハンドラー</p></li>
+<li><p>レコードの転送をさらにコントロールし、レコードをその場で変更することもできるフィルタ</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LogRecord" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogRecord</span></code></a> オブジェクトを、人間や他のシステムで利用できるように文字列や他の形式に変換するためのフォーマッタ</p></li>
+</ul>
+<p>ロギングの設定には様々な方法があります。Django では、 <a class="reference internal" href="../ref/settings.html#std-setting-LOGGING"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LOGGING</span></code></a> 設定が最もよく使われます。この設定は <a class="reference external" href="https://docs.python.org/3/library/logging.config.html#logging-config-dictschema" title="(in Python v3.13)"><span class="xref std std-ref">dictConfig フォーマット</span></a> を使い、 <a class="reference internal" href="../ref/logging.html#default-logging-definition"><span class="std std-ref">デフォルトのロギング設定</span></a> を拡張します。</p>
+<p>カスタム設定が Django のデフォルトとどのようにマージされるかについては <a class="reference internal" href="../topics/logging.html#configuring-logging"><span class="std std-ref">ロギングを設定する</span></a> を参照してください。</p>
+<p>その他のロギングの設定方法の詳細については <a class="reference external" href="https://docs.python.org/3/library/logging.config.html#module-logging.config" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">Python</span> <span class="pre">logging</span> <span class="pre">documentation</span></code></a> を参照してください。簡単にするために、このドキュメントでは <code class="docutils literal notranslate"><span class="pre">LOGGING</span></code> 設定による設定のみを考えます。</p>
+<section id="s-basic-logging-configuration">
+<span id="s-basic-logger-configuration"></span><span id="basic-logging-configuration"></span><span id="basic-logger-configuration"></span><h3>ロギングの基本的な設定<a class="headerlink" href="#basic-logging-configuration" title="Link to this heading">¶</a></h3>
+<p>ロギングを設定する場合、以下のようにします。</p>
+<section id="s-create-a-logging-dictionary">
+<span id="create-a-logging-dictionary"></span><h4><code class="docutils literal notranslate"><span class="pre">LOGGING</span></code> 辞書を作成する<a class="headerlink" href="#create-a-logging-dictionary" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">settings.py</span></code> に以下を追加します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>  <span class="c1"># the dictConfig format version</span>
+    <span class="s2">&quot;disable_existing_loggers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>  <span class="c1"># retain the default loggers</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>ほとんどの場合、 <code class="docutils literal notranslate"><span class="pre">disable_existing_loggers</span></code> を <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定することで、デフォルトのロギング設定を保持し、拡張できます。</p>
+</section>
+<section id="s-configure-a-handler">
+<span id="configure-a-handler"></span><h4>ハンドラを設定する<a class="headerlink" href="#configure-a-handler" title="Link to this heading">¶</a></h4>
+<p>この例では、Python の <a class="reference external" href="https://docs.python.org/3/library/logging.handlers.html#logging.FileHandler" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileHandler</span></code></a> を使って、レベル <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> 以上のログを (プロジェクトルート内の) <code class="docutils literal notranslate"><span class="pre">general.log</span></code> ファイルに保存する <code class="docutils literal notranslate"><span class="pre">file</span></code> という名前のハンドラを設定します:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ...</span>
+<span class="hll">    <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">        <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">            <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.FileHandler&quot;</span><span class="p">,</span>
+</span><span class="hll">            <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;general.log&quot;</span><span class="p">,</span>
+</span><span class="hll">        <span class="p">},</span>
+</span><span class="hll">    <span class="p">},</span>
+</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>異なるハンドラクラスは異なる設定オプションを取ります。利用可能なハンドラクラスの詳細については、 Django が提供する <a class="reference internal" href="../ref/logging.html#django.utils.log.AdminEmailHandler" title="django.utils.log.AdminEmailHandler"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdminEmailHandler</span></code></a> や Python が提供する様々な <a class="reference external" href="https://docs.python.org/3/library/logging.handlers.html#module-logging.handlers" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">handler</span> <span class="pre">class</span></code></a> を参照してください。</p>
+<p>ログレベルはハンドラで設定することもできます（デフォルトでは、ハンドラはすべてのレベルのログメッセージを受け取ります）。上の例を使うと、次のように書けます:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.FileHandler&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;general.log&quot;</span><span class="p">,</span>
+<span class="hll">    <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>これで、レベル <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> 以上のレコードだけを受け付けるようにハンドラを設定できます。</p>
+</section>
+<section id="s-configure-a-logger-mapping">
+<span id="configure-a-logger-mapping"></span><h4>ロガーマッピングを設定する<a class="headerlink" href="#configure-a-logger-mapping" title="Link to this heading">¶</a></h4>
+<p>このハンドラにレコードを送信するには、ロガーマッピングをそのハンドラを使うように設定します。例えば:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ...</span>
+<span class="hll">    <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">        <span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;DEBUG&quot;</span><span class="p">,</span>
+</span><span class="hll">            <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;file&quot;</span><span class="p">],</span>
+</span><span class="hll">        <span class="p">},</span>
+</span><span class="hll">    <span class="p">},</span>
+</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>マッピングの名前はどのログレコードを処理するかを決定します。この設定 (<code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>) は <em>無名</em> です。つまり、 <em>すべての</em> ロガーからのレコードを処理します（レコードを処理するロガーを決定するためにマッピング名を使用する方法については、以下の <a class="reference internal" href="#naming-loggers"><span class="std std-ref">ロガーの名前空間を使う</span></a> を参照してください）。</p>
+<p>これは <code class="docutils literal notranslate"><span class="pre">DEBUG</span></code> レベル以上のメッセージを <code class="docutils literal notranslate"><span class="pre">file</span></code> というハンドラーに転送します。</p>
+<p>ロガーは複数のハンドラーにメッセージを転送できるので、ロガーとハンドラーの関係は多対多であることに注意してください。</p>
+<p>このコードを実行したら、:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Attempting to connect to API&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>プロジェクトルートの <code class="docutils literal notranslate"><span class="pre">general.log</span></code> ファイルにそのメッセージが保存されるでしょう。</p>
+</section>
+<section id="s-configure-a-formatter">
+<span id="configure-a-formatter"></span><h4>フォーマッタを設定する<a class="headerlink" href="#configure-a-formatter" title="Link to this heading">¶</a></h4>
+<p>デフォルトでは、最終的なログ出力には各 <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LogRecord" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">log</span> <span class="pre">record</span></code></a> のメッセージ部分が含まれます。追加データを含めたい場合はフォーマッタを使います。まずフォーマッタに名前を付けて定義します。この例では <code class="docutils literal notranslate"><span class="pre">verbose</span></code> と <code class="docutils literal notranslate"><span class="pre">simple</span></code> という名前のフォーマッタを定義しています:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ...</span>
+<span class="hll">    <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">        <span class="s2">&quot;verbose&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="s2"> </span><span class="si">{levelname}</span><span class="s2"> </span><span class="si">{asctime}</span><span class="s2"> </span><span class="si">{module}</span><span class="s2"> </span><span class="si">{process:d}</span><span class="s2"> </span><span class="si">{thread:d}</span><span class="s2"> </span><span class="si">{message}</span><span class="s2">&quot;</span><span class="p">,</span>
+</span><span class="hll">            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="s2">&quot;{&quot;</span><span class="p">,</span>
+</span><span class="hll">        <span class="p">},</span>
+</span><span class="hll">        <span class="s2">&quot;simple&quot;</span><span class="p">:</span> <span class="p">{</span>
+</span><span class="hll">            <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{levelname}</span><span class="s2"> </span><span class="si">{message}</span><span class="s2">&quot;</span><span class="p">,</span>
+</span><span class="hll">            <span class="s2">&quot;style&quot;</span><span class="p">:</span> <span class="s2">&quot;{&quot;</span><span class="p">,</span>
+</span><span class="hll">        <span class="p">},</span>
+</span><span class="hll">    <span class="p">},</span>
+</span><span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">style</span></code> キーワードを使用すると、 <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str.format" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">str.format()</span></code></a> 用の <code class="docutils literal notranslate"><span class="pre">{</span></code> または <a class="reference external" href="https://docs.python.org/3/library/string.html#string.Template" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">string.Template</span></code></a> フォーマット用の <code class="docutils literal notranslate"><span class="pre">$</span></code> を指定できます。デフォルトは <code class="docutils literal notranslate"><span class="pre">$</span></code> です。</p>
+<p>含めることができる <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.LogRecord" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">LogRecord</span></code></a> 属性については <a class="reference external" href="https://docs.python.org/3/library/logging.html#logrecord-attributes" title="(in Python v3.13)"><span>LogRecord attributes</span></a> を参照してください。</p>
+<p>ハンドラにフォーマッタを適用するには、ハンドラの辞書に <code class="docutils literal notranslate"><span class="pre">formatter</span></code> エントリを追加します:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;file&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.FileHandler&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;general.log&quot;</span><span class="p">,</span>
+<span class="hll">        <span class="s2">&quot;formatter&quot;</span><span class="p">:</span> <span class="s2">&quot;verbose&quot;</span><span class="p">,</span>
+</span>    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="s-use-logger-namespacing">
+<span id="s-naming-loggers"></span><span id="use-logger-namespacing"></span><span id="naming-loggers"></span><h4>ロガーの名前空間を使う<a class="headerlink" href="#use-logger-namespacing" title="Link to this heading">¶</a></h4>
+<p>無名のロギング設定 <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> は任意の Python アプリケーションからログを取り込みます。名前付きロギング設定は、一致する名前のロガーからだけログを取得します。</p>
+<p>logger インスタンスの名前空間は <a class="reference external" href="https://docs.python.org/3/library/logging.html#logging.getLogger" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">getLogger()</span></code></a> を使って定義します。例えば、 <code class="docutils literal notranslate"><span class="pre">my_app</span></code> の <code class="docutils literal notranslate"><span class="pre">views.py</span></code> で次のように定義します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>これは <code class="docutils literal notranslate"><span class="pre">my_app.views</span></code> 名前空間にロガーを作成します。 <code class="docutils literal notranslate"><span class="pre">__name__</span></code> を使うと、プロジェクト内のアプリケーションにおけるログメッセージの出所に基づいて、自動的にそれらを整理できます。また、それによって名前の衝突が起こらなくなります。</p>
+<p><code class="docutils literal notranslate"><span class="pre">my_app.views</span></code> という名前のロガーマッピングは、このロガーからレコードを取得します:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ...</span>
+    <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="hll">        <span class="s2">&quot;my_app.views&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+</span>    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">my_app</span></code> という名前のロガーマッピングはより広く、 <code class="docutils literal notranslate"><span class="pre">my_app</span></code> 名前空間内のロガー（<code class="docutils literal notranslate"><span class="pre">my_app.views</span></code>、<code class="docutils literal notranslate"><span class="pre">my_app.utils</span></code> などを含む）からレコードを取得します:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ...</span>
+    <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="hll">        <span class="s2">&quot;my_app&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">...</span><span class="p">},</span>
+</span>    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>ロガーの名前空間を明示的に定義することもできます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;project.payment&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>そして、それに応じてロガーマッピングを設定することもできます。</p>
+<section id="s-using-logger-hierarchies-and-propagation">
+<span id="s-naming-loggers-hierarchy"></span><span id="using-logger-hierarchies-and-propagation"></span><span id="naming-loggers-hierarchy"></span><h5>ロガーの階層と伝搬（propagation）を使う<a class="headerlink" href="#using-logger-hierarchies-and-propagation" title="Link to this heading">¶</a></h5>
+<p>ロガーの命名は <em>階層的</em> です。 <code class="docutils literal notranslate"><span class="pre">my_app</span></code> は <code class="docutils literal notranslate"><span class="pre">my_app.views</span></code> の親であり、 <code class="docutils literal notranslate"><span class="pre">my_app.views</span></code> は <code class="docutils literal notranslate"><span class="pre">my_app.views.private</span></code> の親です。特に指定がない限り、ロガーのマッピングは処理したレコードを親に伝播（propagate）します―― <code class="docutils literal notranslate"><span class="pre">my_app.views.private</span></code> 名前空間のロガーからのレコードは、 <code class="docutils literal notranslate"><span class="pre">my_app</span></code> と <code class="docutils literal notranslate"><span class="pre">my_app.views</span></code> の両方のマッピングで処理されます。</p>
+<p>この動作を管理するには、定義したマッピングに <code class="docutils literal notranslate"><span class="pre">&quot;propagate&quot;</span></code> キーを設定します:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LOGGING</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># ...</span>
+    <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;my_app&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1"># ...</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;my_app.views&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1"># ...</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;my_app.views.private&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="c1"># ...</span>
+            <span class="s2">&quot;propagate&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">propagate</span></code> のデフォルトは <code class="docutils literal notranslate"><span class="pre">True</span></code> です。この例では、<code class="docutils literal notranslate"><span class="pre">my_app.views.private</span></code> のログは親プロセスでは処理されませんが、 <code class="docutils literal notranslate"><span class="pre">my_app.views</span></code> のログは親プロセスで処理されます。</p>
+</section>
+</section>
+</section>
+<section id="s-configure-responsive-logging">
+<span id="configure-responsive-logging"></span><h3>レスポンシブなロギングを設定する<a class="headerlink" href="#configure-responsive-logging" title="Link to this heading">¶</a></h3>
+<p>ロギングは、必要な情報ができるだけ多く含まれているときに最も有用であり、目的のために必要な情報だけが含まれているとなお嬉しいです。そして、必要な情報量は、あなたが何をしているかによって異なります。デバッグ中には、本番環境では過剰で役に立たないようなレベルの情報が必要になります。</p>
+<p>必要な時に必要な詳細レベルを提供するように、ロギングを設定できます。これを実現するために手動で設定を変更するよりも良い方法は、環境に応じて自動的に設定を適用することです。</p>
+<p>例えば、開発環境とステージング環境で環境変数 <code class="docutils literal notranslate"><span class="pre">DJANGO_LOG_LEVEL</span></code> を適切に設定し、ロガーマッピングで次のように使用できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;DJANGO_LOG_LEVEL&quot;</span><span class="p">,</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>- 環境がより低いログレベルを指定しない限り、このコンフィギュレーションは重大度 <code class="docutils literal notranslate"><span class="pre">WARNING</span></code> 以上のレコードだけをハンドラに転送します。</p>
+<p>設定の他のオプション（ハンドラの <code class="docutils literal notranslate"><span class="pre">level</span></code> や <code class="docutils literal notranslate"><span class="pre">formatter</span></code> オプションなど）も同様に管理できます。</p>
+</section>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ロギングの設定と利用</a><ul>
+<li><a class="reference internal" href="#make-a-basic-logging-call">基本的なロギング呼び出しを作成する</a></li>
+<li><a class="reference internal" href="#customize-logging-configuration">ロギングの設定をカスタマイズする</a><ul>
+<li><a class="reference internal" href="#basic-logging-configuration">ロギングの基本的な設定</a><ul>
+<li><a class="reference internal" href="#create-a-logging-dictionary"><code class="docutils literal notranslate"><span class="pre">LOGGING</span></code> 辞書を作成する</a></li>
+<li><a class="reference internal" href="#configure-a-handler">ハンドラを設定する</a></li>
+<li><a class="reference internal" href="#configure-a-logger-mapping">ロガーマッピングを設定する</a></li>
+<li><a class="reference internal" href="#configure-a-formatter">フォーマッタを設定する</a></li>
+<li><a class="reference internal" href="#use-logger-namespacing">ロガーの名前空間を使う</a><ul>
+<li><a class="reference internal" href="#using-logger-hierarchies-and-propagation">ロガーの階層と伝搬（propagation）を使う</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configure-responsive-logging">レスポンシブなロギングを設定する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="static-files/index.html"
+                          title="前の章へ">静的ファイル (画像、JavaScript、CSS など) を管理する</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="error-reporting.html"
+                          title="次の章へ">エラーレポートの管理</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/howto/logging.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="static-files/index.html" title="静的ファイル (画像、JavaScript、CSS など) を管理する">previous</a>
+     |
+    <a href="index.html" title="How-to ガイド" accesskey="U">up</a>
+   |
+    <a href="error-reporting.html" title="エラーレポートの管理">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

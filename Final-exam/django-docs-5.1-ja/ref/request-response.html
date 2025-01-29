@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>リクエストとレスポンスのオブジェクト &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="SchemaEditor" href="schema-editor.html" />
+    <link rel="prev" title="ページ分割 (Paginator)" href="paginator.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="paginator.html" title="ページ分割 (Paginator)">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="schema-editor.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;SchemaEditor&lt;/span&gt;&lt;/code&gt;">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-request-response">
+            
+  <section id="s-module-django.http">
+<span id="s-request-and-response-objects"></span><span id="module-django.http"></span><span id="request-and-response-objects"></span><h1>リクエストとレスポンスのオブジェクト<a class="headerlink" href="#module-django.http" title="Link to this heading">¶</a></h1>
+<section id="s-quick-overview">
+<span id="quick-overview"></span><h2>簡単な概要<a class="headerlink" href="#quick-overview" title="Link to this heading">¶</a></h2>
+<p>Django は、システムを通じてステータスを渡すために、リクエストとレスポンスのオブジェクトを使います。</p>
+<p>あるページがリクエストされたとき、Django はリクエストに関するメタデータを含んだ <a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> オブジェクトを生成します。それから Django は <a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> をビュー関数の最初の関数として渡し、適切なビューを読み込みます。あらゆるビューは <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトを返す必要があります。</p>
+<p>このドキュメントでは、<a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> と <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトの API を説明しています。これは <a class="reference internal" href="#module-django.http" title="django.http: Classes dealing with HTTP requests and responses."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.http</span></code></a> モジュールにて定義されています。</p>
+</section>
+<section id="s-httprequest-objects">
+<span id="httprequest-objects"></span><h2><code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> オブジェクト<a class="headerlink" href="#httprequest-objects" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpRequest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpRequest</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L52"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<section id="s-attributes">
+<span id="s-httprequest-attributes"></span><span id="attributes"></span><span id="httprequest-attributes"></span><h3>属性<a class="headerlink" href="#attributes" title="Link to this heading">¶</a></h3>
+<p>特に記載がない限り、全ての属性は読み取り専用だと考えてください。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.scheme">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">scheme</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L255"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.scheme" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストのスキームを表す文字列です (通常は <code class="docutils literal notranslate"><span class="pre">http</span></code> か <code class="docutils literal notranslate"><span class="pre">https</span></code>)。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.body">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">body</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L325"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.body" title="Link to this definition">¶</a></dt>
+<dd><p>生の HTTP リクエストボディをバイト文字列として。これは、従来の HTML フォームとは異なる方法でデータを処理するのに便利です：バイナリイメージ、XML ペイロードなど。従来のフォームデータを処理する場合は、<a class="reference internal" href="#django.http.HttpRequest.POST" title="django.http.HttpRequest.POST"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HttpRequest.POST</span></code></a> を使用してください。</p>
+<p><a class="reference internal" href="#django.http.HttpRequest.read" title="django.http.HttpRequest.read"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HttpRequest.read()</span></code></a> や <a class="reference internal" href="#django.http.HttpRequest.readline" title="django.http.HttpRequest.readline"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HttpRequest.readline()</span></code></a> を用いて、ファイルのようなインタフェースから <code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> を読み取ることもできます。これらの I/O ストリームメソッドを用いてリクエストを読み取った <em>後に</em> <code class="docutils literal notranslate"><span class="pre">body</span></code> 属性にアクセスすると、<code class="docutils literal notranslate"><span class="pre">RawPostDataException</span></code> が発生します。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.path">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">path</span></span><a class="headerlink" href="#django.http.HttpRequest.path" title="Link to this definition">¶</a></dt>
+<dd><p>要求されたページへのフルパスを表す文字列であり、scheme、ドメイン、クエリ文字列は含みません。</p>
+<p>例: <code class="docutils literal notranslate"><span class="pre">&quot;/music/bands/the_beatles/&quot;</span></code></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.path_info">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">path_info</span></span><a class="headerlink" href="#django.http.HttpRequest.path_info" title="Link to this definition">¶</a></dt>
+<dd><p>一部のWebサーバー構成では、ホスト名の後のURLがスクリプトプレフィックス部分とパス情報部分に分割されます。<code class="docutils literal notranslate"><span class="pre">path_info</span></code> 属性は、使用されるWebサーバーに関わらず常にパス情報部分を含んでいます。これを <a class="reference internal" href="#django.http.HttpRequest.path" title="django.http.HttpRequest.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">path</span></code></a> の代わりに使用することで、テストサーバーとデプロイメントサーバー間でコードを移動させやすくなります。</p>
+<p>たとえば、アプリケーションの <code class="docutils literal notranslate"><span class="pre">WSGIScriptAlias</span></code> が <code class="docutils literal notranslate"><span class="pre">&quot;/minfo&quot;</span></code> に設定されている場合、<code class="docutils literal notranslate"><span class="pre">path</span></code> が <code class="docutils literal notranslate"><span class="pre">&quot;/minfo/music/bands/the_beatles/&quot;</span></code> である一方、<code class="docutils literal notranslate"><span class="pre">path_info</span></code> は <code class="docutils literal notranslate"><span class="pre">&quot;/music/bands/the_beatles/&quot;</span></code> となる可能性があります。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.method">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">method</span></span><a class="headerlink" href="#django.http.HttpRequest.method" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストで使用された HTTP メソッドを表す文字列です。この値は常に大文字となることが保証されています。たとえば、次のようになります。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;GET&quot;</span><span class="p">:</span>
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="k">elif</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s2">&quot;POST&quot;</span><span class="p">:</span>
+    <span class="n">do_something_else</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.encoding">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">encoding</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L278"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.encoding" title="Link to this definition">¶</a></dt>
+<dd><p>フォーム提出データをデコードする際に使用されている現在のエンコーディングを表す文字列（または <code class="docutils literal notranslate"><span class="pre">None</span></code> で、これは <a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定が使用されることを意味します）。この属性に書き込むことで、フォームデータにアクセスする際に使用されるエンコーディングを変更できます。その後の属性アクセス（<a class="reference internal" href="#django.http.HttpRequest.GET" title="django.http.HttpRequest.GET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">GET</span></code></a> や <a class="reference internal" href="#django.http.HttpRequest.POST" title="django.http.HttpRequest.POST"><code class="xref py py-attr docutils literal notranslate"><span class="pre">POST</span></code></a> からの読み取りなど）は、新しい <code class="docutils literal notranslate"><span class="pre">encoding</span></code> 値を使用します。フォームデータが <a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> エンコーディングでないことがわかっている場合に便利です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.content_type">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">content_type</span></span><a class="headerlink" href="#django.http.HttpRequest.content_type" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストの MIME タイプを表す文字列です。<code class="docutils literal notranslate"><span class="pre">CONTENT_TYPE</span></code> から識別されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.content_params">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">content_params</span></span><a class="headerlink" href="#django.http.HttpRequest.content_params" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">CONTENT_TYPE</span></code> ヘッダに含まれる、キーと値のパラーメータのディクショナリです。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.GET">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">GET</span></span><a class="headerlink" href="#django.http.HttpRequest.GET" title="Link to this definition">¶</a></dt>
+<dd><p>渡された HTTP GET パラメータを含む、ディクショナリライクのオブジェクトです。後述の <a class="reference internal" href="#django.http.QueryDict" title="django.http.QueryDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryDict</span></code></a> のドキュメントを参照してください。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.POST">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">POST</span></span><a class="headerlink" href="#django.http.HttpRequest.POST" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストにフォームデータが含まれている場合に、すべての与えられた HTTP POST パラメータを含む辞書のようなオブジェクト。以下の <a class="reference internal" href="#django.http.QueryDict" title="django.http.QueryDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryDict</span></code></a> ドキュメントを参照してください。リクエストにポストされた生のデータや非フォームデータにアクセスする必要がある場合は、代わりに <a class="reference internal" href="#django.http.HttpRequest.body" title="django.http.HttpRequest.body"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HttpRequest.body</span></code></a> 属性を通じてアクセスしてください。</p>
+<p>POST メソッドでフォームデータが含まれていない場合に、空の <code class="docutils literal notranslate"><span class="pre">POST</span></code> ディクショナリを備えたリクエストが発生する可能性があります。そのため、POST メソッドの使用を確認するために <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">request.POST</span></code> を使用すべきではありません。代わりに、 <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">request.method</span> <span class="pre">==</span> <span class="pre">&quot;POST&quot;</span></code> を使用してください (<a class="reference internal" href="#django.http.HttpRequest.method" title="django.http.HttpRequest.method"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HttpRequest.method</span></code></a> を参照)。</p>
+<p><code class="docutils literal notranslate"><span class="pre">POST</span></code> には file-upload の情報が含まれ <em>ません</em> 。詳しくは <a class="reference internal" href="#django.http.HttpRequest.FILES" title="django.http.HttpRequest.FILES"><code class="xref py py-attr docutils literal notranslate"><span class="pre">FILES</span></code></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.COOKIES">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">COOKIES</span></span><a class="headerlink" href="#django.http.HttpRequest.COOKIES" title="Link to this definition">¶</a></dt>
+<dd><p>すべてのクッキーが格納されたディクショナリです。キーと値は文字列です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.FILES">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">FILES</span></span><a class="headerlink" href="#django.http.HttpRequest.FILES" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">FILES</span></code> は、アップロードされた全てのファイルを含む辞書型のオブジェクトです。<code class="docutils literal notranslate"><span class="pre">FILES</span></code> の各キーは <code class="docutils literal notranslate"><span class="pre">&lt;input</span> <span class="pre">type=&quot;file&quot;</span> <span class="pre">name=&quot;&quot;&gt;</span></code> の <code class="docutils literal notranslate"><span class="pre">name</span></code> から成ります。<code class="docutils literal notranslate"><span class="pre">FILES</span></code> の各値は <a class="reference internal" href="files/uploads.html#django.core.files.uploadedfile.UploadedFile" title="django.core.files.uploadedfile.UploadedFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">UploadedFile</span></code></a> です。</p>
+<p>詳細については、<a class="reference internal" href="../topics/files.html"><span class="doc">ファイルの管理</span></a> を参照してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">FILES</span></code> には、リクエストメソッドが POST で、リクエストに投稿した <code class="docutils literal notranslate"><span class="pre">&lt;form&gt;</span></code> に <code class="docutils literal notranslate"><span class="pre">enctype=&quot;multipart/form-data&quot;</span></code> が設定されていた場合にのみデータが含まれます。それ以外の場合、<code class="docutils literal notranslate"><span class="pre">FILES</span></code> は空の辞書のようなオブジェクトになります。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.META">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">META</span></span><a class="headerlink" href="#django.http.HttpRequest.META" title="Link to this definition">¶</a></dt>
+<dd><p>利用できるすべての HTTP ヘッダーが格納されたディクショナリです。利用可能なヘッダーはクライアントとサーバーによって異なりますが、以下に例を示します。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CONTENT_LENGTH</span></code> -- リクエスト本文の (文字列としての) 長さです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CONTENT_TYPE</span></code> -- リクエスト本文の MIME タイプです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HTTP_ACCEPT</span></code> -- レスポンスに対して受け入れ可能なコンテンツのタイプです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HTTP_ACCEPT_ENCODING</span></code> -- レスポンスに対して受け入れ可能なエンコーディングです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HTTP_ACCEPT_LANGUAGE</span></code> -- レスポンスに対して受け入れ可能な言語です。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HTTP_HOST</span></code> -- クライアントによって送信された HTTP Host ヘッダです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HTTP_REFERER</span></code> -- (存在する場合) リファラページです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HTTP_USER_AGENT</span></code> -- クライアントのユーザエージェント文字列です。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">QUERY_STRING</span></code> -- クエリ文字列で、単一の (未解析の) 文字列です。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">REMOTE_ADDR</span></code> -- クライアントの IP アドレスです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">REMOTE_HOST</span></code> -- クライアントのホスト名です。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">REMOTE_USER</span></code> -- ウェブサーバーによって認証されたユーザー(もしあれば)。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">REQUEST_METHOD</span></code> -- <code class="docutils literal notranslate"><span class="pre">&quot;GET&quot;</span></code> や <code class="docutils literal notranslate"><span class="pre">&quot;POST&quot;</span></code> といったです。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SERVER_NAME</span></code> -- サーバのホスト名です。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SERVER_PORT</span></code> -- (文字列としての) サーバのポートです。</p></li>
+</ul>
+<p>上記の <code class="docutils literal notranslate"><span class="pre">CONTENT_LENGTH</span></code> と <code class="docutils literal notranslate"><span class="pre">CONTENT_TYPE</span></code> を除き、リクエストの HTTP ヘッダーは、すべての文字を大文字に変換し、ハイフンをアンダースコアに置き換え、名前に <code class="docutils literal notranslate"><span class="pre">HTTP_</span></code> プレフィックスを追加することで <code class="docutils literal notranslate"><span class="pre">META</span></code> キーに変換されます。たとえば、<code class="docutils literal notranslate"><span class="pre">X-Bender</span></code> というヘッダーは <code class="docutils literal notranslate"><span class="pre">META</span></code> キー <code class="docutils literal notranslate"><span class="pre">HTTP_X_BENDER</span></code> にマッピングされます。</p>
+<p><a class="reference internal" href="django-admin.html#django-admin-runserver"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">runserver</span></code></a> では、名前にアンダースコアを含むヘッダーはすべて削除されるため、<code class="docutils literal notranslate"><span class="pre">META</span></code> にそれらが表示されません。これにより、WSGI 環境変数内のアンダースコアとダッシュの曖昧さに基づくヘッダー・スプーフィングが防がれます。この動作は、Nginx や Apache 2.4+ のようなウェブサーバーと一致しています。</p>
+<p><a class="reference internal" href="#django.http.HttpRequest.headers" title="django.http.HttpRequest.headers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HttpRequest.headers</span></code></a> は <code class="docutils literal notranslate"><span class="pre">CONTENT_LENGTH</span></code> と <code class="docutils literal notranslate"><span class="pre">CONTENT_TYPE</span></code> を含む、全てのHTTPプレフィックス付きヘッダーにアクセスするより簡単な方法です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.headers">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">headers</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L87"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.headers" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストからHTTPプリフィックスヘッダー全体 (<code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> と <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> を含む) にアクセスを提供する、大文字小文字を区別しない辞書風オブジェクトです。</p>
+<p>各ヘッダーの名前は、表示される際にタイトルケース (例: <code class="docutils literal notranslate"><span class="pre">User-Agent</span></code>) でスタイリズされます。ヘッダーは大文字小文字を区別せずにアクセスできます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">headers</span>
+<span class="go">{&#39;User-Agent&#39;: &#39;Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6&#39;, ...}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;User-Agent&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="s2">&quot;user-agent&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span>
+<span class="go">True</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">]</span>
+<span class="go">Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;user-agent&quot;</span><span class="p">]</span>
+<span class="go">Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">)</span>
+<span class="go">Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user-agent&quot;</span><span class="p">)</span>
+<span class="go">Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6)</span>
+</pre></div>
+</div>
+<p>たとえば Django テンプレートでの使用において、ヘッダーはハイフンの代わりにアンダースコアを使用してもルックアップできます。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{{</span> <span class="nv">request.headers.user_agent</span> <span class="cp">}}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.resolver_match">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">resolver_match</span></span><a class="headerlink" href="#django.http.HttpRequest.resolver_match" title="Link to this definition">¶</a></dt>
+<dd><p>解決されたURLを表す <a class="reference internal" href="urlresolvers.html#django.urls.ResolverMatch" title="django.urls.ResolverMatch"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResolverMatch</span></code></a> のインスタンスです。この属性は、URLの解決が行われた後にのみ設定されます。つまり、全てのビューで利用可能ですが、URLの解決が行われる前に実行されるミドルウェアでは利用できません (<a class="reference internal" href="../topics/http/middleware.html#process_view" title="process_view"><code class="xref py py-meth docutils literal notranslate"><span class="pre">process_view()</span></code></a> では使用できます)。</p>
+</dd></dl>
+
+</section>
+<section id="s-attributes-set-by-application-code">
+<span id="attributes-set-by-application-code"></span><h3>アプリケーションコードがセットする属性<a class="headerlink" href="#attributes-set-by-application-code" title="Link to this heading">¶</a></h3>
+<p>Django はこれらの属性を自分で設定することはありませんが、アプリケーション側で設定された場合にはその値を利用します。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.current_app">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">current_app</span></span><a class="headerlink" href="#django.http.HttpRequest.current_app" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="templates/builtins.html#std-templatetag-url"><code class="xref std std-ttag docutils literal notranslate"><span class="pre">url</span></code></a> テンプレートタグは、その値を <a class="reference internal" href="urlresolvers.html#django.urls.reverse" title="django.urls.reverse"><code class="xref py py-func docutils literal notranslate"><span class="pre">reverse()</span></code></a> の <code class="docutils literal notranslate"><span class="pre">current_app</span></code> 引数に使います。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.urlconf">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">urlconf</span></span><a class="headerlink" href="#django.http.HttpRequest.urlconf" title="Link to this definition">¶</a></dt>
+<dd><p>この値は、現在のリクエストに対する root URLconf として使用され、設定の <a class="reference internal" href="settings.html#std-setting-ROOT_URLCONF"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ROOT_URLCONF</span></code></a> を上書きします。詳しくは <a class="reference internal" href="../topics/http/urls.html#how-django-processes-a-request"><span class="std std-ref">Django のリクエスト処理</span></a> を参照してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">urlconf</span></code> は <code class="docutils literal notranslate"><span class="pre">None</span></code> に設定することで、それまでにミドルウェアで行われた変更を取り消し、元の <a class="reference internal" href="settings.html#std-setting-ROOT_URLCONF"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ROOT_URLCONF</span></code></a> を使用するようにできます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.exception_reporter_filter">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">exception_reporter_filter</span></span><a class="headerlink" href="#django.http.HttpRequest.exception_reporter_filter" title="Link to this definition">¶</a></dt>
+<dd><p>これは、現在のリクエストに対して <a class="reference internal" href="settings.html#std-setting-DEFAULT_EXCEPTION_REPORTER_FILTER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_EXCEPTION_REPORTER_FILTER</span></code></a> の代わりに使用されます。詳細については、 <a class="reference internal" href="../howto/error-reporting.html#custom-error-reports"><span class="std std-ref">カスタムエラーレポート</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.exception_reporter_class">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">exception_reporter_class</span></span><a class="headerlink" href="#django.http.HttpRequest.exception_reporter_class" title="Link to this definition">¶</a></dt>
+<dd><p>これは、現在のリクエストに対して <a class="reference internal" href="settings.html#std-setting-DEFAULT_EXCEPTION_REPORTER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_EXCEPTION_REPORTER</span></code></a> の代わりに使用されます。詳細については <a class="reference internal" href="../howto/error-reporting.html#custom-error-reports"><span class="std std-ref">カスタムエラーレポート</span></a> を参照してください。</p>
+</dd></dl>
+
+</section>
+<section id="s-attributes-set-by-middleware">
+<span id="attributes-set-by-middleware"></span><h3>ミドルウェアが設定する属性<a class="headerlink" href="#attributes-set-by-middleware" title="Link to this heading">¶</a></h3>
+<p>Django の contrib アプリなどのミドルウェアの一部は、リクエストに属性を設定します。もし、リクエストに属性が設定されていない場合は、<a class="reference internal" href="settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> リスト中に適切なミドルウェアが含まれているかを確認してください。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.session">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">session</span></span><a class="headerlink" href="#django.http.HttpRequest.session" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="middleware.html#django.contrib.sessions.middleware.SessionMiddleware" title="django.contrib.sessions.middleware.SessionMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionMiddleware</span></code></a> は、現在のセッションを表す、読み書き可能でディクショナリライクなオブジェクトを設定します。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.site">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">site</span></span><a class="headerlink" href="#django.http.HttpRequest.site" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="middleware.html#django.contrib.sites.middleware.CurrentSiteMiddleware" title="django.contrib.sites.middleware.CurrentSiteMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">CurrentSiteMiddleware</span></code></a> は、現在のサイトを表す <a class="reference internal" href="contrib/sites.html#django.contrib.sites.models.Site" title="django.contrib.sites.models.Site"><code class="xref py py-class docutils literal notranslate"><span class="pre">Site</span></code></a> または <a class="reference internal" href="contrib/sites.html#django.contrib.sites.requests.RequestSite" title="django.contrib.sites.requests.RequestSite"><code class="xref py py-class docutils literal notranslate"><span class="pre">RequestSite</span></code></a> のインスタンスを、<a class="reference internal" href="contrib/sites.html#django.contrib.sites.shortcuts.get_current_site" title="django.contrib.sites.shortcuts.get_current_site"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_current_site()</span></code></a> の返り値で設定します。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpRequest.user">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">user</span></span><a class="headerlink" href="#django.http.HttpRequest.user" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="middleware.html#django.contrib.auth.middleware.AuthenticationMiddleware" title="django.contrib.auth.middleware.AuthenticationMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationMiddleware</span></code></a> から: 現在ログインしているユーザーを表す <a class="reference internal" href="settings.html#std-setting-AUTH_USER_MODEL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">AUTH_USER_MODEL</span></code></a> のインスタンスです。ユーザーが現在ログインしていない場合、 <code class="docutils literal notranslate"><span class="pre">user</span></code> は <a class="reference internal" href="contrib/auth.html#django.contrib.auth.models.AnonymousUser" title="django.contrib.auth.models.AnonymousUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnonymousUser</span></code></a> のインスタンスに設定されます。 <a class="reference internal" href="contrib/auth.html#django.contrib.auth.models.User.is_authenticated" title="django.contrib.auth.models.User.is_authenticated"><code class="xref py py-attr docutils literal notranslate"><span class="pre">is_authenticated</span></code></a> を使用して、それらを区別できます。例えば、こうです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="o">.</span><span class="n">is_authenticated</span><span class="p">:</span>
+    <span class="o">...</span>  <span class="c1"># Do something for logged-in users.</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="o">...</span>  <span class="c1"># Do something for anonymous users.</span>
+</pre></div>
+</div>
+<p><a class="reference internal" href="#django.http.HttpRequest.auser" title="django.http.HttpRequest.auser"><code class="xref py py-meth docutils literal notranslate"><span class="pre">auser()</span></code></a> メソッドは同じ機能を提供しますが、非同期コンテキストから使用できます。</p>
+</dd></dl>
+
+</section>
+<section id="s-methods">
+<span id="methods"></span><h3>メソッド<a class="headerlink" href="#methods" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.auser">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">auser</span></span>()<a class="headerlink" href="#django.http.HttpRequest.auser" title="Link to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<p><a class="reference internal" href="middleware.html#django.contrib.auth.middleware.AuthenticationMiddleware" title="django.contrib.auth.middleware.AuthenticationMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationMiddleware</span></code></a> から: コルーチン。現在ログインしているユーザーを表す <a class="reference internal" href="settings.html#std-setting-AUTH_USER_MODEL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">AUTH_USER_MODEL</span></code></a> のインスタンスを返します。もしユーザーが現在ログインしていない場合、<code class="docutils literal notranslate"><span class="pre">auser</span></code> は <a class="reference internal" href="contrib/auth.html#django.contrib.auth.models.AnonymousUser" title="django.contrib.auth.models.AnonymousUser"><code class="xref py py-class docutils literal notranslate"><span class="pre">AnonymousUser</span></code></a> のインスタンスを返します。これは <a class="reference internal" href="#django.http.HttpRequest.user" title="django.http.HttpRequest.user"><code class="xref py py-attr docutils literal notranslate"><span class="pre">user</span></code></a> 属性に似ていますが、非同期コンテキストでも機能します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.get_host">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">get_host</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L131"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.get_host" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストの発信元ホストを返します。この情報は、順番に <code class="docutils literal notranslate"><span class="pre">HTTP_X_FORWARDED_HOST</span></code> (もし <a class="reference internal" href="settings.html#std-setting-USE_X_FORWARDED_HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_X_FORWARDED_HOST</span></code></a> が有効な場合) および <code class="docutils literal notranslate"><span class="pre">HTTP_HOST</span></code> ヘッダーから取得されます。これらが値を提供しない場合、メソッドは <code class="docutils literal notranslate"><span class="pre">SERVER_NAME</span></code> と <code class="docutils literal notranslate"><span class="pre">SERVER_PORT</span></code> の組み合わせを使用します。詳細は <span class="target" id="index-22"></span><a class="pep reference external" href="https://peps.python.org/pep-3333/"><strong>PEP 3333</strong></a> で説明されています。</p>
+<p>例: <code class="docutils literal notranslate"><span class="pre">&quot;127.0.0.1:8000&quot;</span></code></p>
+<p>ホストが <a class="reference internal" href="settings.html#std-setting-ALLOWED_HOSTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">ALLOWED_HOSTS</span></code></a> にないか、ドメイン名が <span class="target" id="index-23"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc1034.html"><strong>RFC 1034</strong></a>/<span class="target" id="index-24"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc1035.html"><strong>1035</strong></a> に従っていない場合、 <code class="docutils literal notranslate"><span class="pre">django.core.exceptions.DisallowedHost</span></code> を発生させます。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="#django.http.HttpRequest.get_host" title="django.http.HttpRequest.get_host"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_host()</span></code></a> メソッドは、ホストが複数のプロキシの背後にある場合に失敗します。一つの解決策として、以下の例に示すように、プロキシのヘッダーを書き換えるためのミドルウェアを使用できます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MultipleProxyMiddleware</span><span class="p">:</span>
+    <span class="n">FORWARDED_FOR_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;HTTP_X_FORWARDED_FOR&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;HTTP_X_FORWARDED_HOST&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;HTTP_X_FORWARDED_SERVER&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">get_response</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span> <span class="o">=</span> <span class="n">get_response</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Rewrites the proxy headers so that only the most</span>
+<span class="sd">        recent proxy is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">FORWARDED_FOR_FIELDS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">[</span><span class="n">field</span><span class="p">]:</span>
+                    <span class="n">parts</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">[</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">META</span><span class="p">[</span><span class="n">field</span><span class="p">]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_response</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>このミドルウェアは、<a class="reference internal" href="#django.http.HttpRequest.get_host" title="django.http.HttpRequest.get_host"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_host()</span></code></a> の値に依存する他のミドルウェアよりも前に配置されるべきです (例えば、 <a class="reference internal" href="middleware.html#django.middleware.common.CommonMiddleware" title="django.middleware.common.CommonMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonMiddleware</span></code></a> や <a class="reference internal" href="middleware.html#django.middleware.csrf.CsrfViewMiddleware" title="django.middleware.csrf.CsrfViewMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code></a> など)。</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.get_port">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">get_port</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L153"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.get_port" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストの元となったポートを、 <code class="docutils literal notranslate"><span class="pre">HTTP_X_FORWARDED_PORT</span></code> と <code class="docutils literal notranslate"><span class="pre">SERVER_PORT</span></code> の <code class="docutils literal notranslate"><span class="pre">META</span></code> 変数から、その順に使用して情報を取得し返します (ただし、 <a class="reference internal" href="settings.html#std-setting-USE_X_FORWARDED_PORT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_X_FORWARDED_PORT</span></code></a> が有効になっている場合)。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.get_full_path">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">get_full_path</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L161"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.get_full_path" title="Link to this definition">¶</a></dt>
+<dd><p>必要に応じて、 <code class="docutils literal notranslate"><span class="pre">path</span></code> にクエリ文字列を追加して返します。</p>
+<p>例: <code class="docutils literal notranslate"><span class="pre">&quot;/music/bands/the_beatles/?print=true&quot;</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.get_full_path_info">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">get_full_path_info</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L164"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.get_full_path_info" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpRequest.get_full_path" title="django.http.HttpRequest.get_full_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">get_full_path()</span></code></a> と似ていますが、 <a class="reference internal" href="#django.http.HttpRequest.path" title="django.http.HttpRequest.path"><code class="xref py py-attr docutils literal notranslate"><span class="pre">path</span></code></a> の代わりに <a class="reference internal" href="#django.http.HttpRequest.path_info" title="django.http.HttpRequest.path_info"><code class="xref py py-attr docutils literal notranslate"><span class="pre">path_info</span></code></a> を使用します。</p>
+<p>例: <code class="docutils literal notranslate"><span class="pre">&quot;/minfo/music/bands/the_beatles/?print=true&quot;</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.build_absolute_uri">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">build_absolute_uri</span></span>(<em class="sig-param"><span class="n"><span class="pre">location</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L204"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.build_absolute_uri" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">location</span></code> の絶対URI形式を返します。もし location が指定されていない場合、<code class="docutils literal notranslate"><span class="pre">request.get_full_path()</span></code> が location に設定されます。</p>
+<p>もし場所がすでに絶対 URI である場合、それは変更されません。そうでない場合、このリクエストで利用可能なサーバ変数を使用して絶対 URI が構築されます。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">()</span>
+<span class="go">&#39;https://example.com/music/bands/the_beatles/?print=true&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">(</span><span class="s2">&quot;/bands/&quot;</span><span class="p">)</span>
+<span class="go">&#39;https://example.com/bands/&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">build_absolute_uri</span><span class="p">(</span><span class="s2">&quot;https://example2.com/bands/&quot;</span><span class="p">)</span>
+<span class="go">&#39;https://example2.com/bands/&#39;</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>同一サイト上でHTTPとHTTPSを混在させることは推奨されません。そのため、<a class="reference internal" href="#django.http.HttpRequest.build_absolute_uri" title="django.http.HttpRequest.build_absolute_uri"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build_absolute_uri()</span></code></a> は常に、現在のリクエストと同じスキームを持つ絶対URIを生成します。ユーザーをHTTPSにリダイレクトする必要がある場合は、WebサーバーにすべてのHTTPトラフィックをHTTPSにリダイレクトさせるのが最善です。</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.get_signed_cookie">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">get_signed_cookie</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">RAISE_ERROR</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L180"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.get_signed_cookie" title="Link to this definition">¶</a></dt>
+<dd><p>署名付きクッキーの値を返します。署名が無効である場合は <code class="docutils literal notranslate"><span class="pre">django.core.signing.BadSignature</span></code> 例外が発生します。<code class="docutils literal notranslate"><span class="pre">default</span></code> 引数を提供した場合、例外は抑制され、代わりにそのデフォルト値が返されます。</p>
+<p>オプションの <code class="docutils literal notranslate"><span class="pre">salt</span></code> 引数は、秘密鍵への総当たり攻撃から保護するために使用できます。指定された場合、<code class="docutils literal notranslate"><span class="pre">max_age</span></code> 引数は、クッキー値に付加された署名付きタイムスタンプと比較して、クッキーが <code class="docutils literal notranslate"><span class="pre">max_age</span></code> 秒より古くないことを確認します。</p>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">get_signed_cookie</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+<span class="go">&#39;Tony&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">get_signed_cookie</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">salt</span><span class="o">=</span><span class="s2">&quot;name-salt&quot;</span><span class="p">)</span>
+<span class="go">&#39;Tony&#39; # assuming cookie was set using the same salt</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">get_signed_cookie</span><span class="p">(</span><span class="s2">&quot;nonexistent-cookie&quot;</span><span class="p">)</span>
+<span class="go">KeyError: &#39;nonexistent-cookie&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">get_signed_cookie</span><span class="p">(</span><span class="s2">&quot;nonexistent-cookie&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">get_signed_cookie</span><span class="p">(</span><span class="s2">&quot;cookie-that-was-tampered-with&quot;</span><span class="p">)</span>
+<span class="go">BadSignature: ...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">get_signed_cookie</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">max_age</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="go">SignatureExpired: Signature age 1677.3839159 &gt; 60 seconds</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">get_signed_cookie</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">max_age</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<p>詳細については、 <a class="reference internal" href="../topics/signing.html"><span class="doc">暗号署名</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.is_secure">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">is_secure</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L270"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.is_secure" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストがセキュアである場合、つまりHTTPSで行われた場合に <code class="docutils literal notranslate"><span class="pre">True</span></code> を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.accepts">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">accepts</span></span>(<em class="sig-param"><span class="n"><span class="pre">mime_type</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L95"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.accepts" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストの <code class="docutils literal notranslate"><span class="pre">Accept</span></code> ヘッダーが <code class="docutils literal notranslate"><span class="pre">mime_type</span></code> 引数と一致する場合に <code class="docutils literal notranslate"><span class="pre">True</span></code> を返します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">request</span><span class="o">.</span><span class="n">accepts</span><span class="p">(</span><span class="s2">&quot;text/html&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>ほとんどのブラウザはデフォルトで <code class="docutils literal notranslate"><span class="pre">Accept:</span> <span class="pre">*/*</span></code> を送信するため、これはすべてのコンテンツタイプに対して <code class="docutils literal notranslate"><span class="pre">True</span></code> を返します。APIリクエストに明示的な <code class="docutils literal notranslate"><span class="pre">Accept</span></code> ヘッダーを設定することは、それらの利用者のみに異なるコンテンツタイプを返すために役立ちます。APIの利用者に異なるコンテントを返すための <code class="docutils literal notranslate"><span class="pre">accepts()</span></code> の使用例については、 <a class="reference internal" href="../topics/class-based-views/generic-editing.html#content-negotiation-example"><span class="std std-ref">コンテンツネゴシエーションの例</span></a> を参照してください。</p>
+<p>レスポンスが <code class="docutils literal notranslate"><span class="pre">Accept</span></code> ヘッダーの内容によって変わる場合、 Django の <a class="reference internal" href="middleware.html#module-django.middleware.cache" title="django.middleware.cache: Middleware for the site-wide cache."><code class="xref py py-mod docutils literal notranslate"><span class="pre">キャッシュミドルウェア</span></code></a> などのキャッシュ形式を使用している場合は、レスポンスが適切にキャッシュされるように、ビューを <a class="reference internal" href="../topics/http/decorators.html#django.views.decorators.vary.vary_on_headers" title="django.views.decorators.vary.vary_on_headers"><code class="xref py py-func docutils literal notranslate"><span class="pre">vary_on_headers('Accept')</span></code></a> でデコレートする必要があります。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.read">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">read</span></span>(<em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L412"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.read" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.readline">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">readline</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L419"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.readline" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.readlines">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">readlines</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L429"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.readlines" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpRequest.__iter__">
+<span class="sig-prename descclassname"><span class="pre">HttpRequest.</span></span><span class="sig-name descname"><span class="pre">__iter__</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L426"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpRequest.__iter__" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> インスタンスから読み取るためのファイルライクなインターフェースを実装するメソッドです。これにより、着信リクエストをストリーミング形式で消費することが可能になります。一般的な使用例は、大きなXMLペイロードをメモリ内で完全なXMLツリーを構築することなく、繰り返しパーサーで処理する場合です。</p>
+<p>この標準インターフェースを用いると、 <code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> インスタンスは <a class="reference external" href="https://docs.python.org/3/library/xml.etree.elementtree.html#xml.etree.ElementTree.ElementTree" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ElementTree</span></code></a> のようなXMLパーサーに直接渡すことができます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">xml.etree.ElementTree</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ET</span>
+
+<span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">ET</span><span class="o">.</span><span class="n">iterparse</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="n">process</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-querydict-objects">
+<span id="querydict-objects"></span><h2><code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> オブジェクト<a class="headerlink" href="#querydict-objects" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.QueryDict">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">QueryDict</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L484"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> オブジェクト内では、<a class="reference internal" href="#django.http.HttpRequest.GET" title="django.http.HttpRequest.GET"><code class="xref py py-attr docutils literal notranslate"><span class="pre">GET</span></code></a> と <a class="reference internal" href="#django.http.HttpRequest.POST" title="django.http.HttpRequest.POST"><code class="xref py py-attr docutils literal notranslate"><span class="pre">POST</span></code></a> 属性は <code class="docutils literal notranslate"><span class="pre">django.http.QueryDict</span></code> のインスタンスです。これは、同一のキーに対する複数の値を扱うためにカスタマイズされた、辞書型に似たクラスです。これが必要なのは、いくつかの HTML (特に <code class="docutils literal notranslate"><span class="pre">&lt;select</span> <span class="pre">multiple&gt;</span></code>) が同一キーで複数の値を渡すからです。</p>
+<p><code class="docutils literal notranslate"><span class="pre">request.POST</span></code> や <code class="docutils literal notranslate"><span class="pre">request.GET</span></code> の <code class="docutils literal notranslate"><span class="pre">QueryDict</span></code>は、通常の request/response 内でアクセスするときには編集不可です。編集可能なものを取得するには、<a class="reference internal" href="#django.http.QueryDict.copy" title="django.http.QueryDict.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QueryDict.copy()</span></code></a> を使う必要があります。</p>
+<section id="s-id1">
+<span id="id1"></span><h3>メソッド<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h3>
+<p><a class="reference internal" href="#django.http.QueryDict" title="django.http.QueryDict"><code class="xref py py-class docutils literal notranslate"><span class="pre">QueryDict</span></code></a> はディクショナリのサブクラスなので、標準的なディクショナリのメソッドを全て実装しています。当てはまらないのはおおむね以下の通りです:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.__init__">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span>(<em class="sig-param"><span class="n"><span class="pre">query_string</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L504"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.__init__" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">QueryDict</span></code>に基づいて <code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> オブジェクトをインスタンス化します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=1&amp;a=2&amp;c=3&quot;</span><span class="p">)</span>
+<span class="go">&lt;QueryDict: {&#39;a&#39;: [&#39;1&#39;, &#39;2&#39;], &#39;c&#39;: [&#39;3&#39;]}&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">query_string</span></code> が渡されなかった場合は、<code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> 空となります (何のキーや値も持ちません)。</p>
+<p>使用する <code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> のほとんど、特に <code class="docutils literal notranslate"><span class="pre">request.POST</span></code> や <code class="docutils literal notranslate"><span class="pre">request.GET</span></code> における場合、編集不可となっています。自分でインスタンスを生成する場合は、<code class="docutils literal notranslate"><span class="pre">__init__()</span></code> に <code class="docutils literal notranslate"><span class="pre">mutable=True</span></code> を渡すことで編集可能にできます。</p>
+<p>キーとバリューの両方を設定するための文字列は、<code class="docutils literal notranslate"><span class="pre">encoding</span></code> から <code class="docutils literal notranslate"><span class="pre">str</span></code> に変換されます。<code class="docutils literal notranslate"><span class="pre">encoding</span></code> がセットされていない場合、<a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> がデフォルトとなります。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.fromkeys">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">fromkeys</span></span>(<em class="sig-param"><span class="n"><span class="pre">iterable</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mutable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L535"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.fromkeys" title="Link to this definition">¶</a></dt>
+<dd><p>新しい <code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> を作成します。キーは <code class="docutils literal notranslate"><span class="pre">iterable</span></code> で、各値は <code class="docutils literal notranslate"><span class="pre">value</span></code> になります。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">QueryDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">],</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;val&quot;</span><span class="p">)</span>
+<span class="go">&lt;QueryDict: {&#39;a&#39;: [&#39;val&#39;, &#39;val&#39;], &#39;b&#39;: [&#39;val&#39;]}&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.__getitem__">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>)<a class="headerlink" href="#django.http.QueryDict.__getitem__" title="Link to this definition">¶</a></dt>
+<dd><p>指定したキーに対する値を返します。キーが複数の値を持つ場合、最後の値を返します。キーが存在しない場合は <code class="docutils literal notranslate"><span class="pre">django.utils.datastructures.MultiValueDictKeyError</span></code> を発生させます (これは Python の標準的な <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">KeyError</span></code></a> サブクラスなので、<code class="docutils literal notranslate"><span class="pre">KeyError</span></code> をキャッチすることに固執できます)。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.__setitem__">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">__setitem__</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L561"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.__setitem__" title="Link to this definition">¶</a></dt>
+<dd><p>指定したキーを <code class="docutils literal notranslate"><span class="pre">[value]</span></code> (各要素が <code class="docutils literal notranslate"><span class="pre">value</span></code> のリスト) にセットします。 副作用を持つ他のディクショナリ関数と同様に、編集可能な <code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> (<a class="reference internal" href="#django.http.QueryDict.copy" title="django.http.QueryDict.copy"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QueryDict.copy()</span></code></a> で作成されたものなど) のみで呼び出し可能です.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.__contains__">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">__contains__</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>)<a class="headerlink" href="#django.http.QueryDict.__contains__" title="Link to this definition">¶</a></dt>
+<dd><p>指定したキーがセットされている場合 <code class="docutils literal notranslate"><span class="pre">True</span></code> を返します。例えば <code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">&quot;foo&quot;</span> <span class="pre">in</span> <span class="pre">request.GET</span></code> を実行するのと同じです。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.get">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">get</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.http.QueryDict.get" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.QueryDict.__getitem__" title="django.http.QueryDict.__getitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__getitem__()</span></code></a> と同じロジックを使いますが、キーが存在しない場合のデフォルト値をフックします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.setdefault">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">setdefault</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L612"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.setdefault" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.setdefault" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.setdefault()</span></code></a> に似ていますが、内部では <a class="reference internal" href="#django.http.QueryDict.__setitem__" title="django.http.QueryDict.__setitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__setitem__()</span></code></a> を使用します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.update">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">update</span></span>(<em class="sig-param"><span class="n"><span class="pre">other_dict</span></span></em>)<a class="headerlink" href="#django.http.QueryDict.update" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> または辞書のどちらかを取ります。 <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.update" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.update()</span></code></a> と似ていますが、現在の辞書の項目を置き換えるのではなく <em>追加</em> します。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=1&quot;</span><span class="p">,</span> <span class="n">mutable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="s2">&quot;2&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="go">[&#39;1&#39;, &#39;2&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;a&quot;</span><span class="p">]</span>  <span class="c1"># returns the last</span>
+<span class="go">&#39;2&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.items">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">items</span></span>()<a class="headerlink" href="#django.http.QueryDict.items" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.items" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.items()</span></code></a> と似ていますが、これは <a class="reference internal" href="#django.http.QueryDict.__getitem__" title="django.http.QueryDict.__getitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__getitem__()</span></code></a> と同じ最後の値のロジックを使用し、ビューオブジェクトの代わりにイテレータオブジェクトを返します。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=1&amp;a=2&amp;a=3&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+<span class="go">[(&#39;a&#39;, &#39;3&#39;)]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.values">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">values</span></span>()<a class="headerlink" href="#django.http.QueryDict.values" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.values" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.values()</span></code></a> のように、<a class="reference internal" href="#django.http.QueryDict.__getitem__" title="django.http.QueryDict.__getitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__getitem__()</span></code></a> と同じ最後の値のロジックを使用しますが、ビューオブジェクトの代わりにイテレータを返します。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=1&amp;a=2&amp;a=3&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">q</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="go">[&#39;3&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<p>加えて、<code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> は以下のメソッドを持ちます:</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.copy">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">copy</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L618"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.copy" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/copy.html#copy.deepcopy" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">copy.deepcopy()</span></code></a> を使用してオブジェクトのコピーを返します。このコピーは、元のオブジェクトがイミュータブルであったとしても、ミュータブルです。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.getlist">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">getlist</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.http.QueryDict.getlist" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストされたキーのデータのリストを返します。キーが存在しない場合には、 <code class="docutils literal notranslate"><span class="pre">default</span></code> が <code class="docutils literal notranslate"><span class="pre">None</span></code> であれば空のリストを返します。デフォルト値がリストでない限り、リストを返すことが保証されています。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.setlist">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">setlist</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">list_</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L584"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.setlist" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたキーを <code class="docutils literal notranslate"><span class="pre">list_</span></code> に設定します ( <a class="reference internal" href="#django.http.QueryDict.__setitem__" title="django.http.QueryDict.__setitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">__setitem__()</span></code></a> と異なります)。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.appendlist">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">appendlist</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L594"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.appendlist" title="Link to this definition">¶</a></dt>
+<dd><p>key に関連付けられた内部リストに項目を追加します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.setlistdefault">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">setlistdefault</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L590"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.setlistdefault" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.QueryDict.setdefault" title="django.http.QueryDict.setdefault"><code class="xref py py-meth docutils literal notranslate"><span class="pre">setdefault()</span></code></a> に似ていますが、単一の値の代わりに値のリストを取ります。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.lists">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">lists</span></span>()<a class="headerlink" href="#django.http.QueryDict.lists" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.QueryDict.items" title="django.http.QueryDict.items"><code class="xref py py-meth docutils literal notranslate"><span class="pre">items()</span></code></a> に似ていますが、辞書の各メンバーに対して、すべての値をリストとして含んでいます。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=1&amp;a=2&amp;a=3&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">lists</span><span class="p">()</span>
+<span class="go">[(&#39;a&#39;, [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;])]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.pop">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">pop</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L600"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.pop" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたキーに対応する値のリストを返し、それらを辞書から削除します。キーが存在しない場合は <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> を発生させます。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=1&amp;a=2&amp;a=3&quot;</span><span class="p">,</span> <span class="n">mutable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)</span>
+<span class="go">[&#39;1&#39;, &#39;2&#39;, &#39;3&#39;]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.popitem">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">popitem</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L604"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.popitem" title="Link to this definition">¶</a></dt>
+<dd><p>辞書の任意のメンバーを削除し (順序の概念がないため)、キーとキーに対するすべての値のリストを含む2値タプルを返します。空の辞書に対して呼び出されると <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> を発生させます。例えば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=1&amp;a=2&amp;a=3&quot;</span><span class="p">,</span> <span class="n">mutable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">popitem</span><span class="p">()</span>
+<span class="go">(&#39;a&#39;, [&#39;1&#39;, &#39;2&#39;, &#39;3&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.dict">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">dict</span></span>()<a class="headerlink" href="#django.http.QueryDict.dict" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> の各(key, list)ペアに対して、 <code class="docutils literal notranslate"><span class="pre">dict</span></code> 形式の表現を返します。 <code class="docutils literal notranslate"><span class="pre">dict</span></code> は、リストの中の要素の1つである item に対して、(key, item) のペアを持ちます。これは、 <a class="reference internal" href="#django.http.QueryDict.__getitem__" title="django.http.QueryDict.__getitem__"><code class="xref py py-meth docutils literal notranslate"><span class="pre">QueryDict.__getitem__()</span></code></a> と同じロジックを使用します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=1&amp;a=3&amp;a=5&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+<span class="go">{&#39;a&#39;: &#39;5&#39;}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.QueryDict.urlencode">
+<span class="sig-prename descclassname"><span class="pre">QueryDict.</span></span><span class="sig-name descname"><span class="pre">urlencode</span></span>(<em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/request.py#L622"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.QueryDict.urlencode" title="Link to this definition">¶</a></dt>
+<dd><p>クエリ文字列形式のデータを文字列で返します。例えば：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="s2">&quot;a=2&amp;b=3&amp;b=5&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">urlencode</span><span class="p">()</span>
+<span class="go">&#39;a=2&amp;b=3&amp;b=5&#39;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">safe</span></code> パラメータを使って、エンコードを不要とする文字を渡すことができます。たとえば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">q</span> <span class="o">=</span> <span class="n">QueryDict</span><span class="p">(</span><span class="n">mutable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="p">[</span><span class="s2">&quot;next&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;/a&amp;b/&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">q</span><span class="o">.</span><span class="n">urlencode</span><span class="p">(</span><span class="n">safe</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="go">&#39;next=/a%26b/&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-httpresponse-objects">
+<span id="httpresponse-objects"></span><h2><code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> オブジェクト<a class="headerlink" href="#httpresponse-objects" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponse</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L364"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponse" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Django によって自動的に生成される <a class="reference internal" href="#django.http.HttpRequest" title="django.http.HttpRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpRequest</span></code></a> オブジェクトとは対照的に、<a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> オブジェクトの作成はあなたの責任です。プログラム内に記述されるあらゆるビューは、<a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> をインスタンス化し、データを格納して返す必要があります。</p>
+<p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> クラスは <a class="reference internal" href="#module-django.http" title="django.http: Classes dealing with HTTP requests and responses."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.http</span></code></a> モジュール内に存在します。</p>
+<section id="s-usage">
+<span id="usage"></span><h3>使い方<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h3>
+<section id="s-passing-strings">
+<span id="passing-strings"></span><h4>文字列を渡す<a class="headerlink" href="#passing-strings" title="Link to this heading">¶</a></h4>
+<p>一般的な使い方としては、ページのコンテンツを文字列、バイト文字列、または <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">memoryview</span></code></a> として、 <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> コンストラクタに渡します。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Here&#39;s the text of the web page.&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="s2">&quot;Text only, please.&quot;</span><span class="p">,</span> <span class="n">content_type</span><span class="o">=</span><span class="s2">&quot;text/plain&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Bytestrings are also accepted.&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="nb">memoryview</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;Memoryview as well.&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>しかし、内容を段階的に追加したい場合は、 <code class="docutils literal notranslate"><span class="pre">response</span></code> をファイルライクオブジェクトとして使用できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;p&gt;Here&#39;s the text of the web page.&lt;/p&gt;&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;p&gt;Here&#39;s another paragraph.&lt;/p&gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="s-passing-iterators">
+<span id="passing-iterators"></span><h4>イテレータを渡す<a class="headerlink" href="#passing-iterators" title="Link to this heading">¶</a></h4>
+<p>最後に、文字列ではなくイテレータを <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> に渡すこともできます。 <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> はイテレータを即座に受け取り、その内容を文字列として保存し、破棄します。ファイルやジェネレータのような <code class="docutils literal notranslate"><span class="pre">close()</span></code> メソッドを持つオブジェクトは、すぐに閉じられます。</p>
+<p>レスポンスに対して、イテレータからクライアントにストリーミングさせる必要がある場合には、代わりに <a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> クラスを使う必要があります。</p>
+</section>
+<section id="s-setting-header-fields">
+<span id="s-id2"></span><span id="setting-header-fields"></span><span id="id2"></span><h4>ヘッダーフィールドをセットする<a class="headerlink" href="#setting-header-fields" title="Link to this heading">¶</a></h4>
+<p>レスポンスでヘッダーフィールドを設定または削除するには、 <a class="reference internal" href="#django.http.HttpResponse.headers" title="django.http.HttpResponse.headers"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HttpResponse.headers</span></code></a> を使用してください。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>レスポンスを辞書のように扱うことで、ヘッダーを操作することもできます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">del</span> <span class="n">response</span><span class="p">[</span><span class="s2">&quot;Age&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>これは <code class="docutils literal notranslate"><span class="pre">HttpResponse.headers</span></code> へのプロキシで、 <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> が提供する本来のインタフェースです。</p>
+<p>このインターフェースを使用する際、辞書とは異なり、ヘッダーフィールドが存在しない場合に <code class="docutils literal notranslate"><span class="pre">del</span></code> が <code class="docutils literal notranslate"><span class="pre">KeyError</span></code> を発生させることはありません。</p>
+<p>インスタンス化の際にもヘッダーを設定できます:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Age&quot;</span><span class="p">:</span> <span class="mi">120</span><span class="p">})</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Cache-Control</span></code> および <code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダーフィールドを設定するには、これらのフィールドが複数のカンマ区切りの値を持ち得るため、 <a class="reference internal" href="utils.html#module-django.utils.cache" title="django.utils.cache: Helper functions for controlling caching."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.utils.cache</span></code></a> から <a class="reference internal" href="utils.html#django.utils.cache.patch_cache_control" title="django.utils.cache.patch_cache_control"><code class="xref py py-func docutils literal notranslate"><span class="pre">patch_cache_control()</span></code></a> と <a class="reference internal" href="utils.html#django.utils.cache.patch_vary_headers" title="django.utils.cache.patch_vary_headers"><code class="xref py py-func docutils literal notranslate"><span class="pre">patch_vary_headers()</span></code></a> メソッドを使用することが推奨されます。&quot;patch&quot; メソッドは、ミドルウェアによって追加された他の値が削除されないように保証します。</p>
+<p>HTTP ヘッダフィールドには改行を含めることはできません。改行文字 (CR または LF) を含むヘッダフィールドを設定しようとすると、<code class="docutils literal notranslate"><span class="pre">BadHeaderError</span></code> が発生します。</p>
+</section>
+<section id="s-telling-the-browser-to-treat-the-response-as-a-file-attachment">
+<span id="telling-the-browser-to-treat-the-response-as-a-file-attachment"></span><h4>レスポンスをファイル添付物として扱うようにブラウザに指示します。<a class="headerlink" href="#telling-the-browser-to-treat-the-response-as-a-file-attachment" title="Link to this heading">¶</a></h4>
+<p>ブラウザにレスポンスをファイル添付として扱うように指示するためには、<code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> と <code class="docutils literal notranslate"><span class="pre">Content-Disposition</span></code> ヘッダを設定します。例えば、Microsoft Excel スプレッドシートを返す方法は以下のようになります:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">HttpResponse</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">my_data</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/vnd.ms-excel&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">&quot;Content-Disposition&quot;</span><span class="p">:</span> <span class="s1">&#39;attachment; filename=&quot;foo.xls&quot;&#39;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">},</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">Content-Disposition</span></code> ヘッダについては Django 固有のものはありませんが、その構文を忘れやすいので、ここに含めています。</p>
+</section>
+</section>
+<section id="s-id3">
+<span id="id3"></span><h3>属性<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponse.content">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">content</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L396"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponse.content" title="Link to this definition">¶</a></dt>
+<dd><p>必要に応じて文字列からエンコードされた、コンテンツを表すバイト文字列。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponse.cookies">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">cookies</span></span><a class="headerlink" href="#django.http.HttpResponse.cookies" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスに含まれるクッキーを保持する <a class="reference external" href="https://docs.python.org/3/library/http.cookies.html#http.cookies.SimpleCookie" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">http.cookies.SimpleCookie</span></code></a> オブジェクトです。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponse.headers">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">headers</span></span><a class="headerlink" href="#django.http.HttpResponse.headers" title="Link to this definition">¶</a></dt>
+<dd><p>大文字小文字を区別しない辞書型オブジェクトで、<code class="docutils literal notranslate"><span class="pre">Set-Cookie</span></code> ヘッダを除くすべてのHTTPヘッダに対するインターフェイスを提供します。 <a class="reference internal" href="#setting-header-fields"><span class="std std-ref">ヘッダーフィールドをセットする</span></a> および <a class="reference internal" href="#django.http.HttpResponse.cookies" title="django.http.HttpResponse.cookies"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HttpResponse.cookies</span></code></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponse.charset">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">charset</span></span><a class="headerlink" href="#django.http.HttpResponse.charset" title="Link to this definition">¶</a></dt>
+<dd><p>応答がエンコードされる文字セットを示す文字列です。 <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> のインスタンス化の際に指定されなかった場合、 <code class="docutils literal notranslate"><span class="pre">content_type</span></code> から抽出され、もしこれが失敗した場合は、 <a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定が使用されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponse.status_code">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">status_code</span></span><a class="headerlink" href="#django.http.HttpResponse.status_code" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスの <span class="target" id="index-25"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-15"><strong>HTTP ステータスコード</strong></a> 。</p>
+<p><a class="reference internal" href="#django.http.HttpResponse.reason_phrase" title="django.http.HttpResponse.reason_phrase"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reason_phrase</span></code></a> が明示的にセットされていない限り、コンストラクタの外で <code class="docutils literal notranslate"><span class="pre">status_code</span></code> の値を変更すると <code class="docutils literal notranslate"><span class="pre">reason_phrase</span></code> の値も変更されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponse.reason_phrase">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">reason_phrase</span></span><a class="headerlink" href="#django.http.HttpResponse.reason_phrase" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスの HTTP reason フレーズです。これは <span class="target" id="index-26"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-15.1"><strong>HTTP 標準の</strong></a> デフォルトの reason フレーズを使用します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">reason_phrase</span></code> が明示的に設定されていない場合、 <a class="reference internal" href="#django.http.HttpResponse.status_code" title="django.http.HttpResponse.status_code"><code class="xref py py-attr docutils literal notranslate"><span class="pre">status_code</span></code></a> の値に基づいて決定されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponse.streaming">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">streaming</span></span><a class="headerlink" href="#django.http.HttpResponse.streaming" title="Link to this definition">¶</a></dt>
+<dd><p>これは常に <code class="docutils literal notranslate"><span class="pre">False</span></code> です。</p>
+<p>この属性は、ミドルウェアが通常のレスポンスとは違う形でストリーミングレスポンスを扱えるようにするために存在しています。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponse.closed">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">closed</span></span><a class="headerlink" href="#django.http.HttpResponse.closed" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスが閉じられた場合、<code class="docutils literal notranslate"><span class="pre">True</span></code> となります。</p>
+</dd></dl>
+
+</section>
+<section id="s-id4">
+<span id="id4"></span><h3>メソッド<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.__init__">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">__init__</span></span>(<em class="sig-param"><span class="n"><span class="pre">content</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">b''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L373"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponse.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたページ内容、コンテンツタイプ、およびヘッダーを持つ <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> オブジェクトをインスタンス化します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">content</span></code> は、最も一般的にはイテレータ、バイト文字列、 <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">memoryview</span></code></a> 、または文字列です。その他の型は、文字列表現をエンコードしてバイト文字列に変換されます。イテレータは文字列またはバイト文字列を返すべきで、それらはレスポンスの内容を形成するために連結されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">content_type</span></code> は、MIME タイプであり、オプションで文字セットエンコーディングを指定して HTTP <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> ヘッダを埋めるために使用されます。指定されていない場合、デフォルトでは <code class="docutils literal notranslate"><span class="pre">'text/html'</span></code> と <a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定によって形成されます: つまり <code class="docutils literal notranslate"><span class="pre">&quot;text/html;</span> <span class="pre">charset=utf-8&quot;</span></code> 。</p>
+<p><code class="docutils literal notranslate"><span class="pre">status</span></code> はレスポンスの <span class="target" id="index-27"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-15"><strong>HTTPステータスコード</strong></a> です。Python の <a class="reference external" href="https://docs.python.org/3/library/http.html#http.HTTPStatus" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">http.HTTPStatus</span></code></a> を使用して、 <code class="docutils literal notranslate"><span class="pre">HTTPStatus.NO_CONTENT</span></code> のような意味のあるエイリアスを使用できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">reason</span></code> は HTTP レスポンスフレーズです。指定しない場合、デフォルトのフレーズが使用されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">charset</span></code> は、レスポンスがエンコードされる文字セットです。もし指定されていない場合、<code class="docutils literal notranslate"><span class="pre">content_type</span></code> から抽出されます。それが失敗した場合は、 <a class="reference internal" href="settings.html#std-setting-DEFAULT_CHARSET"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DEFAULT_CHARSET</span></code></a> 設定が使用されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">headers</span></code> はレスポンス用のHTTPヘッダーの <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a> です。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.__setitem__">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">__setitem__</span></span>(<em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.__setitem__" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたヘッダ名に指定された値を設定します。 <code class="docutils literal notranslate"><span class="pre">header</span></code> と <code class="docutils literal notranslate"><span class="pre">value</span></code> は共に文字列であるべきです。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.__delitem__">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">__delitem__</span></span>(<em class="sig-param"><span class="n"><span class="pre">header</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.__delitem__" title="Link to this definition">¶</a></dt>
+<dd><p>指定された名前のヘッダーを削除します。ヘッダーが存在しなくても、静かに失敗します。大文字小文字を区別しません。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.__getitem__">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">__getitem__</span></span>(<em class="sig-param"><span class="n"><span class="pre">header</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.__getitem__" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたヘッダ名の値を返します。大文字小文字を区別しません。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.get">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">get</span></span>(<em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alternate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.get" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたヘッダーの値を返します。ヘッダーが存在しない場合は、<code class="docutils literal notranslate"><span class="pre">alternate</span></code> を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.has_header">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">has_header</span></span>(<em class="sig-param"><span class="n"><span class="pre">header</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.has_header" title="Link to this definition">¶</a></dt>
+<dd><p>指定された名前のヘッダーが存在するかどうかを大文字小文字を区別せずにチェックし、<code class="docutils literal notranslate"><span class="pre">True</span></code> または <code class="docutils literal notranslate"><span class="pre">False</span></code> を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.items">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">items</span></span>()<a class="headerlink" href="#django.http.HttpResponse.items" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスのHTTPヘッダに対して、 <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict.items" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">dict.items()</span></code></a> のように動作します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.setdefault">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">setdefault</span></span>(<em class="sig-param"><span class="n"><span class="pre">header</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.setdefault" title="Link to this definition">¶</a></dt>
+<dd><p>ヘッダーがまだ設定されていない場合に、ヘッダーを設定します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.set_cookie">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">set_cookie</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expires</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">httponly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samesite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.set_cookie" title="Link to this definition">¶</a></dt>
+<dd><p>クッキーを設定します。パラメータは、Python標準ライブラリ内の <a class="reference external" href="https://docs.python.org/3/library/http.cookies.html#http.cookies.Morsel" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Morsel</span></code></a> クッキーオブジェクトと同じです。</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">max_age</span></code> は <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code></a> オブジェクト、整数秒数、または <code class="docutils literal notranslate"><span class="pre">None</span></code> (デフォルト) である必要があります。これにより、クッキーの有効期限はクライアントのブラウザセッションが終了するまでとなります。 <code class="docutils literal notranslate"><span class="pre">expires</span></code> が指定されていない場合は自動的に計算されます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">expires</span></code> は、 <code class="docutils literal notranslate"><span class="pre">&quot;Wdy,</span> <span class="pre">DD-Mon-YY</span> <span class="pre">HH:MM:SS</span> <span class="pre">GMT&quot;</span></code> 形式の文字列か、UTCの <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code> オブジェクトであるべきです。もし <code class="docutils literal notranslate"><span class="pre">expires</span></code> が <code class="docutils literal notranslate"><span class="pre">datetime</span></code> オブジェクトである場合、 <code class="docutils literal notranslate"><span class="pre">max_age</span></code> が計算されます。</p></li>
+<li><p>クロスドメインのクッキーを設定したい場合は、<code class="docutils literal notranslate"><span class="pre">domain</span></code> を使用してください。例えば、 <code class="docutils literal notranslate"><span class="pre">domain=&quot;example.com&quot;</span></code> とすると、www.example.com、blog.example.com などのドメインから読み取れるクッキーが設定されます。そうでない場合、クッキーは設定したドメインのみから読み取れます。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">secure=True</span></code> を使用すると、リクエストが <code class="docutils literal notranslate"><span class="pre">https</span></code> スキームで行われた場合にのみ、クッキーがサーバーに送信されるようになります。</p></li>
+<li><p>クライアントサイドのJavaScriptがクッキーにアクセスするのを防ぎたい場合は、<code class="docutils literal notranslate"><span class="pre">httponly=True</span></code> を使用してください。</p>
+<p><a class="reference external" href="https://owasp.org/www-community/HttpOnly">HttpOnly</a> は、Set-Cookie HTTP レスポンスヘッダーに含まれるフラグです。これは、クッキーの <span class="target" id="index-28"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc6265.html#section-4.1.2.6"><strong>RFC 6265</strong></a> 標準の一部であり、クライアントサイドのスクリプトが保護されたクッキーデータにアクセスするリスクを軽減する有用な方法です。</p>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">samesite='Strict'</span></code> や <code class="docutils literal notranslate"><span class="pre">samesite='Lax'</span></code> を使用して、ブラウザにクロスオリジンリクエストを行う際にこのクッキーを送信しないよう指示します。 <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie#samesitesamesite-value">SameSite</a> はすべてのブラウザに対応しているわけではないため、DjangoのCSRF保護の代わりとなるものではありませんが、防御の深度を増すための措置です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">samesite='None'</span></code> (文字列) を使えば、このクッキーが同一サイトおよびクロスサイトのすべてのリクエストに送信されることを明示できます。</p>
+</li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p><span class="target" id="index-29"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc6265.html#section-6.1"><strong>RFC 6265</strong></a> には、ユーザーエージェントが少なくとも 4096 バイトのクッキーをサポートすべきであると記されています。多くのブラウザでは、これが最大サイズでもあります。Django は 4096 バイトを超えるクッキーを保存しようとした際に例外を発生させませんが、多くのブラウザでは正しくクッキーを設定しないでしょう。</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.set_signed_cookie">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">set_signed_cookie</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_age</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expires</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">secure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">httponly</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samesite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.set_signed_cookie" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse.set_cookie" title="django.http.HttpResponse.set_cookie"><code class="xref py py-meth docutils literal notranslate"><span class="pre">set_cookie()</span></code></a> のように、クッキーを設定する前に <a class="reference internal" href="../topics/signing.html"><span class="doc">暗号署名</span></a> を行います。 <a class="reference internal" href="#django.http.HttpRequest.get_signed_cookie" title="django.http.HttpRequest.get_signed_cookie"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HttpRequest.get_signed_cookie()</span></code></a> と組み合わせて使用してください。オプショナルな <code class="docutils literal notranslate"><span class="pre">salt</span></code> 引数を使用して鍵強度を高めることができますが、対応する <a class="reference internal" href="#django.http.HttpRequest.get_signed_cookie" title="django.http.HttpRequest.get_signed_cookie"><code class="xref py py-meth docutils literal notranslate"><span class="pre">HttpRequest.get_signed_cookie()</span></code></a> 呼び出しにそれを渡す必要があります。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.delete_cookie">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">delete_cookie</span></span>(<em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">samesite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="headerlink" href="#django.http.HttpResponse.delete_cookie" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたキーを持つクッキーを削除します。キーが存在しない場合は、静かに失敗します。</p>
+<p>クッキーの動作方法により、 <code class="docutils literal notranslate"><span class="pre">path</span></code> と <code class="docutils literal notranslate"><span class="pre">domain</span></code> は <code class="docutils literal notranslate"><span class="pre">set_cookie()</span></code> で使用した値と同じでなければなりません。そうでない場合、クッキーが削除されない可能性があります。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.close">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">close</span></span>()<a class="headerlink" href="#django.http.HttpResponse.close" title="Link to this definition">¶</a></dt>
+<dd><p>このメソッドは、リクエストの終了時に、WSGIサーバーによって直接呼び出されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.write">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">write</span></span>(<em class="sig-param"><span class="n"><span class="pre">content</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L415"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponse.write" title="Link to this definition">¶</a></dt>
+<dd><p>このメソッドは、 <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> インスタンスをファイルライクオブジェクトにします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.flush">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">flush</span></span>()<a class="headerlink" href="#django.http.HttpResponse.flush" title="Link to this definition">¶</a></dt>
+<dd><p>このメソッドは、 <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> インスタンスをファイルライクオブジェクトにします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.tell">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">tell</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L418"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponse.tell" title="Link to this definition">¶</a></dt>
+<dd><p>このメソッドは、 <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> インスタンスをファイルライクオブジェクトにします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.getvalue">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">getvalue</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L421"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponse.getvalue" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse.content" title="django.http.HttpResponse.content"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HttpResponse.content</span></code></a> の値を返します。このメソッドにより、 <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> インスタンスはストリームライクオブジェクトになります。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.readable">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">readable</span></span>()<a class="headerlink" href="#django.http.HttpResponse.readable" title="Link to this definition">¶</a></dt>
+<dd><p>常に <code class="docutils literal notranslate"><span class="pre">False</span></code> です。このメソッドは <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> インスタンスをストリームライクオブジェクトにします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.seekable">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">seekable</span></span>()<a class="headerlink" href="#django.http.HttpResponse.seekable" title="Link to this definition">¶</a></dt>
+<dd><p>常に <code class="docutils literal notranslate"><span class="pre">False</span></code> です。このメソッドは <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> インスタンスをストリームライクオブジェクトにします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.writable">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">writable</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L424"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponse.writable" title="Link to this definition">¶</a></dt>
+<dd><p>常に <code class="docutils literal notranslate"><span class="pre">True</span></code> です。このメソッドは <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> インスタンスをストリームライクオブジェクトにします。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.HttpResponse.writelines">
+<span class="sig-prename descclassname"><span class="pre">HttpResponse.</span></span><span class="sig-name descname"><span class="pre">writelines</span></span>(<em class="sig-param"><span class="n"><span class="pre">lines</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L427"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponse.writelines" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスに行のリストを書き込みます。行区切りは追加されません。このメソッドは、 <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> インスタンスをストリームライクオブジェクトにします。</p>
+</dd></dl>
+
+</section>
+<section id="s-httpresponse-subclasses">
+<span id="s-ref-httpresponse-subclasses"></span><span id="httpresponse-subclasses"></span><span id="ref-httpresponse-subclasses"></span><h3><code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> サブクラス<a class="headerlink" href="#httpresponse-subclasses" title="Link to this heading">¶</a></h3>
+<p>Djangoには、異なるタイプのHTTPレスポンスを処理するための <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> のサブクラスがいくつか含まれています。 <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> と同様に、これらのサブクラスは <a class="reference internal" href="#module-django.http" title="django.http: Classes dealing with HTTP requests and responses."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.http</span></code></a> に存在します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseRedirect">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseRedirect</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L639"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseRedirect" title="Link to this definition">¶</a></dt>
+<dd><p>コンストラクタには最初の引数が必須です。これはリダイレクト先のパスです。これは完全なURL (例: <code class="docutils literal notranslate"><span class="pre">'https://www.yahoo.com/search/'</span></code>)、ドメインなしの絶対パス (例: <code class="docutils literal notranslate"><span class="pre">'/search/'</span></code>)、あるいは相対パス (例: <code class="docutils literal notranslate"><span class="pre">'search/'</span></code>) でも構いません。後者の場合、クライアントブラウザが現在のパスに従って完全なURLを自身で再構築します。その他のオプションのコンストラクタ引数については、 <a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> を参照してください。この処理はHTTPステータスコード302を返すことに注意してください。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.HttpResponseRedirect.url">
+<span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#django.http.HttpResponseRedirect.url" title="Link to this definition">¶</a></dt>
+<dd><p>この読み取り専用の属性は、レスポンスがリダイレクトするURLを表しています (<code class="docutils literal notranslate"><span class="pre">Location</span></code> レスポンスヘッダに相当します)。</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponsePermanentRedirect">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponsePermanentRedirect</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L643"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponsePermanentRedirect" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseRedirect</span></code></a> に似ていますが、&quot;found&quot; リダイレクト(ステータスコード 302) ではなく、恒久的なリダイレクト(HTTPステータスコード 301) を返します。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseNotModified">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseNotModified</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L647"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseNotModified" title="Link to this definition">¶</a></dt>
+<dd><p>コンストラクタは引数を取らず、このレスポンスにはコンテンツを追加すべきではありません。これを使用して、ページがユーザーの最後のリクエスト以降に変更されていないことを指定します(ステータスコード304)。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseBadRequest">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseBadRequest</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L663"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseBadRequest" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> と似ていますが、ステータスコードとして 400 を使用します。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseNotFound">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseNotFound</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L667"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseNotFound" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> と似ていますが、404 ステータスコードを使用します。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseForbidden">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseForbidden</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L671"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseForbidden" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> と似ていますが、403 ステータスコードを使用します。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseNotAllowed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseNotAllowed</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L675"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseNotAllowed" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> と似ていますが、ステータスコード 405 を使用します。コンストラクタへの最初の引数は必須です: 許可されているメソッドのリスト (例: <code class="docutils literal notranslate"><span class="pre">['GET',</span> <span class="pre">'POST']</span></code>)。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseGone">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseGone</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L691"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseGone" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> と似ていますが、410 ステータスコードを使用します。</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseServerError">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseServerError</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L695"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseServerError" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> と似ていますが、ステータスコードとして 500 を使用します。</p>
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> のカスタムサブクラスが <code class="docutils literal notranslate"><span class="pre">render</span></code> メソッドを実装している場合、Djangoはそれを <a class="reference internal" href="template-response.html#django.template.response.SimpleTemplateResponse" title="django.template.response.SimpleTemplateResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleTemplateResponse</span></code></a> を模倣しているものとして扱い、 <code class="docutils literal notranslate"><span class="pre">render</span></code> メソッド自体が有効なレスポンスオブジェクトを返さなければなりません。</p>
+</div>
+<section id="s-custom-response-classes">
+<span id="custom-response-classes"></span><h4>カスタムレスポンスクラス<a class="headerlink" href="#custom-response-classes" title="Link to this heading">¶</a></h4>
+<p>Django が提供していないレスポンスクラスが必要になった場合は、<a class="reference external" href="https://docs.python.org/3/library/http.html#http.HTTPStatus" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">http.HTTPStatus</span></code></a> を使用して作成できます。例えば：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPStatus</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">HttpResponse</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HttpResponseNoContent</span><span class="p">(</span><span class="n">HttpResponse</span><span class="p">):</span>
+    <span class="n">status_code</span> <span class="o">=</span> <span class="n">HTTPStatus</span><span class="o">.</span><span class="n">NO_CONTENT</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="s-jsonresponse-objects">
+<span id="jsonresponse-objects"></span><h2><code class="docutils literal notranslate"><span class="pre">JsonResponse</span></code> オブジェクト<a class="headerlink" href="#jsonresponse-objects" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.JsonResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">JsonResponse</span></span>(<em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">DjangoJSONEncoder</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">json_dumps_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L703"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.JsonResponse" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> のサブクラスで、JSONエンコードされたレスポンスを作成するのに役立ちます。このクラスは、いくつかの違いを除き、その基底クラスからほとんどの動作を継承しています:</p>
+<p>デフォルトの <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> ヘッダーは <em class="mimetype">application/json</em> に設定されています。</p>
+<p>最初のパラメーター <code class="docutils literal notranslate"><span class="pre">data</span></code> は、<code class="docutils literal notranslate"><span class="pre">dict</span></code> インスタンスであるべきです。<code class="docutils literal notranslate"><span class="pre">safe</span></code> パラメーターが <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定されている場合 (下記参照)、これはどんな JSON シリアライズ可能オブジェクトでも可能です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">encoder</span></code> のデフォルトは <a class="reference internal" href="../topics/serialization.html#django.core.serializers.json.DjangoJSONEncoder" title="django.core.serializers.json.DjangoJSONEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.serializers.json.DjangoJSONEncoder</span></code></a> で、このエンコーダーがデータのシリアライズに使用されます。このシリアライザについての詳細は、<a class="reference internal" href="../topics/serialization.html#serialization-formats-json"><span class="std std-ref">JSON のシリアライズ</span></a> を参照してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">safe</span></code> ブールパラメータのデフォルト値は <code class="docutils literal notranslate"><span class="pre">True</span></code> です。もし <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定されている場合、任意のオブジェクトをシリアライズのために渡すことができます（そうでなければ、 <code class="docutils literal notranslate"><span class="pre">dict</span></code> インスタンスのみが許可されます）。<code class="docutils literal notranslate"><span class="pre">safe</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> であり、非 <code class="docutils literal notranslate"><span class="pre">dict</span></code> オブジェクトが第一引数として渡された場合、 <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> が発生します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">json_dumps_params</span></code> パラメーターは、レスポンス生成に使用される <code class="docutils literal notranslate"><span class="pre">json.dumps()</span></code> 呼び出しに渡すキーワード引数の辞書です。</p>
+</dd></dl>
+
+<section id="s-id5">
+<span id="id5"></span><h3>使い方<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h3>
+<p>一般的な使用方法は以下のようになります:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">JsonResponse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">JsonResponse</span><span class="p">({</span><span class="s2">&quot;foo&quot;</span><span class="p">:</span> <span class="s2">&quot;bar&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="o">.</span><span class="n">content</span>
+<span class="go">b&#39;{&quot;foo&quot;: &quot;bar&quot;}&#39;</span>
+</pre></div>
+</div>
+<section id="s-serializing-non-dictionary-objects">
+<span id="serializing-non-dictionary-objects"></span><h4>辞書以外のオブジェクトのシリアライズ<a class="headerlink" href="#serializing-non-dictionary-objects" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">dict</span></code> 以外のオブジェクトをシリアライズする場合、 <code class="docutils literal notranslate"><span class="pre">safe</span></code> パラメータを <code class="docutils literal notranslate"><span class="pre">False</span></code> に設定する必要があります:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">JsonResponse</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">safe</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">safe=False</span></code> を指定しなかった場合、<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TypeError</span></code></a> が発生します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">dict</span></code> オブジェクトに基づいた API は、より拡張性が高く、柔軟性があり、前方互換性の維持が容易になります。したがって、JSON エンコードされたレスポンスでは非 dict オブジェクトの使用は避けるべきです。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p><a class="reference external" href="https://262.ecma-international.org/5.1/#sec-11.1.4">ECMAScript 5th edition</a> の前では、JavaScript の <code class="docutils literal notranslate"><span class="pre">Array</span></code> コンストラクタに対する侵害が可能でした。この理由から、Django はデフォルトで <a class="reference internal" href="#django.http.JsonResponse" title="django.http.JsonResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">JsonResponse</span></code></a> コンストラクタに辞書以外のオブジェクトを渡すことを許可しません。ただし、ほとんどの最新ブラウザは ECMAScript 5 を実装しており、この攻撃ベクトルが取り除かれています。したがって、このセキュリティ対策を無効にすることが可能です。</p>
+</div>
+</section>
+<section id="s-changing-the-default-json-encoder">
+<span id="changing-the-default-json-encoder"></span><h4>デフォルトのJSONエンコーダーを変更する<a class="headerlink" href="#changing-the-default-json-encoder" title="Link to this heading">¶</a></h4>
+<p>異なるJSONエンコーダークラスを使用する必要がある場合は、コンストラクターメソッドに <code class="docutils literal notranslate"><span class="pre">encoder</span></code> パラメータを渡すことができます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">JsonResponse</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="n">MyJSONEncoder</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="s-streaminghttpresponse-objects">
+<span id="s-httpresponse-streaming"></span><span id="streaminghttpresponse-objects"></span><span id="httpresponse-streaming"></span><h2><code class="docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code> オブジェクト<a class="headerlink" href="#streaminghttpresponse-objects" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.StreamingHttpResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">StreamingHttpResponse</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L432"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.StreamingHttpResponse" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> クラスは、Djangoからブラウザへのレスポンスをストリーミングするために使用されます。</p>
+<div class="admonition-advanced-usage admonition">
+<p class="admonition-title">高度な使用法</p>
+<p><a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> はやや高度です。アプリケーションを WSGI で同期的に、あるいは ASGI で非同期的に提供するかを知り、使用方法を適切に調整することが重要です。</p>
+<p>これらの注意点を注意深く読んでください。</p>
+</div>
+<p>WSGI 下での <a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> の使用例としては、レスポンスの生成に時間がかかりすぎる場合やメモリを大量に使用する場合にコンテンツをストリーミングすることが挙げられます。例えば、<a class="reference internal" href="../howto/outputting-csv.html#streaming-csv-files"><span class="std std-ref">大きなCSVファイルを生成する場合</span></a> に役立ちます。</p>
+<p>しかしながら、これを行う際にはパフォーマンスを考慮する必要があります。WSGIの下でのDjangoは、短期間のリクエストのために設計されています。ストリーミングレスポンスは、レスポンスの全期間にわたってワーカープロセスを占有します。これにより、パフォーマンスが低下する可能性があります。</p>
+<p>一般的に、ストリーミングレスポンスに頼るのではなく、リクエスト/レスポンスサイクルの外で高コストのタスクを行うほうが良いです。</p>
+<p>しかし、ASGI の下で提供される場合、<a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> はI/Oを待っている間に他のリクエストが提供されるのを妨げる必要はありません。これにより、ストリーミングコンテンツのための長時間生存するリクエストや、ロングポーリングやサーバー送信イベントといったパターンの実装の可能性が開かれます。</p>
+<p>ASGI環境下であっても、<a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> は、クライアントにデータを転送する前に全内容がイテレートされることが絶対に必要な状況でのみ使用すべきです。コンテンツにアクセスできないため、多くのミドルウェアが正常に機能しません。例えば、ストリーミングレスポンスには <code class="docutils literal notranslate"><span class="pre">ETag</span></code> や <code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> ヘッダを生成することができません。</p>
+<p><a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> は、若干異なるAPIを特徴とするため、<a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> のサブクラスではありません。しかし、以下に挙げる顕著な違いを除いて、ほぼ同一です。</p>
+<ul>
+<li><p>コンテンツとしてバイト文字列、<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#memoryview" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">memoryview</span></code></a>、または文字列を生成するイテレータを渡すべきです。WSGI下で提供する場合、これは同期イテレータであるべきです。ASGI下で提供する場合、これは非同期イテレータであるべきです。</p></li>
+<li><p>その内容にアクセスするには、レスポンスオブジェクト自体をイテレートする必要があります。これはクライアントにレスポンスが返されたときのみ発生すべきです。自分でレスポンスをイテレートすべきではありません。</p>
+<p>WSGIでは、レスポンスは同期的にイテレートされます。ASGIでは、レスポンスは非同期的にイテレートされます。(これが、イテレータのタイプが使用しているプロトコルと一致しなければならない理由です。)</p>
+<p>クラッシュを回避するため、間違ったイテレータのタイプは、イテレート中に正しいタイプにマッピングされ、警告が発生します。ただし、これを行うにはイテレータを完全に消費する必要があり、これは全く <a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> を使用する目的を果たしません。</p>
+</li>
+<li><p>これは <code class="docutils literal notranslate"><span class="pre">content</span></code> 属性を持ちません。代わりに <a class="reference internal" href="#django.http.StreamingHttpResponse.streaming_content" title="django.http.StreamingHttpResponse.streaming_content"><code class="xref py py-attr docutils literal notranslate"><span class="pre">streaming_content</span></code></a> 属性があります。これはミドルウェアでレスポンスのイテラブルをラップするために使用できますが、消費されるべきではありません。</p></li>
+<li><p>ファイルライクオブジェクトの <code class="docutils literal notranslate"><span class="pre">tell()</span></code> や <code class="docutils literal notranslate"><span class="pre">write()</span></code> メソッドは使用できません。これらを使用すると例外が発生します。</p></li>
+</ul>
+<p><a class="reference internal" href="#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> と <a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> は、共通の基底クラス <a class="reference internal" href="#django.http.HttpResponseBase" title="django.http.HttpResponseBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseBase</span></code></a> を持っています。</p>
+<section id="s-id6">
+<span id="id6"></span><h3>属性<a class="headerlink" href="#id6" title="Link to this heading">¶</a></h3>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.StreamingHttpResponse.streaming_content">
+<span class="sig-prename descclassname"><span class="pre">StreamingHttpResponse.</span></span><span class="sig-name descname"><span class="pre">streaming_content</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L479"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.StreamingHttpResponse.streaming_content" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンス内容のイテレータ。 バイト文字列は <a class="reference internal" href="#django.http.HttpResponse.charset" title="django.http.HttpResponse.charset"><code class="xref py py-attr docutils literal notranslate"><span class="pre">HttpResponse.charset</span></code></a> に従ってエンコードされます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.StreamingHttpResponse.status_code">
+<span class="sig-prename descclassname"><span class="pre">StreamingHttpResponse.</span></span><span class="sig-name descname"><span class="pre">status_code</span></span><a class="headerlink" href="#django.http.StreamingHttpResponse.status_code" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスの <span class="target" id="index-30"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-15"><strong>HTTP ステータスコード</strong></a> 。</p>
+<p><a class="reference internal" href="#django.http.StreamingHttpResponse.reason_phrase" title="django.http.StreamingHttpResponse.reason_phrase"><code class="xref py py-attr docutils literal notranslate"><span class="pre">reason_phrase</span></code></a> が明示的にセットされていない限り、コンストラクタの外で <code class="docutils literal notranslate"><span class="pre">status_code</span></code> の値を変更すると <code class="docutils literal notranslate"><span class="pre">reason_phrase</span></code> の値も変更されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.StreamingHttpResponse.reason_phrase">
+<span class="sig-prename descclassname"><span class="pre">StreamingHttpResponse.</span></span><span class="sig-name descname"><span class="pre">reason_phrase</span></span><a class="headerlink" href="#django.http.StreamingHttpResponse.reason_phrase" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスの HTTP reason フレーズです。これは <span class="target" id="index-31"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-15.1"><strong>HTTP 標準の</strong></a> デフォルトの reason フレーズを使用します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">reason_phrase</span></code> が明示的に設定されていない場合、 <a class="reference internal" href="#django.http.StreamingHttpResponse.status_code" title="django.http.StreamingHttpResponse.status_code"><code class="xref py py-attr docutils literal notranslate"><span class="pre">status_code</span></code></a> の値に基づいて決定されます。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.StreamingHttpResponse.streaming">
+<span class="sig-prename descclassname"><span class="pre">StreamingHttpResponse.</span></span><span class="sig-name descname"><span class="pre">streaming</span></span><a class="headerlink" href="#django.http.StreamingHttpResponse.streaming" title="Link to this definition">¶</a></dt>
+<dd><p>これは常に <code class="docutils literal notranslate"><span class="pre">True</span></code> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.http.StreamingHttpResponse.is_async">
+<span class="sig-prename descclassname"><span class="pre">StreamingHttpResponse.</span></span><span class="sig-name descname"><span class="pre">is_async</span></span><a class="headerlink" href="#django.http.StreamingHttpResponse.is_async" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.StreamingHttpResponse.streaming_content" title="django.http.StreamingHttpResponse.streaming_content"><code class="xref py py-attr docutils literal notranslate"><span class="pre">StreamingHttpResponse.streaming_content</span></code></a> が非同期イテレータであるかどうかを示す真偽値です。</p>
+<p>これは、 <a class="reference internal" href="#django.http.StreamingHttpResponse.streaming_content" title="django.http.StreamingHttpResponse.streaming_content"><code class="xref py py-attr docutils literal notranslate"><span class="pre">StreamingHttpResponse.streaming_content</span></code></a> をラップする必要があるミドルウェアにとって便利です。</p>
+</dd></dl>
+
+</section>
+<section id="s-handling-disconnects">
+<span id="s-request-response-streaming-disconnect"></span><span id="handling-disconnects"></span><span id="request-response-streaming-disconnect"></span><h3>切断の取り扱い<a class="headerlink" href="#handling-disconnects" title="Link to this heading">¶</a></h3>
+<div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<p>クライアントがストリーミングレスポンス中に切断されると、Django はレスポンスを処理しているコルーチンをキャンセルします。リソースの手動クリーンアップを行いたい場合は、<code class="docutils literal notranslate"><span class="pre">asyncio.CancelledError</span></code> をキャッチして行うことができます:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">streaming_response</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Do some work here</span>
+        <span class="k">async</span> <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">my_streaming_iterator</span><span class="p">():</span>
+            <span class="k">yield</span> <span class="n">chunk</span>
+    <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+        <span class="c1"># Handle disconnect</span>
+        <span class="o">...</span>
+        <span class="k">raise</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">my_streaming_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">StreamingHttpResponse</span><span class="p">(</span><span class="n">streaming_response</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>この例は、レスポンスがストリーミングされている間にクライアントの切断をどのように処理するかを示しているだけです。ビュー内で <code class="docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code> オブジェクトを返す前に長時間実行される操作を行う場合は、ビュー自体で <a class="reference internal" href="../topics/async.html#async-handling-disconnect"><span class="std std-ref">切断を処理する</span></a> 必要があるかもしれません。</p>
+</section>
+</section>
+<section id="s-fileresponse-objects">
+<span id="fileresponse-objects"></span><h2><code class="docutils literal notranslate"><span class="pre">FileResponse</span></code> オブジェクト<a class="headerlink" href="#fileresponse-objects" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.FileResponse">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FileResponse</span></span>(<em class="sig-param"><span class="n"><span class="pre">open_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_attachment</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L531"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.FileResponse" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.http.FileResponse" title="django.http.FileResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">FileResponse</span></code></a> はバイナリファイルに最適化された <a class="reference internal" href="#django.http.StreamingHttpResponse" title="django.http.StreamingHttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code></a> のサブクラスです。もし WSGI サーバーが提供していれば <span class="target" id="index-32"></span><a class="pep reference external" href="https://peps.python.org/pep-3333/#optional-platform-specific-file-handling"><strong>wsgi.file_wrapper</strong></a> を使用し、そうでない場合はファイルを小さなチャンクでストリーミングします。</p>
+<p><code class="docutils literal notranslate"><span class="pre">as_attachment=True</span></code> だと、<code class="docutils literal notranslate"><span class="pre">Content-Disposition</span></code> ヘッダーが <code class="docutils literal notranslate"><span class="pre">attachment</span></code> に設定され、ブラウザにファイルをダウンロードするように要求します。それ以外の場合は、ファイル名が利用可能な場合のみ、値が <code class="docutils literal notranslate"><span class="pre">inline</span></code> （ブラウザのデフォルト値）の <code class="docutils literal notranslate"><span class="pre">Content-Disposition</span></code> ヘッダーが設定されます。</p>
+<p>もし <code class="docutils literal notranslate"><span class="pre">open_file</span></code> に名前がない、または <code class="docutils literal notranslate"><span class="pre">open_file</span></code> の名前が適切でない場合は、<code class="docutils literal notranslate"><span class="pre">filename</span></code> パラメータを使用してカスタムファイル名を提供してください。<code class="docutils literal notranslate"><span class="pre">io.BytesIO</span></code> のようなファイルライクオブジェクトを渡す場合、それを <code class="docutils literal notranslate"><span class="pre">FileResponse</span></code> に渡す前に <code class="docutils literal notranslate"><span class="pre">seek()</span></code> を行うのはあなたの仕事です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">open_file</span></code> の内容から推測できる場合、 <code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> ヘッダーは自動的に設定されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> ヘッダーは、<code class="docutils literal notranslate"><span class="pre">filename</span></code> や <code class="docutils literal notranslate"><span class="pre">open_file</span></code> の名前から推測できる場合には自動的に設定されます。</p>
+</dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">FileResponse</span></code> は、例えば以下のようにバイナリモードで開かれたファイルのような、バイナリー内容を持つあらゆるファイルライクオブジェクトを受け付けます。</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">FileResponse</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span> <span class="o">=</span> <span class="n">FileResponse</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;myfile.png&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>ファイルは自動的に閉じられるため、コンテキストマネージャーで開かないでください。</p>
+<div class="admonition-use-under-asgi admonition">
+<p class="admonition-title">ASGI における使用</p>
+<p>PythonのファイルAPIは同期的です。これは、ファイルをASGI下で提供するためには、ファイルを完全に消費しなければならないことを意味します。</p>
+<p>非同期にファイルをストリーミングするには、<a class="reference external" href="https://github.com/Tinche/aiofiles">aiofiles</a> のような非同期ファイルAPIを提供するサードパーティパッケージを使用する必要があります。</p>
+</div>
+<section id="s-id7">
+<span id="id7"></span><h3>メソッド<a class="headerlink" href="#id7" title="Link to this heading">¶</a></h3>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.http.FileResponse.set_headers">
+<span class="sig-prename descclassname"><span class="pre">FileResponse.</span></span><span class="sig-name descname"><span class="pre">set_headers</span></span>(<em class="sig-param"><span class="n"><span class="pre">open_file</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L558"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.FileResponse.set_headers" title="Link to this definition">¶</a></dt>
+<dd><p>このメソッドはレスポンス初期化中に自動的に呼び出され、<code class="docutils literal notranslate"><span class="pre">open_file</span></code> に応じてさまざまなヘッダー (<code class="docutils literal notranslate"><span class="pre">Content-Length</span></code>、<code class="docutils literal notranslate"><span class="pre">Content-Type</span></code>、および <code class="docutils literal notranslate"><span class="pre">Content-Disposition</span></code>) を設定します。</p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-httpresponsebase-class">
+<span id="httpresponsebase-class"></span><h2><code class="docutils literal notranslate"><span class="pre">HttpResponseBase</span></code> クラス<a class="headerlink" href="#httpresponsebase-class" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.http.HttpResponseBase">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HttpResponseBase</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/http/response.py#L102"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.http.HttpResponseBase" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><a class="reference internal" href="#django.http.HttpResponseBase" title="django.http.HttpResponseBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseBase</span></code></a> クラスは、Django のすべてのレスポンスに共通です。直接レスポンスを作成するために使用すべきではありませんが、型チェックの際に役立つことがあります。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">リクエストとレスポンスのオブジェクト</a><ul>
+<li><a class="reference internal" href="#quick-overview">簡単な概要</a></li>
+<li><a class="reference internal" href="#httprequest-objects"><code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> オブジェクト</a><ul>
+<li><a class="reference internal" href="#attributes">属性</a></li>
+<li><a class="reference internal" href="#attributes-set-by-application-code">アプリケーションコードがセットする属性</a></li>
+<li><a class="reference internal" href="#attributes-set-by-middleware">ミドルウェアが設定する属性</a></li>
+<li><a class="reference internal" href="#methods">メソッド</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#querydict-objects"><code class="docutils literal notranslate"><span class="pre">QueryDict</span></code> オブジェクト</a><ul>
+<li><a class="reference internal" href="#id1">メソッド</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#httpresponse-objects"><code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> オブジェクト</a><ul>
+<li><a class="reference internal" href="#usage">使い方</a><ul>
+<li><a class="reference internal" href="#passing-strings">文字列を渡す</a></li>
+<li><a class="reference internal" href="#passing-iterators">イテレータを渡す</a></li>
+<li><a class="reference internal" href="#setting-header-fields">ヘッダーフィールドをセットする</a></li>
+<li><a class="reference internal" href="#telling-the-browser-to-treat-the-response-as-a-file-attachment">レスポンスをファイル添付物として扱うようにブラウザに指示します。</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">属性</a></li>
+<li><a class="reference internal" href="#id4">メソッド</a></li>
+<li><a class="reference internal" href="#httpresponse-subclasses"><code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> サブクラス</a><ul>
+<li><a class="reference internal" href="#custom-response-classes">カスタムレスポンスクラス</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#jsonresponse-objects"><code class="docutils literal notranslate"><span class="pre">JsonResponse</span></code> オブジェクト</a><ul>
+<li><a class="reference internal" href="#id5">使い方</a><ul>
+<li><a class="reference internal" href="#serializing-non-dictionary-objects">辞書以外のオブジェクトのシリアライズ</a></li>
+<li><a class="reference internal" href="#changing-the-default-json-encoder">デフォルトのJSONエンコーダーを変更する</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#streaminghttpresponse-objects"><code class="docutils literal notranslate"><span class="pre">StreamingHttpResponse</span></code> オブジェクト</a><ul>
+<li><a class="reference internal" href="#id6">属性</a></li>
+<li><a class="reference internal" href="#handling-disconnects">切断の取り扱い</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fileresponse-objects"><code class="docutils literal notranslate"><span class="pre">FileResponse</span></code> オブジェクト</a><ul>
+<li><a class="reference internal" href="#id7">メソッド</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#httpresponsebase-class"><code class="docutils literal notranslate"><span class="pre">HttpResponseBase</span></code> クラス</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="paginator.html"
+                          title="前の章へ">ページ分割 (Paginator)</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="schema-editor.html"
+                          title="次の章へ"><code class="docutils literal notranslate"><span class="pre">SchemaEditor</span></code></a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/request-response.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="paginator.html" title="ページ分割 (Paginator)">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="schema-editor.html" title="&lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;SchemaEditor&lt;/span&gt;&lt;/code&gt;">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

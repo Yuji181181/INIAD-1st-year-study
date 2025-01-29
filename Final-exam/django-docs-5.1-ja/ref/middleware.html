@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ミドルウェア &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="マイグレーション・オペレーション" href="migration-operations.html" />
+    <link rel="prev" title="ロギング" href="logging.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="logging.html" title="ロギング">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="migration-operations.html" title="マイグレーション・オペレーション">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-middleware">
+            
+  <section id="s-module-django.middleware">
+<span id="s-middleware"></span><span id="module-django.middleware"></span><span id="middleware"></span><h1>ミドルウェア<a class="headerlink" href="#module-django.middleware" title="Link to this heading">¶</a></h1>
+<p>このドキュメントでは、Djangoに付属するすべてのミドルウェアコンポーネントについて説明します。それらの使用方法や独自のミドルウェアの作成方法についての情報は、 <a class="reference internal" href="../topics/http/middleware.html"><span class="doc">ミドルウェア使用ガイド</span></a> を参照してください。</p>
+<section id="s-available-middleware">
+<span id="available-middleware"></span><h2>使用できる middleware<a class="headerlink" href="#available-middleware" title="Link to this heading">¶</a></h2>
+<section id="s-module-django.middleware.cache">
+<span id="s-cache-middleware"></span><span id="module-django.middleware.cache"></span><span id="cache-middleware"></span><h3>Cache middleware<a class="headerlink" href="#module-django.middleware.cache" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.cache.UpdateCacheMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">UpdateCacheMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/cache.py#L61"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.cache.UpdateCacheMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.cache.FetchFromCacheMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FetchFromCacheMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/cache.py#L133"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.cache.FetchFromCacheMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>サイト全体でキャッシュを有効にします。有効にすると、Django を利用している各ページは <a class="reference internal" href="settings.html#std-setting-CACHE_MIDDLEWARE_SECONDS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CACHE_MIDDLEWARE_SECONDS</span></code></a> 設定で指定した時間だけキャッシュされます。詳しくは <a class="reference internal" href="../topics/cache.html"><span class="doc">キャッシュのドキュメント</span></a> を参照してください。</p>
+</section>
+<section id="s-module-django.middleware.common">
+<span id="s-common-middleware"></span><span id="module-django.middleware.common"></span><span id="common-middleware"></span><h3>Common middleware<a class="headerlink" href="#module-django.middleware.common" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.common.CommonMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CommonMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/common.py#L13"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.common.CommonMiddleware" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="django.middleware.common.CommonMiddleware.response_redirect_class">
+<span class="sig-name descname"><span class="pre">response_redirect_class</span></span><a class="headerlink" href="#django.middleware.common.CommonMiddleware.response_redirect_class" title="Link to this definition">¶</a></dt>
+<dd><p>デフォルトは <a class="reference internal" href="request-response.html#django.http.HttpResponsePermanentRedirect" title="django.http.HttpResponsePermanentRedirect"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponsePermanentRedirect</span></code></a> です。ミドルウェアが発行するリダイレクトをカスタマイズするには、 <code class="docutils literal notranslate"><span class="pre">CommonMiddleware</span></code> をサブクラス化し、この属性をオーバーライドします。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>完璧主義者のためにいくつかの便利な機能を提供します。</p>
+<ul>
+<li><p><a class="reference internal" href="settings.html#std-setting-DISALLOWED_USER_AGENTS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DISALLOWED_USER_AGENTS</span></code></a> 設定に含まれるユーザーエージェントのアクセスを禁止します。この設定は、コンパイルした正規表現オブジェクトのリストである必要があります。</p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-APPEND_SLASH"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APPEND_SLASH</span></code></a> および <a class="reference internal" href="settings.html#std-setting-PREPEND_WWW"><code class="xref std std-setting docutils literal notranslate"><span class="pre">PREPEND_WWW</span></code></a> 設定に基づいて、URL の書き換えを実行します。</p>
+<p><a class="reference internal" href="settings.html#std-setting-APPEND_SLASH"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APPEND_SLASH</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> で、与えられた URL がスラッシュで終わっていなくて、さらに URLconf に URL が見つからなければ、Django は / が最後に追加された新しい URL を作り、この新しい URL へリクエストをリダイレクトします。それ以外のときには、最初の URL を通常通りに処理します。</p>
+<p>たとえば、 <code class="docutils literal notranslate"><span class="pre">foo.com/bar</span></code> は、 <code class="docutils literal notranslate"><span class="pre">foo.com/bar</span></code> に対する有効な URL パタンがなく、<code class="docutils literal notranslate"><span class="pre">foo.com/bar/</span></code> に対しては有効なパタンが <em>存在する</em> 場合に、 <code class="docutils literal notranslate"><span class="pre">foo.com/bar/</span></code> にリダイレクトされます。</p>
+<p><a class="reference internal" href="settings.html#std-setting-PREPEND_WWW"><code class="xref std std-setting docutils literal notranslate"><span class="pre">PREPEND_WWW</span></code></a> を <code class="docutils literal notranslate"><span class="pre">True</span></code> にすると、先頭に &quot;www.&quot; がない URL は &quot;www.&quot; で始まる同じ URL にリダイレクトされます。</p>
+<p>2つのオプションが意味するのは、URL を正規化するということです。これは、1つの URL には1つの、かつただ1つだけの場所を指すべきだという考えです。技術的には URL <code class="docutils literal notranslate"><span class="pre">foo.com/bar</span></code> は <code class="docutils literal notranslate"><span class="pre">foo.com/bar/</span></code> とは区別されます。実際、サーチエンジンのインデクスはこれらを区別して作成されます。よって、URL を正規化するというのがベストプラクティスなのです。</p>
+<p>必要に応じて、個々のビューは、 <a class="reference internal" href="../topics/http/decorators.html#django.views.decorators.common.no_append_slash" title="django.views.decorators.common.no_append_slash"><code class="xref py py-func docutils literal notranslate"><span class="pre">no_append_slash()</span></code></a> デコレータを使用して、<code class="docutils literal notranslate"><span class="pre">APPEND_SLASH</span></code> の動作から除外できます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.views.decorators.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">no_append_slash</span>
+
+
+<span class="nd">@no_append_slash</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">sensitive_fbv</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;View to be excluded from APPEND_SLASH.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p>非ストリーミングレスポンスに対して <code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> ヘッダを設定します。</p></li>
+</ul>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.common.BrokenLinkEmailsMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BrokenLinkEmailsMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/common.py#L118"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.common.BrokenLinkEmailsMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<ul class="simple">
+<li><p>壊れたリンクの通知メールを <a class="reference internal" href="settings.html#std-setting-MANAGERS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MANAGERS</span></code></a> に送信します (詳細は <a class="reference internal" href="../howto/error-reporting.html"><span class="doc">エラーレポートの管理</span></a> を参照)。</p></li>
+</ul>
+</section>
+<section id="s-module-django.middleware.gzip">
+<span id="s-gzip-middleware"></span><span id="module-django.middleware.gzip"></span><span id="gzip-middleware"></span><h3>GZip middleware<a class="headerlink" href="#module-django.middleware.gzip" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.gzip.GZipMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">GZipMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/gzip.py#L9"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.gzip.GZipMiddleware" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="django.middleware.gzip.GZipMiddleware.max_random_bytes">
+<span class="sig-name descname"><span class="pre">max_random_bytes</span></span><a class="headerlink" href="#django.middleware.gzip.GZipMiddleware.max_random_bytes" title="Link to this definition">¶</a></dt>
+<dd><p>デフォルトは 100 です。 圧縮されたレスポンスに含まれるランダムバイトの最大数を変更するには、<code class="docutils literal notranslate"><span class="pre">GZipMiddleware</span></code> をサブクラス化して属性をオーバーライドしてください。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>セキュリティ研究者たちは、Webサイトで <code class="docutils literal notranslate"><span class="pre">GZipMiddleware</span></code> を含む圧縮技術が使用されると、そのサイトが多くの潜在的な攻撃にさらされる可能性があることを明らかにしました。</p>
+<p>攻撃を軽減するために、Django は <em>Heal The Breach (HTB)</em> と呼ばれる技術を実装しています。攻撃の効果を軽減するため、各レスポンスに最大で 100 バイトまでのランダムなバイト (詳細は <a class="reference internal" href="#django.middleware.gzip.GZipMiddleware.max_random_bytes" title="django.middleware.gzip.GZipMiddleware.max_random_bytes"><code class="xref py py-attr docutils literal notranslate"><span class="pre">max_random_bytes</span></code></a> を参照) を追加します。</p>
+<p>詳細については、 <a class="reference external" href="https://www.breachattack.com/resources/BREACH%20-%20SSL,%20gone%20in%2030%20seconds.pdf">BREACH paper (PDF)</a> 、<a class="reference external" href="https://www.breachattack.com/">breachattack.com</a>、そして <a class="reference external" href="https://ieeexplore.ieee.org/document/9754554">Heal The Breach (HTB) paper</a> を参照してください。</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">django.middleware.gzip.GZipMiddleware</span></code> は、GZip 圧縮に対応したブラウザ(すべてのモダンブラウザ)のためにコンテンツを圧縮します。</p>
+<p>このミドルウェアは、レスポンスボディを読み書きする必要がある他のミドルウェアよりも前に配置するべきです。圧縮がその後に行われるようにするためです。</p>
+<p>次のいずれかが当てはまる場合、コンテンツは圧縮されません:</p>
+<ul class="simple">
+<li><p>コンテンツ・ボディの長さが200バイト未満。</p></li>
+<li><p>レスポンスがすでに <code class="docutils literal notranslate"><span class="pre">Content-Encoding</span></code> ヘッダを設定している。</p></li>
+<li><p>リクエスト（ブラウザ）が <code class="docutils literal notranslate"><span class="pre">Accept-Encoding</span></code> ヘッダに <code class="docutils literal notranslate"><span class="pre">gzip</span></code> を含んでいない。</p></li>
+</ul>
+<p>もしレスポンスに <code class="docutils literal notranslate"><span class="pre">ETag</span></code> ヘッダーがあれば、ETag は、<span class="target" id="index-2"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-8.8.1"><strong>RFC 9110 Section 8.8.1</strong></a> に準拠するために弱い形式になります。</p>
+<p><a class="reference internal" href="../topics/http/decorators.html#django.views.decorators.gzip.gzip_page" title="django.views.decorators.gzip.gzip_page"><code class="xref py py-func docutils literal notranslate"><span class="pre">gzip_page()</span></code></a> デコレータを使用して、個別のビューに GZip 圧縮を適用できます。</p>
+</section>
+<section id="s-module-django.middleware.http">
+<span id="s-conditional-get-middleware"></span><span id="module-django.middleware.http"></span><span id="conditional-get-middleware"></span><h3>Conditional GET middleware<a class="headerlink" href="#module-django.middleware.http" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.http.ConditionalGetMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ConditionalGetMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/http.py#L6"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.http.ConditionalGetMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>条件付きGET操作を扱います。レスポンスに <code class="docutils literal notranslate"><span class="pre">ETag</span></code> ヘッダーがない場合、必要に応じてミドルウェアが追加します。レスポンスに <code class="docutils literal notranslate"><span class="pre">ETag</span></code> または <code class="docutils literal notranslate"><span class="pre">Last-Modified</span></code> ヘッダーがあり、リクエストに <code class="docutils literal notranslate"><span class="pre">If-None-Match</span></code> または <code class="docutils literal notranslate"><span class="pre">If-Modified-Since</span></code> がある場合、レスポンスは <a class="reference internal" href="request-response.html#django.http.HttpResponseNotModified" title="django.http.HttpResponseNotModified"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseNotModified</span></code></a> に置き換えられます。</p>
+</section>
+<section id="s-module-django.middleware.locale">
+<span id="s-locale-middleware"></span><span id="module-django.middleware.locale"></span><span id="locale-middleware"></span><h3>Locale ミドルウェア<a class="headerlink" href="#module-django.middleware.locale" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.locale.LocaleMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LocaleMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/locale.py#L10"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.locale.LocaleMiddleware" title="Link to this definition">¶</a></dt>
+<dd><dl class="py attribute">
+<dt class="sig sig-object py" id="django.middleware.locale.LocaleMiddleware.response_redirect_class">
+<span class="sig-name descname"><span class="pre">response_redirect_class</span></span><a class="headerlink" href="#django.middleware.locale.LocaleMiddleware.response_redirect_class" title="Link to this definition">¶</a></dt>
+<dd><p>デフォルトは <a class="reference internal" href="request-response.html#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseRedirect</span></code></a> です。<code class="docutils literal notranslate"><span class="pre">LocaleMiddleware</span></code> をサブクラス化して属性をオーバーライドし、ミドルウェアによって発行されたリダイレクトをカスタマイズします。</p>
+</dd></dl>
+
+</dd></dl>
+
+<p>リクエストからのデータに基づいた言語セクションを有効化します。この機能は、それぞれのユーザに対してコンテンツをカスタマイズします。 <a class="reference internal" href="../topics/i18n/translation.html"><span class="doc">国際化のドキュメント</span></a> を参照してください。</p>
+</section>
+<section id="s-module-django.contrib.messages.middleware">
+<span id="s-message-middleware"></span><span id="module-django.contrib.messages.middleware"></span><span id="message-middleware"></span><h3>Message ミドルウェア<a class="headerlink" href="#module-django.contrib.messages.middleware" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.messages.middleware.MessageMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MessageMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/messages/middleware.py#L6"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.messages.middleware.MessageMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>クッキーおよびセッションをベースとしたメッセージサポートを有効化します。<a class="reference internal" href="contrib/messages.html"><span class="doc">メッセージのドキュメント</span></a> を参照してください。</p>
+</section>
+<section id="s-module-django.middleware.security">
+<span id="s-id1"></span><span id="s-security-middleware"></span><span id="module-django.middleware.security"></span><span id="id1"></span><span id="security-middleware"></span><h3>Security middleware<a class="headerlink" href="#module-django.middleware.security" title="Link to this heading">¶</a></h3>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>デプロイメントの状況によっては、通常、フロントエンドのウェブサーバーが <code class="docutils literal notranslate"><span class="pre">SecurityMiddleware</span></code> が提供する機能を実行するのが良いです。これにより、Djangoで処理されないリクエスト（静的メディアやユーザーがアップロードしたファイルなど）も、Djangoアプリケーションへのリクエストと同じ保護を受けることができます。</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.security.SecurityMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SecurityMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/security.py#L8"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.security.SecurityMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">django.middleware.security.SecurityMiddleware</span></code> は、リクエスト/レスポンスサイクルに複数のセキュリティ強化機能を提供します。それぞれの機能は、設定を使って個別に有効または無効にできます。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_CONTENT_TYPE_NOSNIFF"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_CONTENT_TYPE_NOSNIFF</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_CROSS_ORIGIN_OPENER_POLICY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_CROSS_ORIGIN_OPENER_POLICY</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_HSTS_INCLUDE_SUBDOMAINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_INCLUDE_SUBDOMAINS</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_HSTS_PRELOAD"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_PRELOAD</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_HSTS_SECONDS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_SECONDS</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_REDIRECT_EXEMPT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_REDIRECT_EXEMPT</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_REFERRER_POLICY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_REFERRER_POLICY</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_SSL_HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_SSL_HOST</span></code></a></p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-SECURE_SSL_REDIRECT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_SSL_REDIRECT</span></code></a></p></li>
+</ul>
+<section id="s-http-strict-transport-security">
+<span id="s-id2"></span><span id="http-strict-transport-security"></span><span id="id2"></span><h4>HTTP Strict Transport Security<a class="headerlink" href="#http-strict-transport-security" title="Link to this heading">¶</a></h4>
+<p>HTTPSでのみアクセスする必要のあるサイトでは、  <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security">&quot;Strict-Transport-Security&quot; header</a> を設定することで、一定期間、モダンブラウザに対して、セキュアでない接続を通じてドメイン名に接続しないように指示できます。これにより、SSLストリッピング型の中間者攻撃 (MITM) に対するリスクを軽減できます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">SecurityMiddleware</span></code> は、<a class="reference internal" href="settings.html#std-setting-SECURE_HSTS_SECONDS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_SECONDS</span></code></a> 設定をゼロ以外の整数値に設定すると、すべての HTTPS レスポンスに対してこのヘッダーを自動的に設定します。</p>
+<p>HSTSを有効にする際には、最初に小さい値をテスト用に使用することをお勧めします。たとえば、1時間の場合は <a class="reference internal" href="settings.html#std-setting-SECURE_HSTS_SECONDS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_SECONDS</span> <span class="pre">=</span> <span class="pre">3600</span></code></a> です。ウェブブラウザがあなたのサイトからHSTSヘッダーを検知するたびに、指定された期間、非セキュアな通信(HTTPを使用)をあなたのドメインと行うことを拒否します。サイト上の全てのアセットが安全に提供されていること(つまり、HSTSが何も壊していないこと)を確認できたら、頻繁でない訪問者も保護されるようにこの値を増やすことをお勧めします(一般的には31536000秒、すなわち1年が普通です)。</p>
+<p>また、<a class="reference internal" href="settings.html#std-setting-SECURE_HSTS_INCLUDE_SUBDOMAINS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_INCLUDE_SUBDOMAINS</span></code></a> 設定を <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定すると、<code class="docutils literal notranslate"><span class="pre">SecurityMiddleware</span></code> は <code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> ヘッダーに <code class="docutils literal notranslate"><span class="pre">includeSubDomains</span></code> ディレクティブを追加します。これは推奨です (すべてのサブドメインが HTTPS を使用してのみ提供されている場合)。それ以外の場合、サイトはまだサブドメインへの安全でない接続を介して脆弱になる可能性があります。</p>
+<p><a class="reference external" href="https://hstspreload.org/">browser preload list</a> にサイトを登録する場合は、 <a class="reference internal" href="settings.html#std-setting-SECURE_HSTS_PRELOAD"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_HSTS_PRELOAD</span></code></a> 設定を <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定してください。これにより、 <code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> ヘッダーに <code class="docutils literal notranslate"><span class="pre">preload</span></code> ディレクティブが追加されます。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>HSTSポリシーは、ヘッダーを設定したレスポンスのURLだけでなく、ドメイン全体に適用されます。したがって、ドメイン全体がHTTPS経由のみで提供される場合にのみ使用すべきです。</p>
+<p>HSTSヘッダーを適切に尊重するブラウザは、期限切れ、自己署名、またはその他の無効なSSL証明書を持つサイトに警告をバイパスして接続することをユーザーに許可しません。HSTSを使用する場合は、証明書が適切な状態にあることを確認し、維持してください！</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>ロードバランサーやリバースプロキシサーバーの後ろに配置されている場合、そして <code class="docutils literal notranslate"><span class="pre">Strict-Transport-Security</span></code> ヘッダーがレスポンスに追加されていない場合は、Djangoが安全な接続上にあることを認識していない可能性があります。その場合、<a class="reference internal" href="settings.html#std-setting-SECURE_PROXY_SSL_HEADER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_PROXY_SSL_HEADER</span></code></a> 設定を行う必要があるかもしれません。</p>
+</div>
+</section>
+<section id="s-referrer-policy">
+<span id="s-id4"></span><span id="referrer-policy"></span><span id="id4"></span><h4>リファラ・ポリシー<a class="headerlink" href="#referrer-policy" title="Link to this heading">¶</a></h4>
+<p>ブラウザは、ユーザーがどのようにそのサイトに到達したかについての情報をサイトに送信する手段として、 <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referer">the Referer header</a> を使用します。ユーザーがリンクをクリックすると、ブラウザはリファラとしてリンク元ページの完全な URL を送信します。これにより、誰があなたのサイトにリンクしているかを特定するなどの目的には役立ちますが、同時に、ユーザーが別のサイトを訪れていたことを1つのサイトに通知することでプライバシー上の懸念が引き起こされる可能性もあります。</p>
+<p>一部のブラウザには、ユーザーがリンクをクリックした際に HTTP <code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダを送信すべきかについてのヒントを受け入れる機能があります。このヒントは <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy">the Referrer-Policy header</a> を介して提供されます。このヘッダは、ブラウザに対して3つの動作のいずれかを提案できます:</p>
+<ul class="simple">
+<li><p>完全なURL: <code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダーには、完全なURLを送信します。たとえば、ユーザーが <code class="docutils literal notranslate"><span class="pre">https://example.com/page.html</span></code> を訪問している場合、<code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダーには <code class="docutils literal notranslate"><span class="pre">&quot;https://example.com/page.html&quot;</span></code> が含まれます。</p></li>
+<li><p>Origin のみ: referrerには &quot;origin&quot; のみを送信します。origin はスキーム、ホスト、(オプションで) ポート番号から構成されます。例えば、ユーザーが <code class="docutils literal notranslate"><span class="pre">https://example.com/page.html</span></code> を訪問している場合、origin は <code class="docutils literal notranslate"><span class="pre">https://example.com/</span></code> となります。</p></li>
+<li><p>リファラなし: <code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダーを一切送信しません。</p></li>
+</ul>
+<p>このヘッダーがブラウザーに注意を促す条件は2種類あります:</p>
+<ul class="simple">
+<li><p>同一オリジンとクロスオリジン: <code class="docutils literal notranslate"><span class="pre">https://example.com/1.html</span></code> から <code class="docutils literal notranslate"><span class="pre">https://example.com/2.html</span></code> へのリンクは同一オリジンです。 <code class="docutils literal notranslate"><span class="pre">https://example.com/page.html</span></code> から <code class="docutils literal notranslate"><span class="pre">https://not.example.com/page.html</span></code> へのリンクはクロスオリジンです。</p></li>
+<li><p>プロトコルのダウングレード: リンクを含むページがHTTPS経由で提供されている場合、リンク先のページがHTTPS経由で提供されていない場合にダウングレードが発生します。</p></li>
+</ul>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>サイトが HTTPS 経由で提供される場合、<a class="reference internal" href="csrf.html#how-csrf-works"><span class="std std-ref">Django の CSRF 保護システム</span></a> は <code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダーが存在することを要求するので、<code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダーを完全に無効にすることは CSRF 保護の妨げになります。 <code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダーを無効にすることの多くの利点を享受しつつ、CSRF 保護も維持するには、同一オリジンのリファラーのみを有効にすることを検討してください。</p>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">SecurityMiddleware</span></code> は、<a class="reference internal" href="settings.html#std-setting-SECURE_REFERRER_POLICY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_REFERRER_POLICY</span></code></a> 設定に基づいて <code class="docutils literal notranslate"><span class="pre">Referrer-Policy</span></code> ヘッダを設定できます（スペルに注意: ブラウザはユーザーがリンクをクリックすると <code class="docutils literal notranslate"><span class="pre">Referer</span></code> ヘッダを送信しますが、ブラウザにこれを行うかどうかを指示するヘッダは <code class="docutils literal notranslate"><span class="pre">Referrer-Policy</span></code> と綴られます）。この設定の有効な値は次の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">no-referrer</span></code></dt><dd><p>このサイト上でクリックされたリンクに対して、ブラウザにリファラを送信しないよう指示します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">no-referrer-when-downgrade</span></code></dt><dd><p>ブラウザに、プロトコルのダウングレードが発生しない時にのみ、完全なURLをリファラとして送信するよう指示します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">origin</span></code></dt><dd><p>ブラウザに、リファラとして完全な URL ではなく、オリジンのみを送信するよう指示します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">origin-when-cross-origin</span></code></dt><dd><p>ブラウザに、同一オリジンのリンクでは完全なURLをリファラとして送信するように指示し、クロスオリジンのリンクではオリジンのみを送信するようにします。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">same-origin</span></code></dt><dd><p>ブラウザに対し、同一オリジンのリンクについては完全なURLを送信するよう指示します。クロスオリジンのリンクに対しては、リファラは送信されません。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">strict-origin</span></code></dt><dd><p>ブラウザに、プロトコルのダウングレードが発生した場合に、完全なURLではなくオリジンのみを送信するよう指示し、リファラを送信しないようにします。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">strict-origin-when-cross-origin</span></code></dt><dd><p>同一オリジンでプロトコルのダウングレードが発生しない場合、ブラウザには完全なURLを送信するよう指示します。クロスオリジンでプロトコルのダウングレードが発生しない場合、ブラウザにはオリジンのみを送信するよう指示します。プロトコルのダウングレードが発生する場合はリファラを送信しません。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsafe-url</span></code></dt><dd><p>ブラウザに常に完全なURLをリファラとして送信するよう指示します。</p>
+</dd>
+</dl>
+<div class="admonition-unknown-policy-values admonition">
+<p class="admonition-title">ポリシーの値が unknown の場合</p>
+<p>ユーザーエージェントによってポリシー値が <a class="reference external" href="https://w3c.github.io/webappsec-referrer-policy/#unknown-policy-values">unknown</a> とされた場合、フォールバックを提供するために複数のポリシー値を指定できます。解釈可能な最後に指定された値が優先されます。これをサポートするために、イテラブルもしくはカンマで区切られた文字列が <a class="reference internal" href="settings.html#std-setting-SECURE_REFERRER_POLICY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_REFERRER_POLICY</span></code></a> の設定として使用できます。</p>
+</div>
+</section>
+<section id="s-cross-origin-opener-policy">
+<span id="s-id8"></span><span id="cross-origin-opener-policy"></span><span id="id8"></span><h4>同一生成元ポリシー (Cross-Origin Opener Policy)<a class="headerlink" href="#cross-origin-opener-policy" title="Link to this heading">¶</a></h4>
+<p>一部のブラウザは、 <a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy">Cross-Origin Opener Policy</a> (COOP) ヘッダーの値に基づいて、トップレベルウィンドウを他のドキュメントから分離する能力を持っています。この分離によって、特定のドキュメントがクロスオリジンのポップアップウィンドウを開いた場合、そのポップアップの <code class="docutils literal notranslate"><span class="pre">window.opener</span></code> プロパティは <code class="docutils literal notranslate"><span class="pre">null</span></code> になります。COOP を使用したウィンドウの分離は、特に Spectre のような、共有されたブラウジングコンテキストに読み込まれたデータの外部への持ち出しを可能にしたクロスオリジン攻撃に対する深層防御保護です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">SecurityMiddleware</span></code> は、 <a class="reference internal" href="settings.html#std-setting-SECURE_CROSS_ORIGIN_OPENER_POLICY"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_CROSS_ORIGIN_OPENER_POLICY</span></code></a> 設定に基づいて、 <code class="docutils literal notranslate"><span class="pre">Cross-Origin-Opener-Policy</span></code> ヘッダーを設定できます。この設定の有効な値は以下の通りです:</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">same-origin</span></code></dt><dd><p>同じオリジンのドキュメントに閲覧コンテキストを排他的に限定します。異なるオリジンのドキュメントは同じ閲覧コンテキストで読み込まれません。これがデフォルトで最も安全なオプションです。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">same-origin-allow-popups</span></code></dt><dd><p>ブラウジングコンテキストを同一オリジンのドキュメントに限定します。または、COOP を設定しないドキュメントや、COOP を <code class="docutils literal notranslate"><span class="pre">unsafe-none</span></code> に設定して隔離からオプトアウトするドキュメントに限定します。</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">unsafe-none</span></code></dt><dd><p>ドキュメントを、オープナー自体が <code class="docutils literal notranslate"><span class="pre">same-origin</span></code> または <code class="docutils literal notranslate"><span class="pre">same-origin-allow-popups</span></code> のCOOPを持っている場合を除いて、そのオープナーのブラウジングコンテキストグループに追加できるようにします。</p>
+</dd>
+</dl>
+</section>
+<section id="s-x-content-type-options-nosniff">
+<span id="s-x-content-type-options"></span><span id="x-content-type-options-nosniff"></span><span id="x-content-type-options"></span><h4><code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code><a class="headerlink" href="#x-content-type-options-nosniff" title="Link to this heading">¶</a></h4>
+<p>一部のブラウザーは、取得したアセットのコンテンツタイプを推測し、 <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> ヘッダーを上書きしようとします。これは不適切に設定されたサーバーのサイトを表示する際に役立つことがありますが、セキュリティリスクをもたらすこともあります。</p>
+<p>サイトがユーザーがアップロードしたファイルを提供する場合、悪意のあるユーザーが特別に作成したファイルをアップロードする可能性があります。そのファイルが無害なものだと思っていたのに、ブラウザでHTMLまたはJavaScriptとして解釈されてしまう恐れがあります。</p>
+<p>ブラウザがコンテンツタイプを推測し、常に <code class="docutils literal notranslate"><span class="pre">Content-Type</span></code> ヘッダーで提供されたタイプを使用するように強制するために、<a class="reference external" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options">X-Content-Type-Options: nosniff</a> ヘッダーを渡すことができます。 <a class="reference internal" href="settings.html#std-setting-SECURE_CONTENT_TYPE_NOSNIFF"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_CONTENT_TYPE_NOSNIFF</span></code></a> 設定が <code class="docutils literal notranslate"><span class="pre">True</span></code> であれば、 <code class="docutils literal notranslate"><span class="pre">SecurityMiddleware</span></code> は全てのレスポンスに対してこれを行います。</p>
+<p>ほとんどのデプロイ状況では、ユーザーがアップロードしたファイルの配信に Django が関与しないため、この設定は助けになりません。たとえば、<a class="reference internal" href="settings.html#std-setting-MEDIA_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MEDIA_URL</span></code></a> がフロントエンドのウェブサーバー (nginx や Apache など) から直接配信される場合は、このヘッダーを設定することをおすすめします。一方で、たとえばもし認可が必要なファイルをダウンロードするために Django を使用していて、ウェブサーバーを使ってヘッダーを設定することができない場合、この設定が役に立つでしょう。</p>
+</section>
+<section id="s-ssl-redirect">
+<span id="s-id11"></span><span id="ssl-redirect"></span><span id="id11"></span><h4>SSL リダイレクト<a class="headerlink" href="#ssl-redirect" title="Link to this heading">¶</a></h4>
+<p>サイトが HTTP と HTTPS 接続の両方をサポートしている場合、多くのユーザーはデフォルトでセキュアでない接続を行ってしまいます。最善のセキュリティのためには、すべての HTTP 接続を HTTPS 接続にリダイレクトするべきです。</p>
+<p><a class="reference internal" href="settings.html#std-setting-SECURE_SSL_REDIRECT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_SSL_REDIRECT</span></code></a> 設定を True に設定すれば、 <code class="docutils literal notranslate"><span class="pre">SecurityMiddleware</span></code> が すべての HTTP 接続を HTTPS に parmanent (HTTP 301) にリダイレクトしてくれます。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>パフォーマンス上の理由により、このようなリダイレクトは Django の外部、フロントエンドのロードバランサーや <a class="reference external" href="https://nginx.org/">nginx</a> などのリバースプロキシサーバーで実行した方が良いです。 <a class="reference internal" href="settings.html#std-setting-SECURE_SSL_REDIRECT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_SSL_REDIRECT</span></code></a> は、これらのオプションが使用できないデプロイ環境で使われることを想定しています。</p>
+</div>
+<p><a class="reference internal" href="settings.html#std-setting-SECURE_SSL_HOST"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_SSL_HOST</span></code></a> 設定に値がある場合、全てのリダイレクトは元々要求されたホストではなく、その値で指定されたホストに送信されます。</p>
+<p>サイトのいくつかのページをHTTP経由で利用可能にし、HTTPSにリダイレクトされないようにしたい場合は、 <a class="reference internal" href="settings.html#std-setting-SECURE_REDIRECT_EXEMPT"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_REDIRECT_EXEMPT</span></code></a> 設定にそれらのURLに一致する正規表現をリストアップできます。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>ロードバランサーやリバースプロキシサーバーの後ろにデプロイしており、Django がリクエストが既に安全であるかどうかを正しく判断できない場合は、 <a class="reference internal" href="settings.html#std-setting-SECURE_PROXY_SSL_HEADER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SECURE_PROXY_SSL_HEADER</span></code></a> 設定を行う必要があります。</p>
+</div>
+</section>
+</section>
+<section id="s-module-django.contrib.sessions.middleware">
+<span id="s-session-middleware"></span><span id="module-django.contrib.sessions.middleware"></span><span id="session-middleware"></span><h3>Session middleware<a class="headerlink" href="#module-django.contrib.sessions.middleware" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.sessions.middleware.SessionMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SessionMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sessions/middleware.py#L12"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sessions.middleware.SessionMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>セッションのサポートを有効にします。詳しくは <a class="reference internal" href="../topics/http/sessions.html"><span class="doc">セッションのドキュメント</span></a> を読んでください。</p>
+</section>
+<section id="s-module-django.contrib.sites.middleware">
+<span id="s-site-middleware"></span><span id="module-django.contrib.sites.middleware"></span><span id="site-middleware"></span><h3>Site ミドルウェア<a class="headerlink" href="#module-django.contrib.sites.middleware" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.sites.middleware.CurrentSiteMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CurrentSiteMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/sites/middleware.py#L6"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.sites.middleware.CurrentSiteMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>受信側のすべての <code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> オブジェクトに、現在のサイトを表す <code class="docutils literal notranslate"><span class="pre">site</span></code> 属性を追加します。詳しくは <a class="reference internal" href="contrib/sites.html#site-middleware"><span class="std std-ref">sites のドキュメント</span></a> を参照してください。</p>
+</section>
+<section id="s-module-django.contrib.auth.middleware">
+<span id="s-authentication-middleware"></span><span id="module-django.contrib.auth.middleware"></span><span id="authentication-middleware"></span><h3>Authentication middleware<a class="headerlink" href="#module-django.contrib.auth.middleware" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.auth.middleware.AuthenticationMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">AuthenticationMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/auth/middleware.py#L27"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.auth.middleware.AuthenticationMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p><code class="docutils literal notranslate"><span class="pre">HttpRequest</span></code> オブジェクトに対して、現在ログインしているユーザーを表す <code class="docutils literal notranslate"><span class="pre">user</span></code> 属性を追加します。<a class="reference internal" href="../topics/auth/default.html#auth-web-requests"><span class="std std-ref">ウェブリクエストにおける認証</span></a> を参照してください。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.auth.middleware.LoginRequiredMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LoginRequiredMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/auth/middleware.py#L41"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.auth.middleware.LoginRequiredMiddleware" title="Link to this definition">¶</a></dt>
+<dd><p>ミドルウェアをサブクラス化し、以下の属性やメソッドをオーバーライドすることで、認証されていないリクエストに対する動作をカスタマイズできます。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.auth.middleware.LoginRequiredMiddleware.redirect_field_name">
+<span class="sig-name descname"><span class="pre">redirect_field_name</span></span><a class="headerlink" href="#django.contrib.auth.middleware.LoginRequiredMiddleware.redirect_field_name" title="Link to this definition">¶</a></dt>
+<dd><p>デフォルトは <code class="docutils literal notranslate"><span class="pre">&quot;next&quot;</span></code> です。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.auth.middleware.LoginRequiredMiddleware.get_login_url">
+<span class="sig-name descname"><span class="pre">get_login_url</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/auth/middleware.py#L59"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.auth.middleware.LoginRequiredMiddleware.get_login_url" title="Link to this definition">¶</a></dt>
+<dd><p>認証されていないリクエストがリダイレクトされる URL を返します。この結果は、<a class="reference internal" href="../topics/auth/default.html#django.contrib.auth.decorators.login_required" title="django.contrib.auth.decorators.login_required"><code class="xref py py-func docutils literal notranslate"><span class="pre">login_required()</span></code></a> デコレーターで設定された <code class="docutils literal notranslate"><span class="pre">login_url``（もし</span> <span class="pre">``None</span></code> でない場合）か、または <a class="reference internal" href="settings.html#std-setting-LOGIN_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">settings.LOGIN_URL</span></code></a> になります。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.contrib.auth.middleware.LoginRequiredMiddleware.get_redirect_field_name">
+<span class="sig-name descname"><span class="pre">get_redirect_field_name</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/auth/middleware.py#L69"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.auth.middleware.LoginRequiredMiddleware.get_redirect_field_name" title="Link to this definition">¶</a></dt>
+<dd><p>ログインが成功した後にユーザーがリダイレクトされるべき URL を含むクエリパラメータの名前を返します。この結果は、<a class="reference internal" href="../topics/auth/default.html#django.contrib.auth.decorators.login_required" title="django.contrib.auth.decorators.login_required"><code class="xref py py-func docutils literal notranslate"><span class="pre">login_required()</span></code></a> デコレーターで設定された <code class="docutils literal notranslate"><span class="pre">redirect_field_name``（もし</span> <span class="pre">``None</span></code> でない場合）か、または <a class="reference internal" href="#django.contrib.auth.middleware.LoginRequiredMiddleware.redirect_field_name" title="django.contrib.auth.middleware.LoginRequiredMiddleware.redirect_field_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">redirect_field_name</span></code></a> になります。<code class="docutils literal notranslate"><span class="pre">None</span></code> が返される場合、クエリパラメータは追加されません。</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="versionadded">
+<span class="title">New in Django 5.1.</span> </div>
+<p>認証されていないリクエストはすべてログインページにリダイレクトされますが、<a class="reference internal" href="../topics/auth/default.html#django.contrib.auth.decorators.login_not_required" title="django.contrib.auth.decorators.login_not_required"><code class="xref py py-func docutils literal notranslate"><span class="pre">login_not_required()</span></code></a> で除外されたビューはリダイレクトされません。ログインページのデフォルトは <a class="reference internal" href="settings.html#std-setting-LOGIN_URL"><code class="xref std std-setting docutils literal notranslate"><span class="pre">settings.LOGIN_URL</span></code></a> ですが、カスタマイズ可能です。</p>
+<p>このミドルウェアを有効にするには、<a class="reference internal" href="settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> 設定に <a class="reference internal" href="#django.contrib.auth.middleware.AuthenticationMiddleware" title="django.contrib.auth.middleware.AuthenticationMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationMiddleware</span></code></a> の <strong>後に</strong> 追加します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MIDDLEWARE</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.auth.middleware.AuthenticationMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;django.contrib.auth.middleware.LoginRequiredMiddleware&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;...&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>ビューを公開して、認証されていないリクエストを許可するには、<a class="reference internal" href="../topics/auth/default.html#django.contrib.auth.decorators.login_not_required" title="django.contrib.auth.decorators.login_not_required"><code class="xref py py-func docutils literal notranslate"><span class="pre">login_not_required()</span></code></a> を使用します。たとえば次のようにします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">login_not_required</span>
+
+
+<span class="nd">@login_not_required</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">contact_us</span><span class="p">(</span><span class="n">request</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>認証済みのビューのログイン URL やフィールド名をカスタマイズするには、<a class="reference internal" href="../topics/auth/default.html#django.contrib.auth.decorators.login_required" title="django.contrib.auth.decorators.login_required"><code class="xref py py-func docutils literal notranslate"><span class="pre">login_required()</span></code></a> デコレーターでそれぞれ <code class="docutils literal notranslate"><span class="pre">login_url</span></code> や <code class="docutils literal notranslate"><span class="pre">redirect_field_name</span></code> を設定します。たとえば次のようにします。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.auth.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">method_decorator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.views.generic</span><span class="w"> </span><span class="kn">import</span> <span class="n">View</span>
+
+
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="s2">&quot;/books/login/&quot;</span><span class="p">,</span> <span class="n">redirect_field_name</span><span class="o">=</span><span class="s2">&quot;redirect_to&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">book_dashboard</span><span class="p">(</span><span class="n">request</span><span class="p">):</span> <span class="o">...</span>
+
+
+<span class="nd">@method_decorator</span><span class="p">(</span>
+    <span class="n">login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="s2">&quot;/books/login/&quot;</span><span class="p">,</span> <span class="n">redirect_field_name</span><span class="o">=</span><span class="s2">&quot;redirect_to&quot;</span><span class="p">),</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;dispatch&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BookMetrics</span><span class="p">(</span><span class="n">View</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<div class="admonition-ensure-that-your-login-view-does-not-require-a-login admonition">
+<p class="admonition-title">ログインビューでログインを要求しないようにしてください。</p>
+<p>無限リダイレクトを防ぐために、ログインビューへの <a class="reference internal" href="../topics/auth/default.html#disable-login-required-middleware-for-views"><span class="std std-ref">認証されていないリクエストを許可してください</span></a> 。</p>
+</div>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.auth.middleware.RemoteUserMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RemoteUserMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/auth/middleware.py#L91"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.auth.middleware.RemoteUserMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>Web サーバーが提供する認証を利用するためのミドルウェアです。使用方法の詳細については <a class="reference internal" href="../howto/auth-remote-user.html"><span class="doc">REMOTE_USER で認証する</span></a> を参照してください。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.auth.middleware.PersistentRemoteUserMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PersistentRemoteUserMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/contrib/auth/middleware.py#L180"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.contrib.auth.middleware.PersistentRemoteUserMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>ログインページでのみ有効にした場合の、Webサーバー提供の認証を利用するためのミドルウェアです。使い方の詳細については、 <a class="reference internal" href="../howto/auth-remote-user.html#persistent-remote-user-middleware-howto"><span class="std std-ref">ログインページでのみ REMOTE_USER を使用する</span></a> を参照してください。</p>
+</section>
+<section id="s-csrf-protection-middleware">
+<span id="csrf-protection-middleware"></span><h3>CSRF プロテクション middleware<a class="headerlink" href="#csrf-protection-middleware" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.csrf.CsrfViewMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">CsrfViewMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/csrf.py#L165"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.csrf.CsrfViewMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>POST フォームに隠しフォームフィールドを追加し、リクエストの値が正しいかチェックすることで、Cross Site Request Forgery に対するプロテクションを追加します。詳しくは <a class="reference internal" href="csrf.html"><span class="doc">Cross Site Request Forgery プロテクションのドキュメント</span></a> を読んでください。</p>
+</section>
+<section id="s-x-frame-options-middleware">
+<span id="x-frame-options-middleware"></span><h3><code class="docutils literal notranslate"><span class="pre">X-Frame-Options</span></code> middleware<a class="headerlink" href="#x-frame-options-middleware" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.middleware.clickjacking.XFrameOptionsMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">XFrameOptionsMiddleware</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/middleware/clickjacking.py#L12"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.middleware.clickjacking.XFrameOptionsMiddleware" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>シンプルな <a class="reference internal" href="clickjacking.html"><span class="doc">クリックジャッキングに対する X-Frame-Options ヘッダ経由のプロテクション</span></a> です。</p>
+</section>
+</section>
+<section id="s-middleware-ordering">
+<span id="s-id12"></span><span id="middleware-ordering"></span><span id="id12"></span><h2>Middleware の順序<a class="headerlink" href="#middleware-ordering" title="Link to this heading">¶</a></h2>
+<p>Django の多様なミドルウェアクラスの順序に関する注意点を挙げておきます。</p>
+<ol class="arabic">
+<li><p><a class="reference internal" href="#django.middleware.security.SecurityMiddleware" title="django.middleware.security.SecurityMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SecurityMiddleware</span></code></a></p>
+<p>SSL リダイレクトを有効にしているなら、他のたくさんの必要のないミドルウェアが実行されないように、リストの先頭付近に置くべきです。</p>
+</li>
+<li><p><a class="reference internal" href="#django.middleware.cache.UpdateCacheMiddleware" title="django.middleware.cache.UpdateCacheMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">UpdateCacheMiddleware</span></code></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダに変更を加えるミドルウェア (<code class="docutils literal notranslate"><span class="pre">SessionMiddleware</span></code>, <code class="docutils literal notranslate"><span class="pre">GZipMiddleware</span></code>, <code class="docutils literal notranslate"><span class="pre">LocaleMiddleware</span></code>) の前に置きます。</p>
+</li>
+<li><p><a class="reference internal" href="#django.middleware.gzip.GZipMiddleware" title="django.middleware.gzip.GZipMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">GZipMiddleware</span></code></a></p>
+<p>response body を変更・使用する可能性のあるミドルウェアの前に置きます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダを修正するため、 <code class="docutils literal notranslate"><span class="pre">UpdateCacheMiddleware</span></code> の後に置きます。</p>
+</li>
+<li><p><a class="reference internal" href="#django.contrib.sessions.middleware.SessionMiddleware" title="django.contrib.sessions.middleware.SessionMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionMiddleware</span></code></a></p>
+<p><a class="reference internal" href="settings.html#std-setting-CSRF_USE_SESSIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_USE_SESSIONS</span></code></a> を使用している場合、例えば <a class="reference internal" href="exceptions.html#django.core.exceptions.PermissionDenied" title="django.core.exceptions.PermissionDenied"><code class="xref py py-exc docutils literal notranslate"><span class="pre">PermissionDenied</span></code></a> のようなエラービューをトリガーする例外を発生させる可能性のあるミドルウェアよりも前に配置してください。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダを修正するため、 <code class="docutils literal notranslate"><span class="pre">UpdateCacheMiddleware</span></code> の後に置きます。</p>
+</li>
+<li><p><a class="reference internal" href="#django.middleware.http.ConditionalGetMiddleware" title="django.middleware.http.ConditionalGetMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConditionalGetMiddleware</span></code></a></p>
+<p>レスポンスを変更する可能性があるミドルウェアよりも前に設定してください (これは <code class="docutils literal notranslate"><span class="pre">ETag</span></code> ヘッダを設定します)。</p>
+<p>gzip されたコンテンツに対して <code class="docutils literal notranslate"><span class="pre">ETag</span></code> ヘッダを計算しないように、 <code class="docutils literal notranslate"><span class="pre">GZipMiddleware</span></code> の後に置きます。</p>
+</li>
+<li><p><a class="reference internal" href="#django.middleware.locale.LocaleMiddleware" title="django.middleware.locale.LocaleMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">LocaleMiddleware</span></code></a></p>
+<p><code class="docutils literal notranslate"><span class="pre">SessionMiddleware</span></code> (session データを使う) と <code class="docutils literal notranslate"><span class="pre">UpdateCacheMiddleware</span></code> (<code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダを修正する) の後のできるだけ高い位置に置きます。</p>
+</li>
+<li><p><a class="reference internal" href="#django.middleware.common.CommonMiddleware" title="django.middleware.common.CommonMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommonMiddleware</span></code></a></p>
+<p>レスポンスを変更する可能性のあるミドルウェアの前に配置します (<code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> ヘッダーを設定します)。 <code class="docutils literal notranslate"><span class="pre">CommonMiddleware</span></code> の前に配置され、レスポンスを変更するミドルウェアは、 <code class="docutils literal notranslate"><span class="pre">Content-Length</span></code> をリセットする必要があります。</p>
+<p><a class="reference internal" href="settings.html#std-setting-APPEND_SLASH"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APPEND_SLASH</span></code></a> か <a class="reference internal" href="settings.html#std-setting-PREPEND_WWW"><code class="xref std std-setting docutils literal notranslate"><span class="pre">PREPEND_WWW</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> に設定されているとリダイレクトされるので、先頭の近くに置きます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">SessionMiddleware</span></code> の後に、 <a class="reference internal" href="settings.html#std-setting-CSRF_USE_SESSIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_USE_SESSIONS</span></code></a> を使用している場合。</p>
+</li>
+<li><p><a class="reference internal" href="#django.middleware.csrf.CsrfViewMiddleware" title="django.middleware.csrf.CsrfViewMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">CsrfViewMiddleware</span></code></a></p>
+<p>CSRF 攻撃が可能なすべての view ミドルウェアの前に置きます。</p>
+<p><a class="reference internal" href="#django.contrib.auth.middleware.RemoteUserMiddleware" title="django.contrib.auth.middleware.RemoteUserMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">RemoteUserMiddleware</span></code></a> の前、あるいはログインを実行し、CSRF トークンをローテートする可能性のある他の認証ミドルウェアの前、ミドルウェアチェインを呼び出す前に置きます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">SessionMiddleware</span></code> の後に、 <a class="reference internal" href="settings.html#std-setting-CSRF_USE_SESSIONS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CSRF_USE_SESSIONS</span></code></a> を使用している場合。</p>
+</li>
+<li><p><a class="reference internal" href="#django.contrib.auth.middleware.AuthenticationMiddleware" title="django.contrib.auth.middleware.AuthenticationMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationMiddleware</span></code></a></p>
+<p>session ストレージを使うので、 <code class="docutils literal notranslate"><span class="pre">SessionMiddleware</span></code> の後に置きます。</p>
+</li>
+<li><p><a class="reference internal" href="#django.contrib.auth.middleware.LoginRequiredMiddleware" title="django.contrib.auth.middleware.LoginRequiredMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoginRequiredMiddleware</span></code></a></p>
+<div class="versionadded">
+<span class="title">New in Django 5.1.</span> </div>
+<p>user オブジェクトを使うので、 <code class="docutils literal notranslate"><span class="pre">AuthenticationMiddleware</span></code> の後に置きます。</p>
+</li>
+<li><p><a class="reference internal" href="#django.contrib.messages.middleware.MessageMiddleware" title="django.contrib.messages.middleware.MessageMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageMiddleware</span></code></a></p>
+<p>session ベースの storage を使うので、 <code class="docutils literal notranslate"><span class="pre">SessionMiddleware</span></code> の後に置きます。</p>
+</li>
+<li><p><a class="reference internal" href="#django.middleware.cache.FetchFromCacheMiddleware" title="django.middleware.cache.FetchFromCacheMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">FetchFromCacheMiddleware</span></code></a></p>
+<p>キャッシュのハッシュキーを生成するのに <code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダを使用するため、このヘッダを修正するすべてのミドルウェアのあとに置きます。</p>
+</li>
+<li><p><a class="reference internal" href="contrib/flatpages.html#django.contrib.flatpages.middleware.FlatpageFallbackMiddleware" title="django.contrib.flatpages.middleware.FlatpageFallbackMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">FlatpageFallbackMiddleware</span></code></a></p>
+<p>最後に実行されるタイプのミドルウェアなので、できるだけ下に置く必要があります。</p>
+</li>
+<li><p><a class="reference internal" href="contrib/redirects.html#django.contrib.redirects.middleware.RedirectFallbackMiddleware" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedirectFallbackMiddleware</span></code></a></p>
+<p>最後に実行されるタイプのミドルウェアなので、できるだけ下に置く必要があります。</p>
+</li>
+</ol>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">ミドルウェア</a><ul>
+<li><a class="reference internal" href="#available-middleware">使用できる middleware</a><ul>
+<li><a class="reference internal" href="#module-django.middleware.cache">Cache middleware</a></li>
+<li><a class="reference internal" href="#module-django.middleware.common">Common middleware</a></li>
+<li><a class="reference internal" href="#module-django.middleware.gzip">GZip middleware</a></li>
+<li><a class="reference internal" href="#module-django.middleware.http">Conditional GET middleware</a></li>
+<li><a class="reference internal" href="#module-django.middleware.locale">Locale ミドルウェア</a></li>
+<li><a class="reference internal" href="#module-django.contrib.messages.middleware">Message ミドルウェア</a></li>
+<li><a class="reference internal" href="#module-django.middleware.security">Security middleware</a><ul>
+<li><a class="reference internal" href="#http-strict-transport-security">HTTP Strict Transport Security</a></li>
+<li><a class="reference internal" href="#referrer-policy">リファラ・ポリシー</a></li>
+<li><a class="reference internal" href="#cross-origin-opener-policy">同一生成元ポリシー (Cross-Origin Opener Policy)</a></li>
+<li><a class="reference internal" href="#x-content-type-options-nosniff"><code class="docutils literal notranslate"><span class="pre">X-Content-Type-Options:</span> <span class="pre">nosniff</span></code></a></li>
+<li><a class="reference internal" href="#ssl-redirect">SSL リダイレクト</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.contrib.sessions.middleware">Session middleware</a></li>
+<li><a class="reference internal" href="#module-django.contrib.sites.middleware">Site ミドルウェア</a></li>
+<li><a class="reference internal" href="#module-django.contrib.auth.middleware">Authentication middleware</a></li>
+<li><a class="reference internal" href="#csrf-protection-middleware">CSRF プロテクション middleware</a></li>
+<li><a class="reference internal" href="#x-frame-options-middleware"><code class="docutils literal notranslate"><span class="pre">X-Frame-Options</span></code> middleware</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#middleware-ordering">Middleware の順序</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="logging.html"
+                          title="前の章へ">ロギング</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="migration-operations.html"
+                          title="次の章へ">マイグレーション・オペレーション</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/middleware.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="logging.html" title="ロギング">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="migration-operations.html" title="マイグレーション・オペレーション">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

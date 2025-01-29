@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django 0.95 リリースノート &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="セキュリティ上の問題のアーカイブ" href="security.html" />
+    <link rel="prev" title="Django 0.96 リリースノート" href="0.96.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../ref/templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="0.96.html" title="Django 0.96 リリースノート">previous</a>
+     |
+    <a href="index.html" title="リリースノート" accesskey="U">up</a>
+   |
+    <a href="security.html" title="セキュリティ上の問題のアーカイブ">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="releases-0.95">
+            
+  <section id="s-django-version-0-95-release-notes">
+<span id="django-version-0-95-release-notes"></span><h1>Django 0.95 リリースノート<a class="headerlink" href="#django-version-0-95-release-notes" title="Link to this heading">¶</a></h1>
+<p>Django 0.95 へようこそ！</p>
+<p>このリリースでは、2006年1月にリリースされた 0.91 から Django の開発が大幅に進んでいます。このリリースのすべての変更点を詳細に書くことはできませんが、以下にその要点を列挙します。</p>
+<section id="s-suitability-and-api-stability">
+<span id="suitability-and-api-stability"></span><h2>適合性 (suitablitiry) と API の安定性<a class="headerlink" href="#suitability-and-api-stability" title="Link to this heading">¶</a></h2>
+<p>This release is intended to provide a stable reference point for developers
+wanting to work on production-level applications that use Django.</p>
+<p>However, it's not the 1.0 release, and we'll be introducing further changes
+before 1.0. For a clear look at which areas of the framework will change (and
+which ones will <em>not</em> change) before 1.0, see the <code class="docutils literal notranslate"><span class="pre">api-stability.txt</span></code> file,
+which lives in the docs/ directory of the distribution.</p>
+<p>You may have a need to use some of the features that are marked as
+&quot;subject to API change&quot; in that document, but that's OK with us as long as it's
+OK with you, and as long as you understand APIs may change in the future.</p>
+<p>Fortunately, most of Django's core APIs won't be changing before version 1.0.
+There likely won't be as big of a change between 0.95 and 1.0 versions as there
+was between 0.91 and 0.95.</p>
+</section>
+<section id="s-changes-and-new-features">
+<span id="changes-and-new-features"></span><h2>変更と新機能<a class="headerlink" href="#changes-and-new-features" title="Link to this heading">¶</a></h2>
+<p>The major changes in this release (for developers currently using the 0.91
+release) are a result of merging the 'magic-removal' branch of development.
+This branch removed a number of constraints in the way Django code had to be
+written that were a consequence of decisions made in the early days of Django,
+prior to its open-source release. It's now possible to write more natural,
+Pythonic code that works as expected, and there's less &quot;black magic&quot; happening
+behind the scenes.</p>
+<p>Aside from that, another main theme of this release is a dramatic increase in
+usability. We've made countless improvements in error messages, documentation,
+etc., to improve developers' quality of life.</p>
+<p>The new features and changes introduced in 0.95 include:</p>
+<ul class="simple">
+<li><p>Django now uses a more consistent and natural filtering interface for
+retrieving objects from the database.</p></li>
+<li><p>User-defined models, functions and constants now appear in the module
+namespace they were defined in. (Previously everything was magically
+transferred to the <code class="docutils literal notranslate"><span class="pre">django.models.*</span></code> namespace.)</p></li>
+<li><p>Some optional applications, such as the FlatPage, Sites and Redirects
+apps, have been decoupled and moved into <code class="docutils literal notranslate"><span class="pre">django.contrib</span></code>. If you don't
+want to use these applications, you no longer have to install their
+database tables.</p></li>
+<li><p>Django now has support for managing database transactions.</p></li>
+<li><p>たとえば LDAP などの他のシステムに対して認証中のユーザー向けに、カスタムの認証および認可バックエンドを作成する機能を追加しました。</p></li>
+<li><p>We've made it easier to add custom table-level functions to models,
+through a new &quot;Manager&quot; API.</p></li>
+<li><p>It's now possible to use Django without a database. This simply means
+that the framework no longer requires you to have a working database set
+up just to serve dynamic pages. In other words, you can just use
+URLconfs/views on their own. Previously, the framework required that a
+database be configured, regardless of whether you actually used it.</p></li>
+<li><p>It's now more explicit and natural to override <code class="docutils literal notranslate"><span class="pre">save()</span></code> and <code class="docutils literal notranslate"><span class="pre">delete()</span></code>
+methods on models, rather than needing to hook into the <code class="docutils literal notranslate"><span class="pre">pre_save()</span></code> and
+<code class="docutils literal notranslate"><span class="pre">post_save()</span></code> method hooks.</p></li>
+<li><p>Individual pieces of the framework now can be configured without
+requiring the setting of an environment variable. This permits use of,
+for example, the Django templating system inside other applications.</p></li>
+<li><p>More and more parts of the framework have been internationalized, as
+we've expanded internationalization (i18n) support. The Django
+codebase, including code and templates, has now been translated, at least
+in part, into 31 languages. From Arabic to Chinese to Hungarian to Welsh,
+it is now possible to use Django's admin site in your native language.</p></li>
+</ul>
+<p>The number of changes required to port from 0.91-compatible code to the 0.95
+code base are significant in some cases. However, they are, for the most part,
+reasonably routine and only need to be done once. A list of the necessary
+changes is described in the <a class="reference external" href="https://code.djangoproject.com/wiki/RemovingTheMagic">Removing The Magic</a> wiki page. There is also an
+easy <a class="reference external" href="https://code.djangoproject.com/wiki/MagicRemovalCheatSheet">checklist</a> for reference when undertaking the porting operation.</p>
+</section>
+<section id="s-problem-reports-and-getting-help">
+<span id="problem-reports-and-getting-help"></span><h2>Problem reports and getting help<a class="headerlink" href="#problem-reports-and-getting-help" title="Link to this heading">¶</a></h2>
+<p>Need help resolving a problem with Django? The documentation in the
+distribution is also available <a class="reference internal" href="../index.html"><span class="doc">online</span></a> at the <a class="reference external" href="https://www.djangoproject.com/">Django website</a>.
+The <a class="reference internal" href="../faq/index.html"><span class="doc">FAQ</span></a> document is especially recommended, as it contains
+a number of issues that come up time and again.</p>
+<p>For more personalized help, the <a class="reference external" href="https://groups.google.com/g/django-users">django-users</a> mailing list is a very active
+list, with more than 2,000 subscribers who can help you solve any sort of
+Django problem. We recommend you search the archives first, though, because
+many common questions appear with some regularity, and any particular problem
+may already have been answered.</p>
+<p>Finally, for those who prefer the more immediate feedback offered by IRC,
+there's a <code class="docutils literal notranslate"><span class="pre">#django</span></code> channel on <code class="docutils literal notranslate"><span class="pre">irc.libera.chat</span></code> that is regularly
+populated by Django users and developers from around the world. Friendly people
+are usually available at any hour of the day -- to help, or just to chat.</p>
+<p>Thanks for using Django!</p>
+<p>The Django Team
+July 2006</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Django 0.95 リリースノート</a><ul>
+<li><a class="reference internal" href="#suitability-and-api-stability">適合性 (suitablitiry) と API の安定性</a></li>
+<li><a class="reference internal" href="#changes-and-new-features">変更と新機能</a></li>
+<li><a class="reference internal" href="#problem-reports-and-getting-help">Problem reports and getting help</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="0.96.html"
+                          title="前の章へ">Django 0.96 リリースノート</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="security.html"
+                          title="次の章へ">セキュリティ上の問題のアーカイブ</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/releases/0.95.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="0.96.html" title="Django 0.96 リリースノート">previous</a>
+     |
+    <a href="index.html" title="リリースノート" accesskey="U">up</a>
+   |
+    <a href="security.html" title="セキュリティ上の問題のアーカイブ">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

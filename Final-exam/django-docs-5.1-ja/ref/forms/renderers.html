@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>フォームレンダリング API &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="ウィジェット" href="widgets.html" />
+    <link rel="prev" title="フォームセット (Formset) の関数" href="formsets.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="formsets.html" title="フォームセット (Formset) の関数">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="widgets.html" title="ウィジェット">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-forms-renderers">
+            
+  <section id="s-module-django.forms.renderers">
+<span id="s-the-form-rendering-api"></span><span id="module-django.forms.renderers"></span><span id="the-form-rendering-api"></span><h1>フォームレンダリング API<a class="headerlink" href="#module-django.forms.renderers" title="Link to this heading">¶</a></h1>
+<p>Djangoのフォームウィジェットは、Djangoの <a class="reference internal" href="../../topics/templates.html"><span class="doc">テンプレートエンジンシステム</span></a> を使用してレンダリングされます。</p>
+<p>フォームのレンダリングプロセスは、いくつかのレベルでカスタマイズできます:</p>
+<ul class="simple">
+<li><p>ウィジェットはカスタムテンプレート名を指定できます。</p></li>
+<li><p>フォームとウィジェットは、カスタムレンダラークラスを指定できます。</p></li>
+<li><p>ウィジェットのテンプレートはプロジェクトによって上書きできます。(再利用可能なアプリケーションは通常、組込みテンプレートを上書きすべきではありません。なぜなら、それがプロジェクトのカスタムテンプレートと競合する可能性があるからです。)</p></li>
+</ul>
+<section id="s-the-low-level-render-api">
+<span id="s-low-level-widget-render-api"></span><span id="the-low-level-render-api"></span><span id="low-level-widget-render-api"></span><h2>低レベルのレンダリングAPI<a class="headerlink" href="#the-low-level-render-api" title="Link to this heading">¶</a></h2>
+<p>フォームテンプレートのレンダリングは、カスタマイズ可能なレンダラークラスによって制御されます。カスタムレンダラーは、<a class="reference internal" href="../settings.html#std-setting-FORM_RENDERER"><code class="xref std std-setting docutils literal notranslate"><span class="pre">FORM_RENDERER</span></code></a> 設定を更新することによって指定できます。デフォルトでは <code class="docutils literal notranslate"><span class="pre">'</span></code><a class="reference internal" href="#django.forms.renderers.DjangoTemplates" title="django.forms.renderers.DjangoTemplates"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.forms.renderers.DjangoTemplates</span></code></a><code class="docutils literal notranslate"><span class="pre">'</span></code> になっています。</p>
+<p>カスタムフォームレンダラーを指定し、<a class="reference internal" href="#django.forms.renderers.BaseRenderer.form_template_name" title="django.forms.renderers.BaseRenderer.form_template_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">form_template_name</span></code></a> をオーバーライドすることで、プロジェクト全体のデフォルトフォームマークアップを一か所から調整できます。</p>
+<p><a class="reference internal" href="api.html#django.forms.Form.default_renderer" title="django.forms.Form.default_renderer"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Form.default_renderer</span></code></a> 属性を設定するか、または <a class="reference internal" href="api.html#django.forms.Form.render" title="django.forms.Form.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Form.render()</span></code></a> や <a class="reference internal" href="widgets.html#django.forms.Widget.render" title="django.forms.Widget.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Widget.render()</span></code></a> のメソッドの <code class="docutils literal notranslate"><span class="pre">renderer</span></code> 引数を使用することで、フォームごとやウィジェットごとにカスタムレンダラーを提供することもできます。</p>
+<p>マッチングポイントは、formset のレンダリングに適用されます。詳細は、<a class="reference internal" href="../../topics/forms/formsets.html#formset-rendering"><span class="std std-ref">ビューとテンプレートでフォームセットを使う</span></a> を参照してください。</p>
+<p><a class="reference internal" href="#built-in-template-form-renderers"><span class="std std-ref">組み込みのテンプレートフォームレンダラ</span></a> のいずれかを使用するか、独自のものを実装してください。カスタムレンダラは、<code class="docutils literal notranslate"><span class="pre">render(template_name,</span> <span class="pre">context,</span> <span class="pre">request=None)</span></code> メソッドを実装する必要があります。レンダリングされたテンプレート(文字列として)を返すか、 <a class="reference internal" href="../../topics/templates.html#django.template.TemplateDoesNotExist" title="django.template.TemplateDoesNotExist"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TemplateDoesNotExist</span></code></a> を発生させるべきです。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.forms.renderers.BaseRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">BaseRenderer</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/forms/renderers.py#L19"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.forms.renderers.BaseRenderer" title="Link to this definition">¶</a></dt>
+<dd><p>組み込みフォームレンダラーの基底クラスです。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.forms.renderers.BaseRenderer.form_template_name">
+<span class="sig-name descname"><span class="pre">form_template_name</span></span><a class="headerlink" href="#django.forms.renderers.BaseRenderer.form_template_name" title="Link to this definition">¶</a></dt>
+<dd><p>フォームをレンダリングするために使用するテンプレートのデフォルト名です。</p>
+<p>デフォルトは <code class="docutils literal notranslate"><span class="pre">&quot;django/forms/div.html&quot;</span></code> テンプレートです。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.forms.renderers.BaseRenderer.formset_template_name">
+<span class="sig-name descname"><span class="pre">formset_template_name</span></span><a class="headerlink" href="#django.forms.renderers.BaseRenderer.formset_template_name" title="Link to this definition">¶</a></dt>
+<dd><p>フォームセットをレンダリングするために使用するテンプレートのデフォルト名。</p>
+<p>デフォルトは <code class="docutils literal notranslate"><span class="pre">&quot;django/forms/formsets/div.html&quot;</span></code> テンプレートです。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.forms.renderers.BaseRenderer.field_template_name">
+<span class="sig-name descname"><span class="pre">field_template_name</span></span><a class="headerlink" href="#django.forms.renderers.BaseRenderer.field_template_name" title="Link to this definition">¶</a></dt>
+<dd><div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<p><code class="docutils literal notranslate"><span class="pre">BoundField</span></code> をレンダリングするために使用されるテンプレートのデフォルト名。</p>
+<p>デフォルトは <code class="docutils literal notranslate"><span class="pre">&quot;django/forms/field.html&quot;</span></code> です。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.forms.renderers.BaseRenderer.get_template">
+<span class="sig-name descname"><span class="pre">get_template</span></span>(<em class="sig-param"><span class="n"><span class="pre">template_name</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/forms/renderers.py#L24"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.forms.renderers.BaseRenderer.get_template" title="Link to this definition">¶</a></dt>
+<dd><p>サブクラスは、適切なテンプレート検索ロジックを持つようにこのメソッドを実装しなければなりません。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.forms.renderers.BaseRenderer.render">
+<span class="sig-name descname"><span class="pre">render</span></span>(<em class="sig-param"><span class="n"><span class="pre">template_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/forms/renderers.py#L27"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.forms.renderers.BaseRenderer.render" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたテンプレートをレンダリングします。存在しない場合は、 <a class="reference internal" href="../../topics/templates.html#django.template.TemplateDoesNotExist" title="django.template.TemplateDoesNotExist"><code class="xref py py-exc docutils literal notranslate"><span class="pre">TemplateDoesNotExist</span></code></a> を発生させます。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-built-in-template-form-renderers">
+<span id="s-id1"></span><span id="built-in-template-form-renderers"></span><span id="id1"></span><h2>組み込みのテンプレートフォームレンダラー<a class="headerlink" href="#built-in-template-form-renderers" title="Link to this heading">¶</a></h2>
+<section id="s-djangotemplates">
+<span id="djangotemplates"></span><h3><code class="docutils literal notranslate"><span class="pre">DjangoTemplates</span></code><a class="headerlink" href="#djangotemplates" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.forms.renderers.DjangoTemplates">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DjangoTemplates</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/forms/renderers.py#L48"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.forms.renderers.DjangoTemplates" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>このレンダラーは、 (<a class="reference internal" href="../settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> 設定で構成されているものとは接続されていない) 独立した <a class="reference internal" href="../../topics/templates.html#django.template.backends.django.DjangoTemplates" title="django.template.backends.django.DjangoTemplates"><code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoTemplates</span></code></a> エンジンを使用しています。まず <a class="extlink-source reference external" href="https://github.com/django/django/blob/main/django/forms/templates">django/forms/templates</a> にある組み込みのフォームテンプレートディレクトリからテンプレートを読み込み、次に <a class="reference internal" href="../templates/api.html#django.template.loaders.app_directories.Loader" title="django.template.loaders.app_directories.Loader"><code class="xref py py-class docutils literal notranslate"><span class="pre">app_directories</span></code></a> ローダーを使用してインストール済みアプリのテンプレートディレクトリから読み込みます。</p>
+<p>カスタマイズを施した <a class="reference internal" href="../settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> 設定からテンプレートをレンダリングしたい場合、例えばコンテキストプロセッサなどを使用するには、<a class="reference internal" href="#django.forms.renderers.TemplatesSetting" title="django.forms.renderers.TemplatesSetting"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatesSetting</span></code></a> レンダラーを使用してください。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.forms.renderers.DjangoDivFormRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DjangoDivFormRenderer</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/forms/renderers.py#L71"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.forms.renderers.DjangoDivFormRenderer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="deprecated">
+<p><span class="versionmodified deprecated">バージョン 5.0 で非推奨.</span></p>
+</div>
+<p><a class="reference internal" href="#django.forms.renderers.DjangoTemplates" title="django.forms.renderers.DjangoTemplates"><code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoTemplates</span></code></a> のエイリアス。</p>
+</section>
+<section id="s-jinja2">
+<span id="jinja2"></span><h3><code class="docutils literal notranslate"><span class="pre">Jinja2</span></code><a class="headerlink" href="#jinja2" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.forms.renderers.Jinja2">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jinja2</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/forms/renderers.py#L57"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.forms.renderers.Jinja2" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>このレンダラーは <a class="reference internal" href="#django.forms.renderers.DjangoTemplates" title="django.forms.renderers.DjangoTemplates"><code class="xref py py-class docutils literal notranslate"><span class="pre">DjangoTemplates</span></code></a> レンダラーと同じですが、<a class="reference internal" href="../../topics/templates.html#django.template.backends.jinja2.Jinja2" title="django.template.backends.jinja2.Jinja2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Jinja2</span></code></a> バックエンドを使用します。組み込みウィジェットのテンプレートは <a class="extlink-source reference external" href="https://github.com/django/django/blob/main/django/forms/jinja2">django/forms/jinja2</a> にあり、インストールされたアプリは <code class="docutils literal notranslate"><span class="pre">jinja2</span></code> ディレクトリ内にテンプレートを提供できます。</p>
+<p>このバックエンドを使用するには、プロジェクトとそのサードパーティアプリのすべてのフォームとウィジェットにJinja2のテンプレートがなければなりません。ウィジェットにJinja2のテンプレートがない場合、自分で提供しない限り、このレンダラーを使用することはできません。例えば、 <a class="reference internal" href="../contrib/admin/index.html#module-django.contrib.admin" title="django.contrib.admin: Django's admin site."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.contrib.admin</span></code></a> は、Djangoのテンプレートタグを使用しているため、そのウィジェットにJinja2テンプレートを含んでいません。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.forms.renderers.Jinja2DivFormRenderer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Jinja2DivFormRenderer</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/forms/renderers.py#L88"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.forms.renderers.Jinja2DivFormRenderer" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<div class="deprecated">
+<p><span class="versionmodified deprecated">バージョン 5.0 で非推奨.</span></p>
+</div>
+<p><a class="reference internal" href="#django.forms.renderers.Jinja2" title="django.forms.renderers.Jinja2"><code class="xref py py-class docutils literal notranslate"><span class="pre">Jinja2</span></code></a> のエイリアス。</p>
+</section>
+<section id="s-templatessetting">
+<span id="templatessetting"></span><h3><code class="docutils literal notranslate"><span class="pre">TemplatesSetting</span></code><a class="headerlink" href="#templatessetting" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.forms.renderers.TemplatesSetting">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">TemplatesSetting</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/forms/renderers.py#L103"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.forms.renderers.TemplatesSetting" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<p>このレンダラーは、フォームとウィジェットのテンプレートの取得方法を完全に制御できます。これは、 <a class="reference internal" href="../../topics/templates.html#django.template.loader.get_template" title="django.template.loader.get_template"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_template()</span></code></a> を使用して、 <a class="reference internal" href="../settings.html#std-setting-TEMPLATES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TEMPLATES</span></code></a> 設定で構成されている内容に基づいてテンプレートを見つけます。</p>
+<p>このレンダラーを組み込みテンプレートと一緒に使用するには, 次のいずれかが必要です:</p>
+<ul>
+<li><p><a class="reference internal" href="../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> に <code class="docutils literal notranslate"><span class="pre">'django.forms'</span></code> が含まれていて、少なくとも一つのエンジンが <a class="reference internal" href="../settings.html#std-setting-TEMPLATES-APP_DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">APP_DIRS=True</span></code></a> に設定されている必要があります。</p></li>
+<li><p>テンプレートエンジンの <a class="reference internal" href="../settings.html#std-setting-TEMPLATES-DIRS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">DIRS</span></code></a> に組み込みテンプレートディレクトリを追加します。そのパスを生成するには次のようにします:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">django</span>
+
+<span class="n">django</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;/forms/templates&quot;</span>  <span class="c1"># or &#39;/forms/jinja2&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>このレンダラーを使用するには、プロジェクトが必要とするフォームテンプレートが見つかるようにする必要があります。</p>
+</section>
+</section>
+<section id="s-context-available-in-formset-templates">
+<span id="context-available-in-formset-templates"></span><h2>フォームセットテンプレートで利用可能なコンテキスト<a class="headerlink" href="#context-available-in-formset-templates" title="Link to this heading">¶</a></h2>
+<p>フォームセットテンプレートは、 <a class="reference internal" href="../../topics/forms/formsets.html#django.forms.formsets.BaseFormSet.get_context" title="django.forms.formsets.BaseFormSet.get_context"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BaseFormSet.get_context()</span></code></a> からコンテキストを受け取ります。デフォルトでは、フォームセットは以下の値を含む辞書を受け取ります:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">formset</span></code>: フォームセットのインスタンス。</p></li>
+</ul>
+</section>
+<section id="s-context-available-in-form-templates">
+<span id="context-available-in-form-templates"></span><h2>フォームテンプレートで利用可能なコンテキスト<a class="headerlink" href="#context-available-in-form-templates" title="Link to this heading">¶</a></h2>
+<p>フォームテンプレートは、 <a class="reference internal" href="api.html#django.forms.Form.get_context" title="django.forms.Form.get_context"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Form.get_context()</span></code></a> からコンテキストを受け取ります。デフォルトでは、フォームは次の値を持つ辞書を受け取ります。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">form</span></code>: バインドされたフォーム。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fields</span></code>: 隠されたフィールドを除く、すべてのバインドされたフィールド。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hidden_fields</span></code>: すべての隠されたバインドフィールド。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">errors</span></code>: フォームの非フィールド関連または非表示フィールド関連の全エラー。</p></li>
+</ul>
+</section>
+<section id="s-context-available-in-field-templates">
+<span id="context-available-in-field-templates"></span><h2>フィールドテンプレートで利用可能なコンテキスト<a class="headerlink" href="#context-available-in-field-templates" title="Link to this heading">¶</a></h2>
+<div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<p>フィールドテンプレートは、 <a class="reference internal" href="api.html#django.forms.BoundField.get_context" title="django.forms.BoundField.get_context"><code class="xref py py-meth docutils literal notranslate"><span class="pre">BoundField.get_context()</span></code></a> からコンテキストを受け取ります。デフォルトでは、フィールドは以下の値を含む辞書を受け取ります:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">field</span></code>: <a class="reference internal" href="api.html#django.forms.BoundField" title="django.forms.BoundField"><code class="xref py py-class docutils literal notranslate"><span class="pre">BoundField</span></code></a> 。</p></li>
+</ul>
+</section>
+<section id="s-context-available-in-widget-templates">
+<span id="context-available-in-widget-templates"></span><h2>ウィジェットテンプレートで利用可能なコンテキスト<a class="headerlink" href="#context-available-in-widget-templates" title="Link to this heading">¶</a></h2>
+<p>Widgetテンプレートは <a class="reference internal" href="widgets.html#django.forms.Widget.get_context" title="django.forms.Widget.get_context"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Widget.get_context()</span></code></a> からコンテキストを受け取ります。デフォルトでは、ウィジェットはコンテキスト内で単一の値、 <code class="docutils literal notranslate"><span class="pre">widget</span></code> を受け取ります。これは次のような値を含む辞書です:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">value</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">attrs</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_hidden</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">template_name</span></code></p></li>
+</ul>
+<p>一部のウィジェットは、コンテキストにさらなる情報を追加します。例えば、<code class="docutils literal notranslate"><span class="pre">Input</span></code> のサブクラスであるすべてのウィジェットは <code class="docutils literal notranslate"><span class="pre">widget['type']</span></code> を定義し、<a class="reference internal" href="widgets.html#django.forms.MultiWidget" title="django.forms.MultiWidget"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiWidget</span></code></a> はループ目的のために <code class="docutils literal notranslate"><span class="pre">widget['subwidgets']</span></code> を定義します。</p>
+</section>
+<section id="s-overriding-built-in-formset-templates">
+<span id="s-id2"></span><span id="overriding-built-in-formset-templates"></span><span id="id2"></span><h2>組み込みのフォームセットテンプレートをオーバーライドする<a class="headerlink" href="#overriding-built-in-formset-templates" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="../../topics/forms/formsets.html#django.forms.formsets.BaseFormSet.template_name" title="django.forms.formsets.BaseFormSet.template_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">BaseFormSet.template_name</span></code></a></p>
+<p>フォームセットテンプレートをオーバーライドするには、<a class="reference internal" href="#django.forms.renderers.TemplatesSetting" title="django.forms.renderers.TemplatesSetting"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatesSetting</span></code></a> レンダラーを使用する必要があります。そうすると、フォームセットテンプレートのオーバーライドは、プロジェクト内の他のテンプレートをオーバーライドするのと <a class="reference internal" href="../../howto/overriding-templates.html"><span class="doc">同じように行うことができます</span></a> 。</p>
+</section>
+<section id="s-overriding-built-in-form-templates">
+<span id="s-id3"></span><span id="overriding-built-in-form-templates"></span><span id="id3"></span><h2>組み込みのフォームテンプレートをオーバーライドする<a class="headerlink" href="#overriding-built-in-form-templates" title="Link to this heading">¶</a></h2>
+<p><a class="reference internal" href="api.html#django.forms.Form.template_name" title="django.forms.Form.template_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Form.template_name</span></code></a></p>
+<p>フォームテンプレートをオーバーライドするには、<a class="reference internal" href="#django.forms.renderers.TemplatesSetting" title="django.forms.renderers.TemplatesSetting"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatesSetting</span></code></a> レンダラーを使用する必要があります。その後、フォームテンプレートのオーバーライドは、プロジェクト内の他のテンプレートをオーバーライドする場合と <a class="reference internal" href="../../howto/overriding-templates.html"><span class="doc">同様に機能します</span></a>。</p>
+</section>
+<section id="s-overriding-built-in-field-templates">
+<span id="s-id4"></span><span id="overriding-built-in-field-templates"></span><span id="id4"></span><h2>組み込みのフィールドテンプレートをオーバーライドする<a class="headerlink" href="#overriding-built-in-field-templates" title="Link to this heading">¶</a></h2>
+<div class="versionadded">
+<span class="title">New in Django 5.0.</span> </div>
+<p><a class="reference internal" href="fields.html#django.forms.Field.template_name" title="django.forms.Field.template_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Field.template_name</span></code></a></p>
+<p>フィールドテンプレートを上書きするには、 <a class="reference internal" href="#django.forms.renderers.TemplatesSetting" title="django.forms.renderers.TemplatesSetting"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatesSetting</span></code></a> レンダラーを使用する必要があります。それから、フィールドテンプレートのオーバーライドは、プロジェクト内の他のテンプレートのオーバーライドと <a class="reference internal" href="../../howto/overriding-templates.html"><span class="doc">同じ方法</span></a> で機能します。</p>
+</section>
+<section id="s-overriding-built-in-widget-templates">
+<span id="s-id5"></span><span id="overriding-built-in-widget-templates"></span><span id="id5"></span><h2>組み込みのウィジェットテンプレートをオーバーライドする<a class="headerlink" href="#overriding-built-in-widget-templates" title="Link to this heading">¶</a></h2>
+<p>各ウィジェットは、<code class="docutils literal notranslate"><span class="pre">input.html</span></code> のような値を持つ <code class="docutils literal notranslate"><span class="pre">template_name</span></code> 属性を持っています。組み込みウィジェットテンプレートは、 <code class="docutils literal notranslate"><span class="pre">django/forms/widgets</span></code> パスに格納されています。例えば、 <code class="docutils literal notranslate"><span class="pre">django/forms/widgets/input.html</span></code> を定義することで、 <code class="docutils literal notranslate"><span class="pre">input.html</span></code> のカスタムテンプレートを提供できます。各ウィジェットのテンプレートの名前については、 <a class="reference internal" href="widgets.html#built-in-widgets"><span class="std std-ref">ビルトインのウィジェット</span></a> を参照してください。</p>
+<p>ウィジェットテンプレートをオーバーライドするには、 <a class="reference internal" href="#django.forms.renderers.TemplatesSetting" title="django.forms.renderers.TemplatesSetting"><code class="xref py py-class docutils literal notranslate"><span class="pre">TemplatesSetting</span></code></a> レンダラを使用する必要があります。その後、ウィジェットテンプレートのオーバーライドは、プロジェクト内の他のテンプレートをオーバーライドするのと <a class="reference internal" href="../../howto/overriding-templates.html"><span class="doc">同じ方法で機能</span></a> します。</p>
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">フォームレンダリング API</a><ul>
+<li><a class="reference internal" href="#the-low-level-render-api">低レベルのレンダリングAPI</a></li>
+<li><a class="reference internal" href="#built-in-template-form-renderers">組み込みのテンプレートフォームレンダラー</a><ul>
+<li><a class="reference internal" href="#djangotemplates"><code class="docutils literal notranslate"><span class="pre">DjangoTemplates</span></code></a></li>
+<li><a class="reference internal" href="#jinja2"><code class="docutils literal notranslate"><span class="pre">Jinja2</span></code></a></li>
+<li><a class="reference internal" href="#templatessetting"><code class="docutils literal notranslate"><span class="pre">TemplatesSetting</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#context-available-in-formset-templates">フォームセットテンプレートで利用可能なコンテキスト</a></li>
+<li><a class="reference internal" href="#context-available-in-form-templates">フォームテンプレートで利用可能なコンテキスト</a></li>
+<li><a class="reference internal" href="#context-available-in-field-templates">フィールドテンプレートで利用可能なコンテキスト</a></li>
+<li><a class="reference internal" href="#context-available-in-widget-templates">ウィジェットテンプレートで利用可能なコンテキスト</a></li>
+<li><a class="reference internal" href="#overriding-built-in-formset-templates">組み込みのフォームセットテンプレートをオーバーライドする</a></li>
+<li><a class="reference internal" href="#overriding-built-in-form-templates">組み込みのフォームテンプレートをオーバーライドする</a></li>
+<li><a class="reference internal" href="#overriding-built-in-field-templates">組み込みのフィールドテンプレートをオーバーライドする</a></li>
+<li><a class="reference internal" href="#overriding-built-in-widget-templates">組み込みのウィジェットテンプレートをオーバーライドする</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="formsets.html"
+                          title="前の章へ">フォームセット (Formset) の関数</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="widgets.html"
+                          title="次の章へ">ウィジェット</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/forms/renderers.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="formsets.html" title="フォームセット (Formset) の関数">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="widgets.html" title="ウィジェット">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

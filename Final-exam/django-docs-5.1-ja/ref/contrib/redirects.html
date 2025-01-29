@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>redirects （リダイレクト）アプリ &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../../_static/default.css?v=bf4d74af" />
+    <script src="../../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../../genindex.html" />
+    <link rel="search" title="検索" href="../../search.html" />
+    <link rel="next" title="サイトマップ・フレームワーク" href="sitemaps.html" />
+    <link rel="prev" title="バリデータ (Validator)" href="postgres/validators.html" />
+
+
+
+ 
+<script src="../../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "../templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../../index.html">Home</a>  |
+        <a title="Table of contents" href="../../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../../genindex.html">Index</a>  |
+        <a title="Module index" href="../../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="postgres/validators.html" title="バリデータ (Validator)">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="sitemaps.html" title="サイトマップ・フレームワーク">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-contrib-redirects">
+            
+  <section id="s-module-django.contrib.redirects">
+<span id="s-the-redirects-app"></span><span id="module-django.contrib.redirects"></span><span id="the-redirects-app"></span><h1>redirects （リダイレクト）アプリ<a class="headerlink" href="#module-django.contrib.redirects" title="Link to this heading">¶</a></h1>
+<p>Django にはオプションで redirects (リダイレクト) アプリケーションが付属しています。リダイレクトをデータベースに保存し、リダイレクトを処理します。デフォルトでは HTTP 応答ステータスコード <code class="docutils literal notranslate"><span class="pre">301</span> <span class="pre">Moved</span> <span class="pre">Permanently</span></code> を使います。</p>
+<section id="s-installation">
+<span id="installation"></span><h2>インストール<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h2>
+<p>redirects アプリをインストールするには、以下の手順に従ってください:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">django.contrib.sites</span></code> フレームワークが <a class="reference internal" href="sites.html#enabling-the-sites-framework"><span class="std std-ref">インストールされていること</span></a> を確認してください。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'django.contrib.redirects'</span></code> を <a class="reference internal" href="../settings.html#std-setting-INSTALLED_APPS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code></a> 設定に追加します。</p></li>
+<li><p><a class="reference internal" href="../settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> 設定に <code class="docutils literal notranslate"><span class="pre">'django.contrib.redirects.middleware.RedirectFallbackMiddleware'</span></code> を追加します。</p></li>
+<li><p>コマンド <a class="reference internal" href="../django-admin.html#django-admin-migrate"><code class="xref std std-djadmin docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">migrate</span></code></a> を実行します。</p></li>
+</ol>
+</section>
+<section id="s-how-it-works">
+<span id="how-it-works"></span><h2>しくみ<a class="headerlink" href="#how-it-works" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">migrate</span></code> はデータベースに <code class="docutils literal notranslate"><span class="pre">django_redirect</span></code> テーブルを作成します。これは、 <code class="docutils literal notranslate"><span class="pre">site_id</span></code>、 <code class="docutils literal notranslate"><span class="pre">old_path</span></code>、および <code class="docutils literal notranslate"><span class="pre">new_path</span></code> フィールドを持つルックアップテーブルです。</p>
+<p><a class="reference internal" href="#django.contrib.redirects.middleware.RedirectFallbackMiddleware" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedirectFallbackMiddleware</span></code></a> が全ての作業を担当しています。Djangoアプリケーションが404エラーを発生させるたびに、このミドルウェアは要求されたURLが最終手段としてリダイレクトデータベースをチェックします。具体的には、与えられた <code class="docutils literal notranslate"><span class="pre">old_path</span></code> とサイトIDが <a class="reference internal" href="../settings.html#std-setting-SITE_ID"><code class="xref std std-setting docutils literal notranslate"><span class="pre">SITE_ID</span></code></a> 設定に対応するリダイレクトを確認します。</p>
+<ul class="simple">
+<li><p>一致するものが見つかり、かつ <code class="docutils literal notranslate"><span class="pre">new_path</span></code> が空でない場合、301 (&quot;Moved Permanently&quot;) リダイレクトで <code class="docutils literal notranslate"><span class="pre">new_path</span></code> にリダイレクトします。 <a class="reference internal" href="#django.contrib.redirects.middleware.RedirectFallbackMiddleware" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedirectFallbackMiddleware</span></code></a> をサブクラス化し、 <a class="reference internal" href="#django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class"><code class="xref py py-attr docutils literal notranslate"><span class="pre">response_redirect_class</span></code></a> を <a class="reference internal" href="../request-response.html#django.http.HttpResponseRedirect" title="django.http.HttpResponseRedirect"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.http.HttpResponseRedirect</span></code></a> に設定して、 <code class="docutils literal notranslate"><span class="pre">302</span> <span class="pre">Moved</span> <span class="pre">Temporarily</span></code> リダイレクトを代わりに使用できます。</p></li>
+<li><p>一致するものが見つかり、 <code class="docutils literal notranslate"><span class="pre">new_path</span></code> が空であれば、410 (&quot;Gone&quot;) HTTPヘッダーと空の (content-less) レスポンスを送信します。</p></li>
+<li><p>マッチするものが見つからない場合は、リクエストは通常通り処理されます。</p></li>
+</ul>
+<p>ミドルウェアは、404 エラーにのみアクティブ化され、500 エラーや他のステータスコードのレスポンスには適用されません。</p>
+<p><a class="reference internal" href="../settings.html#std-setting-MIDDLEWARE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">MIDDLEWARE</span></code></a> の順番は重要であることに注意してください。一般的に、 <a class="reference internal" href="#django.contrib.redirects.middleware.RedirectFallbackMiddleware" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedirectFallbackMiddleware</span></code></a> をリストの最後に置くべきです。それは最終手段として機能します。</p>
+<p>ミドルウェアについての詳細は <a class="reference internal" href="../../topics/http/middleware.html"><span class="doc">ミドルウェアのドキュメント</span></a> を参照してください。</p>
+</section>
+<section id="s-how-to-add-change-and-delete-redirects">
+<span id="how-to-add-change-and-delete-redirects"></span><h2>リダイレクトの追加、変更、削除方法<a class="headerlink" href="#how-to-add-change-and-delete-redirects" title="Link to this heading">¶</a></h2>
+<section id="s-via-the-admin-interface">
+<span id="via-the-admin-interface"></span><h3>admin インターフェイス経由<a class="headerlink" href="#via-the-admin-interface" title="Link to this heading">¶</a></h3>
+<p>Django の自動管理インターフェイスを有効にしていれば、管理インデックスページに &quot;Redirects&quot; セクションがあるはずです。システムの他のオブジェクトを編集するように、リダイレクトを編集してください。</p>
+</section>
+<section id="s-via-the-python-api">
+<span id="via-the-python-api"></span><h3>Python API 経由<a class="headerlink" href="#via-the-python-api" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.redirects.models.Redirect">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">models.</span></span><span class="sig-name descname"><span class="pre">Redirect</span></span><a class="headerlink" href="#django.contrib.redirects.models.Redirect" title="Link to this definition">¶</a></dt>
+<dd><p>リダイレクトは標準の <a class="reference internal" href="../../topics/db/models.html"><span class="doc">Django モデル</span></a> で表現され、 <a class="extlink-source reference external" href="https://github.com/django/django/blob/main/django/contrib/redirects/models.py">django/contrib/redirects/models.py</a> にあります。 リダイレクトオブジェクトには、<a class="reference internal" href="../../topics/db/queries.html"><span class="doc">DjangoデータベースAPI</span></a> を経由してアクセスできます。たとえば:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">settings</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.contrib.redirects.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">Redirect</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Add a new redirect.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">redirect</span> <span class="o">=</span> <span class="n">Redirect</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">site_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">old_path</span><span class="o">=</span><span class="s2">&quot;/contact-us/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">new_path</span><span class="o">=</span><span class="s2">&quot;/contact/&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Change a redirect.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">redirect</span><span class="o">.</span><span class="n">new_path</span> <span class="o">=</span> <span class="s2">&quot;/contact-details/&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">redirect</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">redirect</span>
+<span class="go">&lt;Redirect: /contact-us/ ---&gt; /contact-details/&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Delete a redirect.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Redirect</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">site_id</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">old_path</span><span class="o">=</span><span class="s2">&quot;/contact-us/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+<span class="go">(1, {&#39;redirects.Redirect&#39;: 1})</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-middleware">
+<span id="middleware"></span><h2>ミドルウェア<a class="headerlink" href="#middleware" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.contrib.redirects.middleware.RedirectFallbackMiddleware">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">middleware.</span></span><span class="sig-name descname"><span class="pre">RedirectFallbackMiddleware</span></span><a class="headerlink" href="#django.contrib.redirects.middleware.RedirectFallbackMiddleware" title="Link to this definition">¶</a></dt>
+<dd><p>ミドルウェアが使用する <a class="reference internal" href="../request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> クラスは、 <a class="reference internal" href="#django.contrib.redirects.middleware.RedirectFallbackMiddleware" title="django.contrib.redirects.middleware.RedirectFallbackMiddleware"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedirectFallbackMiddleware</span></code></a> のサブクラスを作成し、 <code class="docutils literal notranslate"><span class="pre">response_gone_class</span></code> や <code class="docutils literal notranslate"><span class="pre">response_redirect_class</span></code> をオーバーライドすることで変更できます。</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_gone_class">
+<span class="sig-name descname"><span class="pre">response_gone_class</span></span><a class="headerlink" href="#django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_gone_class" title="Link to this definition">¶</a></dt>
+<dd><p>要求されたパスが見つからないか、<code class="docutils literal notranslate"><span class="pre">new_path</span></code> に空の値が含まれている時に、 <a class="reference internal" href="#django.contrib.redirects.models.Redirect" title="django.contrib.redirects.models.Redirect"><code class="xref py py-class docutils literal notranslate"><span class="pre">Redirect</span></code></a> が見つからないときに使用される <a class="reference internal" href="../request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> クラス。</p>
+<p>デフォルトは <a class="reference internal" href="../request-response.html#django.http.HttpResponseGone" title="django.http.HttpResponseGone"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponseGone</span></code></a> です。</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class">
+<span class="sig-name descname"><span class="pre">response_redirect_class</span></span><a class="headerlink" href="#django.contrib.redirects.middleware.RedirectFallbackMiddleware.response_redirect_class" title="Link to this definition">¶</a></dt>
+<dd><p>リダイレクトを処理する <a class="reference internal" href="../request-response.html#django.http.HttpResponse" title="django.http.HttpResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponse</span></code></a> クラス。</p>
+<p>デフォルトは <a class="reference internal" href="../request-response.html#django.http.HttpResponsePermanentRedirect" title="django.http.HttpResponsePermanentRedirect"><code class="xref py py-class docutils literal notranslate"><span class="pre">HttpResponsePermanentRedirect</span></code></a> です。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">redirects （リダイレクト）アプリ</a><ul>
+<li><a class="reference internal" href="#installation">インストール</a></li>
+<li><a class="reference internal" href="#how-it-works">しくみ</a></li>
+<li><a class="reference internal" href="#how-to-add-change-and-delete-redirects">リダイレクトの追加、変更、削除方法</a><ul>
+<li><a class="reference internal" href="#via-the-admin-interface">admin インターフェイス経由</a></li>
+<li><a class="reference internal" href="#via-the-python-api">Python API 経由</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#middleware">ミドルウェア</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="postgres/validators.html"
+                          title="前の章へ">バリデータ (Validator)</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="sitemaps.html"
+                          title="次の章へ">サイトマップ・フレームワーク</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/ref/contrib/redirects.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="postgres/validators.html" title="バリデータ (Validator)">previous</a>
+     |
+    <a href="../index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="sitemaps.html" title="サイトマップ・フレームワーク">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>

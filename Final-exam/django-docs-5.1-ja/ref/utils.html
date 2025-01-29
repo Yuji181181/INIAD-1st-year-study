@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+
+<html lang="ja" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Django ユーティリティ (django.utils) &#8212; Django 5.1.6.dev20250122212402 ドキュメント</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=34bb78ad" />
+    <link rel="stylesheet" type="text/css" href="../_static/default.css?v=bf4d74af" />
+    <script src="../_static/documentation_options.js?v=d2885b0a"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/translations.js?v=4755f45a"></script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="バリデータ (Validator)" href="validators.html" />
+    <link rel="prev" title="URLconf で使用するための django.urls 関数" href="urls.html" />
+
+
+
+ 
+<script src="../templatebuiltins.js"></script>
+<script>
+(function($) {
+    if (!django_template_builtins) {
+       // templatebuiltins.js missing, do nothing.
+       return;
+    }
+    $(document).ready(function() {
+        // Hyperlink Django template tags and filters
+        var base = "templates/builtins.html";
+        if (base == "#") {
+            // Special case for builtins.html itself
+            base = "";
+        }
+        // Tags are keywords, class '.k'
+        $("div.highlight\\-html\\+django span.k").each(function(i, elem) {
+             var tagname = $(elem).text();
+             if ($.inArray(tagname, django_template_builtins.ttags) != -1) {
+                 var fragment = tagname.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + tagname + "</a>");
+             }
+        });
+        // Filters are functions, class '.nf'
+        $("div.highlight\\-html\\+django span.nf").each(function(i, elem) {
+             var filtername = $(elem).text();
+             if ($.inArray(filtername, django_template_builtins.tfilters) != -1) {
+                 var fragment = filtername.replace(/_/, '-');
+                 $(elem).html("<a href='" + base + "#" + fragment + "'>" + filtername + "</a>");
+             }
+        });
+    });
+})(jQuery);</script>
+
+  </head><body>
+
+    <div class="document">
+  <div id="custom-doc" class="yui-t6">
+    <div id="hd">
+      <h1><a href="../index.html">Django 5.1.6.dev20250122212402 ドキュメント</a></h1>
+      <div id="global-nav">
+        <a title="Home page" href="../index.html">Home</a>  |
+        <a title="Table of contents" href="../contents.html">Table of contents</a>  |
+        <a title="Global index" href="../genindex.html">Index</a>  |
+        <a title="Module index" href="../py-modindex.html">Modules</a>
+      </div>
+      <div class="nav">
+    &laquo; <a href="urls.html" title="URLconf で使用するための &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.urls&lt;/span&gt;&lt;/code&gt; 関数">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="validators.html" title="バリデータ (Validator)">next</a> &raquo;</div>
+    </div>
+
+    <div id="bd">
+      <div id="yui-main">
+        <div class="yui-b">
+          <div class="yui-g" id="ref-utils">
+            
+  <section id="s-module-django.utils">
+<span id="s-django-utils"></span><span id="module-django.utils"></span><span id="django-utils"></span><h1>Django ユーティリティ (<code class="docutils literal notranslate"><span class="pre">django.utils</span></code>)<a class="headerlink" href="#module-django.utils" title="Link to this heading">¶</a></h1>
+<p>このドキュメントは、<code class="docutils literal notranslate"><span class="pre">django.utils</span></code> のすべての安定したモジュールを対象としています。<code class="docutils literal notranslate"><span class="pre">django.utils</span></code> 内のほとんどのモジュールは内部使用を目的としていることから、 <a class="reference internal" href="../internals/release-process.html#internal-release-deprecation-policy"><span class="std std-ref">内部リリース非推奨ポリシー</span></a> に従い、以下に記載する内容のみが 安定版として提供され、また後方互換性を維持しています。</p>
+<section id="s-module-django.utils.cache">
+<span id="s-django-utils-cache"></span><span id="module-django.utils.cache"></span><span id="django-utils-cache"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.cache</span></code><a class="headerlink" href="#module-django.utils.cache" title="Link to this heading">¶</a></h2>
+<p>このモジュールには、HTTPキャッシュの制御を補助するための関数が含まれています。これは、レスポンスの <code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダーを管理することによって行います。レスポンスオブジェクトのヘッダーを直接パッチするための関数や、そのヘッダーパッチを行うためのデコレータも含まれています。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダーについての詳細は、 <span class="target" id="index-16"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-12.5.5"><strong>RFC 9110 Section 12.5.5</strong></a> を参照してください。</p>
+<p>基本的に、 <code class="docutils literal notranslate"><span class="pre">Vary</span></code> HTTPヘッダーは、キャッシュがキャッシュキーを構築する際に考慮すべきヘッダーを定義します。同一パスのリクエストであっても、 <code class="docutils literal notranslate"><span class="pre">Vary</span></code> で指定されたヘッダーの内容が異なる場合は、誤ったコンテンツの配信を防ぐために異なるキャッシュキーを取得する必要があります。</p>
+<p>たとえば、<a class="reference internal" href="../topics/i18n/index.html"><span class="doc">国際化のためのミドルウェア</span></a> は、<code class="docutils literal notranslate"><span class="pre">Accept-language</span></code> ヘッダーによってキャッシュを区別するようにしています。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.cache.patch_cache_control">
+<span class="sig-name descname"><span class="pre">patch_cache_control</span></span>(<em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/cache.py#L34"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.cache.patch_cache_control" title="Link to this definition">¶</a></dt>
+<dd><p>この関数は、キーワード引数を <code class="docutils literal notranslate"><span class="pre">Cache-Control</span></code> ヘッダーに追加することで、ヘッダーをパッチします。変換する内容は以下の通りです。</p>
+<ul class="simple">
+<li><p>すべてのキーワードパラメータ名を小文字に変換し、アンダースコアをハイフンに変換する</p></li>
+<li><p>パラメータの値が <code class="docutils literal notranslate"><span class="pre">True</span></code> （実質的な真の値ではなく、正確に <code class="docutils literal notranslate"><span class="pre">True</span></code> ）である場合、ヘッダーにはパラメータ名のみを追加する</p></li>
+<li><p>すべての他のパラメータは、その値に <code class="docutils literal notranslate"><span class="pre">str()</span></code> を適用した後に追加する</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.cache.get_max_age">
+<span class="sig-name descname"><span class="pre">get_max_age</span></span>(<em class="sig-param"><span class="n"><span class="pre">response</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/cache.py#L103"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.cache.get_max_age" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスのCache-Controlヘッダーから max-age を整数として返します（見つからなかった場合や整数でなかった場合は <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します）。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.cache.patch_response_headers">
+<span class="sig-name descname"><span class="pre">patch_response_headers</span></span>(<em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/cache.py#L270"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.cache.patch_response_headers" title="Link to this definition">¶</a></dt>
+<dd><p>与えられた <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> オブジェクトに以下のような便利なヘッダーを追加します。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Expires</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Cache-Control</span></code></p></li>
+</ul>
+<p>それぞれのヘッダーは、未設定の場合にのみ追加されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">cache_timeout</span></code> は秒単位で指定します。デフォルトでは、 <a class="reference internal" href="settings.html#std-setting-CACHE_MIDDLEWARE_SECONDS"><code class="xref std std-setting docutils literal notranslate"><span class="pre">CACHE_MIDDLEWARE_SECONDS</span></code></a> の値が使用されます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.cache.add_never_cache_headers">
+<span class="sig-name descname"><span class="pre">add_never_cache_headers</span></span>(<em class="sig-param"><span class="n"><span class="pre">response</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/cache.py#L289"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.cache.add_never_cache_headers" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">Expires</span></code> ヘッダーを現在の日付/時刻で設定します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">Cache-Control:</span> <span class="pre">max-age=0,</span> <span class="pre">no-cache,</span> <span class="pre">no-store,</span> <span class="pre">must-revalidate,</span> <span class="pre">private</span></code> ヘッダーをレスポンスに追加し、ページがキャッシュされないように設定します。</p>
+<p>それぞれのヘッダーは、未設定の場合にのみ追加されます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.cache.patch_vary_headers">
+<span class="sig-name descname"><span class="pre">patch_vary_headers</span></span>(<em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newheaders</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/cache.py#L299"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.cache.patch_vary_headers" title="Link to this definition">¶</a></dt>
+<dd><p>与えられた <code class="docutils literal notranslate"><span class="pre">HttpResponse</span></code> オブジェクトに、 <code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダーを追加（または更新）します。 <code class="docutils literal notranslate"><span class="pre">newheaders</span></code> は、<code class="docutils literal notranslate"><span class="pre">Vary</span></code> に含まれるべきヘッダー名のリストです。ヘッダーにアスタリスクが含まれている場合、 <span class="target" id="index-17"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-12.5.5"><strong>RFC 9110 Section 12.5.5</strong></a> に従い  <code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダーは単一のアスタリスク <code class="docutils literal notranslate"><span class="pre">'*'</span></code> で構成されます。それ以外の場合、<code class="docutils literal notranslate"><span class="pre">Vary</span></code> の既存のヘッダーは削除されません。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.cache.get_cache_key">
+<span class="sig-name descname"><span class="pre">get_cache_key</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'GET'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/cache.py#L377"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.cache.get_cache_key" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストのパスに基づいたキャッシュキーを返します。グローバルパスレジストリから考慮すべきヘッダーのリストを取得してそれを使用してキャッシュキーを構築するため、リクエストフェーズで使用できます。</p>
+<p>ヘッダーリストが保存されていない場合、ページを再構築する必要があるので、この関数は <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.cache.learn_cache_key">
+<span class="sig-name descname"><span class="pre">learn_cache_key</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/cache.py#L399"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.cache.learn_cache_key" title="Link to this definition">¶</a></dt>
+<dd><p>レスポンスオブジェクトから、特定のリクエストパスに対してどのヘッダーを考慮する必要があるかを学習します。それらのヘッダーはグローバルパスレジストリに格納されるため、後からそのパスにアクセスした際には、レスポンスオブジェクト自体を構築することなく、どのヘッダーを考慮する必要があるかがわかります。ヘッダーはレスポンスの <code class="docutils literal notranslate"><span class="pre">Vary</span></code> ヘッダーで指定されますが、レスポンスの生成は防ぎたいでしょう。</p>
+<p>キャッシュキー生成に使用するヘッダーのリストは、ページ自体と同じキャッシュ内に保存されています。キャッシュがあるデータを破棄する場合、Varyヘッダーとキャッシュキー生成に使用するヘッダーのリストを取得するために、レスポンスを構築する必要があります。</p>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.dateparse">
+<span id="s-django-utils-dateparse"></span><span id="module-django.utils.dateparse"></span><span id="django-utils-dateparse"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.dateparse</span></code><a class="headerlink" href="#module-django.utils.dateparse" title="Link to this heading">¶</a></h2>
+<p>このモジュールで定義された関数は、以下の特性を共有しています：</p>
+<ul class="simple">
+<li><p>ISO 8601 日付/時刻形式の文字列（またはそれに近い代替形式）を受け付け、Python の <a class="reference external" href="https://docs.python.org/3/library/datetime.html#module-datetime" title="(in Python v3.13)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">datetime</span></code></a> モジュールにある対応するクラスからオブジェクトを返します。</p></li>
+<li><p>入力が適切にフォーマットされているが、有効な日付や時刻ではない場合、 <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> を発生させます。</p></li>
+<li><p>それが全く適切にフォーマットされていない場合、 <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します。</p></li>
+<li><p>入力ではピコ秒単位まで受け付けますが、Pythonがサポートしているマイクロ秒単位に切り捨てられます。</p></li>
+</ul>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.dateparse.parse_date">
+<span class="sig-name descname"><span class="pre">parse_date</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/dateparse.py#L67"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.dateparse.parse_date" title="Link to this definition">¶</a></dt>
+<dd><p>文字列を解析し、<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.date" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.date</span></code></a> を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.dateparse.parse_time">
+<span class="sig-name descname"><span class="pre">parse_time</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/dateparse.py#L81"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.dateparse.parse_time" title="Link to this definition">¶</a></dt>
+<dd><p>文字列を解析し、<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.time" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.time</span></code></a> を返します。</p>
+<p>UTC オフセットはサポートされていません; もし <code class="docutils literal notranslate"><span class="pre">value</span></code> がそれを記述している場合、結果は <code class="docutils literal notranslate"><span class="pre">None</span></code> です。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.dateparse.parse_datetime">
+<span class="sig-name descname"><span class="pre">parse_datetime</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/dateparse.py#L104"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.dateparse.parse_datetime" title="Link to this definition">¶</a></dt>
+<dd><p>文字列を解析し、<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.datetime</span></code></a> を返します。</p>
+<p>UTC オフセットに対応しています。もし <code class="docutils literal notranslate"><span class="pre">value</span></code> がそれを記述している場合、結果の <code class="docutils literal notranslate"><span class="pre">tzinfo</span></code> 属性は <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timezone" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.timezone</span></code></a> インスタンスになります。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.dateparse.parse_duration">
+<span class="sig-name descname"><span class="pre">parse_duration</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/dateparse.py#L132"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.dateparse.parse_duration" title="Link to this definition">¶</a></dt>
+<dd><p>文字列を解析し、 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.timedelta</span></code></a> を返します。</p>
+<p>データは、 <code class="docutils literal notranslate"><span class="pre">&quot;DD</span> <span class="pre">HH:MM:SS.uuuuuu&quot;</span></code> 、 <code class="docutils literal notranslate"><span class="pre">&quot;DD</span> <span class="pre">HH:MM:SS,uuuuuu&quot;</span></code> の形式、または ISO 8601 で指定された形式 (例えば、<code class="docutils literal notranslate"><span class="pre">P4DT1H15M20S</span></code> は <code class="docutils literal notranslate"><span class="pre">4</span> <span class="pre">1:15:20</span></code> に相当) や PostgreSQL の日時間隔形式 (例えば、<code class="docutils literal notranslate"><span class="pre">3</span> <span class="pre">days</span> <span class="pre">04:05:06</span></code>) であることを期待します。</p>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.decorators">
+<span id="s-django-utils-decorators"></span><span id="module-django.utils.decorators"></span><span id="django-utils-decorators"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.decorators</span></code><a class="headerlink" href="#module-django.utils.decorators" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.decorators.method_decorator">
+<span class="sig-name descname"><span class="pre">method_decorator</span></span>(<em class="sig-param"><span class="n"><span class="pre">decorator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/decorators.py#L58"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.decorators.method_decorator" title="Link to this definition">¶</a></dt>
+<dd><p>関数デコレータをメソッドデコレータに変換します。これは、メソッドまたはクラスをデコレートするのに使用できます。後者の場合、 <code class="docutils literal notranslate"><span class="pre">name</span></code> はデコレートされるメソッドの名前であり、必須です。</p>
+<p><code class="docutils literal notranslate"><span class="pre">decorator</span></code> は関数のリストまたはタプルでも構いません。それらは逆順でラップされるため、呼び出しの順序は関数がリスト/タプル内に登場する順序となります。</p>
+<p>使用方法の例については、 <a class="reference internal" href="../topics/class-based-views/intro.html#id1"><span class="std std-ref">クラスベースビューのデコレート</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.decorators.decorator_from_middleware">
+<span class="sig-name descname"><span class="pre">decorator_from_middleware</span></span>(<em class="sig-param"><span class="n"><span class="pre">middleware_class</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/decorators.py#L111"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.decorators.decorator_from_middleware" title="Link to this definition">¶</a></dt>
+<dd><p>ミドルウェアクラスが与えられた場合、ビューデコレータを返します。これにより、ミドルウェアの機能をビューごとに使用できます。ミドルウェアは、パラメータを渡さずに作成されます。</p>
+<p>これは、Django 1.9以前の古いスタイルと互換性のあるミドルウェアを想定しています（<code class="docutils literal notranslate"><span class="pre">process_request()</span></code>, <code class="docutils literal notranslate"><span class="pre">process_exception()</span></code>, <code class="docutils literal notranslate"><span class="pre">process_response()</span></code> のようなメソッドを持っている）。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.decorators.decorator_from_middleware_with_args">
+<span class="sig-name descname"><span class="pre">decorator_from_middleware_with_args</span></span>(<em class="sig-param"><span class="n"><span class="pre">middleware_class</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/decorators.py#L95"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.decorators.decorator_from_middleware_with_args" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">decorator_from_middleware</span></code> と似ていますが、<code class="docutils literal notranslate"><span class="pre">middleware_class</span></code> に渡す引数を受け入れる関数を返します。例えば、<a class="reference internal" href="../topics/cache.html#django.views.decorators.cache.cache_page" title="django.views.decorators.cache.cache_page"><code class="xref py py-func docutils literal notranslate"><span class="pre">cache_page()</span></code></a> デコレータは <code class="docutils literal notranslate"><span class="pre">CacheMiddleware</span></code> からこのように作成されます：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cache_page</span> <span class="o">=</span> <span class="n">decorator_from_middleware_with_args</span><span class="p">(</span><span class="n">CacheMiddleware</span><span class="p">)</span>
+
+
+<span class="nd">@cache_page</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">my_view</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.decorators.sync_only_middleware">
+<span class="sig-name descname"><span class="pre">sync_only_middleware</span></span>(<em class="sig-param"><span class="n"><span class="pre">middleware</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/decorators.py#L211"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.decorators.sync_only_middleware" title="Link to this definition">¶</a></dt>
+<dd><p>ミドルウェアを <a class="reference internal" href="../topics/http/middleware.html#async-middleware"><span class="std std-ref">同期専用</span></a> としてマークします。(これはDjangoのデフォルトですが、将来的にデフォルトが変更された場合に備えて、あらかじめ設定しておくことを可能にします。)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.decorators.async_only_middleware">
+<span class="sig-name descname"><span class="pre">async_only_middleware</span></span>(<em class="sig-param"><span class="n"><span class="pre">middleware</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/decorators.py#L221"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.decorators.async_only_middleware" title="Link to this definition">¶</a></dt>
+<dd><p>ミドルウェアを <a class="reference internal" href="../topics/http/middleware.html#async-middleware"><span class="std std-ref">非同期専用</span></a> としてマークします。WSGIリクエストパスから呼び出されたとき、Djangoはそれを非同期イベントループでラップします。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.decorators.sync_and_async_middleware">
+<span class="sig-name descname"><span class="pre">sync_and_async_middleware</span></span>(<em class="sig-param"><span class="n"><span class="pre">middleware</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/decorators.py#L201"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.decorators.sync_and_async_middleware" title="Link to this definition">¶</a></dt>
+<dd><p>ミドルウェアを <a class="reference internal" href="../topics/http/middleware.html#async-middleware"><span class="std std-ref">同期および非同期互換</span></a> としてマークすることで、リクエストの変換を避けることができます。このデコレータを使用するためには、現在のリクエストタイプの検出を実装する必要があります。詳細については、<a class="reference internal" href="../topics/http/middleware.html#async-middleware"><span class="std std-ref">非同期ミドルウェアのドキュメント</span></a> を参照してください。</p>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.encoding">
+<span id="s-django-utils-encoding"></span><span id="module-django.utils.encoding"></span><span id="django-utils-encoding"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.encoding</span></code><a class="headerlink" href="#module-django.utils.encoding" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.smart_str">
+<span class="sig-name descname"><span class="pre">smart_str</span></span>(<em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strings_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L20"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.smart_str" title="Link to this definition">¶</a></dt>
+<dd><p>任意のオブジェクト <code class="docutils literal notranslate"><span class="pre">s</span></code> を表す <code class="docutils literal notranslate"><span class="pre">str</span></code> オブジェクトを返します。バイトストリングは <code class="docutils literal notranslate"><span class="pre">encoding</span></code> コーデックを使用して処理します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">strings_only</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、(いくつかの) 非文字列型オブジェクトを変換しないでください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.is_protected_type">
+<span class="sig-name descname"><span class="pre">is_protected_type</span></span>(<em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L44"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.is_protected_type" title="Link to this definition">¶</a></dt>
+<dd><p>オブジェクトインスタンスが保護された型であるかどうかを判断します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">force_str(strings_only=True)</span></code> に渡された際に、保護された型のオブジェクトはそのまま保持されます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.force_str">
+<span class="sig-name descname"><span class="pre">force_str</span></span>(<em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strings_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L53"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.force_str" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">smart_str()</span></code> に似ていますが、遅延インスタンスは遅延オブジェクトとして保持されるのではなく、文字列に変換されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">strings_only</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、(いくつかの) 非文字列型オブジェクトを変換しないでください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.smart_bytes">
+<span class="sig-name descname"><span class="pre">smart_bytes</span></span>(<em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strings_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L75"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.smart_bytes" title="Link to this definition">¶</a></dt>
+<dd><p>任意のオブジェクト <code class="docutils literal notranslate"><span class="pre">s</span></code> を、 <code class="docutils literal notranslate"><span class="pre">encoding</span></code> で指定された方法でエンコードされたバイト文字列バージョンを返します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">strings_only</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、(いくつかの) 非文字列型オブジェクトを変換しないでください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.force_bytes">
+<span class="sig-name descname"><span class="pre">force_bytes</span></span>(<em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strings_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">errors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'strict'</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L87"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.force_bytes" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">smart_bytes</span></code> に似ていますが、遅延インスタンスは遅延オブジェクトとして保持されるのではなく、バイト文字列に解決されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">strings_only</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、(いくつかの) 非文字列型オブジェクトを変換しないでください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.iri_to_uri">
+<span class="sig-name descname"><span class="pre">iri_to_uri</span></span>(<em class="sig-param"><span class="n"><span class="pre">iri</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L107"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.iri_to_uri" title="Link to this definition">¶</a></dt>
+<dd><p>国際化リソース識別子 (IRI) の一部を、URL に含めるのに適した URI の一部に変換します。</p>
+<p>これは、入力が任意のバイトストリームではなく文字列であると仮定しているため、若干単純化された、セクション3.1の <span class="target" id="index-18"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3987.html#section-3.1"><strong>RFC 3987 Section 3.1</strong></a> のアルゴリズムです。</p>
+<p>IRI (文字列または UTF-8 バイト) を取得し、エンコードされた結果を含む文字列を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.uri_to_iri">
+<span class="sig-name descname"><span class="pre">uri_to_iri</span></span>(<em class="sig-param"><span class="n"><span class="pre">uri</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L155"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.uri_to_iri" title="Link to this definition">¶</a></dt>
+<dd><p>統一リソース識別子（URI）を国際化リソース識別子（IRI）に変換します。</p>
+<p>これは <span class="target" id="index-19"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc3987.html#section-3.2"><strong>RFC 3987 Section 3.2</strong></a> のセクション3.2からのアルゴリズムです。</p>
+<p>ASCII バイトで表される URI を受け取り、エンコードされた結果を含む文字列を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.filepath_to_uri">
+<span class="sig-name descname"><span class="pre">filepath_to_uri</span></span>(<em class="sig-param"><span class="n"><span class="pre">path</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L233"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.filepath_to_uri" title="Link to this definition">¶</a></dt>
+<dd><p>ファイルシステムのパスを、URLに含めるのに適したURI部分に変換します。パスは、UTF-8バイト、文字列、または <a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Path</span></code></a> のいずれかであると想定されます。</p>
+<p>このメソッドは、通常URIの特別な文字として認識される特定の文字をエンコードします。このメソッドは、URI内で有効な文字であるため、「'」文字をエンコードしないことに注意してください。詳細については、 <code class="docutils literal notranslate"><span class="pre">encodeURIComponent()</span></code> JavaScript関数をご覧ください。</p>
+<p>エンコードされた結果を含む ASCII 文字列を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.encoding.escape_uri_path">
+<span class="sig-name descname"><span class="pre">escape_uri_path</span></span>(<em class="sig-param"><span class="n"><span class="pre">path</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/encoding.py#L191"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.encoding.escape_uri_path" title="Link to this definition">¶</a></dt>
+<dd><p>URI (Uniform Resource Identifier) のパス部分から安全でない文字をエスケープします。</p>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.feedgenerator">
+<span id="s-django-utils-feedgenerator"></span><span id="module-django.utils.feedgenerator"></span><span id="django-utils-feedgenerator"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.feedgenerator</span></code><a class="headerlink" href="#module-django.utils.feedgenerator" title="Link to this heading">¶</a></h2>
+<p>使用例：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">feedgenerator</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feed</span> <span class="o">=</span> <span class="n">feedgenerator</span><span class="o">.</span><span class="n">Rss201rev2Feed</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Poynter E-Media Tidbits&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">link</span><span class="o">=</span><span class="s2">&quot;https://www.poynter.org/tag/e-media-tidbits/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;A group blog by the sharpest minds in online media/journalism/publishing.&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">language</span><span class="o">=</span><span class="s2">&quot;en&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feed</span><span class="o">.</span><span class="n">add_item</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">link</span><span class="o">=</span><span class="s2">&quot;https://www.holovaty.com/test/&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Testing.&quot;</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;test.rss&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fp</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">feed</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fp</span><span class="p">,</span> <span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+<span class="gp">...</span>
+</pre></div>
+</div>
+<p>ジェネレータの選択を簡略化するには、現在は <code class="docutils literal notranslate"><span class="pre">Rss201rev2Feed</span></code> である <code class="docutils literal notranslate"><span class="pre">feedgenerator.DefaultFeed</span></code> を使用します。</p>
+<p>異なるバージョンのRSSの定義については、こちらを参照してください: <a class="reference external" href="https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss">https://web.archive.org/web/20110718035220/http://diveintomark.org/archives/2004/02/04/incompatible-rss</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.get_tag_uri">
+<span class="sig-name descname"><span class="pre">get_tag_uri</span></span>(<em class="sig-param"><span class="n"><span class="pre">url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L46"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.get_tag_uri" title="Link to this definition">¶</a></dt>
+<dd><p>TagURI を作成します。</p>
+<p>参考: <a class="reference external" href="https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id">https://web.archive.org/web/20110514113830/http://diveintomark.org/archives/2004/05/28/howto-atom-id</a></p>
+</dd></dl>
+
+<section id="s-syndicationfeed">
+<span id="syndicationfeed"></span><h3><code class="docutils literal notranslate"><span class="pre">SyndicationFeed</span></code><a class="headerlink" href="#syndicationfeed" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SyndicationFeed</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L60"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed" title="Link to this definition">¶</a></dt>
+<dd><p>すべての配信 (syndication) フィードの基底クラスです。サブクラスでは <code class="docutils literal notranslate"><span class="pre">write()</span></code> を提供すべきです。</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span>(<em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">language</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author_email</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author_link</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subtitle</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categories</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_url</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_copyright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feed_guid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L63"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.__init__" title="Link to this definition">¶</a></dt>
+<dd><p>与えられたメタデータの辞書でフィードを初期化します。これはフィード全体に適用されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">__init__</span></code> に渡した追加のキーワード引数は、<code class="docutils literal notranslate"><span class="pre">self.feed</span></code> に格納されます。</p>
+<p>すべてのパラメータは文字列でなければなりませんが、 <code class="docutils literal notranslate"><span class="pre">categories</span></code> のみ文字列のシーケンスであるべきです。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.add_item">
+<span class="sig-name descname"><span class="pre">add_item</span></span>(<em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author_email</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">author_link</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pubdate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">categories</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">()</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item_copyright</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ttl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">updateddate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enclosures</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L102"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.add_item" title="Link to this definition">¶</a></dt>
+<dd><p>フィードにアイテムを追加します。すべての引数は文字列であることが前提ですが、 <code class="docutils literal notranslate"><span class="pre">pubdate</span></code> と <code class="docutils literal notranslate"><span class="pre">updateddate</span></code> は <code class="docutils literal notranslate"><span class="pre">datetime.datetime</span></code> オブジェクトであり、 <code class="docutils literal notranslate"><span class="pre">enclosures</span></code> は <code class="docutils literal notranslate"><span class="pre">Enclosure</span></code> インスタンスのリストです。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.num_items">
+<span class="sig-name descname"><span class="pre">num_items</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L152"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.num_items" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.root_attributes">
+<span class="sig-name descname"><span class="pre">root_attributes</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L155"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.root_attributes" title="Link to this definition">¶</a></dt>
+<dd><p>ルート (つまり、feed/channel) 要素に配置する追加の属性を返します。 <code class="docutils literal notranslate"><span class="pre">write()</span></code> から呼び出されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.add_root_elements">
+<span class="sig-name descname"><span class="pre">add_root_elements</span></span>(<em class="sig-param"><span class="n"><span class="pre">handler</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L162"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.add_root_elements" title="Link to this definition">¶</a></dt>
+<dd><p>ルート(つまり、feed/channel)要素に要素を追加します。<code class="docutils literal notranslate"><span class="pre">write()</span></code> から呼び出されます。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.item_attributes">
+<span class="sig-name descname"><span class="pre">item_attributes</span></span>(<em class="sig-param"><span class="n"><span class="pre">item</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L169"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.item_attributes" title="Link to this definition">¶</a></dt>
+<dd><p>各アイテム(つまり item/entry 要素)に配置するための追加属性を返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.add_item_elements">
+<span class="sig-name descname"><span class="pre">add_item_elements</span></span>(<em class="sig-param"><span class="n"><span class="pre">handler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">item</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L175"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.add_item_elements" title="Link to this definition">¶</a></dt>
+<dd><p>各アイテム（すなわち、item/entry）要素に要素を追加します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.write">
+<span class="sig-name descname"><span class="pre">write</span></span>(<em class="sig-param"><span class="n"><span class="pre">outfile</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L181"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.write" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたエンコーディングでフィードを <code class="docutils literal notranslate"><span class="pre">outfile</span></code> に出力します。これはファイルライクオブジェクトです。サブクラスではこれをオーバーライドするべきです。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.writeString">
+<span class="sig-name descname"><span class="pre">writeString</span></span>(<em class="sig-param"><span class="n"><span class="pre">encoding</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L190"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.writeString" title="Link to this definition">¶</a></dt>
+<dd><p>指定されたエンコーディングでフィードを文字列として返します。</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.SyndicationFeed.latest_post_date">
+<span class="sig-name descname"><span class="pre">latest_post_date</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L198"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.SyndicationFeed.latest_post_date" title="Link to this definition">¶</a></dt>
+<dd><p>フィード内のすべてのアイテムの中で最新の <code class="docutils literal notranslate"><span class="pre">pubdate</span></code> または <code class="docutils literal notranslate"><span class="pre">updateddate</span></code> を返します。これらの属性を持つアイテムがない場合は、現在のUTC日付/時間を返します。</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="s-enclosure">
+<span id="enclosure"></span><h3><code class="docutils literal notranslate"><span class="pre">Enclosure</span></code><a class="headerlink" href="#enclosure" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.Enclosure">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Enclosure</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L216"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.Enclosure" title="Link to this definition">¶</a></dt>
+<dd><p>RSSエンクロージャを表します</p>
+</dd></dl>
+
+</section>
+<section id="s-rssfeed">
+<span id="rssfeed"></span><h3><code class="docutils literal notranslate"><span class="pre">RssFeed</span></code><a class="headerlink" href="#rssfeed" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.RssFeed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RssFeed</span></span>(<em class="sig-param"><span class="n"><span class="pre">SyndicationFeed</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L225"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.RssFeed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="s-rss201rev2feed">
+<span id="rss201rev2feed"></span><h3><code class="docutils literal notranslate"><span class="pre">Rss201rev2Feed</span></code><a class="headerlink" href="#rss201rev2feed" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.Rss201rev2Feed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Rss201rev2Feed</span></span>(<em class="sig-param"><span class="n"><span class="pre">RssFeed</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L282"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.Rss201rev2Feed" title="Link to this definition">¶</a></dt>
+<dd><p>仕様: <a class="reference external" href="https://cyber.harvard.edu/rss/rss.html">https://cyber.harvard.edu/rss/rss.html</a></p>
+</dd></dl>
+
+</section>
+<section id="s-rssuserland091feed">
+<span id="rssuserland091feed"></span><h3><code class="docutils literal notranslate"><span class="pre">RssUserland091Feed</span></code><a class="headerlink" href="#rssuserland091feed" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.RssUserland091Feed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">RssUserland091Feed</span></span>(<em class="sig-param"><span class="n"><span class="pre">RssFeed</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L272"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.RssUserland091Feed" title="Link to this definition">¶</a></dt>
+<dd><p>仕様: <a class="reference external" href="http://backend.userland.com/rss091">http://backend.userland.com/rss091</a></p>
+</dd></dl>
+
+</section>
+<section id="s-atom1feed">
+<span id="atom1feed"></span><h3><code class="docutils literal notranslate"><span class="pre">Atom1Feed</span></code><a class="headerlink" href="#atom1feed" title="Link to this heading">¶</a></h3>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.feedgenerator.Atom1Feed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Atom1Feed</span></span>(<em class="sig-param"><span class="n"><span class="pre">SyndicationFeed</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/feedgenerator.py#L342"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.feedgenerator.Atom1Feed" title="Link to this definition">¶</a></dt>
+<dd><p>仕様: <span class="target" id="index-20"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc4287.html"><strong>RFC 4287</strong></a></p>
+</dd></dl>
+
+</section>
+</section>
+<section id="s-module-django.utils.functional">
+<span id="s-django-utils-functional"></span><span id="module-django.utils.functional"></span><span id="django-utils-functional"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.functional</span></code><a class="headerlink" href="#module-django.utils.functional" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.functional.cached_property">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cached_property</span></span>(<em class="sig-param"><span class="n"><span class="pre">func</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/functional.py#L7"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.functional.cached_property" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">&#64;cached_property</span></code> デコレータは、単一の <code class="docutils literal notranslate"><span class="pre">self</span></code> 引数を持つメソッドの結果をプロパティとしてキャッシュします。キャッシュされた結果はインスタンスが存在する限り永続しますので、インスタンスが渡され、その後関数が呼び出された場合、キャッシュされた結果が返されます。</p>
+<p>典型的なケースを考えてみましょう。ビューがモデルのメソッドを呼び出して計算を行った後に、テンプレートが再度メソッドを呼び出してモデルインスタンスをコンテキストに配置することがあるでしょう。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># the model</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">friends</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># expensive computation</span>
+        <span class="o">...</span>
+        <span class="k">return</span> <span class="n">friends</span>
+
+
+<span class="c1"># in the view:</span>
+<span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">friends</span><span class="p">():</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>テンプレートは次のように記述します。</p>
+<div class="highlight-html+django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">for</span> <span class="nv">friend</span> <span class="k">in</span> <span class="nv">person.friends</span> <span class="cp">%}</span>
+</pre></div>
+</div>
+<p>この場合、 <code class="docutils literal notranslate"><span class="pre">friends()</span></code> が2回呼び出されます。ビューとテンプレートのインスタンス <code class="docutils literal notranslate"><span class="pre">person</span></code> は同一なので、 <code class="docutils literal notranslate"><span class="pre">friends()</span></code> メソッドに <code class="docutils literal notranslate"><span class="pre">&#64;cached_property</span></code> をつけることで、呼び出しの重複を回避できます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">cached_property</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Person</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="nd">@cached_property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">friends</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p>なお、メソッドがプロパティになったため、Pythonのコードからのアクセスが変わっていることに注意してください。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># in the view:</span>
+<span class="k">if</span> <span class="n">person</span><span class="o">.</span><span class="n">friends</span><span class="p">:</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>キャッシュされた値は、インスタンスの通常の属性のように扱うことができます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># clear it, requiring re-computation next time it&#39;s called</span>
+<span class="k">del</span> <span class="n">person</span><span class="o">.</span><span class="n">friends</span>  <span class="c1"># or delattr(person, &quot;friends&quot;)</span>
+
+<span class="c1"># set a value manually, that will persist on the instance until cleared</span>
+<span class="n">person</span><span class="o">.</span><span class="n">friends</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Huckleberry Finn&quot;</span><span class="p">,</span> <span class="s2">&quot;Tom Sawyer&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p><a class="reference external" href="https://docs.python.org/3/reference/datamodel.html#descriptor-invocation" title="(in Python v3.13)"><span class="xref std std-ref">descriptor protocol</span></a> の挙動の都合で、アクセスされていない <code class="docutils literal notranslate"><span class="pre">cached_property</span></code> に対して <code class="docutils literal notranslate"><span class="pre">del</span></code> （または <code class="docutils literal notranslate"><span class="pre">delattr</span></code> ）を使用すると <code class="docutils literal notranslate"><span class="pre">AttributeError</span></code> が発生します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">&#64;cached_property</span></code> はパフォーマンスの利点をもたらすだけでなく、属性の値がインスタンスが有効なうちに予期せず変更されないことも保証します。これは、 <code class="docutils literal notranslate"><span class="pre">datetime.now()</span></code> に基づいて計算されるメソッドや、同一のインスタンスのメソッドを呼び出している間に他のプロセスによって変更がデータベースに保存された場合などに発生する可能性があります。</p>
+<p>また、メソッドのキャッシュされたプロパティを作成することもできます。たとえば、高コストな <code class="docutils literal notranslate"><span class="pre">get_friends()</span></code> メソッドを持っており、キャッシュされた値を取得せずに呼び出すことを許可したい場合、次のように記述できます。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">friends</span> <span class="o">=</span> <span class="n">cached_property</span><span class="p">(</span><span class="n">get_friends</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">person.get_friends()</span></code> を呼び出すたびに <code class="docutils literal notranslate"><span class="pre">friends</span></code> は再計算されますが、キャッシュされたプロパティの値は、上記の説明に従って削除するまで永続します。</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">x</span> <span class="o">=</span> <span class="n">person</span><span class="o">.</span><span class="n">friends</span>  <span class="c1"># calls first time</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">person</span><span class="o">.</span><span class="n">get_friends</span><span class="p">()</span>  <span class="c1"># calls again</span>
+<span class="n">z</span> <span class="o">=</span> <span class="n">person</span><span class="o">.</span><span class="n">friends</span>  <span class="c1"># does not call</span>
+<span class="n">x</span> <span class="ow">is</span> <span class="n">z</span>  <span class="c1"># is True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.functional.classproperty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">classproperty</span></span>(<em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/functional.py#L51"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.functional.classproperty" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#classmethod" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">&#64;classmethod</span></code></a> と同様に、 <code class="docutils literal notranslate"><span class="pre">&#64;classproperty</span></code> デコレータは単一の <code class="docutils literal notranslate"><span class="pre">cls</span></code> 引数をもつメソッドの結果をクラスから直接アクセスできるプロパティに変換します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.functional.keep_lazy">
+<span class="sig-name descname"><span class="pre">keep_lazy</span></span>(<em class="sig-param"><span class="n"><span class="pre">func</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">resultclasses</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/functional.py#L211"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.functional.keep_lazy" title="Link to this definition">¶</a></dt>
+<dd><p>Djangoでは、文字列を最初の引数として受け取り、その文字列に何らかの処理を行う多くのユーティリティ関数を（特に <code class="docutils literal notranslate"><span class="pre">django.utils</span></code> において）提供しています。これらの関数は、テンプレートフィルタや他のコード内で直接使用されます。</p>
+<p>独自の類似機能を書いて、翻訳を扱う際に、最初の引数が遅延評価の翻訳オブジェクトだった場合に何をすべきかという問題に直面します。この機能がビューの外部で使用される可能性があるため(その場合、現在のスレッドのロケール設定が正しくない可能性があります)、すぐに文字列に変換したくないでしょう。</p>
+<p>このような場合には、<code class="docutils literal notranslate"><span class="pre">django.utils.functional.keep_lazy()</span></code> デコレータを使用してください。これは、関数が引数の1つとして遅延評価される翻訳を持つ場合に、関数の評価を文字列に変換する必要があるまで遅らせるように変更します。</p>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">keep_lazy</span><span class="p">,</span> <span class="n">keep_lazy_text</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">fancy_utility_function</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="c1"># Do some conversion on string &#39;s&#39;</span>
+    <span class="o">...</span>
+
+
+<span class="n">fancy_utility_function</span> <span class="o">=</span> <span class="n">keep_lazy</span><span class="p">(</span><span class="nb">str</span><span class="p">)(</span><span class="n">fancy_utility_function</span><span class="p">)</span>
+
+
+<span class="c1"># Or more succinctly:</span>
+<span class="nd">@keep_lazy</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fancy_utility_function</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">keep_lazy()</span></code> デコレータは、オリジナルの関数が返すことができる型を指定するための追加引数 (<code class="docutils literal notranslate"><span class="pre">*args</span></code>) を受け取ります。一般的な使用例は、テキストを返す関数を持つ場合です。これには、<code class="docutils literal notranslate"><span class="pre">str</span></code> 型を <code class="docutils literal notranslate"><span class="pre">keep_lazy</span></code> に渡すことができます(または、次のセクションで説明されている <a class="reference internal" href="#django.utils.functional.keep_lazy_text" title="django.utils.functional.keep_lazy_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">keep_lazy_text()</span></code></a> デコレータを使用します)。</p>
+<p>このデコレータを使用すると、入力が適切な文字列であると仮定して関数を書き、最後に遅延翻訳オブジェクトのサポートを追加できます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.functional.keep_lazy_text">
+<span class="sig-name descname"><span class="pre">keep_lazy_text</span></span>(<em class="sig-param"><span class="n"><span class="pre">func</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/functional.py#L238"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.functional.keep_lazy_text" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">keep_lazy(str)(func)</span></code> のショートカットです。</p>
+<p>テキストを返す関数があり、引数の評価を遅延させつつ、遅延引数を取ることができるようにしたい場合は、このデコレータを使用できます：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.functional</span><span class="w"> </span><span class="kn">import</span> <span class="n">keep_lazy</span><span class="p">,</span> <span class="n">keep_lazy_text</span>
+
+
+<span class="c1"># Our previous example was:</span>
+<span class="nd">@keep_lazy</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fancy_utility_function</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="o">...</span>
+
+
+<span class="c1"># Which can be rewritten as:</span>
+<span class="nd">@keep_lazy_text</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">fancy_utility_function</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span> <span class="o">...</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.html">
+<span id="s-django-utils-html"></span><span id="module-django.utils.html"></span><span id="django-utils-html"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.html</span></code><a class="headerlink" href="#module-django.utils.html" title="Link to this heading">¶</a></h2>
+<p>通常、Djangoの自動エスケープ機構を利用するために、Djangoのテンプレートを使用してHTMLを構築するべきです。適切な場合には、 <a class="reference internal" href="#module-django.utils.safestring" title="django.utils.safestring: Functions and classes for working with strings that can be displayed safely without further escaping in HTML."><code class="xref py py-mod docutils literal notranslate"><span class="pre">django.utils.safestring</span></code></a> のユーティリティを使用します。このモジュールは、HTMLをエスケープするためのいくつかの追加の低レベルユーティリティを提供します。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.html.escape">
+<span class="sig-name descname"><span class="pre">escape</span></span>(<em class="sig-param"><span class="n"><span class="pre">text</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/html.py#L47"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.html.escape" title="Link to this definition">¶</a></dt>
+<dd><p>与えられたテキストに対して、HTMLで使うためにアンパサンド、引用符、および山括弧をエンコードします。入力は最初に文字列に強制され、出力には <a class="reference internal" href="#django.utils.safestring.mark_safe" title="django.utils.safestring.mark_safe"><code class="xref py py-func docutils literal notranslate"><span class="pre">mark_safe()</span></code></a> が適用されます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.html.conditional_escape">
+<span class="sig-name descname"><span class="pre">conditional_escape</span></span>(<em class="sig-param"><span class="n"><span class="pre">text</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/html.py#L111"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.html.conditional_escape" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">escape()</span></code> に似ていますが、事前にエスケープされた文字列には作用しないため、二重にエスケープすることはありません。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.html.format_html">
+<span class="sig-name descname"><span class="pre">format_html</span></span>(<em class="sig-param"><span class="n"><span class="pre">format_string</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/html.py#L126"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.html.format_html" title="Link to this definition">¶</a></dt>
+<dd><p>これは <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str.format" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">str.format()</span></code></a> に似ていますが、HTML フラグメントを組み立てるのに適しています。最初の引数 <code class="docutils literal notranslate"><span class="pre">format_string</span></code> はエスケープされませんが、その他の引数とキーワード引数はすべて <a class="reference internal" href="#django.utils.html.conditional_escape" title="django.utils.html.conditional_escape"><code class="xref py py-func docutils literal notranslate"><span class="pre">conditional_escape()</span></code></a> を通してから <code class="docutils literal notranslate"><span class="pre">str.format()</span></code> に渡されます。最終的に、出力には <a class="reference internal" href="#django.utils.safestring.mark_safe" title="django.utils.safestring.mark_safe"><code class="xref py py-func docutils literal notranslate"><span class="pre">mark_safe()</span></code></a> が適用されます。</p>
+<p>小さなHTML断片を構築する場合、この関数は文字列補間の <code class="docutils literal notranslate"><span class="pre">%</span></code> や <code class="docutils literal notranslate"><span class="pre">str.format()</span></code> を直接利用するよりも望まれます。なぜなら、この関数はテンプレートシステムと同様に、全ての引数にエスケープ処理を適用するからです。</p>
+<p>そのため、以下のように書く代わりに：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mark_safe</span><span class="p">(</span>
+    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> &lt;b&gt;</span><span class="si">%s</span><span class="s2">&lt;/b&gt; </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="o">%</span> <span class="p">(</span>
+        <span class="n">some_html</span><span class="p">,</span>
+        <span class="n">escape</span><span class="p">(</span><span class="n">some_text</span><span class="p">),</span>
+        <span class="n">escape</span><span class="p">(</span><span class="n">some_other_text</span><span class="p">),</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>次のものを使用すべきです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">format_html</span><span class="p">(</span>
+    <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> &lt;b&gt;</span><span class="si">{}</span><span class="s2">&lt;/b&gt; </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">mark_safe</span><span class="p">(</span><span class="n">some_html</span><span class="p">),</span>
+    <span class="n">some_text</span><span class="p">,</span>
+    <span class="n">some_other_text</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>これは、各引数に対して <a class="reference internal" href="#django.utils.html.escape" title="django.utils.html.escape"><code class="xref py py-func docutils literal notranslate"><span class="pre">escape()</span></code></a> を適用する必要がなく、1つを忘れた場合にバグや XSS 脆弱性が発生するリスクがないという利点があります。</p>
+<p>この関数は <code class="docutils literal notranslate"><span class="pre">str.format()</span></code> を使用して補間を行いますが、 <code class="docutils literal notranslate"><span class="pre">str.format()</span></code> が提供する一部の書式設定オプション（例えば数値の書式設定など）は機能しないことに注意してください。なぜなら、すべての引数が <a class="reference internal" href="#django.utils.html.conditional_escape" title="django.utils.html.conditional_escape"><code class="xref py py-func docutils literal notranslate"><span class="pre">conditional_escape()</span></code></a> を介して渡され、これが最終的に <a class="reference internal" href="#django.utils.encoding.force_str" title="django.utils.encoding.force_str"><code class="xref py py-func docutils literal notranslate"><span class="pre">force_str()</span></code></a> を値に対して呼び出すためです。</p>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">バージョン 5.0 で非推奨: </span><code class="docutils literal notranslate"><span class="pre">format_html()</span></code> を引数やキーワード引数なしで呼び出すサポートは非推奨となりました。</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.html.format_html_join">
+<span class="sig-name descname"><span class="pre">format_html_join</span></span>(<em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format_string</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args_generator</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/html.py#L145"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.html.format_html_join" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.utils.html.format_html" title="django.utils.html.format_html"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_html()</span></code></a> のラッパーで、同じフォーマット文字列を使用してフォーマットする必要がある引数のグループと、<code class="docutils literal notranslate"><span class="pre">sep</span></code> を使用して結合する一般的なケースのためのものです。<code class="docutils literal notranslate"><span class="pre">sep</span></code> も <a class="reference internal" href="#django.utils.html.conditional_escape" title="django.utils.html.conditional_escape"><code class="xref py py-func docutils literal notranslate"><span class="pre">conditional_escape()</span></code></a> を通して渡されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">args_generator</span></code> は、<a class="reference internal" href="#django.utils.html.format_html" title="django.utils.html.format_html"><code class="xref py py-func docutils literal notranslate"><span class="pre">format_html()</span></code></a> に渡される <code class="docutils literal notranslate"><span class="pre">args</span></code> のシーケンスを返すイテレータであるべきです。例えば：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">format_html_join</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;li&gt;</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&lt;/li&gt;&quot;</span><span class="p">,</span> <span class="p">((</span><span class="n">u</span><span class="o">.</span><span class="n">first_name</span><span class="p">,</span> <span class="n">u</span><span class="o">.</span><span class="n">last_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">users</span><span class="p">))</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.html.json_script">
+<span class="sig-name descname"><span class="pre">json_script</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">element_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/html.py#L91"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.html.json_script" title="Link to this definition">¶</a></dt>
+<dd><p>すべてのHTML/XML特殊文字をそのユニコードエスケープでエスケープするため、値はJavaScriptでの使用に安全です。エスケープされたJSONを <code class="docutils literal notranslate"><span class="pre">&lt;script&gt;</span></code> タグでラップします。 <code class="docutils literal notranslate"><span class="pre">element_id</span></code> パラメータが <code class="docutils literal notranslate"><span class="pre">None</span></code> でない場合、<code class="docutils literal notranslate"><span class="pre">&lt;script&gt;</span></code> タグに渡されたidが与えられます。例えば：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">json_script</span><span class="p">({</span><span class="s2">&quot;hello&quot;</span><span class="p">:</span> <span class="s2">&quot;world&quot;</span><span class="p">},</span> <span class="n">element_id</span><span class="o">=</span><span class="s2">&quot;hello-data&quot;</span><span class="p">)</span>
+<span class="go">&#39;&lt;script id=&quot;hello-data&quot; type=&quot;application/json&quot;&gt;{&quot;hello&quot;: &quot;world&quot;}&lt;/script&gt;&#39;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">encoder</span></code> のデフォルトは <a class="reference internal" href="../topics/serialization.html#django.core.serializers.json.DjangoJSONEncoder" title="django.core.serializers.json.DjangoJSONEncoder"><code class="xref py py-class docutils literal notranslate"><span class="pre">django.core.serializers.json.DjangoJSONEncoder</span></code></a> で、このエンコーダーがデータのシリアライズに使用されます。このシリアライザについての詳細は、<a class="reference internal" href="../topics/serialization.html#serialization-formats-json"><span class="std std-ref">JSON のシリアライズ</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.html.strip_tags">
+<span class="sig-name descname"><span class="pre">strip_tags</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/html.py#L208"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.html.strip_tags" title="Link to this definition">¶</a></dt>
+<dd><p>文字列から <code class="docutils literal notranslate"><span class="pre">&lt;&gt;</span></code> で囲まれた、HTML タグのように見えるものをすべて除去しようとします。</p>
+<p>結果の文字列がHTMLセーフであることについては、何の保証もありません。したがって、例えば <a class="reference internal" href="#django.utils.html.escape" title="django.utils.html.escape"><code class="xref py py-func docutils literal notranslate"><span class="pre">escape()</span></code></a> でエスケープするなどして最初に行わない限り、<code class="docutils literal notranslate"><span class="pre">strip_tag</span></code> 呼び出しの結果を安全とマークすることは絶対に行わないでください。</p>
+<p>例:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">strip_tags</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">value</span></code> が <code class="docutils literal notranslate"><span class="pre">&quot;&lt;b&gt;Joel&lt;/b&gt;</span> <span class="pre">&lt;button&gt;is&lt;/button&gt;</span> <span class="pre">a</span> <span class="pre">&lt;span&gt;slug&lt;/span&gt;&quot;</span></code> の場合、戻り値は <code class="docutils literal notranslate"><span class="pre">&quot;Joel</span> <span class="pre">is</span> <span class="pre">a</span> <span class="pre">slug&quot;</span></code> になります。</p>
+<p>より堅牢なソリューションを探している場合は、サードパーティ製のHTMLサニタイジングツールの使用を検討してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.html.html_safe">
+<span class="sig-name descname"><span class="pre">html_safe</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/html.py#L492"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.html.html_safe" title="Link to this definition">¶</a></dt>
+<dd><p>クラス上の <code class="docutils literal notranslate"><span class="pre">__html__()</span></code> メソッドは、HTMLエスケープが必要ないクラスの出力を非Djangoテンプレートが検出するのに役立ちます。</p>
+<p>このデコレータは、装飾されたクラスに <code class="docutils literal notranslate"><span class="pre">__str__()</span></code> を <a class="reference internal" href="#django.utils.safestring.mark_safe" title="django.utils.safestring.mark_safe"><code class="xref py py-meth docutils literal notranslate"><span class="pre">mark_safe()</span></code></a> でラッピングし、 <code class="docutils literal notranslate"><span class="pre">__html__()</span></code> メソッドを定義します。 <code class="docutils literal notranslate"><span class="pre">__str__()</span></code> メソッドが HTML エスケープを必要としないテキストを確かに返すことを保証してください。</p>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.http">
+<span id="s-django-utils-http"></span><span id="module-django.utils.http"></span><span id="django-utils-http"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.http</span></code><a class="headerlink" href="#module-django.utils.http" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.http.urlencode">
+<span class="sig-name descname"><span class="pre">urlencode</span></span>(<em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">doseq</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/http.py#L42"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.http.urlencode" title="Link to this definition">¶</a></dt>
+<dd><p>Python の <a class="reference external" href="https://docs.python.org/3/library/urllib.parse.html#urllib.parse.urlencode" title="(in Python v3.13)"><code class="xref py py-func docutils literal notranslate"><span class="pre">urllib.parse.urlencode()</span></code></a> 関数のバージョンで、<code class="docutils literal notranslate"><span class="pre">MultiValueDict</span></code> や非文字列値に対して操作を行うことができます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.http.http_date">
+<span class="sig-name descname"><span class="pre">http_date</span></span>(<em class="sig-param"><span class="n"><span class="pre">epoch_seconds</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/http.py#L83"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.http.http_date" title="Link to this definition">¶</a></dt>
+<dd><p><span class="target" id="index-21"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc1123.html#section-5.2.14"><strong>RFC 1123 Section 5.2.14</strong></a> にて指定されている通り、HTTP <span class="target" id="index-22"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc9110.html#section-5.6.7"><strong>RFC 9110 Section 5.6.7</strong></a> の日付フォーマットに合わせて時間をフォーマットします。</p>
+<p>UTC(協定世界時)でのエポックからの秒数で表された浮動小数点数を受け入れます。例えば、 <code class="docutils literal notranslate"><span class="pre">time.time()</span></code> によって出力されるものです。<code class="docutils literal notranslate"><span class="pre">None</span></code> に設定された場合、デフォルトでは現在時刻になります。</p>
+<p>次の形式で文字列を出力します: <code class="docutils literal notranslate"><span class="pre">Wdy,</span> <span class="pre">DD</span> <span class="pre">Mon</span> <span class="pre">YYYY</span> <span class="pre">HH:MM:SS</span> <span class="pre">GMT</span></code> 。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.http.content_disposition_header">
+<span class="sig-name descname"><span class="pre">content_disposition_header</span></span>(<em class="sig-param"><span class="n"><span class="pre">as_attachment</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/http.py#L356"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.http.content_disposition_header" title="Link to this definition">¶</a></dt>
+<dd><p><span class="target" id="index-23"></span><a class="rfc reference external" href="https://datatracker.ietf.org/doc/html/rfc6266.html"><strong>RFC 6266</strong></a> に指定された <code class="docutils literal notranslate"><span class="pre">filename</span></code> から <code class="docutils literal notranslate"><span class="pre">Content-Disposition</span></code> HTTPヘッダー値を構築します。 <code class="docutils literal notranslate"><span class="pre">as_attachment</span></code> が <code class="docutils literal notranslate"><span class="pre">False</span></code> でかつ <code class="docutils literal notranslate"><span class="pre">filename</span></code> が <code class="docutils literal notranslate"><span class="pre">None</span></code> の場合は <code class="docutils literal notranslate"><span class="pre">None</span></code> を返し、それ以外の場合は <code class="docutils literal notranslate"><span class="pre">Content-Disposition</span></code> HTTPヘッダーに適した文字列を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.http.base36_to_int">
+<span class="sig-name descname"><span class="pre">base36_to_int</span></span>(<em class="sig-param"><span class="n"><span class="pre">s</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/http.py#L150"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.http.base36_to_int" title="Link to this definition">¶</a></dt>
+<dd><p>base36 文字列を整数に変換します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.http.int_to_base36">
+<span class="sig-name descname"><span class="pre">int_to_base36</span></span>(<em class="sig-param"><span class="n"><span class="pre">i</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/http.py#L163"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.http.int_to_base36" title="Link to this definition">¶</a></dt>
+<dd><p>正の整数を base36 文字列に変換します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.http.urlsafe_base64_encode">
+<span class="sig-name descname"><span class="pre">urlsafe_base64_encode</span></span>(<em class="sig-param"><span class="n"><span class="pre">s</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/http.py#L177"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.http.urlsafe_base64_encode" title="Link to this definition">¶</a></dt>
+<dd><p>URLで使用するためにバイト文字列を base64 文字列にエンコードし、末尾の等号を削除します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.http.urlsafe_base64_decode">
+<span class="sig-name descname"><span class="pre">urlsafe_base64_decode</span></span>(<em class="sig-param"><span class="n"><span class="pre">s</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/http.py#L185"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.http.urlsafe_base64_decode" title="Link to this definition">¶</a></dt>
+<dd><p>base64エンコードされた文字列をデコードし、削除されたかもしれない末尾の等号を追加します。</p>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.module_loading">
+<span id="s-django-utils-module-loading"></span><span id="module-django.utils.module_loading"></span><span id="django-utils-module-loading"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.module_loading</span></code><a class="headerlink" href="#module-django.utils.module_loading" title="Link to this heading">¶</a></h2>
+<p>Python モジュールを扱うための関数です。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.module_loading.import_string">
+<span class="sig-name descname"><span class="pre">import_string</span></span>(<em class="sig-param"><span class="n"><span class="pre">dotted_path</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/module_loading.py#L19"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.module_loading.import_string" title="Link to this definition">¶</a></dt>
+<dd><p>ドットで区切られたモジュールパスをインポートし、パスの最後の名前で指定された属性・クラスを返します。インポートが失敗した場合は <code class="docutils literal notranslate"><span class="pre">ImportError</span></code> を発生させます。例えば：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.module_loading</span><span class="w"> </span><span class="kn">import</span> <span class="n">import_string</span>
+
+<span class="n">ValidationError</span> <span class="o">=</span> <span class="n">import_string</span><span class="p">(</span><span class="s2">&quot;django.core.exceptions.ValidationError&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>これは以下と同じです:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.core.exceptions</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationError</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.safestring">
+<span id="s-django-utils-safestring"></span><span id="module-django.utils.safestring"></span><span id="django-utils-safestring"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.safestring</span></code><a class="headerlink" href="#module-django.utils.safestring" title="Link to this heading">¶</a></h2>
+<p>HTML でさらにエスケープする必要なく安全に表示できる「安全な文字列（safe strings）」を扱うための関数とクラス。何かを「安全な文字列」としてマークするということは、文字列の生成者が HTML エンジンによって解釈されるべきでない文字（例えば '&lt;' ）を適切なエンティティに変換済みであることを意味します。</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="django.utils.safestring.SafeString">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SafeString</span></span><a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/safestring.py#L25"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.safestring.SafeString" title="Link to this definition">¶</a></dt>
+<dd><p>HTML出力の目的で「安全」として明示的にマークされた（これ以上のエスケープが必要ない） <code class="docutils literal notranslate"><span class="pre">str</span></code> のサブクラスです。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.safestring.mark_safe">
+<span class="sig-name descname"><span class="pre">mark_safe</span></span>(<em class="sig-param"><span class="n"><span class="pre">s</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/safestring.py#L59"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.safestring.mark_safe" title="Link to this definition">¶</a></dt>
+<dd><p>文字列を (HTML) 出力目的で安全であると明示的にマークします。返されたオブジェクトは、文字列が適切な場所であればどこでも使用できます。</p>
+<p>単一の文字列に対して複数回呼び出すことができます。</p>
+<p>デコレータとしても使用できます。</p>
+<p>HTMLの断片を組み立てる際には、通常、 <a class="reference internal" href="#django.utils.html.format_html" title="django.utils.html.format_html"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.html.format_html()</span></code></a> を使用するべきです。</p>
+<p>マークされた文字列を安全としても、変更されると再び安全でなくなります。例えば：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">mystr</span> <span class="o">=</span> <span class="s2">&quot;&lt;b&gt;Hello World&lt;/b&gt;   &quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mystr</span> <span class="o">=</span> <span class="n">mark_safe</span><span class="p">(</span><span class="n">mystr</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">mystr</span><span class="p">)</span>
+<span class="go">&lt;class &#39;django.utils.safestring.SafeString&#39;&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mystr</span> <span class="o">=</span> <span class="n">mystr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>  <span class="c1"># removing whitespace</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">type</span><span class="p">(</span><span class="n">mystr</span><span class="p">)</span>
+<span class="go">&lt;type &#39;str&#39;&gt;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.text">
+<span id="s-django-utils-text"></span><span id="module-django.utils.text"></span><span id="django-utils-text"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.text</span></code><a class="headerlink" href="#module-django.utils.text" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.text.format_lazy">
+<span class="sig-name descname"><span class="pre">format_lazy</span></span>(<em class="sig-param"><span class="n"><span class="pre">format_string</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em>)<a class="headerlink" href="#django.utils.text.format_lazy" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">format_string</span></code>、<code class="docutils literal notranslate"><span class="pre">args</span></code>、または <code class="docutils literal notranslate"><span class="pre">kwargs</span></code> に遅延オブジェクトが含まれている場合の <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str.format" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">str.format()</span></code></a> のバージョンです。最初の引数は、フォーマットされる文字列です。例えば：</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.text</span><span class="w"> </span><span class="kn">import</span> <span class="n">format_lazy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.utils.translation</span><span class="w"> </span><span class="kn">import</span> <span class="n">pgettext_lazy</span>
+
+<span class="n">urlpatterns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">path</span><span class="p">(</span>
+        <span class="n">format_lazy</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{person}</span><span class="s2">/&lt;int:pk&gt;/&quot;</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="n">pgettext_lazy</span><span class="p">(</span><span class="s2">&quot;URL&quot;</span><span class="p">,</span> <span class="s2">&quot;person&quot;</span><span class="p">)),</span>
+        <span class="n">PersonDetailView</span><span class="o">.</span><span class="n">as_view</span><span class="p">(),</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+<p>この例では、翻訳機がURLの一部を翻訳できます。&quot;person&quot; を &quot;persona&quot; に翻訳した場合、正規表現は <code class="docutils literal notranslate"><span class="pre">persona/(?P&lt;pk&gt;\d+)/$</span></code> に一致します。例えば、<code class="docutils literal notranslate"><span class="pre">persona/5/</span></code> のようになります。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.text.slugify">
+<span class="sig-name descname"><span class="pre">slugify</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_unicode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/text.py#L452"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.text.slugify" title="Link to this definition">¶</a></dt>
+<dd><p>下記によって文字列をURLスラグに変換します:</p>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">allow_unicode</span></code> が <code class="docutils literal notranslate"><span class="pre">False</span></code> （デフォルト）の場合、ASCII に変換します。</p></li>
+<li><p>小文字に変換します。</p></li>
+<li><p>英数字、アンダースコア、ハイフン、空白以外の文字を削除します。</p></li>
+<li><p>空白や繰り返されるダッシュを単一のダッシュに置き換えます。</p></li>
+<li><p>先頭と末尾の空白、ダッシュ、アンダースコアを削除します。</p></li>
+</ol>
+<p>例:</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">slugify</span><span class="p">(</span><span class="s2">&quot; Joel is a slug &quot;</span><span class="p">)</span>
+<span class="go">&#39;joel-is-a-slug&#39;</span>
+</pre></div>
+</div>
+<p>Unicode 文字を許可したい場合は、<code class="docutils literal notranslate"><span class="pre">allow_unicode=True</span></code> を渡します。例えば：</p>
+<div class="highlight-pycon notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">slugify</span><span class="p">(</span><span class="s2">&quot;你好 World&quot;</span><span class="p">,</span> <span class="n">allow_unicode</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="go">&#39;你好-world&#39;</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.timezone">
+<span id="s-django-utils-timezone"></span><span id="s-time-zone-selection-functions"></span><span id="module-django.utils.timezone"></span><span id="django-utils-timezone"></span><span id="time-zone-selection-functions"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.timezone</span></code><a class="headerlink" href="#module-django.utils.timezone" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.get_fixed_timezone">
+<span class="sig-name descname"><span class="pre">get_fixed_timezone</span></span>(<em class="sig-param"><span class="n"><span class="pre">offset</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L33"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.get_fixed_timezone" title="Link to this definition">¶</a></dt>
+<dd><p>UTCからの固定オフセットを持つタイムゾーンを表す <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> インスタンスを返します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">offset</span></code> は <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime.timedelta</span></code></a> または整数の分数です。UTCより東のタイムゾーンには正の値を、西には負の値を使用してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.get_default_timezone">
+<span class="sig-name descname"><span class="pre">get_default_timezone</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L46"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.get_default_timezone" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">デフォルトのタイムゾーン</span></a> を表す <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> インスタンスを返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.get_default_timezone_name">
+<span class="sig-name descname"><span class="pre">get_default_timezone_name</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L56"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.get_default_timezone_name" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">デフォルトタイムゾーンとカレントタイムゾーン</span></a> の名前を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.get_current_timezone">
+<span class="sig-name descname"><span class="pre">get_current_timezone</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L64"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.get_current_timezone" title="Link to this definition">¶</a></dt>
+<dd><p>カレントタイムゾーンを表す <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> インスタンスを返します。 <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.get_current_timezone_name">
+<span class="sig-name descname"><span class="pre">get_current_timezone_name</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L69"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.get_current_timezone_name" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> の名前を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.activate">
+<span class="sig-name descname"><span class="pre">activate</span></span>(<em class="sig-param"><span class="n"><span class="pre">timezone</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L88"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.activate" title="Link to this definition">¶</a></dt>
+<dd><p>カレントタイムゾーンを <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">設定します</span></a> 。 <code class="docutils literal notranslate"><span class="pre">timezone</span></code> 引数は、 <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.tzinfo" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tzinfo</span></code></a> のサブクラスのインスタンスまたはタイムゾーン名でなければなりません。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.deactivate">
+<span class="sig-name descname"><span class="pre">deactivate</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L103"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.deactivate" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> を未設定にします。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.override">
+<span class="sig-name descname"><span class="pre">override</span></span>(<em class="sig-param"><span class="n"><span class="pre">timezone</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L113"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.override" title="Link to this definition">¶</a></dt>
+<dd><p>これは、エントリ時に <a class="reference internal" href="#django.utils.timezone.activate" title="django.utils.timezone.activate"><code class="xref py py-func docutils literal notranslate"><span class="pre">activate()</span></code></a> を使用して <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> を設定し、終了時に以前にアクティブだったタイムゾーンを復元する Python のコンテキストマネージャーです。もし <code class="docutils literal notranslate"><span class="pre">timezone</span></code> 引数が <code class="docutils literal notranslate"><span class="pre">None</span></code> である場合、エントリ時に <a class="reference internal" href="#django.utils.timezone.deactivate" title="django.utils.timezone.deactivate"><code class="xref py py-func docutils literal notranslate"><span class="pre">deactivate()</span></code></a> を使用して <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> が解除されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">override</span></code> は関数デコレータとしても使用できます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.localtime">
+<span class="sig-name descname"><span class="pre">localtime</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L167"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.localtime" title="Link to this definition">¶</a></dt>
+<dd><p>aware な <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> を、デフォルトでは <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> へと変換します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">value</span></code> が省略された場合, デフォルトは <a class="reference internal" href="#django.utils.timezone.now" title="django.utils.timezone.now"><code class="xref py py-func docutils literal notranslate"><span class="pre">now()</span></code></a> になります。</p>
+<p>この関数は naive な日時には機能しません。代わりに <a class="reference internal" href="#django.utils.timezone.make_aware" title="django.utils.timezone.make_aware"><code class="xref py py-func docutils literal notranslate"><span class="pre">make_aware()</span></code></a> を使用してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.localdate">
+<span class="sig-name descname"><span class="pre">localdate</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L187"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.localdate" title="Link to this definition">¶</a></dt>
+<dd><p><a class="reference internal" href="#django.utils.timezone.localtime" title="django.utils.timezone.localtime"><code class="xref py py-func docutils literal notranslate"><span class="pre">localtime()</span></code></a> を使用して、指定された <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> を異なるタイムゾーンの <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime.date" title="(in Python v3.13)"><code class="xref py py-meth docutils literal notranslate"><span class="pre">date()</span></code></a> に変換し、デフォルトでは <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> を使用します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">value</span></code> が省略された場合, デフォルトは <a class="reference internal" href="#django.utils.timezone.now" title="django.utils.timezone.now"><code class="xref py py-func docutils literal notranslate"><span class="pre">now()</span></code></a> になります。</p>
+<p>この関数は naive な日時には機能しません。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.now">
+<span class="sig-name descname"><span class="pre">now</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L200"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.now" title="Link to this definition">¶</a></dt>
+<dd><p>現在の時刻を表す <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> を返します。返される内容は <a class="reference internal" href="settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> の値によって異なります。</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> が <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合、システムのローカルタイムゾーンで現在の時刻を表す、関連するタイムゾーンのない <a class="reference internal" href="../topics/i18n/timezones.html#naive-vs-aware-datetimes"><span class="std std-ref">naive</span></a> な日時（タイムゾーンの関連がない日時）になります。</p></li>
+<li><p><a class="reference internal" href="settings.html#std-setting-USE_TZ"><code class="xref std std-setting docutils literal notranslate"><span class="pre">USE_TZ</span></code></a> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、 UTC の現在時刻を表す <a class="reference internal" href="../topics/i18n/timezones.html#naive-vs-aware-datetimes"><span class="std std-ref">aware</span></a> な日時になります。 <a class="reference internal" href="#django.utils.timezone.now" title="django.utils.timezone.now"><code class="xref py py-func docutils literal notranslate"><span class="pre">now()</span></code></a> は常に <a class="reference internal" href="settings.html#std-setting-TIME_ZONE"><code class="xref std std-setting docutils literal notranslate"><span class="pre">TIME_ZONE</span></code></a> の値に関係なく UTC の時刻を返すことに注意してください。カレントタイムゾーンの時刻を取得するには <a class="reference internal" href="#django.utils.timezone.localtime" title="django.utils.timezone.localtime"><code class="xref py py-func docutils literal notranslate"><span class="pre">localtime()</span></code></a> を使用します。</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.is_aware">
+<span class="sig-name descname"><span class="pre">is_aware</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L211"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.is_aware" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">value</span></code> が &quot;aware&quot; であれば <code class="docutils literal notranslate"><span class="pre">True</span></code> を、&quot;naive&quot; であれば <code class="docutils literal notranslate"><span class="pre">False</span></code> を返します。この関数は <code class="docutils literal notranslate"><span class="pre">value</span></code> が <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> であると仮定します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.is_naive">
+<span class="sig-name descname"><span class="pre">is_naive</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L224"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.is_naive" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">value</span></code> が naive である場合は <code class="docutils literal notranslate"><span class="pre">True</span></code> を aware である場合は <code class="docutils literal notranslate"><span class="pre">False</span></code> を返します。この関数は <code class="docutils literal notranslate"><span class="pre">value</span></code> が <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> であると仮定します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.make_aware">
+<span class="sig-name descname"><span class="pre">make_aware</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L237"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.make_aware" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">value</span></code> が naive な <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> であるとき、<code class="docutils literal notranslate"><span class="pre">timezone</span></code> 内での同じ時点を表す aware な <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> を返します。<code class="docutils literal notranslate"><span class="pre">timezone</span></code> が <code class="docutils literal notranslate"><span class="pre">None</span></code> に設定されている場合、デフォルトで <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> になります。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.timezone.make_naive">
+<span class="sig-name descname"><span class="pre">make_naive</span></span>(<em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/timezone.py#L248"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.timezone.make_naive" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">timezone</span></code> で指定されたタイムゾーンにおいて、aware な <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> である <code class="docutils literal notranslate"><span class="pre">value</span></code> と同じ時点を表す naive な <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> を返します。 <code class="docutils literal notranslate"><span class="pre">timezone</span></code> が <code class="docutils literal notranslate"><span class="pre">None</span></code> に設定されている場合、デフォルトで <a class="reference internal" href="../topics/i18n/timezones.html#default-current-time-zone"><span class="std std-ref">カレントタイムゾーン</span></a> に設定されます。</p>
+</dd></dl>
+
+</section>
+<section id="s-module-django.utils.translation">
+<span id="s-django-utils-translation"></span><span id="module-django.utils.translation"></span><span id="django-utils-translation"></span><h2><code class="docutils literal notranslate"><span class="pre">django.utils.translation</span></code><a class="headerlink" href="#module-django.utils.translation" title="Link to this heading">¶</a></h2>
+<p>以下の使い方の完全な説明は、<a class="reference internal" href="../topics/i18n/translation.html"><span class="doc">翻訳ドキュメント</span></a> を参照してください。</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.gettext">
+<span class="sig-name descname"><span class="pre">gettext</span></span>(<em class="sig-param"><span class="n"><span class="pre">message</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L95"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.gettext" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">message</span></code> を翻訳し、文字列として返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.pgettext">
+<span class="sig-name descname"><span class="pre">pgettext</span></span>(<em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L103"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.pgettext" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">context</span></code> を考慮して <code class="docutils literal notranslate"><span class="pre">message</span></code> を翻訳し、文字列として返します。</p>
+<p>詳しくは <a class="reference internal" href="../topics/i18n/translation.html#contextual-markers"><span class="std std-ref">文脈マーカー</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.gettext_lazy">
+<span class="sig-name descname"><span class="pre">gettext_lazy</span></span>(<em class="sig-param"><span class="n"><span class="pre">message</span></span></em>)<a class="headerlink" href="#django.utils.translation.gettext_lazy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.pgettext_lazy">
+<span class="sig-name descname"><span class="pre">pgettext_lazy</span></span>(<em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>)<a class="headerlink" href="#django.utils.translation.pgettext_lazy" title="Link to this definition">¶</a></dt>
+<dd><p>上述の lazy ではないものと同じですが、遅延処理を使用します。</p>
+<p><a class="reference internal" href="../topics/i18n/translation.html#lazy-translations"><span class="std std-ref">遅延翻訳のドキュメント</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.gettext_noop">
+<span class="sig-name descname"><span class="pre">gettext_noop</span></span>(<em class="sig-param"><span class="n"><span class="pre">message</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L91"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.gettext_noop" title="Link to this definition">¶</a></dt>
+<dd><p>翻訳用に文字列をマークしますが、この段階では翻訳しません。(外部で使われる可能性があるため) ベースの言語のままにする必要があるグローバル変数に文字列を保持するために使えます。そして、後の時点で翻訳します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.ngettext">
+<span class="sig-name descname"><span class="pre">ngettext</span></span>(<em class="sig-param"><span class="n"><span class="pre">singular</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plural</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L99"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.ngettext" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">number</span></code> に基づいて、<code class="docutils literal notranslate"><span class="pre">singular</span></code> と <code class="docutils literal notranslate"><span class="pre">plural</span></code> を翻訳し、適切な文字列を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.npgettext">
+<span class="sig-name descname"><span class="pre">npgettext</span></span>(<em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">singular</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plural</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L107"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.npgettext" title="Link to this definition">¶</a></dt>
+<dd><p><code class="docutils literal notranslate"><span class="pre">singular</span></code> と <code class="docutils literal notranslate"><span class="pre">plural</span></code> を翻訳し、<code class="docutils literal notranslate"><span class="pre">number</span></code> と <code class="docutils literal notranslate"><span class="pre">context</span></code> に基づいて適切な文字列を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.ngettext_lazy">
+<span class="sig-name descname"><span class="pre">ngettext_lazy</span></span>(<em class="sig-param"><span class="n"><span class="pre">singular</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plural</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L171"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.ngettext_lazy" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.npgettext_lazy">
+<span class="sig-name descname"><span class="pre">npgettext_lazy</span></span>(<em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">singular</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plural</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L175"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.npgettext_lazy" title="Link to this definition">¶</a></dt>
+<dd><p>上述の lazy ではないものと同じですが、遅延処理を使用します。</p>
+<p><a class="reference internal" href="../topics/i18n/translation.html#lazy-translations"><span class="std std-ref">遅延翻訳のドキュメント</span></a> を参照してください。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.activate">
+<span class="sig-name descname"><span class="pre">activate</span></span>(<em class="sig-param"><span class="n"><span class="pre">language</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L181"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.activate" title="Link to this definition">¶</a></dt>
+<dd><p>渡された language に対して翻訳オブジェクトを取り出し、現在のスレッドに対してカレント翻訳オブジェクトとして有効化します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.deactivate">
+<span class="sig-name descname"><span class="pre">deactivate</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L185"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.deactivate" title="Link to this definition">¶</a></dt>
+<dd><p>カレント翻訳オブジェクトを無効化し、さらなる _ 呼び出しが再びデフォルトの翻訳オブジェクトに対して解決するようにします。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.deactivate_all">
+<span class="sig-name descname"><span class="pre">deactivate_all</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L265"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.deactivate_all" title="Link to this definition">¶</a></dt>
+<dd><p>アクティブな翻訳オブジェクトを <code class="docutils literal notranslate"><span class="pre">NullTranslations()</span></code> のインスタンスにします。何らかの理由で遅延された翻訳を元の文字列で表示したいときに役立ちます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.override">
+<span class="sig-name descname"><span class="pre">override</span></span>(<em class="sig-param"><span class="n"><span class="pre">language</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deactivate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L189"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.override" title="Link to this definition">¶</a></dt>
+<dd><p>指定された言語の翻訳オブジェクトを取得するために <a class="reference internal" href="#django.utils.translation.activate" title="django.utils.translation.activate"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.translation.activate()</span></code></a> を使用し、現在のスレッドの翻訳オブジェクトとしてそれを有効化し、終了時に以前のアクティブな言語を再有効化する Python のコンテキストマネージャです。オプションで、 <code class="docutils literal notranslate"><span class="pre">deactivate</span></code> 引数が <code class="docutils literal notranslate"><span class="pre">True</span></code> である場合に限り、終了時に一時的な翻訳を無効化するために <a class="reference internal" href="#django.utils.translation.deactivate" title="django.utils.translation.deactivate"><code class="xref py py-func docutils literal notranslate"><span class="pre">django.utils.translation.deactivate()</span></code></a> を使用できます。言語引数として <code class="docutils literal notranslate"><span class="pre">None</span></code> を渡すと、コンテキスト内で <code class="docutils literal notranslate"><span class="pre">NullTranslations()</span></code> インスタンスが有効化されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">override</span></code> は関数デコレータとしても使用できます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.check_for_language">
+<span class="sig-name descname"><span class="pre">check_for_language</span></span>(<em class="sig-param"><span class="n"><span class="pre">lang_code</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L218"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.check_for_language" title="Link to this definition">¶</a></dt>
+<dd><p>与えられた言語コード (たとえば 'fr' や 'pt_BR') に対するグローバル言語ファイルが存在するかどうかをチェックします。ユーザーが提供する言語が有効かどうかを決めるために使われます。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.get_language">
+<span class="sig-name descname"><span class="pre">get_language</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L210"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.get_language" title="Link to this definition">¶</a></dt>
+<dd><p>現在選択中の言語コードを返します。翻訳が (<a class="reference internal" href="#django.utils.translation.deactivate_all" title="django.utils.translation.deactivate_all"><code class="xref py py-func docutils literal notranslate"><span class="pre">deactivate_all()</span></code></a> や <code class="docutils literal notranslate"><span class="pre">None</span></code> が <a class="reference internal" href="#django.utils.translation.override" title="django.utils.translation.override"><code class="xref py py-func docutils literal notranslate"><span class="pre">override()</span></code></a> に渡されることによって) 一時的に無効化されている場合は <code class="docutils literal notranslate"><span class="pre">None</span></code> を返します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.get_language_bidi">
+<span class="sig-name descname"><span class="pre">get_language_bidi</span></span>()<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L214"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.get_language_bidi" title="Link to this definition">¶</a></dt>
+<dd><p>選択中の言語の BiDi レイアウトを返します:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">False</span></code> = 左から右へのレイアウト</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">True</span></code> = 右から左へのレイアウト</p></li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.get_language_from_request">
+<span class="sig-name descname"><span class="pre">get_language_from_request</span></span>(<em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L247"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.get_language_from_request" title="Link to this definition">¶</a></dt>
+<dd><p>リクエストを分析して、ユーザがシステムにどの言語を表示させたいかを明らかにします。settings.LANGUAGES にリストアップされている言語のみが考慮されます。ユーザが主言語の他に副言語をリクエストする場合は、主言語が送信されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">check_path</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、関数はまず、パスが <a class="reference internal" href="settings.html#std-setting-LANGUAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LANGUAGES</span></code></a> 設定にリストアップされた言語コードで始まるかどうか、リクエストされた URL をチェックします。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.get_supported_language_variant">
+<span class="sig-name descname"><span class="pre">get_supported_language_variant</span></span>(<em class="sig-param"><span class="n"><span class="pre">lang_code</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L255"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.get_supported_language_variant" title="Link to this definition">¶</a></dt>
+<dd><p>もし <code class="docutils literal notranslate"><span class="pre">lang_code</span></code> が <a class="reference internal" href="settings.html#std-setting-LANGUAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LANGUAGES</span></code></a> 設定内に存在していれば <code class="docutils literal notranslate"><span class="pre">lang_code</span></code> を返し、もっと一般的なバリアントを選択する可能性があります。例えば、<code class="docutils literal notranslate"><span class="pre">lang_code</span></code> が <code class="docutils literal notranslate"><span class="pre">'es-ar'</span></code> で、<code class="docutils literal notranslate"><span class="pre">'es-ar'</span></code> は <a class="reference internal" href="settings.html#std-setting-LANGUAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LANGUAGES</span></code></a> 内にはないが <code class="docutils literal notranslate"><span class="pre">'es'</span></code> は存在する場合、<code class="docutils literal notranslate"><span class="pre">'es'</span></code> が返されます。</p>
+<p><code class="docutils literal notranslate"><span class="pre">lang_code</span></code> には最大500文字までの長さ制限があります。 <code class="docutils literal notranslate"><span class="pre">lang_code</span></code> がこの制限を超え、<code class="docutils literal notranslate"><span class="pre">strict</span></code> が <code class="docutils literal notranslate"><span class="pre">True</span></code> の場合、または汎用バリアントが存在せず、<code class="docutils literal notranslate"><span class="pre">strict</span></code> が <code class="docutils literal notranslate"><span class="pre">False</span></code> の場合、 <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#LookupError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> が発生します。</p>
+<p><code class="docutils literal notranslate"><span class="pre">strict</span></code> が <code class="docutils literal notranslate"><span class="pre">False</span></code> (デフォルト) の場合、言語コードもその一般的なバリアントも見つからないときに、国別のバリアントが返されることがあります。たとえば、<a class="reference internal" href="settings.html#std-setting-LANGUAGES"><code class="xref std std-setting docutils literal notranslate"><span class="pre">LANGUAGES</span></code></a> に <code class="docutils literal notranslate"><span class="pre">'es-co'</span></code> のみが含まれている場合、その国別バリアントは <code class="docutils literal notranslate"><span class="pre">lang_code</span></code> が <code class="docutils literal notranslate"><span class="pre">'es'</span></code> や <code class="docutils literal notranslate"><span class="pre">'es-ar'</span></code> のような場合に返されます。これらのマッチは <code class="docutils literal notranslate"><span class="pre">strict=True</span></code> の場合には返されません。</p>
+<p>何も見つからない場合、<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#LookupError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> を発生させます。</p>
+<div class="versionchanged">
+<span class="title">Changed in Django 4.2.15:</span> <p>以前のバージョンでは、<code class="docutils literal notranslate"><span class="pre">lang_code</span></code> の値が500文字を超えても、<a class="reference external" href="https://docs.python.org/3/library/exceptions.html#LookupError" title="(in Python v3.13)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">LookupError</span></code></a> は発生せずに処理されていました。</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.to_locale">
+<span class="sig-name descname"><span class="pre">to_locale</span></span>(<em class="sig-param"><span class="n"><span class="pre">language</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L231"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.to_locale" title="Link to this definition">¶</a></dt>
+<dd><p>言語の名前 (en-us) をロケール名 (en_US) に変換します。</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="django.utils.translation.templatize">
+<span class="sig-name descname"><span class="pre">templatize</span></span>(<em class="sig-param"><span class="n"><span class="pre">src</span></span></em>)<a class="reference external" href="https://github.com/django/django/blob/stable/5.1.x/django/utils/translation/__init__.py#L259"><span class="viewcode-link"><span class="pre">[ソース]</span></span></a><a class="headerlink" href="#django.utils.translation.templatize" title="Link to this definition">¶</a></dt>
+<dd><p>Django テンプレートを <code class="docutils literal notranslate"><span class="pre">xgettext</span></code> によって理解されるものに変更します。Django 翻訳タグを標準的な <code class="docutils literal notranslate"><span class="pre">gettext</span></code> 関数の文に変換することによって行われます。</p>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+        </div>
+      </div>
+      
+        
+          <div class="yui-b" id="sidebar">
+            
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../contents.html">目次</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Django ユーティリティ (<code class="docutils literal notranslate"><span class="pre">django.utils</span></code>)</a><ul>
+<li><a class="reference internal" href="#module-django.utils.cache"><code class="docutils literal notranslate"><span class="pre">django.utils.cache</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.dateparse"><code class="docutils literal notranslate"><span class="pre">django.utils.dateparse</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.decorators"><code class="docutils literal notranslate"><span class="pre">django.utils.decorators</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.encoding"><code class="docutils literal notranslate"><span class="pre">django.utils.encoding</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.feedgenerator"><code class="docutils literal notranslate"><span class="pre">django.utils.feedgenerator</span></code></a><ul>
+<li><a class="reference internal" href="#syndicationfeed"><code class="docutils literal notranslate"><span class="pre">SyndicationFeed</span></code></a></li>
+<li><a class="reference internal" href="#enclosure"><code class="docutils literal notranslate"><span class="pre">Enclosure</span></code></a></li>
+<li><a class="reference internal" href="#rssfeed"><code class="docutils literal notranslate"><span class="pre">RssFeed</span></code></a></li>
+<li><a class="reference internal" href="#rss201rev2feed"><code class="docutils literal notranslate"><span class="pre">Rss201rev2Feed</span></code></a></li>
+<li><a class="reference internal" href="#rssuserland091feed"><code class="docutils literal notranslate"><span class="pre">RssUserland091Feed</span></code></a></li>
+<li><a class="reference internal" href="#atom1feed"><code class="docutils literal notranslate"><span class="pre">Atom1Feed</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-django.utils.functional"><code class="docutils literal notranslate"><span class="pre">django.utils.functional</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.html"><code class="docutils literal notranslate"><span class="pre">django.utils.html</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.http"><code class="docutils literal notranslate"><span class="pre">django.utils.http</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.module_loading"><code class="docutils literal notranslate"><span class="pre">django.utils.module_loading</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.safestring"><code class="docutils literal notranslate"><span class="pre">django.utils.safestring</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.text"><code class="docutils literal notranslate"><span class="pre">django.utils.text</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.timezone"><code class="docutils literal notranslate"><span class="pre">django.utils.timezone</span></code></a></li>
+<li><a class="reference internal" href="#module-django.utils.translation"><code class="docutils literal notranslate"><span class="pre">django.utils.translation</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>前のトピックへ</h4>
+    <p class="topless"><a href="urls.html"
+                          title="前の章へ">URLconf で使用するための <code class="docutils literal notranslate"><span class="pre">django.urls</span></code> 関数</a></p>
+  </div>
+  <div>
+    <h4>次のトピックへ</h4>
+    <p class="topless"><a href="validators.html"
+                          title="次の章へ">バリデータ (Validator)</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>このページ</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/ref/utils.txt"
+            rel="nofollow">ソースコードを表示</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">クイック検索</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="検索" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+              <h3>Last update:</h3>
+              <p class="topless">1月 22, 2025</p>
+          </div>
+        
+      
+    </div>
+
+    <div id="ft">
+      <div class="nav">
+    &laquo; <a href="urls.html" title="URLconf で使用するための &lt;code class=&#34;docutils literal notranslate&#34;&gt;&lt;span class=&#34;pre&#34;&gt;django.urls&lt;/span&gt;&lt;/code&gt; 関数">previous</a>
+     |
+    <a href="index.html" title="API リファレンス" accesskey="U">up</a>
+   |
+    <a href="validators.html" title="バリデータ (Validator)">next</a> &raquo;</div>
+    </div>
+  </div>
+
+      <div class="clearer"></div>
+    </div>
+  </body>
+</html>
