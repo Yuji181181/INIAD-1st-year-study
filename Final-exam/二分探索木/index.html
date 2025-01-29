@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<!-- カンペに必要そうな資料を洗い出していこうね♡ -->
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="src/highlight/styles/default.css" />
+    <link rel="stylesheet" href="src/css/index.css" />
+    <script src="src/highlight/highlight.js"></script>
+    <script>
+      hljs.initHighlightingOnLoad();
+    </script>
+    <script
+      id="MathJax-script"
+      async
+      src="src/js/tex-mml-chtml.js"
+    ></script>
+    <title>カンペ</title>
+  </head>
+  <body>
+    <section class="title"><h1>CS中間テストのためのカンペ</h1></section>
+    <section class="stack_que">
+      <h3>リスト, スタック, キュー</h3>
+      <h4>スタック</h4>
+      <p>食堂のトレーのようなもので、データを積み上げる構造</p>
+      <img src="src/img/スクリーンショット 2024-11-19 140812.png" />
+      <h4>キュー</h4>
+      <p>行列のようなもので、データが列に並ぶような構造</p>
+      <img src="src/img/スクリーンショット 2024-11-19 141743.png" />
+    </section>
+    <section class="Tree">
+      <h3>木構造</h3>
+      <h4>木構造について</h4>
+      <p>深さと高さは0から始まるので矢印を数えるのがベスト</p>
+      <img src="src/img/Tree1.png" />
+      <img src="src/img/image.png" />
+      <ul>
+        <li>親と子</li>
+        <p>
+          つながったノードどうしが親子関係となる.
+          根に近いほうが親でそうでない方が子となる.
+        </p>
+        <li>根と葉</li>
+        <p>
+          親ノードを持たないものを根、子ノードを持たないものを葉と呼ぶ.
+          (この図ではオレンジに囲まれた部分が葉)
+        </p>
+      </ul>
+      <img src="src/img/Tree2.png" />
+      <ul>
+        <li>先祖, 子孫</li>
+        <p>
+          あるノードから見て、親を順にたどると着くノードを先祖,
+          子を順にたどると着くノードを子孫という.
+        </p>
+        <li>兄弟</li>
+        <p>同じを親を持つノードを兄弟という. 左側を兄とする.</p>
+      </ul>
+      <h4>二分木の探索</h4>
+      <img class="smallimg" src="src/img/20200118192915.gif" />
+      <img class="smallimg" src="src/img/20200118192923.gif" />
+      <img class="smallimg" src="src/img/20200118192933.gif" />
+    </section>
+    <section class="graph">
+      <h3>グラフ構造</h3>
+      <h4>深さ優先探索</h4>
+      <pre><code>def dfs(node):
+    node.traversed = True
+    print(node, end=", ")
+    
+        for next_node in node.links:
+            if not next_node.traversed:
+                dfs(next_node)
+    
+for node in graph:
+    node.traversed = False
+    
+dfs(a)</code>
+      </code></pre>
+      <h4>幅優先探索</h4>
+      <pre><code>from collections import deque
+
+def bfs(node):
+    q = deque()
+        
+    q.append(node)
+    node.traversed = True
+        
+    while len(q) > 0:
+      node = q.popleft()
+      print(node, end=', ')
+      for next_node in node.links:
+        if not next_node.traversed:
+          q.append(next_node)
+          next_node.traversed = True
+                        
+for node in graph:
+    node.traversed = False
+        
+bfs(a)</code></pre>
+      <h4>ダイクストラ法を用いた最短経路</h4>
+      <pre><code>for i in range(len(G)):
+        sp = nx.shortest_path(G, min(G.nodes), i)
+        w = 0
+        for j in range(len(sp)-1):
+            w += G[sp[j]][sp[j+1]]["weight"]
+        print(f"0から{i}までの重み -> {w}")</code></pre>
+    </section>
+  </body>
+</html>
